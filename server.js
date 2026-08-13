@@ -11,6 +11,7 @@ const apiKey = process.env.GEMINI_API_KEY;
 
 if (!apiKey) {
     console.error("GEMINI_API_KEY is missing");
+    process.exit(1);
 }
 
 const genAI = new GoogleGenerativeAI(apiKey);
@@ -23,7 +24,6 @@ app.get("/", (req, res) => {
 });
 
 app.post("/chat", async (req, res) => {
-
     const message = req.body.message;
 
     if (!message) {
@@ -33,27 +33,20 @@ app.post("/chat", async (req, res) => {
     }
 
     try {
-
         const model = genAI.getGenerativeModel({
             model: "gemini-2.5-flash"
         });
 
-        const result =
-            await model.generateContent(message);
+        const result = await model.generateContent(message);
 
-        const reply =
-            result.response.text();
+        const reply = result.response.text();
 
         res.json({
             reply: reply
         });
 
     } catch (error) {
-
-        console.error(
-            "Gemini Error:",
-            error
-        );
+        console.error("Gemini Error:", error);
 
         res.status(500).json({
             error: "AI request failed"
@@ -61,11 +54,8 @@ app.post("/chat", async (req, res) => {
     }
 });
 
-const PORT =
-    process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-    console.log(
-        `AI Assistant running on port ${PORT}`
-    );
+    console.log(`AI Assistant running on port ${PORT}`);
 });
