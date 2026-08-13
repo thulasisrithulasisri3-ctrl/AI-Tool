@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,12 +28,12 @@
             width: 100%;
             max-width: 650px;
             height: 700px;
-            background: #ffffff;
+            background: white;
             border-radius: 25px;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
         }
 
         .header {
@@ -48,7 +49,7 @@
 
         .header p {
             margin-top: 5px;
-            opacity: 0.8;
+            opacity: 0.85;
         }
 
         #chat {
@@ -80,18 +81,29 @@
         .bottom {
             padding: 15px;
             display: flex;
-            gap: 10px;
+            gap: 8px;
             border-top: 1px solid #ddd;
             background: white;
+            flex-wrap: wrap;
         }
 
         #messageInput {
             flex: 1;
+            min-width: 180px;
             padding: 14px;
             border: 2px solid #ddd;
             border-radius: 15px;
             outline: none;
             font-size: 16px;
+        }
+
+        #language {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 15px;
+            font-size: 15px;
+            outline: none;
+            background: white;
         }
 
         button {
@@ -111,6 +123,22 @@
         #micButton {
             background: #ef4444;
         }
+
+        @media (max-width: 600px) {
+            .app {
+                height: 90vh;
+            }
+
+            .bottom {
+                flex-direction: column;
+            }
+
+            #messageInput,
+            #language,
+            button {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 
@@ -120,13 +148,16 @@
 
     <div class="header">
         <h1>🤖 AI Voice Assistant</h1>
-        <p>Your personal AI assistant</p>
+        <p>Speak in your language 🌍</p>
     </div>
 
     <div id="chat">
+
         <div class="message ai">
             Hello! 👋 I'm your AI assistant.
+            Choose a language and press 🎤.
         </div>
+
     </div>
 
     <div class="bottom">
@@ -137,11 +168,20 @@
             placeholder="Type your message..."
         >
 
+        <select id="language">
+            <option value="en-IN">🇬🇧 English</option>
+            <option value="ta-IN">🇮🇳 தமிழ்</option>
+            <option value="hi-IN">🇮🇳 हिन्दी</option>
+        </select>
+
         <button onclick="sendMessage()">
             ➤
         </button>
 
-        <button id="micButton" onclick="startVoice()">
+        <button
+            id="micButton"
+            onclick="startVoice()"
+        >
             🎤
         </button>
 
@@ -153,7 +193,9 @@
 
 function sendMessage() {
 
-    const input = document.getElementById("messageInput");
+    const input =
+        document.getElementById("messageInput");
+
     const text = input.value.trim();
 
     if (text === "") {
@@ -165,33 +207,43 @@ function sendMessage() {
     input.value = "";
 
     setTimeout(function() {
+
         addMessage(
             "I received your message! 🤖 Real AI will be connected next.",
             "ai"
         );
+
     }, 500);
 }
 
 
 function addMessage(text, type) {
 
-    const chat = document.getElementById("chat");
+    const chat =
+        document.getElementById("chat");
 
-    const message = document.createElement("div");
+    const message =
+        document.createElement("div");
 
-    message.className = "message " + type;
+    message.className =
+        "message " + type;
 
     message.textContent = text;
 
     chat.appendChild(message);
 
-    chat.scrollTop = chat.scrollHeight;
+    chat.scrollTop =
+        chat.scrollHeight;
 }
 
 
 function startVoice() {
 
-    if (!("webkitSpeechRecognition" in window)) {
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
 
         alert(
             "Voice input is not supported in this browser."
@@ -201,11 +253,26 @@ function startVoice() {
     }
 
     const recognition =
-        new webkitSpeechRecognition();
+        new SpeechRecognition();
 
-    recognition.lang = "en-IN";
+    const language =
+        document.getElementById("language").value;
+
+    recognition.lang = language;
+
+    recognition.continuous = false;
+
+    recognition.interimResults = false;
 
     recognition.start();
+
+    recognition.onstart = function() {
+
+        document.getElementById(
+            "micButton"
+        ).textContent = "🎙️ Listening...";
+
+    };
 
     recognition.onresult = function(event) {
 
@@ -217,9 +284,26 @@ function startVoice() {
         ).value = text;
 
     };
+
+    recognition.onerror = function() {
+
+        alert(
+            "Could not hear you. Please try again."
+        );
+
+    };
+
+    recognition.onend = function() {
+
+        document.getElementById(
+            "micButton"
+        ).textContent = "🎤";
+
+    };
 }
 
 </script>
 
 </body>
 </html>
+      
