@@ -8,12 +8,7 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
-
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-
-if (!GEMINI_API_KEY) {
-    console.error("❌ GEMINI_API_KEY is missing");
-}
 
 const ai = GEMINI_API_KEY
     ? new GoogleGenAI({
@@ -22,10 +17,7 @@ const ai = GEMINI_API_KEY
     : null;
 
 
-// ===============================
 // HOME
-// ===============================
-
 app.get("/", (req, res) => {
     res.json({
         status: "online",
@@ -34,10 +26,7 @@ app.get("/", (req, res) => {
 });
 
 
-// ===============================
 // HEALTH CHECK
-// ===============================
-
 app.get("/health", (req, res) => {
     res.json({
         status: "ok",
@@ -46,10 +35,7 @@ app.get("/health", (req, res) => {
 });
 
 
-// ===============================
 // CHAT
-// ===============================
-
 app.post("/chat", async (req, res) => {
 
     const message = req.body.message;
@@ -62,7 +48,7 @@ app.post("/chat", async (req, res) => {
 
     if (!ai) {
         return res.status(500).json({
-            error: "GEMINI_API_KEY is missing on server"
+            error: "GEMINI_API_KEY is missing"
         });
     }
 
@@ -71,7 +57,7 @@ app.post("/chat", async (req, res) => {
         console.log("User:", message);
 
         const response = await ai.models.generateContent({
-            model: "gemini-2.0-flash",
+            model: "gemini-2.5-flash",
             contents: message
         });
 
@@ -79,7 +65,7 @@ app.post("/chat", async (req, res) => {
 
         console.log("AI:", reply);
 
-        return res.json({
+        res.json({
             reply: reply || "No response received."
         });
 
@@ -87,7 +73,7 @@ app.post("/chat", async (req, res) => {
 
         console.error("Gemini Error:", error);
 
-        return res.status(500).json({
+        res.status(500).json({
             error: "AI request failed",
             details: error.message
         });
@@ -95,14 +81,9 @@ app.post("/chat", async (req, res) => {
 });
 
 
-// ===============================
 // START SERVER
-// ===============================
-
 app.listen(PORT, "0.0.0.0", () => {
-
     console.log(
         `AI Assistant running on port ${PORT}`
     );
-
 });
