@@ -8,82 +8,81 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 10000;
-const API_KEY = process.env.GEMINI_API_KEY;
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-if (!API_KEY) {
-    console.error("GEMINI_API_KEY is missing");
+if (!GEMINI_API_KEY) {
+  console.error("GEMINI_API_KEY is missing");
 }
 
-const ai = API_KEY
-    ? new GoogleGenAI({ apiKey: API_KEY })
-    : null;
+const ai = GEMINI_API_KEY
+  ? new GoogleGenAI({
+      apiKey: GEMINI_API_KEY
+    })
+  : null;
 
 
 // HOME
 app.get("/", (req, res) => {
-    res.json({
-        status: "online",
-        message: "AI Assistant Backend is running 🤖"
-    });
+  res.json({
+    status: "online",
+    message: "AI Assistant Backend is running 🤖"
+  });
 });
 
 
-// HEALTH
+// HEALTH CHECK
 app.get("/health", (req, res) => {
-    res.json({
-        status: "ok",
-        geminiConfigured: !!API_KEY
-    });
+  res.json({
+    status: "ok",
+    geminiConfigured: Boolean(GEMINI_API_KEY)
+  });
 });
 
 
 // CHAT
 app.post("/chat", async (req, res) => {
+  try {
+    const message = req.body?.message;
 
-    try {
-
-        const message = req.body?.message;
-
-        if (!message) {
-            return res.status(400).json({
-                error: "Message is required"
-            });
-        }
-
-        if (!ai) {
-            return res.status(500).json({
-                error: "GEMINI_API_KEY is missing"
-            });
-        }
-
-        console.log("User:", message);
-
-        const interaction = await ai.interactions.create({
-            model: "gemini-3.6-flash",
-            input: message
-        });
-
-        const reply = interaction.output_text;
-
-        console.log("AI:", reply);
-
-        res.json({
-            reply: reply || "No response received."
-        });
-
-    } catch (error) {
-
-        console.error("Gemini Error:", error);
-
-        res.status(500).json({
-            error: "AI request failed",
-            details: error.message
-        });
+    if (!message) {
+      return res.status(400).json({
+        error: "Message is required"
+      });
     }
+
+    if (!ai) {
+      return res.status(500).json({
+        error: "GEMINI_API_KEY is missing"
+      });
+    }
+
+    console.log("User:", message);
+
+    const interaction = await ai.interactions.create({
+      model: "gemini-3.6-flash",
+      input: message
+    });
+
+    const reply = interaction.output_text || "No response received.";
+
+    console.log("AI:", reply);
+
+    return res.json({
+      reply
+    });
+
+  } catch (error) {
+    console.error("Gemini Error:", error);
+
+    return res.status(500).json({
+      error: "AI request failed",
+      details: error.message
+    });
+  }
 });
 
 
-// START
+// START SERVER
 app.listen(PORT, "0.0.0.0", () => {
-    console.log(`AI Assistant running on port ${PORT}`);
+  console.log(`AI Assistant running on port ${PORT}`);
 });
