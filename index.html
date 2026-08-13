@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>AI Voice Assistant</title>
 
     <style>
@@ -93,10 +92,6 @@
             border-radius: 15px;
             outline: none;
             font-size: 16px;
-        }
-
-        #messageInput:focus {
-            border-color: #4f46e5;
         }
 
         #language {
@@ -190,17 +185,17 @@
         </select>
 
         <button id="sendButton" type="button">➤</button>
-
         <button id="micButton" type="button">🎤</button>
 
     </div>
-
 </div>
 
 <script>
 
 const BACKEND_URL =
     "https://ai-tool-pxi1.onrender.com/chat";
+
+console.log("NEW VERSION LOADED");
 
 
 const input =
@@ -282,6 +277,11 @@ async function sendMessage() {
         const data =
             await response.json();
 
+        console.log(
+            "Backend response:",
+            data
+        );
+
         if (!response.ok) {
             throw new Error(
                 data.error ||
@@ -304,21 +304,16 @@ async function sendMessage() {
     } finally {
 
         sendButton.disabled = false;
-
         input.focus();
     }
 }
 
-
-/* Send button */
 
 sendButton.addEventListener(
     "click",
     sendMessage
 );
 
-
-/* Enter key */
 
 input.addEventListener(
     "keydown",
@@ -333,8 +328,6 @@ input.addEventListener(
     }
 );
 
-
-/* Voice input */
 
 micButton.addEventListener(
     "click",
