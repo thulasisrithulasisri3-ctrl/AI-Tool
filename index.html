@@ -94,6 +94,10 @@
             font-size: 16px;
         }
 
+        #messageInput:focus {
+            border-color: #4f46e5;
+        }
+
         #language {
             padding: 10px;
             border: 2px solid #ddd;
@@ -193,9 +197,7 @@
 <script>
 
 const BACKEND_URL =
-    "https://ai-tool-pxi1.onrender.com/chat";
-
-console.log("NEW VERSION LOADED");
+    "https://ai-tool-1-fgmc.onrender.com/chat";
 
 
 const input =
@@ -276,11 +278,6 @@ async function sendMessage() {
 
         const data =
             await response.json();
-
-        console.log(
-            "Backend response:",
-            data
-        );
 
         if (!response.ok) {
             throw new Error(
