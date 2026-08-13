@@ -7,9 +7,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const genAI = new GoogleGenerativeAI(
-    process.env.GEMINI_API_KEY
-);
+const apiKey = process.env.GEMINI_API_KEY;
+
+if (!apiKey) {
+    console.error("GEMINI_API_KEY is missing");
+}
+
+const genAI = new GoogleGenerativeAI(apiKey);
 
 app.get("/", (req, res) => {
     res.json({
@@ -31,17 +35,14 @@ app.post("/chat", async (req, res) => {
     try {
 
         const model = genAI.getGenerativeModel({
-            model: "gemini-2.0-flash"
+            model: "gemini-2.5-flash"
         });
 
         const result =
             await model.generateContent(message);
 
-        const response =
-            result.response;
-
         const reply =
-            response.text();
+            result.response.text();
 
         res.json({
             reply: reply
@@ -49,7 +50,10 @@ app.post("/chat", async (req, res) => {
 
     } catch (error) {
 
-        console.error("Gemini Error:", error);
+        console.error(
+            "Gemini Error:",
+            error
+        );
 
         res.status(500).json({
             error: "AI request failed"
