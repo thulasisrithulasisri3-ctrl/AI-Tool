@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,17 +28,17 @@
             max-width: 650px;
             height: 700px;
             background: white;
-            border-radius: 25px;
+            border-radius: 24px;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+            box-shadow: 0 20px 60px rgba(0,0,0,.35);
         }
 
         .header {
-            padding: 20px;
             background: #4f46e5;
             color: white;
+            padding: 20px;
             text-align: center;
         }
 
@@ -49,7 +48,6 @@
 
         .header p {
             margin-top: 6px;
-            opacity: 0.85;
         }
 
         #chat {
@@ -85,12 +83,11 @@
             gap: 8px;
             border-top: 1px solid #ddd;
             background: white;
-            flex-wrap: wrap;
         }
 
         #messageInput {
             flex: 1;
-            min-width: 180px;
+            min-width: 0;
             padding: 14px;
             border: 2px solid #ddd;
             border-radius: 15px;
@@ -98,12 +95,14 @@
             font-size: 16px;
         }
 
+        #messageInput:focus {
+            border-color: #4f46e5;
+        }
+
         #language {
-            padding: 12px;
+            padding: 10px;
             border: 2px solid #ddd;
             border-radius: 15px;
-            font-size: 15px;
-            outline: none;
             background: white;
         }
 
@@ -113,12 +112,13 @@
             padding: 12px 16px;
             cursor: pointer;
             font-size: 18px;
-            background: #4f46e5;
             color: white;
+            background: #4f46e5;
         }
 
-        button:hover {
-            transform: scale(1.05);
+        button:disabled {
+            opacity: .6;
+            cursor: not-allowed;
         }
 
         #micButton {
@@ -131,13 +131,12 @@
             }
 
             .bottom {
-                flex-direction: column;
+                flex-wrap: wrap;
             }
 
-            #messageInput,
-            #language,
-            button {
+            #messageInput {
                 width: 100%;
+                flex-basis: 100%;
             }
         }
     </style>
@@ -149,121 +148,50 @@
 
     <div class="header">
         <h1>🤖 AI Voice Assistant</h1>
-        <p>Speak in your language 🌍</p>
+        <p>Speak or type in your language 🌍</p>
     </div>
 
     <div id="chat">
-
         <div class="message ai">
             Hello! 👋 I'm your AI assistant.
-            Choose a language and start chatting.
         </div>
-
     </div>
 
     <div class="bottom">
 
         <input
-            type="text"
             id="messageInput"
+            type="text"
             placeholder="Type your message..."
-            onkeydown="handleEnter(event)"
+            autocomplete="off"
         >
 
         <select id="language">
-
-            <option value="en-IN">
-                🇬🇧 English
-            </option>
-
-            <option value="ta-IN">
-                🇮🇳 தமிழ்
-            </option>
-
-            <option value="hi-IN">
-                🇮🇳 हिन्दी
-            </option>
-
-            <option value="te-IN">
-                🇮🇳 తెలుగు
-            </option>
-
-            <option value="ml-IN">
-                🇮🇳 മലയാളം
-            </option>
-
-            <option value="kn-IN">
-                🇮🇳 ಕನ್ನಡ
-            </option>
-
-            <option value="bn-IN">
-                🇮🇳 বাংলা
-            </option>
-
-            <option value="mr-IN">
-                🇮🇳 मराठी
-            </option>
-
-            <option value="gu-IN">
-                🇮🇳 ગુજરાતી
-            </option>
-
-            <option value="pa-IN">
-                🇮🇳 ਪੰਜਾਬੀ
-            </option>
-
-            <option value="fr-FR">
-                🇫🇷 Français
-            </option>
-
-            <option value="de-DE">
-                🇩🇪 Deutsch
-            </option>
-
-            <option value="es-ES">
-                🇪🇸 Español
-            </option>
-
-            <option value="it-IT">
-                🇮🇹 Italiano
-            </option>
-
-            <option value="pt-BR">
-                🇧🇷 Português
-            </option>
-
-            <option value="ja-JP">
-                🇯🇵 日本語
-            </option>
-
-            <option value="ko-KR">
-                🇰🇷 한국어
-            </option>
-
-            <option value="zh-CN">
-                🇨🇳 中文
-            </option>
-
-            <option value="ar-SA">
-                🇸🇦 العربية
-            </option>
-
-            <option value="ru-RU">
-                🇷🇺 Русский
-            </option>
-
+            <option value="en-IN">🇬🇧 English</option>
+            <option value="ta-IN">🇮🇳 தமிழ்</option>
+            <option value="hi-IN">🇮🇳 हिन्दी</option>
+            <option value="te-IN">🇮🇳 తెలుగు</option>
+            <option value="ml-IN">🇮🇳 മലയാളം</option>
+            <option value="kn-IN">🇮🇳 ಕನ್ನಡ</option>
+            <option value="bn-IN">🇮🇳 বাংলা</option>
+            <option value="mr-IN">🇮🇳 मराठी</option>
+            <option value="gu-IN">🇮🇳 ગુજરાતી</option>
+            <option value="pa-IN">🇮🇳 ਪੰਜਾਬੀ</option>
+            <option value="fr-FR">🇫🇷 Français</option>
+            <option value="de-DE">🇩🇪 Deutsch</option>
+            <option value="es-ES">🇪🇸 Español</option>
+            <option value="it-IT">🇮🇹 Italiano</option>
+            <option value="pt-BR">🇧🇷 Português</option>
+            <option value="ja-JP">🇯🇵 日本語</option>
+            <option value="ko-KR">🇰🇷 한국어</option>
+            <option value="zh-CN">🇨🇳 中文</option>
+            <option value="ar-SA">🇸🇦 العربية</option>
+            <option value="ru-RU">🇷🇺 Русский</option>
         </select>
 
-        <button onclick="sendMessage()">
-            ➤
-        </button>
+        <button id="sendButton" type="button">➤</button>
 
-        <button
-            id="micButton"
-            onclick="startVoice()"
-        >
-            🎤
-        </button>
+        <button id="micButton" type="button">🎤</button>
 
     </div>
 
@@ -272,13 +200,26 @@
 <script>
 
 const BACKEND_URL =
-https://ai-tool-pxi1.onrender.com/chat
+    "https://ai-tool-pxi1.onrender.com/chat";
+
+
+const input =
+    document.getElementById("messageInput");
+
+const sendButton =
+    document.getElementById("sendButton");
+
+const micButton =
+    document.getElementById("micButton");
+
+const language =
+    document.getElementById("language");
+
+const chat =
+    document.getElementById("chat");
 
 
 function addMessage(text, type) {
-
-    const chat =
-        document.getElementById("chat");
 
     const message =
         document.createElement("div");
@@ -286,24 +227,24 @@ function addMessage(text, type) {
     message.className =
         "message " + type;
 
-    message.textContent = text;
+    message.textContent =
+        text;
 
     chat.appendChild(message);
 
     chat.scrollTop =
         chat.scrollHeight;
+
+    return message;
 }
 
 
 async function sendMessage() {
 
-    const input =
-        document.getElementById("messageInput");
-
     const text =
         input.value.trim();
 
-    if (text === "") {
+    if (!text) {
         return;
     }
 
@@ -311,13 +252,19 @@ async function sendMessage() {
 
     input.value = "";
 
-    addMessage("Thinking... 🤖", "ai");
+    sendButton.disabled = true;
+
+    const aiMessage =
+        addMessage(
+            "Thinking... 🤖",
+            "ai"
+        );
 
     try {
 
         const response =
             await fetch(
-                BACKEND_URL + "/chat",
+                BACKEND_URL,
                 {
                     method: "POST",
 
@@ -332,26 +279,17 @@ async function sendMessage() {
                 }
             );
 
+        const data =
+            await response.json();
+
         if (!response.ok) {
             throw new Error(
+                data.error ||
                 "Server error"
             );
         }
 
-        const data =
-            await response.json();
-
-        const aiMessages =
-            document.querySelectorAll(
-                ".message.ai"
-            );
-
-        const lastAI =
-            aiMessages[
-                aiMessages.length - 1
-            ];
-
-        lastAI.textContent =
+        aiMessage.textContent =
             data.reply ||
             "No response received.";
 
@@ -359,28 +297,49 @@ async function sendMessage() {
 
         console.error(error);
 
-        const aiMessages =
-            document.querySelectorAll(
-                ".message.ai"
-            );
+        aiMessage.textContent =
+            "❌ Connection error: " +
+            error.message;
 
-        const lastAI =
-            aiMessages[
-                aiMessages.length - 1
-            ];
+    } finally {
 
-        lastAI.textContent =
-            "Sorry, I couldn't connect to the server. 😔";
+        sendButton.disabled = false;
+
+        input.focus();
     }
 }
 
 
-function handleEnter(event) {
+/* Send button */
 
-    if (event.key === "Enter") {
-        sendMessage();
+sendButton.addEventListener(
+    "click",
+    sendMessage
+);
+
+
+/* Enter key */
+
+input.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (event.key === "Enter") {
+
+            event.preventDefault();
+
+            sendMessage();
+        }
     }
-}
+);
+
+
+/* Voice input */
+
+micButton.addEventListener(
+    "click",
+    startVoice
+);
 
 
 function startVoice() {
@@ -401,13 +360,8 @@ function startVoice() {
     const recognition =
         new SpeechRecognition();
 
-    const language =
-        document.getElementById(
-            "language"
-        ).value;
-
     recognition.lang =
-        language;
+        language.value;
 
     recognition.continuous =
         false;
@@ -415,15 +369,15 @@ function startVoice() {
     recognition.interimResults =
         false;
 
-    recognition.start();
 
     recognition.onstart =
         function() {
 
-            document.getElementById(
-                "micButton"
-            ).textContent =
-                "🎙️ Listening...";
+            micButton.textContent =
+                "🎙️";
+
+            micButton.disabled =
+                true;
         };
 
 
@@ -431,13 +385,11 @@ function startVoice() {
         function(event) {
 
             const text =
-                event
-                .results[0][0]
-                .transcript;
+                event.results[0][0]
+                    .transcript;
 
-            document.getElementById(
-                "messageInput"
-            ).value = text;
+            input.value =
+                text;
 
             sendMessage();
         };
@@ -452,7 +404,7 @@ function startVoice() {
             );
 
             alert(
-                "Could not hear you. Please try again."
+                "Voice input failed. Please try again."
             );
         };
 
@@ -460,15 +412,18 @@ function startVoice() {
     recognition.onend =
         function() {
 
-            document.getElementById(
-                "micButton"
-            ).textContent =
+            micButton.textContent =
                 "🎤";
+
+            micButton.disabled =
+                false;
         };
+
+
+    recognition.start();
 }
 
 </script>
 
 </body>
-
 </html>
