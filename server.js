@@ -1,13 +1,21 @@
 const express = require("express");
 const cors = require("cors");
+const OpenAI = require("openai");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
+const client = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
+});
+
 app.get("/", (req, res) => {
-    res.send("AI Assistant Backend is running!");
+    res.json({
+        status: "online",
+        message: "AI Assistant Backend is running 🤖"
+    });
 });
 
 app.post("/chat", async (req, res) => {
@@ -22,11 +30,13 @@ app.post("/chat", async (req, res) => {
 
     try {
 
-        // AI API connection will be added here.
-        // Never put your secret API key in index.html.
+        const response = await client.responses.create({
+            model: "gpt-5-mini",
+            input: message
+        });
 
         res.json({
-            reply: "I received: " + message
+            reply: response.output_text
         });
 
     } catch (error) {
@@ -34,9 +44,8 @@ app.post("/chat", async (req, res) => {
         console.error(error);
 
         res.status(500).json({
-            error: "Something went wrong"
+            error: "AI request failed"
         });
-
     }
 });
 
@@ -44,6 +53,6 @@ const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
     console.log(
-        `AI backend running on port ${PORT}`
+        `AI Assistant running on port ${PORT}`
     );
 });
