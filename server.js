@@ -1,20 +1,30 @@
 const express = require("express");
 const cors = require("cors");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { GoogleGenAI } = require("@google/genai");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-const apiKey = process.env.GEMINI_API_KEY;
+const PORT = process.env.PORT || 3000;
 
-if (!apiKey) {
-    console.error("GEMINI_API_KEY is missing");
-    process.exit(1);
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
+if (!GEMINI_API_KEY) {
+    console.error("❌ GEMINI_API_KEY is missing");
 }
 
-const genAI = new GoogleGenerativeAI(apiKey);
+const ai = GEMINI_API_KEY
+    ? new GoogleGenAI({
+        apiKey: GEMINI_API_KEY
+      })
+    : null;
+
+
+// ===============================
+// HOME
+// ===============================
 
 app.get("/", (req, res) => {
     res.json({
@@ -23,7 +33,25 @@ app.get("/", (req, res) => {
     });
 });
 
+
+// ===============================
+// HEALTH CHECK
+// ===============================
+
+app.get("/health", (req, res) => {
+    res.json({
+        status: "ok",
+        geminiConfigured: !!GEMINI_API_KEY
+    });
+});
+
+
+// ===============================
+// CHAT
+// ===============================
+
 app.post("/chat", async (req, res) => {
+
     const message = req.body.message;
 
     if (!message) {
@@ -32,30 +60,49 @@ app.post("/chat", async (req, res) => {
         });
     }
 
+    if (!ai) {
+        return res.status(500).json({
+            error: "GEMINI_API_KEY is missing on server"
+        });
+    }
+
     try {
-        const model = genAI.getGenerativeModel({
-            model: "gemini-2.5-flash"
+
+        console.log("User:", message);
+
+        const response = await ai.models.generateContent({
+            model: "gemini-2.0-flash",
+            contents: message
         });
 
-        const result = await model.generateContent(message);
+        const reply = response.text;
 
-        const reply = result.response.text();
+        console.log("AI:", reply);
 
-        res.json({
-            reply: reply
+        return res.json({
+            reply: reply || "No response received."
         });
 
     } catch (error) {
+
         console.error("Gemini Error:", error);
 
-        res.status(500).json({
-            error: "AI request failed"
+        return res.status(500).json({
+            error: "AI request failed",
+            details: error.message
         });
     }
 });
 
-const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-    console.log(`AI Assistant running on port ${PORT}`);
+// ===============================
+// START SERVER
+// ===============================
+
+app.listen(PORT, "0.0.0.0", () => {
+
+    console.log(
+        `AI Assistant running on port ${PORT}`
+    );
+
 });
