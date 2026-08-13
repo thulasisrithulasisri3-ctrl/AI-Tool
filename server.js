@@ -1,15 +1,15 @@
 const express = require("express");
 const cors = require("cors");
-const OpenAI = require("openai");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-const client = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-});
+const genAI = new GoogleGenerativeAI(
+    process.env.GEMINI_API_KEY
+);
 
 app.get("/", (req, res) => {
     res.json({
@@ -30,18 +30,26 @@ app.post("/chat", async (req, res) => {
 
     try {
 
-        const response = await client.responses.create({
-            model: "gpt-5-mini",
-            input: message
+        const model = genAI.getGenerativeModel({
+            model: "gemini-2.0-flash"
         });
 
+        const result =
+            await model.generateContent(message);
+
+        const response =
+            result.response;
+
+        const reply =
+            response.text();
+
         res.json({
-            reply: response.output_text
+            reply: reply
         });
 
     } catch (error) {
 
-        console.error(error);
+        console.error("Gemini Error:", error);
 
         res.status(500).json({
             error: "AI request failed"
@@ -49,7 +57,8 @@ app.post("/chat", async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT =
+    process.env.PORT || 3000;
 
 app.listen(PORT, () => {
     console.log(
