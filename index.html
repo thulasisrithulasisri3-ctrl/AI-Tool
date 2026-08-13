@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>AI Voice Assistant</title>
 
     <style>
@@ -31,7 +32,7 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 20px 60px rgba(0,0,0,.35);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
         }
 
         .header {
@@ -63,6 +64,7 @@
             border-radius: 16px;
             line-height: 1.5;
             word-wrap: break-word;
+            white-space: pre-wrap;
         }
 
         .ai {
@@ -116,7 +118,7 @@
         }
 
         button:disabled {
-            opacity: .6;
+            opacity: 0.6;
             cursor: not-allowed;
         }
 
@@ -136,6 +138,10 @@
             #messageInput {
                 width: 100%;
                 flex-basis: 100%;
+            }
+
+            #language {
+                flex: 1;
             }
         }
     </style>
@@ -189,15 +195,17 @@
         </select>
 
         <button id="sendButton" type="button">➤</button>
+
         <button id="micButton" type="button">🎤</button>
 
     </div>
+
 </div>
 
 <script>
 
 const BACKEND_URL =
-    "https://ai-tool-1-fgmc.onrender.com/chat";
+    "https://ai-tool-2-zpul.onrender.com/chat";
 
 
 const input =
@@ -280,6 +288,7 @@ async function sendMessage() {
             await response.json();
 
         if (!response.ok) {
+
             throw new Error(
                 data.error ||
                 "Server error"
@@ -292,7 +301,10 @@ async function sendMessage() {
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Connection error:",
+            error
+        );
 
         aiMessage.textContent =
             "❌ Connection error: " +
@@ -301,16 +313,21 @@ async function sendMessage() {
     } finally {
 
         sendButton.disabled = false;
+
         input.focus();
     }
 }
 
+
+/* Send button */
 
 sendButton.addEventListener(
     "click",
     sendMessage
 );
 
+
+/* Enter key */
 
 input.addEventListener(
     "keydown",
@@ -325,6 +342,8 @@ input.addEventListener(
     }
 );
 
+
+/* Voice input */
 
 micButton.addEventListener(
     "click",
