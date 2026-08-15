@@ -1,4 +1,4 @@
-```js
+
 const express = require("express");
 const cors = require("cors");
 
@@ -72,4 +72,3 @@ app.use((req, res) => {
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`AI Tool running on port ${PORT}`);
 });
-```
