@@ -1,639 +1,397 @@
-/*
-=====================================================
-VIGGO AI SERVER
-server/server.js
-=====================================================
-*/
+// ======================================================
+// VIGGO AI SERVER
+// ======================================================
 
-const http = require("http");
-const fs = require("fs");
-const path = require("path");
+const express = require("express");
+const cors = require("cors");
+const dotenv = require("dotenv");
 
-const PORT = process.env.PORT || 3000;
+dotenv.config();
 
+const app = express();
 
-/* =====================================================
-   MIME TYPES
-===================================================== */
+const PORT = process.env.PORT || 10000;
 
-const mimeTypes = {
+// ======================================================
+// MIDDLEWARE
+// ======================================================
 
-  ".html": "text/html; charset=utf-8",
+app.use(cors({
+    origin: "*",
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type"]
+}));
 
-  ".js": "application/javascript; charset=utf-8",
-
-  ".css": "text/css; charset=utf-8",
-
-  ".json": "application/json; charset=utf-8",
-
-  ".png": "image/png",
-
-  ".jpg": "image/jpeg",
-
-  ".jpeg": "image/jpeg",
-
-  ".svg": "image/svg+xml",
-
-  ".ico": "image/x-icon"
-
-};
+app.use(express.json({ limit: "2mb" }));
 
 
-/* =====================================================
-   READ REQUEST BODY
-===================================================== */
+// ======================================================
+// HOME
+// ======================================================
 
-function readBody(req) {
+app.get("/", (req, res) => {
 
-  return new Promise(
-    (resolve, reject) => {
+    res.json({
+        success: true,
+        name: "Viggo AI Server",
+        status: "online",
+        message: "Viggo server is running."
+    });
 
-      let body = "";
-
-      req.on(
-        "data",
-        chunk => {
-
-          body += chunk;
-
-          if (body.length > 1e6) {
-
-            req.destroy();
-
-            reject(
-              new Error(
-                "Request too large"
-              )
-            );
-
-          }
-
-        }
-      );
+});
 
 
-      req.on(
-        "end",
-        () => {
+// ======================================================
+// HEALTH CHECK
+// ======================================================
 
-          try {
+app.get("/api/health", (req, res) => {
 
-            resolve(
-              body
-                ? JSON.parse(body)
-                : {}
-            );
+    res.json({
+        success: true,
+        status: "online",
+        service: "Viggo AI Server",
+        time: new Date().toISOString()
+    });
 
-          } catch {
+});
 
-            reject(
-              new Error(
-                "Invalid JSON"
-              )
-            );
 
-          }
+// ======================================================
+// CHAT API
+// ======================================================
+
+app.post("/api/chat", async (req, res) => {
+
+    try {
+
+        const message =
+            typeof req.body.message === "string"
+                ? req.body.message.trim()
+                : "";
+
+        const history =
+            Array.isArray(req.body.history)
+                ? req.body.history
+                : [];
+
+
+        // ------------------------------------------------
+        // EMPTY MESSAGE
+        // ------------------------------------------------
+
+        if (!message) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                error: "Message is required."
+
+            });
 
         }
-      );
 
 
-      req.on(
-        "error",
-        reject
-      );
+        // =================================================
+        // AI API KEY
+        // =================================================
 
-    }
-  );
-}
+        const apiKey =
+            process.env.OPENAI_API_KEY;
 
 
-/* =====================================================
-   SEND JSON
-===================================================== */
+        // =================================================
+        // IF API KEY IS NOT CONFIGURED
+        // =================================================
 
-function sendJSON(
-  res,
-  status,
-  data
-) {
+        if (!apiKey) {
 
-  res.writeHead(
-    status,
-    {
-      "Content-Type":
-        "application/json; charset=utf-8",
+            return res.json({
 
-      "Access-Control-Allow-Origin":
-        "*",
+                success: true,
 
-      "Access-Control-Allow-Headers":
-        "Content-Type",
+                reply:
+                    "Viggo server is online, but the AI API key is not configured yet. Please add OPENAI_API_KEY to your Render environment variables."
 
-      "Access-Control-Allow-Methods":
-        "GET, POST, OPTIONS"
-    }
-  );
-
-
-  res.end(
-    JSON.stringify(data)
-  );
-}
-
-
-/* =====================================================
-   AI RESPONSE
-===================================================== */
-
-async function getAIResponse(
-  message,
-  history
-) {
-
-  const apiKey =
-    process.env.OPENAI_API_KEY;
-
-
-  /*
-    If no API key is available,
-    return a simple response so
-    the application can still be tested.
-  */
-
-  if (!apiKey) {
-
-    return `
-Hello! I'm Viggo B.
-
-I received your message:
-
-"${message}"
-
-Your Viggo interface and server are working correctly.
-
-To connect Viggo to a real AI model, add your OPENAI_API_KEY and restart the server.
-`;
-
-  }
-
-
-  /*
-  =====================================================
-  OPENAI API
-  =====================================================
-  */
-
-  const messages = [
-
-    {
-      role: "system",
-
-      content:
-        "You are Viggo, a helpful, friendly AI assistant. Give clear and useful answers."
-    }
-
-  ];
-
-
-  if (Array.isArray(history)) {
-
-    history
-      .slice(-12)
-      .forEach(item => {
-
-        if (
-          item &&
-          (
-            item.role === "user" ||
-            item.role === "assistant"
-          )
-        ) {
-
-          messages.push({
-
-            role: item.role,
-
-            content:
-              String(
-                item.content || ""
-              )
-
-          });
+            });
 
         }
 
-      });
 
-  }
+        // =================================================
+        // PREPARE CONVERSATION
+        // =================================================
+
+        const messages = [
+
+            {
+                role: "system",
+
+                content:
+                    `You are Viggo, a friendly AI assistant.
+
+Address the user as "friend" when appropriate.
+
+Give clear, useful and easy-to-understand answers.
+
+If the user asks in Tamil or Tanglish, reply naturally in Tamil/Tanglish.
+
+Do not claim to be a human.
+
+Be helpful, concise and friendly.`
+            }
+
+        ];
 
 
-  /*
-    Avoid adding the same message twice.
-  */
+        // ------------------------------------------------
+        // ADD PREVIOUS CHAT
+        // ------------------------------------------------
 
-  if (
-    messages[messages.length - 1]?.content !==
-    message
-  ) {
+        history
+            .slice(-20)
+            .forEach(item => {
 
-    messages.push({
+                if (
+                    !item ||
+                    typeof item.content !== "string"
+                ) {
+                    return;
+                }
 
-      role: "user",
 
-      content: message
+                if (
+                    item.role !== "user" &&
+                    item.role !== "ai" &&
+                    item.role !== "assistant"
+                ) {
+                    return;
+                }
+
+
+                messages.push({
+
+                    role:
+                        item.role === "user"
+                            ? "user"
+                            : "assistant",
+
+                    content:
+                        item.content.substring(
+                            0,
+                            8000
+                        )
+
+                });
+
+            });
+
+
+        // ------------------------------------------------
+        // CURRENT MESSAGE
+        // ------------------------------------------------
+
+        messages.push({
+
+            role: "user",
+
+            content: message.substring(
+                0,
+                12000
+            )
+
+        });
+
+
+        // =================================================
+        // OPENAI REQUEST
+        // =================================================
+
+        const response =
+            await fetch(
+                "https://api.openai.com/v1/chat/completions",
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            `Bearer ${apiKey}`
+
+                    },
+
+                    body: JSON.stringify({
+
+                        model:
+                            process.env.OPENAI_MODEL ||
+                            "gpt-4o-mini",
+
+                        messages:
+
+                            messages,
+
+                        temperature:
+                            0.7,
+
+                        max_tokens:
+                            1500
+
+                    })
+
+                }
+            );
+
+
+        // =================================================
+        // OPENAI ERROR
+        // =================================================
+
+        if (!response.ok) {
+
+            const errorText =
+                await response.text();
+
+            console.error(
+                "AI API ERROR:",
+                errorText
+            );
+
+
+            return res.status(
+                response.status
+            ).json({
+
+                success: false,
+
+                error:
+                    "AI service returned an error.",
+
+                details:
+                    errorText
+
+            });
+
+        }
+
+
+        // =================================================
+        // RESPONSE JSON
+        // =================================================
+
+        const data =
+            await response.json();
+
+
+        const reply =
+            data?.choices?.[0]?.message?.content;
+
+
+        if (!reply) {
+
+            return res.status(500).json({
+
+                success: false,
+
+                error:
+                    "No response received from AI."
+
+            });
+
+        }
+
+
+        // =================================================
+        // SEND TO FRONTEND
+        // =================================================
+
+        return res.json({
+
+            success: true,
+
+            reply: reply.trim()
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "VIGGO SERVER ERROR:",
+            error
+        );
+
+
+        return res.status(500).json({
+
+            success: false,
+
+            error:
+                "Viggo server error.",
+
+            message:
+                error.message
+
+        });
+
+    }
+
+});
+
+
+// ======================================================
+// 404
+// ======================================================
+
+app.use((req, res) => {
+
+    res.status(404).json({
+
+        success: false,
+
+        error: "Route not found."
 
     });
 
-  }
+});
 
 
-  const response =
-    await fetch(
-      "https://api.openai.com/v1/chat/completions",
-      {
+// ======================================================
+// SERVER START
+// ======================================================
 
-        method: "POST",
+app.listen(
+    PORT,
+    "0.0.0.0",
+    () => {
 
-        headers: {
-
-          "Content-Type":
-            "application/json",
-
-          "Authorization":
-            `Bearer ${apiKey}`
-
-        },
-
-        body:
-          JSON.stringify({
-
-            model:
-              "gpt-4o-mini",
-
-            messages,
-
-            temperature:
-              0.7
-
-          })
-
-      }
-    );
-
-
-  if (!response.ok) {
-
-    const errorText =
-      await response.text();
-
-    console.error(
-      "OpenAI API error:",
-      errorText
-    );
-
-    throw new Error(
-      "AI API request failed"
-    );
-
-  }
-
-
-  const data =
-    await response.json();
-
-
-  return (
-    data
-      ?.choices?.[0]
-      ?.message
-      ?.content
-      ||
-    "I couldn't generate a response."
-  );
-}
-
-
-/* =====================================================
-   SERVER
-===================================================== */
-
-const server =
-  http.createServer(
-    async (req, res) => {
-
-      /*
-      ---------------------------------------------------
-      CORS / OPTIONS
-      ---------------------------------------------------
-      */
-
-      if (req.method === "OPTIONS") {
-
-        res.writeHead(
-          204,
-          {
-            "Access-Control-Allow-Origin":
-              "*",
-
-            "Access-Control-Allow-Headers":
-              "Content-Type",
-
-            "Access-Control-Allow-Methods":
-              "GET, POST, OPTIONS"
-          }
+        console.log(
+            "================================"
         );
 
-        res.end();
-
-        return;
-      }
-
-
-      /*
-      ---------------------------------------------------
-      HEALTH CHECK
-      ---------------------------------------------------
-      */
-
-      if (
-        req.method === "GET" &&
-        req.url === "/api/health"
-      ) {
-
-        sendJSON(
-          res,
-          200,
-          {
-            status: "ok",
-            app: "Viggo",
-            message:
-              "Viggo server is running"
-          }
+        console.log(
+            "        VIGGO AI SERVER"
         );
 
-        return;
-      }
-
-
-      /*
-      ---------------------------------------------------
-      CHAT API
-      ---------------------------------------------------
-      */
-
-      if (
-        req.method === "POST" &&
-        req.url === "/api/chat"
-      ) {
-
-        try {
-
-          const body =
-            await readBody(req);
-
-
-          const message =
-            String(
-              body.message || ""
-            ).trim();
-
-
-          const history =
-            Array.isArray(
-              body.history
-            )
-              ? body.history
-              : [];
-
-
-          if (!message) {
-
-            sendJSON(
-              res,
-              400,
-              {
-                error:
-                  "Message is required"
-              }
-            );
-
-            return;
-          }
-
-
-          const reply =
-            await getAIResponse(
-              message,
-              history
-            );
-
-
-          sendJSON(
-            res,
-            200,
-            {
-              reply
-            }
-          );
-
-
-        } catch (error) {
-
-          console.error(
-            "Chat error:",
-            error
-          );
-
-
-          sendJSON(
-            res,
-            500,
-            {
-              reply:
-                "Sorry, Viggo couldn't process your request right now."
-            }
-          );
-
-        }
-
-        return;
-      }
-
-
-      /*
-      ---------------------------------------------------
-      STATIC FILES
-      ---------------------------------------------------
-      */
-
-      let requestedPath =
-        req.url.split("?")[0];
-
-
-      if (
-        requestedPath === "/" ||
-        requestedPath === ""
-      ) {
-
-        requestedPath =
-          "/index.html";
-
-      }
-
-
-      const filePath =
-        path.join(
-          __dirname,
-          "..",
-          requestedPath
+        console.log(
+            "================================"
         );
 
-
-      /*
-      Security:
-      Don't allow files outside
-      the project directory.
-      */
-
-      const projectRoot =
-        path.resolve(
-          __dirname,
-          ".."
+        console.log(
+            `Viggo running on port: ${PORT}`
         );
 
-
-      const absoluteFile =
-        path.resolve(
-          filePath
+        console.log(
+            `Health check: /api/health`
         );
 
-
-      if (
-        !absoluteFile.startsWith(
-          projectRoot
-        )
-      ) {
-
-        res.writeHead(403);
-
-        res.end(
-          "Forbidden"
+        console.log(
+            "================================"
         );
-
-        return;
-      }
-
-
-      fs.readFile(
-        absoluteFile,
-        (error, data) => {
-
-          if (error) {
-
-            res.writeHead(
-              404,
-              {
-                "Content-Type":
-                  "text/plain"
-              }
-            );
-
-            res.end(
-              "404 - File not found"
-            );
-
-            return;
-          }
-
-
-          const ext =
-            path.extname(
-              absoluteFile
-            );
-
-
-          const contentType =
-            mimeTypes[ext] ||
-            "application/octet-stream";
-
-
-          res.writeHead(
-            200,
-            {
-              "Content-Type":
-                contentType
-            }
-          );
-
-
-          res.end(data);
-
-        }
-      );
 
     }
-  );
-
-
-/* =====================================================
-   START SERVER
-===================================================== */
-
-server.listen(
-  PORT,
-  () => {
-
-    console.log(
-      "================================"
-    );
-
-    console.log(
-      "        VIGGO AI SERVER"
-    );
-
-    console.log(
-      "================================"
-    );
-
-    console.log(
-      `Viggo running at: http://localhost:${PORT}`
-    );
-
-    console.log(
-      `Health check: http://localhost:${PORT}/api/health`
-    );
-
-    console.log(
-      "================================"
-    );
-
-  }
-);
-
-
-/* =====================================================
-   ERROR HANDLING
-===================================================== */
-
-server.on(
-  "error",
-  error => {
-
-    if (error.code === "EADDRINUSE") {
-
-      console.error(
-        `Port ${PORT} is already in use.`
-      );
-
-    } else {
-
-      console.error(
-        "Server error:",
-        error
-      );
-
-    }
-
-  }
 );
