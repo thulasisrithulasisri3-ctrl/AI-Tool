@@ -1,7 +1,5 @@
-const API_URL =
-  "https://ai-tool-2-zpul.onrender.com/api/chat";
-
-const input =
+const API_URL = "https://ai-tool-2-zpul.onrender.com/api/chat";
+  
   document.querySelector("#messageInput") ||
   document.querySelector("#userInput") ||
   document.querySelector("textarea");
