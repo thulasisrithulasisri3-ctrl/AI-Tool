@@ -1,8 +1,6 @@
-
 {
   "name": "ai-voice-assistant",
   "version": "1.0.0",
-  "description": "AI Assistant Backend",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
