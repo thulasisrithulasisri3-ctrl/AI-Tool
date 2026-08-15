@@ -1,8 +1,17 @@
 "use strict";
 
+
+/* =====================================
+   RENDER API
+===================================== */
+
 const API_URL =
   "https://ai-tool-2-zpul.onrender.com/api/chat";
 
+
+/* =====================================
+   ELEMENTS
+===================================== */
 
 const chat =
   document.getElementById("chat");
@@ -35,23 +44,57 @@ const historyList =
   document.getElementById("historyList");
 
 
-/* =========================
+/* =====================================
+   CHECK ELEMENTS
+===================================== */
+
+if (
+  !chat ||
+  !messageInput ||
+  !sendButton ||
+  !saveButton ||
+  !micButton ||
+  !voiceToggle ||
+  !historyButton ||
+  !historyPanel ||
+  !closeHistory ||
+  !historyList
+) {
+
+  console.error(
+    "❌ Some HTML elements are missing."
+  );
+
+}
+
+
+/* =====================================
    HISTORY
-========================= */
+===================================== */
 
 let history = [];
 
 try {
+
   history = JSON.parse(
-    localStorage.getItem("viggoHistory") || "[]"
+    localStorage.getItem(
+      "viggoHistory"
+    ) || "[]"
   );
 
   if (!Array.isArray(history)) {
     history = [];
   }
 
-} catch {
+} catch (error) {
+
+  console.error(
+    "History error:",
+    error
+  );
+
   history = [];
+
 }
 
 
@@ -59,12 +102,14 @@ let currentUserMessage = "";
 let currentAIMessage = "";
 
 
-/* =========================
-   VOICE ON / OFF
-========================= */
+/* =====================================
+   VOICE ON/OFF
+===================================== */
 
 let voiceEnabled =
-  localStorage.getItem("viggoVoice") !== "false";
+  localStorage.getItem(
+    "viggoVoice"
+  ) !== "false";
 
 
 function updateVoiceButton() {
@@ -74,141 +119,240 @@ function updateVoiceButton() {
     voiceToggle.textContent =
       "🔊 Voice ON";
 
-    voiceToggle.classList.remove("off");
+    voiceToggle.classList.remove(
+      "off"
+    );
 
   } else {
 
     voiceToggle.textContent =
       "🔇 Voice OFF";
 
-    voiceToggle.classList.add("off");
+    voiceToggle.classList.add(
+      "off"
+    );
 
-    if ("speechSynthesis" in window) {
-      speechSynthesis.cancel();
+    if (
+      "speechSynthesis" in window
+    ) {
+
+      window.speechSynthesis.cancel();
+
     }
+
   }
+
 }
 
 
 updateVoiceButton();
 
 
-voiceToggle.addEventListener("click", () => {
+voiceToggle.addEventListener(
+  "click",
+  function () {
 
-  voiceEnabled = !voiceEnabled;
+    voiceEnabled =
+      !voiceEnabled;
 
-  localStorage.setItem(
-    "viggoVoice",
-    voiceEnabled
-  );
+    localStorage.setItem(
+      "viggoVoice",
+      voiceEnabled
+    );
 
-  updateVoiceButton();
+    updateVoiceButton();
 
-});
+  }
+);
 
 
-/* =========================
-   SPEAK
-========================= */
+/* =====================================
+   TEXT TO SPEECH
+===================================== */
 
 function speak(text) {
 
-  if (!voiceEnabled) return;
+  if (!voiceEnabled) {
+    return;
+  }
 
-  if (!("speechSynthesis" in window)) return;
+  if (
+    !("speechSynthesis" in window)
+  ) {
+    return;
+  }
 
-  speechSynthesis.cancel();
+  window.speechSynthesis.cancel();
+
 
   const speech =
-    new SpeechSynthesisUtterance(text);
+    new SpeechSynthesisUtterance(
+      text
+    );
 
-  speech.lang = "en-IN";
-  speech.rate = 0.95;
 
-  speechSynthesis.speak(speech);
+  speech.lang =
+    "en-IN";
+
+  speech.rate =
+    0.95;
+
+
+  window.speechSynthesis.speak(
+    speech
+  );
+
 }
 
 
-/* =========================
-   MESSAGE
-========================= */
+/* =====================================
+   ADD MESSAGE
+===================================== */
 
-function addMessage(text, type) {
+function addMessage(
+  text,
+  type
+) {
 
   const div =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
+
 
   div.className =
     "message " + type;
 
-  div.textContent = text;
 
-  chat.appendChild(div);
+  div.textContent =
+    text;
+
+
+  chat.appendChild(
+    div
+  );
+
 
   chat.scrollTop =
     chat.scrollHeight;
+
 }
 
 
-/* =========================
-   SEND
-========================= */
+/* =====================================
+   SEND MESSAGE
+===================================== */
 
 async function sendMessage() {
 
   const text =
     messageInput.value.trim();
 
-  if (!text) return;
+
+  if (!text) {
+    return;
+  }
 
 
-  addMessage(text, "user");
+  addMessage(
+    text,
+    "user"
+  );
 
-  currentUserMessage = text;
-  currentAIMessage = "";
 
-  messageInput.value = "";
+  currentUserMessage =
+    text;
 
-  sendButton.disabled = true;
-  sendButton.textContent = "...";
+  currentAIMessage =
+    "";
+
+
+  messageInput.value =
+    "";
+
+
+  sendButton.disabled =
+    true;
+
+  sendButton.textContent =
+    "...";
 
 
   try {
 
+    console.log(
+      "Sending to:",
+      API_URL
+    );
+
+
     const response =
-      await fetch(API_URL, {
+      await fetch(
+        API_URL,
+        {
+          method:
+            "POST",
 
-        method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
 
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
-
-        body: JSON.stringify({
-          message: text
-        })
-
-      });
+          body:
+            JSON.stringify({
+              message:
+                text
+            })
+        }
+      );
 
 
     const contentType =
-      response.headers.get("content-type") || "";
+      response.headers.get(
+        "content-type"
+      ) || "";
 
 
-    if (!contentType.includes("application/json")) {
+    console.log(
+      "Status:",
+      response.status
+    );
+
+
+    console.log(
+      "Content-Type:",
+      contentType
+    );
+
+
+    /*
+      IMPORTANT:
+      Prevent <!DOCTYPE html>
+      JSON error.
+    */
+
+    if (
+      !contentType
+        .toLowerCase()
+        .includes(
+          "application/json"
+        )
+    ) {
 
       const raw =
         await response.text();
 
+
       console.error(
-        "Server returned:",
+        "Server response:",
         raw
       );
 
+
       throw new Error(
-        "Server returned HTML instead of JSON"
+        "Server returned HTML instead of JSON."
       );
+
     }
 
 
@@ -222,6 +366,7 @@ async function sendMessage() {
         data.error ||
         "AI request failed"
       );
+
     }
 
 
@@ -230,37 +375,53 @@ async function sendMessage() {
       "No response received.";
 
 
-    currentAIMessage = reply;
+    currentAIMessage =
+      reply;
+
 
     addMessage(
       reply,
       "ai"
     );
 
-    speak(reply);
+
+    speak(
+      reply
+    );
 
 
   } catch (error) {
 
     console.error(
-      "Viggo error:",
+      "❌ Viggo error:",
       error
     );
 
+
     addMessage(
-      "❌ " + error.message,
+      "❌ " +
+      error.message,
       "ai"
     );
 
   }
 
 
-  sendButton.disabled = false;
-  sendButton.textContent = "Send";
+  sendButton.disabled =
+    false;
+
+  sendButton.textContent =
+    "Send";
+
 
   messageInput.focus();
+
 }
 
+
+/* =====================================
+   SEND BUTTON
+===================================== */
 
 sendButton.addEventListener(
   "click",
@@ -268,11 +429,13 @@ sendButton.addEventListener(
 );
 
 
-/* ENTER */
+/* =====================================
+   ENTER TO SEND
+===================================== */
 
 messageInput.addEventListener(
   "keydown",
-  event => {
+  function (event) {
 
     if (
       event.key === "Enter" &&
@@ -282,19 +445,20 @@ messageInput.addEventListener(
       event.preventDefault();
 
       sendMessage();
+
     }
 
   }
 );
 
 
-/* =========================
+/* =====================================
    SAVE
-========================= */
+===================================== */
 
 saveButton.addEventListener(
   "click",
-  () => {
+  function () {
 
     if (
       !currentUserMessage ||
@@ -306,12 +470,14 @@ saveButton.addEventListener(
       );
 
       return;
+
     }
 
 
     history.push({
 
-      id: Date.now(),
+      id:
+        Date.now(),
 
       user:
         currentUserMessage,
@@ -319,7 +485,8 @@ saveButton.addEventListener(
       ai:
         currentAIMessage,
 
-      pinned: false,
+      pinned:
+        false,
 
       time:
         new Date().toLocaleString()
@@ -337,186 +504,322 @@ saveButton.addEventListener(
       "✅ Saved";
 
 
-    setTimeout(() => {
+    setTimeout(
+      function () {
 
-      saveButton.textContent =
-        "💾 Save";
+        saveButton.textContent =
+          "💾 Save";
 
-    }, 1500);
+      },
+      1500
+    );
 
   }
 );
 
 
-/* =========================
-   HISTORY
-========================= */
+/* =====================================
+   SHOW HISTORY
+===================================== */
 
 function showHistory() {
 
-  historyList.innerHTML = "";
+  historyList.innerHTML =
+    "";
 
 
-  if (history.length === 0) {
+  if (
+    history.length === 0
+  ) {
 
     historyList.innerHTML =
       '<div class="empty">No saved chats yet.</div>';
 
     return;
+
   }
 
 
   const sorted =
     [...history].sort(
-      (a, b) => {
+      function (a, b) {
 
-        if (a.pinned && !b.pinned)
+        if (
+          a.pinned &&
+          !b.pinned
+        ) {
+
           return -1;
 
-        if (!a.pinned && b.pinned)
+        }
+
+
+        if (
+          !a.pinned &&
+          b.pinned
+        ) {
+
           return 1;
 
+        }
+
+
         return b.id - a.id;
+
       }
     );
 
 
-  sorted.forEach(item => {
+  sorted.forEach(
+    function (item) {
 
-    const box =
-      document.createElement("div");
-
-    box.className =
-      "history-item";
-
-
-    if (item.pinned) {
-      box.classList.add("pinned");
-    }
-
-
-    box.innerHTML = `
-      <strong>
-        ${item.pinned ? "📌 Pinned Chat" : "💾 Saved Chat"}
-      </strong>
-
-      <div class="history-user">
-        You: ${escapeHTML(item.user)}
-      </div>
-
-      <div class="history-ai">
-        Viggo: ${escapeHTML(item.ai)}
-      </div>
-
-      <div class="history-time">
-        ${escapeHTML(item.time)}
-      </div>
-    `;
-
-
-    const actions =
-      document.createElement("div");
-
-    actions.className =
-      "history-actions";
-
-
-    const pin =
-      document.createElement("button");
-
-    pin.className =
-      "pin-btn";
-
-    pin.textContent =
-      item.pinned
-        ? "📌 Unpin"
-        : "📌 Pin";
-
-
-    pin.onclick = () => {
-
-      const found =
-        history.find(
-          h => h.id === item.id
+      const box =
+        document.createElement(
+          "div"
         );
 
-      if (found) {
 
-        found.pinned =
-          !found.pinned;
+      box.className =
+        "history-item";
 
-        localStorage.setItem(
-          "viggoHistory",
-          JSON.stringify(history)
+
+      if (item.pinned) {
+
+        box.classList.add(
+          "pinned"
         );
 
-        showHistory();
-      }
-    };
-
-
-    const del =
-      document.createElement("button");
-
-    del.className =
-      "delete-btn";
-
-    del.textContent =
-      "🗑️ Delete";
-
-
-    del.onclick = () => {
-
-      if (
-        !confirm("Delete this chat?")
-      ) {
-        return;
       }
 
 
-      history =
-        history.filter(
-          h => h.id !== item.id
+      const title =
+        document.createElement(
+          "strong"
         );
 
 
-      localStorage.setItem(
-        "viggoHistory",
-        JSON.stringify(history)
+      title.textContent =
+        item.pinned
+          ? "📌 Pinned Chat"
+          : "💾 Saved Chat";
+
+
+      const user =
+        document.createElement(
+          "div"
+        );
+
+
+      user.className =
+        "history-user";
+
+
+      user.textContent =
+        "You: " +
+        item.user;
+
+
+      const ai =
+        document.createElement(
+          "div"
+        );
+
+
+      ai.className =
+        "history-ai";
+
+
+      ai.textContent =
+        "Viggo: " +
+        item.ai;
+
+
+      const time =
+        document.createElement(
+          "div"
+        );
+
+
+      time.className =
+        "history-time";
+
+
+      time.textContent =
+        item.time;
+
+
+      const actions =
+        document.createElement(
+          "div"
+        );
+
+
+      actions.className =
+        "history-actions";
+
+
+      /* PIN */
+
+      const pin =
+        document.createElement(
+          "button"
+        );
+
+
+      pin.type =
+        "button";
+
+      pin.className =
+        "pin-btn";
+
+      pin.textContent =
+        item.pinned
+          ? "📌 Unpin"
+          : "📌 Pin";
+
+
+      pin.addEventListener(
+        "click",
+        function () {
+
+          const found =
+            history.find(
+              function (h) {
+
+                return (
+                  h.id ===
+                  item.id
+                );
+
+              }
+            );
+
+
+          if (found) {
+
+            found.pinned =
+              !found.pinned;
+
+
+            localStorage.setItem(
+              "viggoHistory",
+              JSON.stringify(history)
+            );
+
+
+            showHistory();
+
+          }
+
+        }
       );
 
 
-      showHistory();
-    };
+      /* DELETE */
+
+      const del =
+        document.createElement(
+          "button"
+        );
 
 
-    actions.appendChild(pin);
-    actions.appendChild(del);
+      del.type =
+        "button";
 
-    box.appendChild(actions);
+      del.className =
+        "delete-btn";
 
-    historyList.appendChild(box);
+      del.textContent =
+        "🗑️ Delete";
 
-  });
+
+      del.addEventListener(
+        "click",
+        function () {
+
+          const confirmDelete =
+            confirm(
+              "Delete this chat?"
+            );
+
+
+          if (!confirmDelete) {
+            return;
+          }
+
+
+          history =
+            history.filter(
+              function (h) {
+
+                return (
+                  h.id !==
+                  item.id
+                );
+
+              }
+            );
+
+
+          localStorage.setItem(
+            "viggoHistory",
+            JSON.stringify(history)
+          );
+
+
+          showHistory();
+
+        }
+      );
+
+
+      actions.appendChild(
+        pin
+      );
+
+      actions.appendChild(
+        del
+      );
+
+
+      box.appendChild(
+        title
+      );
+
+      box.appendChild(
+        user
+      );
+
+      box.appendChild(
+        ai
+      );
+
+      box.appendChild(
+        time
+      );
+
+      box.appendChild(
+        actions
+      );
+
+
+      historyList.appendChild(
+        box
+      );
+
+    }
+  );
+
 }
 
 
-function escapeHTML(text) {
-
-  return String(text)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-
-/* OPEN HISTORY */
+/* =====================================
+   OPEN HISTORY
+===================================== */
 
 historyButton.addEventListener(
   "click",
-  () => {
+  function () {
 
     showHistory();
 
@@ -527,11 +830,13 @@ historyButton.addEventListener(
 );
 
 
-/* CLOSE HISTORY */
+/* =====================================
+   CLOSE HISTORY
+===================================== */
 
 closeHistory.addEventListener(
   "click",
-  () => {
+  function () {
 
     historyPanel.style.display =
       "none";
@@ -540,9 +845,31 @@ closeHistory.addEventListener(
 );
 
 
-/* =========================
+/* =====================================
+   CLOSE HISTORY OUTSIDE
+===================================== */
+
+historyPanel.addEventListener(
+  "click",
+  function (event) {
+
+    if (
+      event.target ===
+      historyPanel
+    ) {
+
+      historyPanel.style.display =
+        "none";
+
+    }
+
+  }
+);
+
+
+/* =====================================
    MICROPHONE
-========================= */
+===================================== */
 
 const SpeechRecognition =
   window.SpeechRecognition ||
@@ -558,69 +885,99 @@ if (SpeechRecognition) {
   recognition.lang =
     "en-IN";
 
+
   recognition.continuous =
     false;
+
 
   recognition.interimResults =
     false;
 
 
-  recognition.onstart = () => {
+  recognition.onstart =
+    function () {
 
-    micButton.classList.add(
-      "listening"
-    );
-
-    micButton.textContent =
-      "🔴";
-  };
+      micButton.classList.add(
+        "listening"
+      );
 
 
-  recognition.onend = () => {
+      micButton.textContent =
+        "🔴";
 
-    micButton.classList.remove(
-      "listening"
-    );
-
-    micButton.textContent =
-      "🎤";
-  };
+    };
 
 
-  recognition.onerror = event => {
+  recognition.onend =
+    function () {
 
-    console.error(
-      "Mic error:",
-      event.error
-    );
-
-    micButton.classList.remove(
-      "listening"
-    );
-
-    micButton.textContent =
-      "🎤";
-  };
+      micButton.classList.remove(
+        "listening"
+      );
 
 
-  recognition.onresult = event => {
+      micButton.textContent =
+        "🎤";
 
-    messageInput.value =
-      event.results[0][0].transcript;
+    };
 
-  };
+
+  recognition.onerror =
+    function (event) {
+
+      console.error(
+        "Microphone error:",
+        event.error
+      );
+
+
+      micButton.classList.remove(
+        "listening"
+      );
+
+
+      micButton.textContent =
+        "🎤";
+
+    };
+
+
+  recognition.onresult =
+    function (event) {
+
+      const text =
+        event.results[0][0]
+          .transcript;
+
+
+      messageInput.value =
+        text;
+
+
+      /*
+        Voice input fills the box.
+        User presses Send.
+      */
+
+      messageInput.focus();
+
+    };
 
 
   micButton.addEventListener(
     "click",
-    () => {
+    function () {
 
       try {
+
         recognition.start();
-      } catch {
+
+      } catch (error) {
+
         console.log(
-          "Microphone already active"
+          "Microphone already active."
         );
+
       }
 
     }
@@ -631,17 +988,18 @@ if (SpeechRecognition) {
 
   micButton.addEventListener(
     "click",
-    () => {
+    function () {
 
       alert(
-        "Microphone is not supported. Use Chrome."
+        "Microphone is not supported in this browser. Please use Chrome."
       );
 
     }
   );
+
 }
 
 
 console.log(
-  "✅ Viggo script loaded"
+  "✅ Viggo script.js loaded"
 );
