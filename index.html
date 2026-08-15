@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,867 +12,546 @@
       box-sizing: border-box;
     }
 
-    html,
     body {
-      width: 100%;
-      height: 100%;
       margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: #ffffff;
-      color: #111827;
+      font-family: Arial, sans-serif;
+      background: #f7f7f8;
+      color: #222;
     }
-
-    body {
-      overflow: hidden;
-    }
-
-    button {
-      font-family: inherit;
-      cursor: pointer;
-    }
-
-    /* =========================
-       APP
-    ========================= */
 
     .app {
       display: flex;
-      width: 100%;
       height: 100vh;
       overflow: hidden;
     }
 
-    /* =========================
-       SIDEBAR
-    ========================= */
+    /* SIDEBAR */
 
-    .sidebar {
-      width: 280px;
-      height: 100%;
-      background: #f7f7f8;
-      border-right: 1px solid #e5e7eb;
+    #sidebar {
+      width: 270px;
+      background: #202123;
+      color: white;
+      padding: 14px;
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
     }
 
-    .sidebar-top {
-      padding: 14px;
-    }
-
     .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 14px;
-      padding: 5px;
-    }
-
-    .brand-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 12px;
-      background: #111827;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-    }
-
-    .brand-name {
-      font-size: 20px;
-      font-weight: 700;
-    }
-
-    .new-chat {
-      width: 100%;
-      border: 1px solid #d1d5db;
-      background: white;
-      color: #111827;
-      border-radius: 10px;
-      padding: 11px 13px;
-      text-align: left;
-      font-size: 15px;
-      font-weight: 600;
-    }
-
-    .new-chat:hover {
-      background: #eeeeef;
-    }
-
-    /* =========================
-       SIDEBAR CONTENT
-    ========================= */
-
-    .sidebar-content {
-      flex: 1;
-      overflow-y: auto;
+      font-size: 22px;
+      font-weight: bold;
       padding: 10px;
+      margin-bottom: 10px;
     }
 
-    .section-title {
-      padding: 8px 9px;
-      color: #6b7280;
+    #newChat,
+    #historyButton,
+    #saveButton,
+    #voiceToggle,
+    #clearHistory {
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    #newChat {
+      background: #343541;
+      color: white;
+      text-align: left;
+      margin-bottom: 12px;
+    }
+
+    .side-title {
       font-size: 12px;
-      font-weight: 700;
+      color: #aaa;
+      padding: 8px 10px;
       text-transform: uppercase;
     }
 
     .chat-list {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
+      overflow-y: auto;
     }
 
     .chat-item {
       width: 100%;
-      border: none;
-      background: transparent;
-      border-radius: 8px;
-      padding: 10px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: space-between;
+      background: transparent;
+      color: #ddd;
+      border: 0;
+      padding: 10px;
+      border-radius: 7px;
+      cursor: pointer;
       text-align: left;
-      color: #374151;
-      font-size: 14px;
+      margin-bottom: 3px;
     }
 
-    .chat-item:hover {
-      background: #e9e9eb;
-    }
-
+    .chat-item:hover,
     .chat-item.active {
-      background: #e5e7eb;
-      color: #111827;
-      font-weight: 600;
+      background: #343541;
     }
 
     .chat-item-title {
-      flex: 1;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
 
     .pin-icon {
-      font-size: 12px;
+      margin-left: 5px;
     }
 
     .empty-sidebar {
-      color: #9ca3af;
-      font-size: 13px;
+      color: #777;
+      font-size: 12px;
       padding: 10px;
     }
-
-    /* =========================
-       SIDEBAR BOTTOM
-    ========================= */
 
     .sidebar-bottom {
-      padding: 12px;
-      border-top: 1px solid #e5e7eb;
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
     }
 
-    .sidebar-bottom button {
-      width: 100%;
-      border: none;
-      background: transparent;
-      padding: 10px;
-      border-radius: 8px;
-      text-align: left;
+    #historyButton,
+    #voiceToggle {
+      background: #343541;
+      color: white;
     }
 
-    .sidebar-bottom button:hover {
-      background: #e9e9eb;
+    #saveButton {
+      background: #10a37f;
+      color: white;
     }
 
-    /* =========================
-       MAIN
-    ========================= */
+    #clearHistory {
+      background: #8b2020;
+      color: white;
+    }
+
+    #mobileMenu {
+      display: none;
+    }
+
+    /* MAIN */
 
     .main {
       flex: 1;
-      min-width: 0;
-      height: 100%;
       display: flex;
       flex-direction: column;
-      background: white;
+      min-width: 0;
     }
-
-    /* =========================
-       TOP BAR
-    ========================= */
 
     .topbar {
       height: 60px;
-      border-bottom: 1px solid #e5e7eb;
+      background: white;
+      border-bottom: 1px solid #ddd;
       display: flex;
       align-items: center;
-      padding: 0 16px;
+      padding: 0 18px;
       gap: 12px;
-      flex-shrink: 0;
     }
 
-    .mobile-menu {
-      display: none;
-      border: none;
-      background: transparent;
-      font-size: 22px;
-      padding: 5px;
+    #currentTitle {
+      font-size: 17px;
+      font-weight: bold;
     }
 
-    .current-title {
-      flex: 1;
-      font-weight: 600;
-      font-size: 16px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .top-actions {
-      display: flex;
-      gap: 5px;
-    }
-
-    .top-actions button {
-      border: none;
-      background: transparent;
-      border-radius: 8px;
-      padding: 8px;
-      font-size: 18px;
-    }
-
-    .top-actions button:hover {
-      background: #f3f4f6;
-    }
-
-    /* =========================
-       CHAT AREA
-    ========================= */
-
-    .chat-area {
+    #chatArea {
       flex: 1;
       overflow-y: auto;
-      padding: 25px 15px 30px;
+      padding: 20px;
     }
 
-    .conversation {
-      width: 100%;
-      max-width: 850px;
-      margin: 0 auto;
+    #conversation {
+      max-width: 900px;
+      margin: auto;
     }
 
     .welcome {
       min-height: 65vh;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       text-align: center;
     }
 
     .welcome-box {
-      max-width: 550px;
+      max-width: 500px;
     }
 
     .welcome-icon {
-      font-size: 48px;
-      margin-bottom: 12px;
+      font-size: 50px;
     }
 
-    .welcome h1 {
-      margin: 0 0 10px;
-      font-size: 32px;
+    .welcome-box h1 {
+      margin: 10px 0;
     }
 
-    .welcome p {
-      margin: 0;
-      color: #6b7280;
-      font-size: 16px;
+    .welcome-box p {
+      color: #777;
     }
-
-    /* =========================
-       MESSAGE
-    ========================= */
 
     .message {
       display: flex;
       gap: 12px;
-      margin: 20px 0;
-      width: 100%;
+      padding: 18px 10px;
+      border-bottom: 1px solid #eee;
     }
 
     .message.user {
-      justify-content: flex-end;
+      background: #fff;
+    }
+
+    .message.ai {
+      background: #f7f7f8;
     }
 
     .message-avatar {
       width: 34px;
       height: 34px;
-      border-radius: 10px;
+      border-radius: 7px;
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-shrink: 0;
-      font-size: 17px;
-    }
-
-    .message.ai .message-avatar {
-      background: #111827;
+      background: #10a37f;
       color: white;
-      order: 0;
+      font-weight: bold;
+      flex-shrink: 0;
     }
 
     .message.user .message-avatar {
-      background: #2563eb;
-      color: white;
-      order: 2;
-    }
-
-    .message-content {
-      max-width: min(75%, 700px);
+      background: #555;
     }
 
     .message-name {
-      font-size: 12px;
-      color: #6b7280;
-      margin-bottom: 4px;
-      font-weight: 600;
+      font-weight: bold;
+      margin-bottom: 5px;
     }
 
     .message-text {
-      line-height: 1.6;
       white-space: pre-wrap;
-      word-break: break-word;
-      font-size: 15px;
+      line-height: 1.6;
     }
 
-    .message.user .message-content {
-      background: #2563eb;
-      color: white;
-      padding: 10px 14px;
-      border-radius: 15px;
-    }
+    /* INPUT */
 
-    .message.user .message-name {
-      display: none;
-    }
-
-    .message.ai .message-text {
-      color: #111827;
-    }
-
-    /* =========================
-       INPUT
-    ========================= */
-
-    .input-wrapper {
-      padding: 10px 15px 18px;
+    .input-area {
       background: white;
-      flex-shrink: 0;
+      border-top: 1px solid #ddd;
+      padding: 12px;
     }
 
     .input-box {
-      width: 100%;
-      max-width: 850px;
+      max-width: 900px;
       margin: auto;
-      border: 1px solid #d1d5db;
-      border-radius: 16px;
-      padding: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      background: white;
-    }
-
-    .input-row {
       display: flex;
-      align-items: flex-end;
-      gap: 7px;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      padding: 7px;
+      background: white;
     }
 
     #message {
       flex: 1;
-      min-height: 42px;
-      max-height: 150px;
-      resize: none;
-      border: none;
+      border: 0;
       outline: none;
-      padding: 10px 9px;
+      resize: none;
       font-size: 15px;
-      font-family: inherit;
-      background: transparent;
+      min-height: 38px;
+      padding: 9px;
     }
 
-    #message::placeholder {
-      color: #9ca3af;
+    #mic,
+    #send {
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      min-width: 45px;
+      height: 40px;
     }
 
-    .input-button {
-      width: 42px;
-      height: 42px;
-      border: none;
-      border-radius: 11px;
-      background: transparent;
-      font-size: 19px;
-      flex-shrink: 0;
-    }
-
-    .input-button:hover {
-      background: #f3f4f6;
+    #mic {
+      background: #eee;
+      font-size: 18px;
     }
 
     #mic.listening {
-      background: #fee2e2;
-      color: #dc2626;
+      background: #ffdddd;
     }
 
     #send {
-      background: #111827;
+      background: #10a37f;
       color: white;
-    }
-
-    #send:hover {
-      background: #374151;
+      font-weight: bold;
     }
 
     #send:disabled {
-      opacity: 0.5;
+      opacity: .5;
       cursor: not-allowed;
     }
 
-    .input-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 4px 5px 0;
-    }
+    /* HISTORY MODAL */
 
-    .voice-toggle {
-      border: none;
-      background: transparent;
-      color: #6b7280;
-      padding: 5px 7px;
-      border-radius: 7px;
-      font-size: 12px;
-    }
-
-    .voice-toggle:hover {
-      background: #f3f4f6;
-    }
-
-    .voice-toggle.on {
-      color: #16a34a;
-    }
-
-    .voice-toggle.off {
-      color: #6b7280;
-    }
-
-    .input-hint {
-      color: #9ca3af;
-      font-size: 11px;
-    }
-
-    /* =========================
-       HISTORY MENU
-    ========================= */
-
-    .history-modal {
+    #historyModal {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.45);
+      background: rgba(0,0,0,.55);
       z-index: 1000;
+      padding: 30px;
     }
 
-    .history-panel {
-      position: absolute;
-      right: 15px;
-      top: 70px;
-      width: 360px;
-      max-width: calc(100vw - 30px);
-      max-height: 75vh;
-      overflow-y: auto;
+    .history-window {
       background: white;
-      border-radius: 14px;
-      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.2);
-      padding: 15px;
+      max-width: 800px;
+      max-height: 85vh;
+      overflow-y: auto;
+      margin: auto;
+      border-radius: 12px;
+      padding: 18px;
     }
 
     .history-header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      margin-bottom: 10px;
+      align-items: center;
+      margin-bottom: 15px;
     }
 
-    .history-header h2 {
-      margin: 0;
-      font-size: 18px;
-    }
-
-    .close-history {
-      border: none;
-      background: #f3f4f6;
-      border-radius: 8px;
-      padding: 7px 10px;
+    #closeHistory {
+      border: 0;
+      background: #eee;
+      border-radius: 7px;
+      padding: 8px 12px;
+      cursor: pointer;
     }
 
     .history-card {
-      border: 1px solid #e5e7eb;
+      border: 1px solid #ddd;
       border-radius: 10px;
-      padding: 11px;
-      margin-top: 8px;
+      padding: 13px;
+      margin-bottom: 10px;
     }
 
     .history-card.pinned {
-      border-color: #facc15;
-      background: #fffbeb;
+      border-left: 4px solid #10a37f;
     }
 
     .history-card-title {
-      font-weight: 600;
-      font-size: 14px;
+      font-weight: bold;
       margin-bottom: 5px;
     }
 
     .history-card-time {
-      color: #9ca3af;
-      font-size: 11px;
+      color: #888;
+      font-size: 12px;
+      margin-bottom: 10px;
     }
 
     .history-card-actions {
       display: flex;
-      gap: 7px;
-      margin-top: 9px;
+      flex-wrap: wrap;
+      gap: 6px;
     }
 
     .history-card-actions button {
-      border: none;
+      border: 0;
       border-radius: 7px;
-      padding: 6px 9px;
-      font-size: 12px;
+      padding: 8px 10px;
+      cursor: pointer;
     }
 
     .pin-button {
-      background: #fef3c7;
+      background: #eee;
     }
 
     .delete-button {
-      background: #fee2e2;
-      color: #dc2626;
+      background: #ffdede;
+      color: #a00;
     }
 
-    /* =========================
-       MOBILE
-    ========================= */
+    /* MOBILE */
 
     @media (max-width: 700px) {
 
-      .sidebar {
+      #sidebar {
         position: fixed;
-        left: -290px;
+        left: -280px;
         top: 0;
         bottom: 0;
-        z-index: 2000;
-        transition: left 0.2s ease;
+        z-index: 900;
+        transition: left .2s;
       }
 
-      .sidebar.open {
+      #sidebar.open {
         left: 0;
       }
 
-      .mobile-menu {
+      #mobileMenu {
         display: block;
+        border: 0;
+        background: #eee;
+        border-radius: 7px;
+        padding: 8px 10px;
+        cursor: pointer;
       }
 
-      .message-content {
-        max-width: 82%;
+      .topbar {
+        padding: 0 10px;
       }
 
-      .input-hint {
-        display: none;
+      #chatArea {
+        padding: 10px;
       }
 
+      #historyModal {
+        padding: 10px;
+      }
+
+      .history-window {
+        max-height: 95vh;
+      }
     }
   </style>
 </head>
 
 <body>
 
-  <div class="app">
+<div class="app">
 
-    <!-- =========================
-         SIDEBAR
-    ========================== -->
+  <!-- SIDEBAR -->
 
-    <aside
-      class="sidebar"
-      id="sidebar"
-    >
+  <aside id="sidebar">
 
-      <div class="sidebar-top">
+    <div class="brand">
+      Viggo
+    </div>
 
-        <div class="brand">
+    <button id="newChat">
+      ＋ New Chat
+    </button>
 
-          <div class="brand-icon">
-            V
-          </div>
+    <div class="side-title">
+      Pinned
+    </div>
 
-          <div class="brand-name">
-            Viggo
-          </div>
+    <div id="pinnedList" class="chat-list"></div>
 
-        </div>
+    <div class="side-title">
+      Recent
+    </div>
 
+    <div id="recentList" class="chat-list"></div>
 
-        <button
-          class="new-chat"
-          id="newChat"
-          type="button"
-        >
-          ➕ New Chat
-        </button>
+    <div class="sidebar-bottom">
 
-      </div>
+      <button id="historyButton">
+        🕘 History
+      </button>
 
+      <button id="saveButton">
+        💾 Save
+      </button>
 
-      <div class="sidebar-content">
+      <button id="voiceToggle">
+        🔊 Voice ON
+      </button>
 
-        <div class="section-title">
-          📌 Pinned
-        </div>
-
-        <div
-          class="chat-list"
-          id="pinnedList"
-        >
-        </div>
-
-
-        <div class="section-title">
-          🕘 Recent
-        </div>
-
-        <div
-          class="chat-list"
-          id="recentList"
-        >
-        </div>
-
-      </div>
-
-
-      <div class="sidebar-bottom">
-
-        <button
-          id="clearHistory"
-          type="button"
-        >
-          🗑️ Clear History
-        </button>
-
-      </div>
-
-    </aside>
-
-
-    <!-- =========================
-         MAIN
-    ========================== -->
-
-    <main class="main">
-
-      <!-- TOP BAR -->
-
-      <div class="topbar">
-
-        <button
-          class="mobile-menu"
-          id="mobileMenu"
-          type="button"
-        >
-          ☰
-        </button>
-
-
-        <div
-          class="current-title"
-          id="currentTitle"
-        >
-          New Chat
-        </div>
-
-
-        <div class="top-actions">
-
-          <button
-            id="saveButton"
-            type="button"
-            title="Save"
-          >
-            💾
-          </button>
-
-
-          <button
-            id="historyButton"
-            type="button"
-            title="History"
-          >
-            📜
-          </button>
-
-        </div>
-
-      </div>
-
-
-      <!-- CHAT -->
-
-      <div
-        class="chat-area"
-        id="chatArea"
-      >
-
-        <div
-          class="conversation"
-          id="conversation"
-        >
-
-          <div
-            class="welcome"
-            id="welcome"
-          >
-
-            <div class="welcome-box">
-
-              <div class="welcome-icon">
-                🤖
-              </div>
-
-              <h1>
-                Welcome to Viggo
-              </h1>
-
-              <p>
-                Your AI assistant. Start a new conversation.
-              </p>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <!-- INPUT -->
-
-      <div class="input-wrapper">
-
-        <div class="input-box">
-
-          <div class="input-row">
-
-            <button
-              class="input-button"
-              id="mic"
-              type="button"
-              title="Microphone"
-            >
-              🎤
-            </button>
-
-
-            <textarea
-              id="message"
-              rows="1"
-              placeholder="Message Viggo..."
-              autocomplete="off"
-            ></textarea>
-
-
-            <button
-              class="input-button"
-              id="send"
-              type="button"
-              title="Send"
-            >
-              ➤
-            </button>
-
-          </div>
-
-
-          <div class="input-footer">
-
-            <button
-              class="voice-toggle on"
-              id="voiceToggle"
-              type="button"
-            >
-              🔊 Voice ON
-            </button>
-
-
-            <div class="input-hint">
-              Enter to send · Shift + Enter for new line
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </main>
-
-  </div>
-
-
-  <!-- =========================
-       HISTORY MODAL
-  ========================== -->
-
-  <div
-    class="history-modal"
-    id="historyModal"
-  >
-
-    <div
-      class="history-panel"
-      id="historyPanel"
-    >
-
-      <div class="history-header">
-
-        <h2>
-          📜 History
-        </h2>
-
-        <button
-          class="close-history"
-          id="closeHistory"
-          type="button"
-        >
-          ✕
-        </button>
-
-      </div>
-
-
-      <div id="historyList">
-      </div>
+      <button id="clearHistory">
+        🗑️ Clear History
+      </button>
 
     </div>
 
+  </aside>
+
+  <!-- MAIN -->
+
+  <main class="main">
+
+    <header class="topbar">
+
+      <button id="mobileMenu">
+        ☰
+      </button>
+
+      <div id="currentTitle">
+        New Chat
+      </div>
+
+    </header>
+
+    <section id="chatArea">
+
+      <div id="conversation"></div>
+
+    </section>
+
+    <footer class="input-area">
+
+      <div class="input-box">
+
+        <textarea
+          id="message"
+          placeholder="Type message..."
+          rows="1"
+        ></textarea>
+
+        <button
+          id="mic"
+          title="Microphone"
+        >
+          🎤
+        </button>
+
+        <button
+          id="send"
+          title="Send"
+        >
+          ➤
+        </button>
+
+      </div>
+
+    </footer>
+
+  </main>
+
+</div>
+
+<!-- HISTORY -->
+
+<div id="historyModal">
+
+  <div class="history-window">
+
+    <div class="history-header">
+
+      <h2>
+        Chat History
+      </h2>
+
+      <button id="closeHistory">
+        ✕
+      </button>
+
+    </div>
+
+    <div id="historyList"></div>
+
   </div>
 
+</div>
 
-  <script src="./script.js"></script>
+<script src="script.js"></script>
 
 </body>
 </html>
+```
