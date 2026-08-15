@@ -10,59 +10,30 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
-
-// ==============================
-// GEMINI
-// ==============================
-
 const API_KEY = process.env.GEMINI_API_KEY;
 
 if (!API_KEY) {
   console.error("❌ GEMINI_API_KEY is missing");
-} else {
-  console.log("✅ Gemini API key found");
 }
 
 const ai = API_KEY
-  ? new GoogleGenAI({
-      apiKey: API_KEY
-    })
+  ? new GoogleGenAI({ apiKey: API_KEY })
   : null;
 
-
-// ==============================
-// HOME
-// ==============================
-
 app.get("/", (req, res) => {
-  res.sendFile(
-    path.join(__dirname, "index.html")
-  );
+  res.sendFile(path.join(__dirname, "index.html"));
 });
-
-
-// ==============================
-// HEALTH
-// ==============================
 
 app.get("/health", (req, res) => {
   res.json({
     success: true,
-    status: "healthy"
+    message: "Viggo AI Assistant is running"
   });
 });
 
-
-// ==============================
-// CHAT
-// ==============================
-
 app.post("/api/chat", async (req, res) => {
-
   try {
-
-    const message =
-      req.body?.message?.trim();
+    const message = req.body?.message?.trim();
 
     if (!message) {
       return res.status(400).json({
@@ -74,96 +45,40 @@ app.post("/api/chat", async (req, res) => {
     if (!ai) {
       return res.status(500).json({
         success: false,
-        error:
-          "GEMINI_API_KEY is not configured in Render"
+        error: "GEMINI_API_KEY is missing in Render Environment Variables"
       });
     }
 
     console.log("User:", message);
 
-
-    // Gemini request
-
-    const response =
-      await ai.models.generateContent({
-
-        model: "gemini-2.5-flash",
-
-        contents: message
-
-      });
-
-
-    const reply =
-      response.text || "No response received.";
-
-
-    console.log("AI:", reply);
-
-
-    return res.json({
-
-      success: true,
-
-      reply: reply
-
+    const result = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: message
     });
 
+    const reply = result.text;
+
+    if (!reply) {
+      throw new Error("Gemini returned an empty response");
+    }
+
+    console.log("Viggo:", reply);
+
+    res.json({
+      success: true,
+      reply: reply
+    });
 
   } catch (error) {
+    console.error("❌ GEMINI ERROR:", error);
 
-    console.error(
-      "❌ Gemini Error:",
-      error
-    );
-
-
-    return res.status(500).json({
-
+    res.status(500).json({
       success: false,
-
-      error:
-        "AI request failed",
-
-      details:
-        error.message
-
+      error: error.message || "Unknown Gemini error"
     });
-
   }
-
 });
 
-
-// ==============================
-// 404
-// ==============================
-
-app.use((req, res) => {
-
-  res.status(404).json({
-
-    success: false,
-
-    error: "Route not found"
-
-  });
-
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Viggo AI Assistant running on port ${PORT}`);
 });
-
-
-// ==============================
-// START SERVER
-// ==============================
-
-app.listen(
-  PORT,
-  "0.0.0.0",
-  () => {
-
-    console.log(
-      `🚀 AI Assistant running on port ${PORT}`
-    );
-
-  }
-);
