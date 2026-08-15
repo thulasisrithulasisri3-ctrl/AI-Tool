@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>AI Assistant</title>
+  <title>AI Voice Assistant</title>
 
   <style>
     * {
@@ -13,9 +13,9 @@
 
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f7fb;
       min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: #eef2ff;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -23,30 +23,30 @@
 
     .app {
       width: 95%;
-      max-width: 700px;
+      max-width: 720px;
       height: 90vh;
       background: white;
-      border-radius: 20px;
-      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
       display: flex;
       flex-direction: column;
-      overflow: hidden;
     }
 
     .header {
-      padding: 20px;
       background: #111827;
       color: white;
+      padding: 20px;
       text-align: center;
     }
 
     .header h1 {
       margin: 0;
-      font-size: 24px;
+      font-size: 25px;
     }
 
-    .status {
-      margin-top: 6px;
+    #status {
+      margin-top: 7px;
       font-size: 13px;
       color: #86efac;
     }
@@ -58,20 +58,24 @@
     }
 
     .message {
-      margin-bottom: 15px;
       display: flex;
+      margin-bottom: 15px;
     }
 
     .user {
       justify-content: flex-end;
     }
 
+    .ai {
+      justify-content: flex-start;
+    }
+
     .bubble {
-      max-width: 80%;
-      padding: 12px 16px;
-      border-radius: 15px;
-      line-height: 1.5;
+      max-width: 82%;
+      padding: 13px 16px;
+      border-radius: 16px;
       white-space: pre-wrap;
+      line-height: 1.5;
     }
 
     .user .bubble {
@@ -86,10 +90,10 @@
       border-bottom-left-radius: 4px;
     }
 
-    .input-area {
+    .controls {
       display: flex;
-      gap: 10px;
-      padding: 15px;
+      gap: 8px;
+      padding: 12px 15px 5px;
       border-top: 1px solid #ddd;
     }
 
@@ -98,27 +102,51 @@
       padding: 13px;
       border: 1px solid #ccc;
       border-radius: 12px;
-      outline: none;
       font-size: 16px;
+      outline: none;
     }
 
-    #sendButton {
+    button {
       border: none;
-      background: #2563eb;
-      color: white;
-      padding: 0 20px;
       border-radius: 12px;
       cursor: pointer;
       font-size: 16px;
     }
 
-    #sendButton:disabled {
+    #sendButton {
+      padding: 0 18px;
+      background: #2563eb;
+      color: white;
+    }
+
+    #micButton {
+      width: 50px;
+      height: 50px;
+      background: #111827;
+      color: white;
+      font-size: 21px;
+    }
+
+    #micButton.listening {
+      background: #dc2626;
+    }
+
+    #speakButton {
+      margin: 5px 15px 15px;
+      padding: 11px;
+      background: #16a34a;
+      color: white;
+    }
+
+    button:disabled {
       opacity: 0.6;
       cursor: not-allowed;
     }
 
-    .error {
-      color: #dc2626;
+    .welcome {
+      text-align: center;
+      color: #6b7280;
+      margin-top: 40px;
     }
   </style>
 </head>
@@ -128,22 +156,29 @@
   <div class="app">
 
     <div class="header">
-      <h1>🤖 AI Assistant</h1>
-      <div class="status" id="status">
-        Connecting...
+      <h1>🤖 AI Voice Assistant</h1>
+      <div id="status">Connecting...</div>
+    </div>
+
+    <div id="chat">
+      <div class="welcome">
+        🎤 Tap the microphone and speak<br>
+        தமிழ் / English / Tanglish
       </div>
     </div>
 
-    <div id="chat"></div>
-
-    <div class="input-area">
+    <div class="controls">
 
       <input
         id="messageInput"
         type="text"
-        placeholder="Type your message..."
+        placeholder="Type or speak..."
         autocomplete="off"
       >
+
+      <button id="micButton" title="Speak">
+        🎤
+      </button>
 
       <button id="sendButton">
         Send
@@ -151,98 +186,176 @@
 
     </div>
 
+    <button id="speakButton">
+      🔊 Read last answer
+    </button>
+
   </div>
 
 
   <script>
 
-    const API_URL = "https://ai-tool-2-zpul.onrender.com";
+    const API_URL =
+      "https://ai-tool-2-zpul.onrender.com";
 
-    const chat = document.getElementById("chat");
-    const input = document.getElementById("messageInput");
-    const sendButton = document.getElementById("sendButton");
-    const status = document.getElementById("status");
 
+    const chat =
+      document.getElementById("chat");
+
+    const input =
+      document.getElementById("messageInput");
+
+    const sendButton =
+      document.getElementById("sendButton");
+
+    const micButton =
+      document.getElementById("micButton");
+
+    const speakButton =
+      document.getElementById("speakButton");
+
+    const status =
+      document.getElementById("status");
+
+
+    let lastAnswer = "";
+
+
+    // -----------------------------
+    // ADD MESSAGE
+    // -----------------------------
 
     function addMessage(text, type) {
 
-      const message = document.createElement("div");
-      message.className = `message ${type}`;
+      const welcome =
+        document.querySelector(".welcome");
 
-      const bubble = document.createElement("div");
-      bubble.className = "bubble";
+      if (welcome) {
+        welcome.remove();
+      }
 
-      bubble.textContent = text;
+      const message =
+        document.createElement("div");
+
+      message.className =
+        "message " + type;
+
+
+      const bubble =
+        document.createElement("div");
+
+      bubble.className =
+        "bubble";
+
+      bubble.textContent =
+        text;
+
 
       message.appendChild(bubble);
+
       chat.appendChild(message);
 
-      chat.scrollTop = chat.scrollHeight;
+      chat.scrollTop =
+        chat.scrollHeight;
     }
 
+
+    // -----------------------------
+    // BACKEND CHECK
+    // -----------------------------
 
     async function checkBackend() {
 
       try {
 
-        const response = await fetch(`${API_URL}/`);
+        const response =
+          await fetch(API_URL + "/");
 
         if (!response.ok) {
-          throw new Error("Backend unavailable");
+          throw new Error("Backend offline");
         }
 
-        const data = await response.json();
+        const data =
+          await response.json();
 
         if (data.status === "online") {
-          status.textContent = "● Online";
-        } else {
-          status.textContent = "● Backend connected";
+
+          status.textContent =
+            "● Online";
+
+          status.style.color =
+            "#86efac";
+
         }
 
       } catch (error) {
 
-        status.textContent = "● Backend offline";
-        status.style.color = "#fca5a5";
+        status.textContent =
+          "● Backend offline";
 
-        console.error("Backend error:", error);
+        status.style.color =
+          "#fca5a5";
+
+        console.error(error);
       }
     }
 
 
+    // -----------------------------
+    // SEND MESSAGE
+    // -----------------------------
+
     async function sendMessage() {
 
-      const message = input.value.trim();
+      const message =
+        input.value.trim();
+
 
       if (!message) {
         return;
       }
 
-      addMessage(message, "user");
+
+      addMessage(
+        message,
+        "user"
+      );
+
 
       input.value = "";
 
-      sendButton.disabled = true;
-      sendButton.textContent = "Thinking...";
+      sendButton.disabled =
+        true;
+
+      micButton.disabled =
+        true;
+
+      sendButton.textContent =
+        "Thinking...";
 
 
       try {
 
-        const response = await fetch(`${API_URL}/chat`, {
+        const response =
+          await fetch(
+            API_URL + "/chat",
+            {
+              method: "POST",
 
-          method: "POST",
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
 
-          headers: {
-            "Content-Type": "application/json"
-          },
-
-          body: JSON.stringify({
-            message: message
-          })
-
-        });
+              body: JSON.stringify({
+                message: message
+              })
+            }
+          );
 
 
-        const data = await response.json();
+        const data =
+          await response.json();
 
 
         if (!response.ok) {
@@ -256,15 +369,32 @@
         }
 
 
+        const answer =
+          data.reply ||
+          "No response received.";
+
+
+        lastAnswer =
+          answer;
+
+
         addMessage(
-          data.reply || "No response received.",
+          answer,
           "ai"
         );
 
 
+        // Automatically speak AI answer
+        speakText(answer);
+
+
       } catch (error) {
 
-        console.error("AI Error:", error);
+        console.error(
+          "AI Error:",
+          error
+        );
+
 
         addMessage(
           "❌ " + error.message,
@@ -273,19 +403,23 @@
 
       } finally {
 
-        sendButton.disabled = false;
-        sendButton.textContent = "Send";
+        sendButton.disabled =
+          false;
+
+        micButton.disabled =
+          false;
+
+        sendButton.textContent =
+          "Send";
 
         input.focus();
       }
     }
 
 
-    sendButton.addEventListener(
-      "click",
-      sendMessage
-    );
-
+    // -----------------------------
+    // ENTER KEY
+    // -----------------------------
 
     input.addEventListener(
       "keydown",
@@ -298,6 +432,210 @@
       }
     );
 
+
+    sendButton.addEventListener(
+      "click",
+      sendMessage
+    );
+
+
+    // -----------------------------
+    // VOICE INPUT
+    // -----------------------------
+
+    const SpeechRecognition =
+      window.SpeechRecognition ||
+      window.webkitSpeechRecognition;
+
+
+    let recognition = null;
+
+
+    if (SpeechRecognition) {
+
+      recognition =
+        new SpeechRecognition();
+
+
+      recognition.continuous =
+        false;
+
+      recognition.interimResults =
+        false;
+
+
+      // Tamil voice recognition
+      recognition.lang =
+        "ta-IN";
+
+
+      recognition.onstart =
+        function() {
+
+          micButton.classList.add(
+            "listening"
+          );
+
+          micButton.textContent =
+            "🔴";
+
+          status.textContent =
+            "🎤 Listening...";
+
+        };
+
+
+      recognition.onresult =
+        function(event) {
+
+          const transcript =
+            event.results[0][0].transcript;
+
+          input.value =
+            transcript;
+
+          status.textContent =
+            "● Online";
+
+          status.style.color =
+            "#86efac";
+
+
+          // Automatically send
+          sendMessage();
+
+        };
+
+
+      recognition.onerror =
+        function(event) {
+
+          console.error(
+            "Speech error:",
+            event.error
+          );
+
+          status.textContent =
+            "🎤 Mic error";
+
+          status.style.color =
+            "#fca5a5";
+        };
+
+
+      recognition.onend =
+        function() {
+
+          micButton.classList.remove(
+            "listening"
+          );
+
+          micButton.textContent =
+            "🎤";
+
+          status.textContent =
+            "● Online";
+
+          status.style.color =
+            "#86efac";
+        };
+
+
+      micButton.addEventListener(
+        "click",
+        function() {
+
+          try {
+
+            recognition.start();
+
+          } catch (error) {
+
+            console.error(error);
+
+          }
+
+        }
+      );
+
+
+    } else {
+
+      micButton.disabled =
+        true;
+
+      micButton.title =
+        "Speech recognition is not supported in this browser";
+
+    }
+
+
+    // -----------------------------
+    // VOICE OUTPUT
+    // -----------------------------
+
+    function speakText(text) {
+
+      if (
+        !("speechSynthesis" in window)
+      ) {
+
+        console.log(
+          "Speech synthesis not supported"
+        );
+
+        return;
+      }
+
+
+      window.speechSynthesis.cancel();
+
+
+      const utterance =
+        new SpeechSynthesisUtterance(
+          text
+        );
+
+
+      // Tamil voice
+      utterance.lang =
+        "ta-IN";
+
+      utterance.rate =
+        1;
+
+      utterance.pitch =
+        1;
+
+      utterance.volume =
+        1;
+
+
+      window.speechSynthesis.speak(
+        utterance
+      );
+    }
+
+
+    speakButton.addEventListener(
+      "click",
+      function() {
+
+        if (lastAnswer) {
+
+          speakText(
+            lastAnswer
+          );
+
+        }
+
+      }
+    );
+
+
+    // -----------------------------
+    // START
+    // -----------------------------
 
     checkBackend();
 
