@@ -1,84 +1,21 @@
+
 const API_URL = "https://ai-tool-2-zpul.onrender.com/api/chat";
-  
-  document.querySelector("#messageInput") ||
-  document.querySelector("#userInput") ||
-  document.querySelector("textarea");
 
-const sendButton =
-  document.querySelector("#sendButton") ||
-  document.querySelector("#sendBtn");
-
-const chat =
-  document.querySelector("#chat") ||
-  document.querySelector("#chatContainer") ||
-  document.querySelector(".chat-container");
+const chat = document.getElementById("chat");
+const input = document.getElementById("message");
+const sendButton = document.getElementById("send");
 
 function addMessage(text, type) {
-  if (!chat) {
-    console.log(type, text);
-    return;
-  }
+  const message = document.createElement("div");
 
-  const div = document.createElement("div");
+  message.className = "message " + type;
+  message.textContent = text;
 
-  div.className =
-    type === "user"
-      ? "message user-message"
-      : "message ai-message";
-
-  div.textContent = text;
-
-  chat.appendChild(div);
-
+  chat.appendChild(message);
   chat.scrollTop = chat.scrollHeight;
 }
 
-async function askAI(message) {
-  const response = await fetch(API_URL, {
-    method: "POST",
-
-    headers: {
-      "Content-Type": "application/json"
-    },
-
-    body: JSON.stringify({
-      message: message
-    })
-  });
-
-  const text = await response.text();
-
-  console.log("Backend:", text);
-
-  let data;
-
-  try {
-    data = JSON.parse(text);
-  } catch (error) {
-    throw new Error(
-      "Backend JSON response கிடைக்கவில்லை"
-    );
-  }
-
-  if (!response.ok) {
-    throw new Error(
-      data.error ||
-      data.details ||
-      "AI request failed"
-    );
-  }
-
-  return data.reply;
-}
-
 async function sendMessage() {
-  if (!input) {
-    console.error(
-      "Input element not found"
-    );
-    return;
-  }
-
   const message = input.value.trim();
 
   if (!message) {
@@ -88,77 +25,86 @@ async function sendMessage() {
   addMessage(message, "user");
 
   input.value = "";
+  sendButton.disabled = true;
+  sendButton.textContent = "…";
 
-  addMessage("Thinking...", "ai");
+  const loading = document.createElement("div");
+  loading.className = "message ai";
+  loading.textContent = "Thinking...";
+
+  chat.appendChild(loading);
 
   try {
-    const reply = await askAI(message);
+    const response = await fetch(API_URL, {
+      method: "POST",
 
-    if (chat) {
-      const aiMessages =
-        chat.querySelectorAll(".ai-message");
+      headers: {
+        "Content-Type": "application/json"
+      },
 
-      const last =
-        aiMessages[aiMessages.length - 1];
+      body: JSON.stringify({
+        message: message
+      })
+    });
 
-      if (
-        last &&
-        last.textContent === "Thinking..."
-      ) {
-        last.remove();
-      }
+    const text = await response.text();
+
+    console.log("Server response:", text);
+
+    let data;
+
+    try {
+      data = JSON.parse(text);
+    } catch (error) {
+      throw new Error(
+        "Server JSON response கொடுக்கவில்லை: " + text
+      );
     }
 
-    addMessage(reply, "ai");
+    if (!response.ok) {
+      throw new Error(
+        data.error || "Request failed"
+      );
+    }
+
+    loading.remove();
+
+    addMessage(
+      data.reply || "Empty response",
+      "ai"
+    );
 
   } catch (error) {
-    console.error("AI Error:", error);
+    console.error("Connection error:", error);
 
-    if (chat) {
-      const aiMessages =
-        chat.querySelectorAll(".ai-message");
-
-      const last =
-        aiMessages[aiMessages.length - 1];
-
-      if (
-        last &&
-        last.textContent === "Thinking..."
-      ) {
-        last.remove();
-      }
-    }
+    loading.remove();
 
     addMessage(
       "❌ " + error.message,
       "ai"
     );
   }
+
+  sendButton.disabled = false;
+  sendButton.textContent = "Send";
+
+  input.focus();
 }
 
-if (sendButton) {
-  sendButton.addEventListener(
-    "click",
-    sendMessage
-  );
-}
+sendButton.addEventListener(
+  "click",
+  sendMessage
+);
 
-if (input) {
-  input.addEventListener(
-    "keydown",
-    function (event) {
-      if (
-        event.key === "Enter" &&
-        !event.shiftKey
-      ) {
-        event.preventDefault();
-        sendMessage();
-      }
+input.addEventListener(
+  "keydown",
+  function (event) {
+    if (
+      event.key === "Enter" &&
+      !event.shiftKey
+    ) {
+      event.preventDefault();
+      sendMessage();
     }
-  );
-}
-
-console.log(
-  "AI frontend connected:",
-  API_URL
+  }
 );
