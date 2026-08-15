@@ -1,30 +1,69 @@
 /* =====================================================
-   VIGGO AI - FRONTEND SCRIPT
+   VIGGO AI - COMPLETE SCRIPT
+   Connected to Render Backend
 ===================================================== */
 
-const messageInput = document.getElementById("message");
-const sendButton = document.getElementById("send");
-const micButton = document.getElementById("mic");
+const API_URL =
+  "https://ai-tool-1-fgmc.onrender.com/api/chat";
 
-const conversation = document.getElementById("conversation");
 
-const newChatButton = document.getElementById("newChat");
-const historyButton = document.getElementById("historyButton");
-const saveButton = document.getElementById("saveButton");
-const voiceToggle = document.getElementById("voiceToggle");
-const clearHistoryButton = document.getElementById("clearHistory");
+/* =====================================================
+   ELEMENTS
+===================================================== */
 
-const historyModal = document.getElementById("historyModal");
-const historyList = document.getElementById("historyList");
-const closeHistory = document.getElementById("closeHistory");
+const messageInput =
+  document.getElementById("message");
 
-const currentTitle = document.getElementById("currentTitle");
+const sendButton =
+  document.getElementById("send");
 
-const pinnedList = document.getElementById("pinnedList");
-const recentList = document.getElementById("recentList");
+const micButton =
+  document.getElementById("mic");
 
-const mobileMenu = document.getElementById("mobileMenu");
-const sidebar = document.getElementById("sidebar");
+const conversation =
+  document.getElementById("conversation");
+
+const newChatButton =
+  document.getElementById("newChat");
+
+const historyButton =
+  document.getElementById("historyButton");
+
+const saveButton =
+  document.getElementById("saveButton");
+
+const voiceToggle =
+  document.getElementById("voiceToggle");
+
+const clearHistoryButton =
+  document.getElementById("clearHistory");
+
+const historyModal =
+  document.getElementById("historyModal");
+
+const historyList =
+  document.getElementById("historyList");
+
+const closeHistory =
+  document.getElementById("closeHistory");
+
+const currentTitle =
+  document.getElementById("currentTitle");
+
+const pinnedList =
+  document.getElementById("pinnedList");
+
+const recentList =
+  document.getElementById("recentList");
+
+const mobileMenu =
+  document.getElementById("mobileMenu");
+
+const sidebar =
+  document.getElementById("sidebar");
+
+const chatArea =
+  document.getElementById("chatArea");
 
 
 /* =====================================================
@@ -34,7 +73,9 @@ const sidebar = document.getElementById("sidebar");
 let currentMessages = [];
 
 let savedChats =
-  JSON.parse(localStorage.getItem("viggoChats") || "[]");
+  JSON.parse(
+    localStorage.getItem("viggoChats") || "[]"
+  );
 
 let voiceEnabled = true;
 
@@ -42,18 +83,23 @@ let recognition = null;
 
 
 /* =====================================================
-   INITIALIZE
+   START
 ===================================================== */
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
 
-  renderSidebar();
+    renderSidebar();
 
-  setupSuggestions();
+    setupSuggestions();
 
-  setupVoice();
+    setupVoice();
 
-});
+    messageInput.focus();
+
+  }
+);
 
 
 /* =====================================================
@@ -65,49 +111,86 @@ async function sendMessage() {
   const text =
     messageInput.value.trim();
 
+
   if (!text) {
     return;
   }
 
-  addMessage("user", text);
+
+  /* USER MESSAGE */
+
+  addMessage(
+    "user",
+    text
+  );
+
+
+  currentMessages.push({
+
+    role: "user",
+
+    content: text
+
+  });
+
 
   messageInput.value = "";
 
   autoResize();
 
-  currentMessages.push({
-    role: "user",
-    content: text
-  });
-
   updateTitle(text);
 
+  scrollToBottom();
+
+
+  /* DISABLE SEND */
+
   sendButton.disabled = true;
+
+
+  /* TYPING */
 
   const typingId =
     addTypingMessage();
 
+
   try {
 
     const response =
-      await fetch("/api/chat", {
+      await fetch(
+        API_URL,
+        {
 
-        method: "POST",
+          method: "POST",
 
-        headers: {
-          "Content-Type": "application/json"
-        },
+          headers: {
 
-        body: JSON.stringify({
-          message: text,
-          history: currentMessages
-        })
+            "Content-Type":
+              "application/json"
 
-      });
+          },
+
+          body:
+            JSON.stringify({
+
+              message: text,
+
+              history:
+                currentMessages
+
+            })
+
+        }
+      );
 
 
     if (!response.ok) {
-      throw new Error("Server error");
+
+      throw new Error(
+        "Server returned " +
+        response.status
+      );
+
     }
 
 
@@ -115,7 +198,9 @@ async function sendMessage() {
       await response.json();
 
 
-    removeMessage(typingId);
+    removeMessage(
+      typingId
+    );
 
 
     const reply =
@@ -123,41 +208,62 @@ async function sendMessage() {
       "Sorry, I couldn't generate a response.";
 
 
-    addMessage("ai", reply);
+    /* AI MESSAGE */
+
+    addMessage(
+      "ai",
+      reply
+    );
 
 
     currentMessages.push({
+
       role: "assistant",
+
       content: reply
+
     });
 
 
+    /* VOICE */
+
     if (voiceEnabled) {
+
       speak(reply);
+
     }
 
+
+    /* SAVE */
 
     saveCurrentChat();
 
 
   } catch (error) {
 
-    removeMessage(typingId);
+    console.error(
+      "Viggo API Error:",
+      error
+    );
 
-    const fallback =
-      "Viggo server is not connected. Please start the server and try again.";
 
-    addMessage("ai", fallback);
+    removeMessage(
+      typingId
+    );
 
-    console.error(error);
 
-  } finally {
-
-    sendButton.disabled = false;
-
-    messageInput.focus();
+    addMessage(
+      "ai",
+      "Viggo server is not connected. Please check the Render server and try again."
+    );
 
   }
+
+
+  sendButton.disabled = false;
+
+  messageInput.focus();
+
 }
 
 
@@ -172,12 +278,13 @@ sendButton.addEventListener(
 
 
 /* =====================================================
-   ENTER KEY
+   ENTER = SEND
+   SHIFT + ENTER = NEW LINE
 ===================================================== */
 
 messageInput.addEventListener(
   "keydown",
-  function(event) {
+  event => {
 
     if (
       event.key === "Enter" &&
@@ -195,7 +302,7 @@ messageInput.addEventListener(
 
 
 /* =====================================================
-   TEXTAREA AUTO RESIZE
+   TEXTAREA RESIZE
 ===================================================== */
 
 messageInput.addEventListener(
@@ -206,13 +313,16 @@ messageInput.addEventListener(
 
 function autoResize() {
 
-  messageInput.style.height = "auto";
+  messageInput.style.height =
+    "auto";
+
 
   messageInput.style.height =
     Math.min(
       messageInput.scrollHeight,
       150
     ) + "px";
+
 }
 
 
@@ -220,20 +330,28 @@ function autoResize() {
    ADD MESSAGE
 ===================================================== */
 
-function addMessage(type, text) {
+function addMessage(
+  type,
+  text
+) {
 
   const wrapper =
     document.createElement("div");
+
 
   wrapper.className =
     `message ${type}`;
 
 
+  /* AVATAR */
+
   const avatar =
     document.createElement("div");
 
+
   avatar.className =
     "message-avatar";
+
 
   avatar.textContent =
     type === "user"
@@ -241,15 +359,21 @@ function addMessage(type, text) {
       : "B";
 
 
+  /* CONTENT */
+
   const content =
     document.createElement("div");
 
 
+  /* NAME */
+
   const name =
     document.createElement("div");
 
+
   name.className =
     "message-name";
+
 
   name.textContent =
     type === "user"
@@ -257,78 +381,128 @@ function addMessage(type, text) {
       : "Viggo";
 
 
+  /* TEXT */
+
   const textElement =
     document.createElement("div");
 
+
   textElement.className =
     "message-text";
+
 
   textElement.textContent =
     text;
 
 
-  content.appendChild(name);
+  content.appendChild(
+    name
+  );
 
-  content.appendChild(textElement);
 
-  wrapper.appendChild(avatar);
+  content.appendChild(
+    textElement
+  );
 
-  wrapper.appendChild(content);
 
-  conversation.appendChild(wrapper);
+  wrapper.appendChild(
+    avatar
+  );
+
+
+  wrapper.appendChild(
+    content
+  );
+
+
+  conversation.appendChild(
+    wrapper
+  );
 
 
   scrollToBottom();
 
+
   return wrapper;
+
 }
 
 
 /* =====================================================
-   TYPING
+   TYPING MESSAGE
 ===================================================== */
 
 function addTypingMessage() {
 
+  const id =
+    "typing-" +
+    Date.now();
+
+
   const wrapper =
     document.createElement("div");
+
 
   wrapper.className =
     "message ai";
 
+
   wrapper.id =
-    "typing-" + Date.now();
+    id;
 
 
   wrapper.innerHTML = `
-    <div class="message-avatar">B</div>
+
+    <div class="message-avatar">
+      B
+    </div>
 
     <div>
-      <div class="message-name">Viggo</div>
+
+      <div class="message-name">
+        Viggo
+      </div>
 
       <div class="message-text">
         Thinking...
       </div>
+
     </div>
+
   `;
 
 
-  conversation.appendChild(wrapper);
+  conversation.appendChild(
+    wrapper
+  );
+
 
   scrollToBottom();
 
-  return wrapper.id;
+
+  return id;
+
 }
 
+
+/* =====================================================
+   REMOVE MESSAGE
+===================================================== */
 
 function removeMessage(id) {
 
   const element =
-    document.getElementById(id);
+    document.getElementById(
+      id
+    );
+
 
   if (element) {
+
     element.remove();
+
   }
+
 }
 
 
@@ -338,15 +512,42 @@ function removeMessage(id) {
 
 function scrollToBottom() {
 
-  const chatArea =
-    document.getElementById("chatArea");
+  setTimeout(
+    () => {
 
-  setTimeout(() => {
+      chatArea.scrollTop =
+        chatArea.scrollHeight;
 
-    chatArea.scrollTop =
-      chatArea.scrollHeight;
+    },
+    50
+  );
 
-  }, 50);
+}
+
+
+/* =====================================================
+   UPDATE TITLE
+===================================================== */
+
+function updateTitle(text) {
+
+  let title =
+    text.substring(
+      0,
+      35
+    );
+
+
+  if (text.length > 35) {
+
+    title += "...";
+
+  }
+
+
+  currentTitle.textContent =
+    title;
+
 }
 
 
@@ -360,7 +561,9 @@ newChatButton.addEventListener(
 
     saveCurrentChat();
 
+
     currentMessages = [];
+
 
     conversation.innerHTML = `
 
@@ -368,7 +571,9 @@ newChatButton.addEventListener(
 
         <div class="welcome-box">
 
-          <div class="ai-logo">B</div>
+          <div class="ai-logo">
+            B
+          </div>
 
           <h1>
             What can I help you with?
@@ -379,18 +584,87 @@ newChatButton.addEventListener(
             for learning, coding, ideas and everyday tasks.
           </p>
 
+          <div class="suggestions">
+
+            <button
+              class="suggestion"
+              data-text="Explain this concept in simple words">
+
+              <strong>
+                🧠 Explain
+              </strong>
+
+              <span>
+                Understand difficult topics easily
+              </span>
+
+            </button>
+
+
+            <button
+              class="suggestion"
+              data-text="Help me write a program">
+
+              <strong>
+                💻 Code
+              </strong>
+
+              <span>
+                Build and debug your projects
+              </span>
+
+            </button>
+
+
+            <button
+              class="suggestion"
+              data-text="Give me creative ideas">
+
+              <strong>
+                💡 Create
+              </strong>
+
+              <span>
+                Generate fresh ideas
+              </span>
+
+            </button>
+
+
+            <button
+              class="suggestion"
+              data-text="Teach me something interesting">
+
+              <strong>
+                🚀 Learn
+              </strong>
+
+              <span>
+                Learn something new
+              </span>
+
+            </button>
+
+          </div>
+
         </div>
 
       </div>
 
     `;
 
+
     currentTitle.textContent =
       "New Chat";
 
+
     setupSuggestions();
 
+
     closeSidebar();
+
+
+    messageInput.focus();
 
   }
 );
@@ -403,43 +677,31 @@ newChatButton.addEventListener(
 function setupSuggestions() {
 
   document
-    .querySelectorAll(".suggestion")
-    .forEach(button => {
+    .querySelectorAll(
+      ".suggestion"
+    )
+    .forEach(
+      button => {
 
-      button.addEventListener(
-        "click",
-        () => {
+        button.addEventListener(
+          "click",
+          () => {
 
-          messageInput.value =
-            button.dataset.text;
-
-          autoResize();
-
-          messageInput.focus();
-
-        }
-      );
-
-    });
-
-}
+            messageInput.value =
+              button.dataset.text;
 
 
-/* =====================================================
-   TITLE
-===================================================== */
+            autoResize();
 
-function updateTitle(text) {
 
-  let title =
-    text.substring(0, 35);
+            messageInput.focus();
 
-  if (text.length > 35) {
-    title += "...";
-  }
+          }
+        );
 
-  currentTitle.textContent =
-    title;
+      }
+    );
+
 }
 
 
@@ -449,60 +711,107 @@ function updateTitle(text) {
 
 function saveCurrentChat() {
 
-  if (currentMessages.length === 0) {
+  if (
+    currentMessages.length === 0
+  ) {
+
     return;
+
   }
 
 
   const firstUser =
     currentMessages.find(
-      message =>
-        message.role === "user"
+      item =>
+        item.role === "user"
     );
 
 
   if (!firstUser) {
+
     return;
+
   }
 
 
-  const chat = {
+  /*
+     Avoid saving the exact
+     same conversation repeatedly.
+  */
 
-    id: Date.now(),
-
-    title:
-      firstUser.content.substring(
-        0,
-        45
-      ),
-
-    messages:
-      [...currentMessages],
-
-    pinned: false,
-
-    time:
-      new Date().toLocaleString()
-
-  };
+  const existing =
+    savedChats.find(
+      chat =>
+        chat.messages?.length ===
+        currentMessages.length &&
+        chat.messages?.[0]?.content ===
+        currentMessages[0]?.content
+    );
 
 
-  savedChats.unshift(chat);
+  if (existing) {
+
+    existing.messages =
+      [...currentMessages];
+
+    existing.time =
+      new Date().toLocaleString();
 
 
-  if (savedChats.length > 30) {
+  } else {
+
+    const chat = {
+
+      id: Date.now(),
+
+      title:
+        firstUser.content.substring(
+          0,
+          45
+        ),
+
+      messages:
+        [...currentMessages],
+
+      pinned:
+        false,
+
+      time:
+        new Date().toLocaleString()
+
+    };
+
+
+    savedChats.unshift(
+      chat
+    );
+
+  }
+
+
+  if (
+    savedChats.length > 30
+  ) {
+
     savedChats =
-      savedChats.slice(0, 30);
+      savedChats.slice(
+        0,
+        30
+      );
+
   }
 
 
   localStorage.setItem(
     "viggoChats",
-    JSON.stringify(savedChats)
+    JSON.stringify(
+      savedChats
+    )
   );
 
 
   renderSidebar();
+
 }
 
 
@@ -512,29 +821,36 @@ function saveCurrentChat() {
 
 function renderSidebar() {
 
-  pinnedList.innerHTML = "";
+  pinnedList.innerHTML =
+    "";
 
-  recentList.innerHTML = "";
+  recentList.innerHTML =
+    "";
 
 
   const pinned =
     savedChats.filter(
-      chat => chat.pinned
+      chat =>
+        chat.pinned
     );
 
 
   const recent =
     savedChats.filter(
-      chat => !chat.pinned
+      chat =>
+        !chat.pinned
     );
 
 
-  if (pinned.length === 0) {
+  if (
+    pinned.length === 0
+  ) {
 
-    pinnedList.innerHTML =
-      `<div class="empty-sidebar">
+    pinnedList.innerHTML = `
+      <div class="empty-sidebar">
         No pinned chats
-      </div>`;
+      </div>
+    `;
 
   } else {
 
@@ -549,12 +865,15 @@ function renderSidebar() {
   }
 
 
-  if (recent.length === 0) {
+  if (
+    recent.length === 0
+  ) {
 
-    recentList.innerHTML =
-      `<div class="empty-sidebar">
+    recentList.innerHTML = `
+      <div class="empty-sidebar">
         No recent chats
-      </div>`;
+      </div>
+    `;
 
   } else {
 
@@ -574,7 +893,7 @@ function renderSidebar() {
 
 
 /* =====================================================
-   SIDEBAR CHAT ITEM
+   SIDEBAR CHAT
 ===================================================== */
 
 function addSidebarChat(
@@ -583,44 +902,69 @@ function addSidebarChat(
 ) {
 
   const button =
-    document.createElement("button");
+    document.createElement(
+      "button"
+    );
+
 
   button.className =
     "chat-item";
 
 
   const title =
-    document.createElement("span");
+    document.createElement(
+      "span"
+    );
+
 
   title.className =
     "chat-item-title";
+
 
   title.textContent =
     chat.title;
 
 
-  button.appendChild(title);
+  button.appendChild(
+    title
+  );
 
 
   if (chat.pinned) {
 
     const pin =
-      document.createElement("span");
+      document.createElement(
+        "span"
+      );
 
-    pin.textContent = "📌";
 
-    button.appendChild(pin);
+    pin.textContent =
+      "📌";
+
+
+    button.appendChild(
+      pin
+    );
 
   }
 
 
   button.addEventListener(
     "click",
-    () => loadChat(chat.id)
+    () => {
+
+      loadChat(
+        chat.id
+      );
+
+    }
   );
 
 
-  container.appendChild(button);
+  container.appendChild(
+    button
+  );
+
 }
 
 
@@ -632,12 +976,15 @@ function loadChat(id) {
 
   const chat =
     savedChats.find(
-      item => item.id === id
+      item =>
+        item.id === id
     );
 
 
   if (!chat) {
+
     return;
+
   }
 
 
@@ -645,18 +992,21 @@ function loadChat(id) {
     [...chat.messages];
 
 
-  conversation.innerHTML = "";
+  conversation.innerHTML =
+    "";
 
 
   currentMessages.forEach(
     message => {
 
       addMessage(
+
         message.role === "user"
           ? "user"
           : "ai",
 
         message.content
+
       );
 
     }
@@ -673,7 +1023,7 @@ function loadChat(id) {
 
 
 /* =====================================================
-   HISTORY
+   HISTORY BUTTON
 ===================================================== */
 
 historyButton.addEventListener(
@@ -682,12 +1032,17 @@ historyButton.addEventListener(
 
     renderHistory();
 
+
     historyModal.style.display =
       "block";
 
   }
 );
 
+
+/* =====================================================
+   CLOSE HISTORY
+===================================================== */
 
 closeHistory.addEventListener(
   "click",
@@ -705,7 +1060,8 @@ historyModal.addEventListener(
   event => {
 
     if (
-      event.target === historyModal
+      event.target ===
+      historyModal
     ) {
 
       historyModal.style.display =
@@ -723,188 +1079,207 @@ historyModal.addEventListener(
 
 function renderHistory() {
 
-  historyList.innerHTML = "";
+  historyList.innerHTML =
+    "";
 
 
-  if (savedChats.length === 0) {
+  if (
+    savedChats.length === 0
+  ) {
 
-    historyList.innerHTML =
-      `<div class="empty-sidebar">
+    historyList.innerHTML = `
+      <div class="empty-sidebar">
         No chat history yet.
-      </div>`;
+      </div>
+    `;
 
     return;
+
   }
 
 
-  savedChats.forEach(chat => {
+  savedChats.forEach(
+    chat => {
 
-    const card =
-      document.createElement("div");
-
-    card.className =
-      "history-card";
-
-
-    card.innerHTML = `
-
-      <div class="history-card-title">
-        ${escapeHTML(chat.title)}
-      </div>
-
-      <div class="history-card-time">
-        ${escapeHTML(chat.time)}
-      </div>
-
-      <div class="history-card-actions">
-
-        <button data-load="${chat.id}">
-          Open
-        </button>
-
-        <button data-pin="${chat.id}">
-          ${chat.pinned ? "Unpin" : "Pin"}
-        </button>
-
-        <button data-delete="${chat.id}">
-          Delete
-        </button>
-
-      </div>
-
-    `;
+      const card =
+        document.createElement(
+          "div"
+        );
 
 
-    historyList.appendChild(card);
+      card.className =
+        "history-card";
 
-  });
+
+      card.innerHTML = `
+
+        <div class="history-card-title">
+          ${escapeHTML(chat.title)}
+        </div>
+
+        <div class="history-card-time">
+          ${escapeHTML(chat.time)}
+        </div>
+
+        <div class="history-card-actions">
+
+          <button data-load="${chat.id}">
+            Open
+          </button>
+
+          <button data-pin="${chat.id}">
+            ${
+              chat.pinned
+                ? "Unpin"
+                : "Pin"
+            }
+          </button>
+
+          <button data-delete="${chat.id}">
+            Delete
+          </button>
+
+        </div>
+
+      `;
 
 
-  historyList
-    .querySelectorAll("[data-load]")
-    .forEach(button => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          loadChat(
-            Number(
-              button.dataset.load
-            )
-          );
-
-          historyModal.style.display =
-            "none";
-
-        }
+      historyList.appendChild(
+        card
       );
 
-    });
-
-
-  historyList
-    .querySelectorAll("[data-pin]")
-    .forEach(button => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          const chat =
-            savedChats.find(
-              item =>
-                item.id ===
-                Number(button.dataset.pin)
-            );
-
-          if (chat) {
-            chat.pinned =
-              !chat.pinned;
-          }
-
-          localStorage.setItem(
-            "viggoChats",
-            JSON.stringify(savedChats)
-          );
-
-          renderHistory();
-
-          renderSidebar();
-
-        }
-      );
-
-    });
-
-
-  historyList
-    .querySelectorAll("[data-delete]")
-    .forEach(button => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          savedChats =
-            savedChats.filter(
-              item =>
-                item.id !==
-                Number(
-                  button.dataset.delete
-                )
-            );
-
-
-          localStorage.setItem(
-            "viggoChats",
-            JSON.stringify(savedChats)
-          );
-
-
-          renderHistory();
-
-          renderSidebar();
-
-        }
-      );
-
-    });
-
-}
-
-
-/* =====================================================
-   CLEAR HISTORY
-===================================================== */
-
-clearHistoryButton.addEventListener(
-  "click",
-  () => {
-
-    const ok =
-      confirm(
-        "Delete all Viggo chat history?"
-      );
-
-    if (!ok) {
-      return;
     }
+  );
 
 
-    savedChats = [];
+  /* OPEN */
 
-    localStorage.removeItem(
-      "viggoChats"
+  historyList
+    .querySelectorAll(
+      "[data-load]"
+    )
+    .forEach(
+      button => {
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            loadChat(
+              Number(
+                button.dataset.load
+              )
+            );
+
+
+            historyModal.style.display =
+              "none";
+
+          }
+        );
+
+      }
     );
 
 
-    renderSidebar();
+  /* PIN */
 
-    historyList.innerHTML = "";
+  historyList
+    .querySelectorAll(
+      "[data-pin]"
+    )
+    .forEach(
+      button => {
 
-  }
-);
+        button.addEventListener(
+          "click",
+          () => {
+
+            const id =
+              Number(
+                button.dataset.pin
+              );
+
+
+            const chat =
+              savedChats.find(
+                item =>
+                  item.id === id
+              );
+
+
+            if (chat) {
+
+              chat.pinned =
+                !chat.pinned;
+
+            }
+
+
+            localStorage.setItem(
+              "viggoChats",
+              JSON.stringify(
+                savedChats
+              )
+            );
+
+
+            renderHistory();
+
+            renderSidebar();
+
+          }
+        );
+
+      }
+    );
+
+
+  /* DELETE */
+
+  historyList
+    .querySelectorAll(
+      "[data-delete]"
+    )
+    .forEach(
+      button => {
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            const id =
+              Number(
+                button.dataset.delete
+              );
+
+
+            savedChats =
+              savedChats.filter(
+                item =>
+                  item.id !== id
+              );
+
+
+            localStorage.setItem(
+              "viggoChats",
+              JSON.stringify(
+                savedChats
+              )
+            );
+
+
+            renderHistory();
+
+            renderSidebar();
+
+          }
+        );
+
+      }
+    );
+
+}
 
 
 /* =====================================================
@@ -915,17 +1290,21 @@ saveButton.addEventListener(
   "click",
   () => {
 
-    if (currentMessages.length === 0) {
+    if (
+      currentMessages.length === 0
+    ) {
 
       alert(
         "Start a chat first."
       );
 
       return;
+
     }
 
 
     saveCurrentChat();
+
 
     alert(
       "Chat saved successfully."
@@ -936,7 +1315,48 @@ saveButton.addEventListener(
 
 
 /* =====================================================
-   VOICE OUTPUT
+   CLEAR HISTORY
+===================================================== */
+
+clearHistoryButton.addEventListener(
+  "click",
+  () => {
+
+    const confirmDelete =
+      confirm(
+        "Delete all Viggo chat history?"
+      );
+
+
+    if (!confirmDelete) {
+
+      return;
+
+    }
+
+
+    savedChats = [];
+
+
+    localStorage.removeItem(
+      "viggoChats"
+    );
+
+
+    renderSidebar();
+
+
+    historyList.innerHTML =
+      `<div class="empty-sidebar">
+        No chat history yet.
+      </div>`;
+
+  }
+);
+
+
+/* =====================================================
+   VOICE TOGGLE
 ===================================================== */
 
 voiceToggle.addEventListener(
@@ -952,9 +1372,14 @@ voiceToggle.addEventListener(
         ? "🔊  Voice ON"
         : "🔇  Voice OFF";
 
+
   }
 );
 
+
+/* =====================================================
+   TEXT TO SPEECH
+===================================================== */
 
 function speak(text) {
 
@@ -962,7 +1387,9 @@ function speak(text) {
     !voiceEnabled ||
     !("speechSynthesis" in window)
   ) {
+
     return;
+
   }
 
 
@@ -975,19 +1402,23 @@ function speak(text) {
     );
 
 
-  speech.rate = 1;
+  speech.rate =
+    1;
 
-  speech.pitch = 1;
+
+  speech.pitch =
+    1;
 
 
   speechSynthesis.speak(
     speech
   );
+
 }
 
 
 /* =====================================================
-   VOICE INPUT
+   MICROPHONE
 ===================================================== */
 
 function setupVoice() {
@@ -997,12 +1428,15 @@ function setupVoice() {
     window.webkitSpeechRecognition;
 
 
-  if (!SpeechRecognition) {
+  if (
+    !SpeechRecognition
+  ) {
 
     micButton.title =
-      "Voice input is not supported";
+      "Voice input is not supported in this browser";
 
     return;
+
   }
 
 
@@ -1013,8 +1447,10 @@ function setupVoice() {
   recognition.lang =
     "en-IN";
 
+
   recognition.continuous =
     false;
+
 
   recognition.interimResults =
     false;
@@ -1027,6 +1463,7 @@ function setupVoice() {
         "listening"
       );
 
+
       micButton.textContent =
         "🔴";
 
@@ -1037,10 +1474,14 @@ function setupVoice() {
     event => {
 
       const transcript =
-        event.results[0][0].transcript;
+        event
+          .results[0][0]
+          .transcript;
+
 
       messageInput.value +=
         transcript;
+
 
       autoResize();
 
@@ -1054,6 +1495,7 @@ function setupVoice() {
         "listening"
       );
 
+
       micButton.textContent =
         "🎤";
 
@@ -1064,9 +1506,18 @@ function setupVoice() {
     error => {
 
       console.error(
-        "Voice error:",
+        "Microphone error:",
         error
       );
+
+
+      micButton.classList.remove(
+        "listening"
+      );
+
+
+      micButton.textContent =
+        "🎤";
 
     };
 
@@ -1082,7 +1533,7 @@ function setupVoice() {
       } catch (error) {
 
         console.log(
-          "Voice already running"
+          "Voice recognition already running."
         );
 
       }
@@ -1097,16 +1548,20 @@ function setupVoice() {
    MOBILE MENU
 ===================================================== */
 
-mobileMenu.addEventListener(
-  "click",
-  () => {
+if (mobileMenu) {
 
-    sidebar.classList.toggle(
-      "open"
-    );
+  mobileMenu.addEventListener(
+    "click",
+    () => {
 
-  }
-);
+      sidebar.classList.toggle(
+        "open"
+      );
+
+    }
+  );
+
+}
 
 
 function closeSidebar() {
@@ -1125,10 +1580,32 @@ function closeSidebar() {
 function escapeHTML(text) {
 
   const div =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
+
 
   div.textContent =
     text;
 
+
   return div.innerHTML;
+
 }
+
+
+/* =====================================================
+   GLOBAL ERROR
+===================================================== */
+
+window.addEventListener(
+  "error",
+  event => {
+
+    console.error(
+      "Viggo error:",
+      event.error
+    );
+
+  }
+);
