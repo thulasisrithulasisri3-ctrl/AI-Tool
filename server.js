@@ -5,157 +5,301 @@ const { GoogleGenAI } = require("@google/genai");
 
 const app = express();
 
-const PORT = process.env.PORT || 10000;
-
-app.use(cors());
-app.use(express.json());
-app.use(express.static(__dirname));
+const PORT =
+  process.env.PORT || 10000;
 
 
-// ==============================
-// GEMINI
-// ==============================
+/* =================================
+   MIDDLEWARE
+================================= */
 
-const API_KEY = process.env.GEMINI_API_KEY;
+app.use(
+  cors({
+    origin: "*"
+  })
+);
+
+app.use(
+  express.json()
+);
+
+
+/* =================================
+   GEMINI
+================================= */
+
+const API_KEY =
+  process.env.GEMINI_API_KEY;
+
 
 if (!API_KEY) {
-  console.error("❌ GEMINI_API_KEY is missing");
+
+  console.error(
+    "❌ GEMINI_API_KEY is missing"
+  );
+
 } else {
-  console.log("✅ Gemini API key found");
+
+  console.log(
+    "✅ Gemini API key found"
+  );
+
 }
 
-const ai = API_KEY
-  ? new GoogleGenAI({
-      apiKey: API_KEY,
-      httpOptions: {
-        apiVersion: "v1"
-      }
-    })
-  : null;
+
+const ai =
+  API_KEY
+    ? new GoogleGenAI({
+        apiKey: API_KEY,
+
+        httpOptions: {
+          apiVersion: "v1"
+        }
+      })
+    : null;
 
 
-// ==============================
-// HOME
-// ==============================
+/* =================================
+   STATIC FILES
+================================= */
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
-
-
-// ==============================
-// HEALTH
-// ==============================
-
-app.get("/health", (req, res) => {
-  res.json({
-    success: true,
-    app: "Viggo AI Assistant",
-    status: "running"
-  });
-});
+app.use(
+  express.static(__dirname)
+);
 
 
-// ==============================
-// CHAT
-// ==============================
+/* =================================
+   HOME
+================================= */
 
-app.post("/api/chat", async (req, res) => {
+app.get(
+  "/",
+  function (req, res) {
 
-  try {
-
-    const message = req.body?.message?.trim();
-
-    if (!message) {
-      return res.status(400).json({
-        success: false,
-        error: "Message is required"
-      });
-    }
-
-    if (!ai) {
-      return res.status(500).json({
-        success: false,
-        error: "GEMINI_API_KEY is missing"
-      });
-    }
-
-    console.log("User:", message);
-
-
-    // NEW INTERACTIONS API
-
-    const interaction = await ai.interactions.create({
-
-      model: "gemini-3.6-flash",
-
-      input: message
-
-    });
-
-
-    const reply =
-      interaction.output_text ||
-      interaction.outputText ||
-      "No response received.";
-
-
-    console.log("Viggo:", reply);
-
-
-    res.json({
-      success: true,
-      reply: reply
-    });
-
-
-  } catch (error) {
-
-    console.error(
-      "❌ GEMINI ERROR:",
-      error
+    res.sendFile(
+      path.join(
+        __dirname,
+        "index.html"
+      )
     );
 
-    res.status(500).json({
+  }
+);
 
-      success: false,
 
-      error:
-        error.message ||
-        "Gemini request failed"
+/* =================================
+   HEALTH
+================================= */
+
+app.get(
+  "/health",
+  function (req, res) {
+
+    res.status(200).json({
+
+      success:
+        true,
+
+      app:
+        "Viggo AI Assistant",
+
+      status:
+        "running"
 
     });
 
   }
-
-});
-
-
-// ==============================
-// 404
-// ==============================
-
-app.use((req, res) => {
-
-  res.status(404).json({
-
-    success: false,
-
-    error: "Route not found"
-
-  });
-
-});
+);
 
 
-// ==============================
-// START
-// ==============================
+/* =================================
+   CHAT API
+================================= */
+
+app.post(
+  "/api/chat",
+  async function (req, res) {
+
+    try {
+
+      console.log(
+        "POST /api/chat"
+      );
+
+
+      const message =
+        req.body &&
+        typeof req.body.message ===
+          "string"
+          ? req.body.message.trim()
+          : "";
+
+
+      if (!message) {
+
+        return res
+          .status(400)
+          .json({
+
+            success:
+              false,
+
+            error:
+              "Message is required"
+
+          });
+
+      }
+
+
+      if (!ai) {
+
+        return res
+          .status(500)
+          .json({
+
+            success:
+              false,
+
+            error:
+              "GEMINI_API_KEY is missing"
+
+          });
+
+      }
+
+
+      console.log(
+        "User:",
+        message
+      );
+
+
+      const interaction =
+        await ai.interactions.create({
+
+          model:
+            "gemini-3.6-flash",
+
+          input:
+            message
+
+        });
+
+
+      console.log(
+        "Interaction status:",
+        interaction.status
+      );
+
+
+      const reply =
+        interaction.output_text ||
+        interaction.outputText ||
+        "";
+
+
+      if (!reply) {
+
+        console.error(
+          "Gemini returned no text:",
+          interaction
+        );
+
+
+        return res
+          .status(500)
+          .json({
+
+            success:
+              false,
+
+            error:
+              "Gemini returned an empty response"
+
+          });
+
+      }
+
+
+      console.log(
+        "Viggo:",
+        reply
+      );
+
+
+      return res
+        .status(200)
+        .json({
+
+          success:
+            true,
+
+          reply:
+            reply
+
+        });
+
+
+    } catch (error) {
+
+      console.error(
+        "❌ GEMINI ERROR:",
+        error
+      );
+
+
+      return res
+        .status(500)
+        .json({
+
+          success:
+            false,
+
+          error:
+            error.message ||
+            "Gemini request failed"
+
+        });
+
+    }
+
+  }
+);
+
+
+/* =================================
+   API 404
+================================= */
+
+app.use(
+  "/api",
+  function (req, res) {
+
+    res
+      .status(404)
+      .json({
+
+        success:
+          false,
+
+        error:
+          "API route not found"
+
+      });
+
+  }
+);
+
+
+/* =================================
+   SERVER
+================================= */
 
 app.listen(
   PORT,
   "0.0.0.0",
-  () => {
+  function () {
 
     console.log(
       `🚀 Viggo AI Assistant running on port ${PORT}`
