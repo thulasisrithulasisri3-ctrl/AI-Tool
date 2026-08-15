@@ -1,1198 +1,926 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta charset="UTF-8">
+<title>Viggo AI</title>
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+<style>
 
-  <title>Viggo AI</title>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-  <style>
+body {
+    font-family: Arial, sans-serif;
+    background:
+        radial-gradient(circle at 20% 10%, #123b75 0%, transparent 35%),
+        radial-gradient(circle at 80% 90%, #071a38 0%, transparent 40%),
+        #030812;
+    color: #ffffff;
+    height: 100vh;
+    overflow: hidden;
+}
 
-    * {
-      box-sizing: border-box;
+/* ================= APP ================= */
+
+.app {
+    display: flex;
+    height: 100vh;
+}
+
+/* ================= SIDEBAR ================= */
+
+.sidebar {
+    width: 270px;
+    background: rgba(3, 10, 22, 0.94);
+    border-right: 1px solid rgba(38, 126, 255, 0.25);
+    box-shadow: 8px 0 35px rgba(0, 75, 180, 0.12);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* LOGO */
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-bottom: 25px;
+}
+
+.logo-b {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 23px;
+    font-weight: bold;
+
+    background: linear-gradient(
+        145deg,
+        #248cff,
+        #0751c9
+    );
+
+    box-shadow:
+        0 0 12px rgba(20, 125, 255, .7),
+        inset 0 0 12px rgba(255,255,255,.12);
+}
+
+.logo-text {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+/* NEW CHAT */
+
+.new-chat {
+    border: 1px solid rgba(55, 145, 255, .35);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(18, 78, 150, .65),
+            rgba(5, 20, 45, .8)
+        );
+
+    color: white;
+
+    padding: 12px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    text-align: left;
+
+    font-size: 14px;
+
+    box-shadow:
+        0 5px 20px rgba(0, 80, 200, .15);
+
+    transition: .2s;
+}
+
+.new-chat:hover {
+    border-color: #238cff;
+
+    box-shadow:
+        0 0 18px rgba(20,130,255,.3);
+}
+
+/* SIDEBAR TITLE */
+
+.side-title {
+    color: #6e9bcf;
+    font-size: 11px;
+    margin-top: 22px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+/* CHAT LIST */
+
+.chat-list {
+    overflow-y: auto;
+}
+
+.chat-item {
+    width: 100%;
+
+    background: transparent;
+
+    color: #c9d9ef;
+
+    border: none;
+
+    padding: 10px;
+
+    border-radius: 8px;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    margin-bottom: 3px;
+}
+
+.chat-item:hover,
+.chat-item.active {
+    background:
+        linear-gradient(
+            90deg,
+            rgba(20,105,210,.35),
+            rgba(15,30,60,.2)
+        );
+
+    color: white;
+}
+
+/* SIDEBAR BOTTOM */
+
+.sidebar-bottom {
+    margin-top: auto;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+.side-button {
+    border: 1px solid rgba(55,145,255,.18);
+
+    background: rgba(10,25,48,.75);
+
+    color: #dceaff;
+
+    padding: 10px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    text-align: left;
+
+    transition: .2s;
+}
+
+.side-button:hover {
+    background: rgba(20,80,160,.35);
+    border-color: #247fff;
+}
+
+/* ================= MAIN ================= */
+
+.main {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+}
+
+/* ================= TOPBAR ================= */
+
+.topbar {
+    height: 64px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 20px;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(5,15,30,.95),
+            rgba(7,22,45,.9)
+        );
+
+    border-bottom:
+        1px solid rgba(40,130,255,.2);
+
+    box-shadow:
+        0 5px 25px rgba(0,80,180,.12);
+}
+
+.current-title {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.online {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    margin-left: 12px;
+
+    font-size: 12px;
+
+    color: #4ca3ff;
+}
+
+.online-dot {
+    width: 8px;
+    height: 8px;
+
+    border-radius: 50%;
+
+    background: #2b9cff;
+
+    box-shadow:
+        0 0 10px #238cff;
+}
+
+/* TOP ACTIONS */
+
+.top-actions {
+    margin-left: auto;
+
+    display: flex;
+
+    gap: 8px;
+}
+
+.top-btn {
+    border: 1px solid rgba(50,140,255,.25);
+
+    background: rgba(10,30,60,.8);
+
+    color: #d9eaff;
+
+    padding: 8px 12px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+.top-btn:hover {
+    border-color: #298cff;
+
+    box-shadow:
+        0 0 12px rgba(20,130,255,.3);
+}
+
+/* ================= CHAT AREA ================= */
+
+.chat-area {
+    flex: 1;
+
+    overflow-y: auto;
+
+    padding: 25px;
+}
+
+.conversation {
+    max-width: 900px;
+
+    margin: auto;
+}
+
+/* WELCOME */
+
+.welcome {
+    min-height: 65vh;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    text-align: center;
+}
+
+.welcome-b {
+    width: 80px;
+    height: 80px;
+
+    border-radius: 22px;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    margin: auto;
+
+    font-size: 42px;
+    font-weight: bold;
+
+    background:
+        linear-gradient(
+            145deg,
+            #238cff,
+            #063c9d
+        );
+
+    box-shadow:
+        0 0 25px rgba(20,130,255,.6),
+        0 0 70px rgba(10,80,200,.25);
+}
+
+.welcome h1 {
+    margin-top: 18px;
+
+    font-size: 30px;
+}
+
+.welcome p {
+    margin-top: 10px;
+
+    color: #7895ba;
+}
+
+/* ================= MESSAGE ================= */
+
+.message {
+    display: flex;
+
+    gap: 13px;
+
+    padding: 19px 12px;
+
+    border-bottom:
+        1px solid rgba(50,130,255,.1);
+}
+
+.message.user {
+    background: rgba(5,15,30,.3);
+}
+
+.message.ai {
+    background:
+        linear-gradient(
+            90deg,
+            rgba(8,28,58,.48),
+            rgba(4,12,25,.3)
+        );
+
+    border-radius: 10px;
+}
+
+/* AVATAR */
+
+.avatar {
+    width: 36px;
+    height: 36px;
+
+    min-width: 36px;
+
+    border-radius: 9px;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    background:
+        linear-gradient(
+            145deg,
+            #238cff,
+            #0751bd
+        );
+
+    font-weight: bold;
+
+    box-shadow:
+        0 0 12px rgba(20,125,255,.3);
+}
+
+.user .avatar {
+    background:
+        linear-gradient(
+            145deg,
+            #293a52,
+            #111b2b
+        );
+}
+
+.message-content {
+    flex: 1;
+}
+
+.message-name {
+    font-weight: bold;
+
+    margin-bottom: 6px;
+}
+
+.message-text {
+    color: #d4e1f2;
+
+    line-height: 1.65;
+
+    white-space: pre-wrap;
+}
+
+/* ================= MESSAGE BUTTONS ================= */
+
+.message-actions {
+    display: flex;
+
+    gap: 6px;
+
+    margin-top: 11px;
+}
+
+.msg-btn {
+    border:
+        1px solid rgba(60,145,255,.2);
+
+    background:
+        rgba(8,25,50,.7);
+
+    color: #9fc5ed;
+
+    padding: 6px 9px;
+
+    border-radius: 7px;
+
+    cursor: pointer;
+
+    font-size: 12px;
+
+    transition: .2s;
+}
+
+.msg-btn:hover {
+    color: white;
+
+    border-color: #248cff;
+
+    background:
+        rgba(20,90,180,.35);
+
+    box-shadow:
+        0 0 10px rgba(20,120,255,.2);
+}
+
+.msg-btn.active {
+    background: #126ed3;
+
+    color: white;
+
+    border-color: #3298ff;
+}
+
+/* ================= INPUT ================= */
+
+.input-area {
+    padding: 15px 20px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(3,10,22,.7),
+            rgba(2,7,15,.97)
+        );
+
+    border-top:
+        1px solid rgba(45,130,255,.18);
+}
+
+.input-box {
+    max-width: 900px;
+
+    margin: auto;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 7px;
+
+    border-radius: 14px;
+
+    background:
+        rgba(7,22,45,.95);
+
+    border:
+        1px solid rgba(50,140,255,.25);
+
+    box-shadow:
+        0 0 25px rgba(0,80,180,.12);
+}
+
+.message-input {
+    flex: 1;
+
+    background: transparent;
+
+    border: none;
+
+    outline: none;
+
+    resize: none;
+
+    color: white;
+
+    font-size: 15px;
+
+    padding: 10px;
+
+    min-height: 40px;
+}
+
+.message-input::placeholder {
+    color: #607c9f;
+}
+
+.input-btn {
+    width: 42px;
+    height: 40px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    cursor: pointer;
+
+    background:
+        rgba(20,60,110,.7);
+
+    color: #c8e3ff;
+
+    font-size: 17px;
+}
+
+.input-btn:hover {
+    background: #126bd0;
+
+    box-shadow:
+        0 0 14px rgba(20,130,255,.35);
+}
+
+.send-btn {
+    background:
+        linear-gradient(
+            145deg,
+            #238cff,
+            #0751c9
+        );
+
+    color: white;
+}
+
+/* ================= VOICE PANEL ================= */
+
+.voice-panel {
+    display: none;
+
+    position: fixed;
+
+    right: 25px;
+    bottom: 90px;
+
+    width: 280px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #071a35,
+            #020914
+        );
+
+    border:
+        1px solid rgba(50,140,255,.35);
+
+    border-radius: 14px;
+
+    padding: 18px;
+
+    box-shadow:
+        0 0 35px rgba(0,90,220,.3);
+}
+
+.voice-panel.show {
+    display: block;
+}
+
+.voice-panel h3 {
+    margin-bottom: 15px;
+}
+
+.voice-select {
+    width: 100%;
+
+    padding: 10px;
+
+    background: #091b35;
+
+    color: white;
+
+    border:
+        1px solid rgba(50,140,255,.3);
+
+    border-radius: 8px;
+}
+
+/* ================= MOBILE ================= */
+
+.mobile-menu {
+    display: none;
+}
+
+@media(max-width:700px) {
+
+    .sidebar {
+        position: fixed;
+
+        left: -280px;
+
+        top: 0;
+        bottom: 0;
+
+        z-index: 1000;
+
+        transition: .25s;
     }
 
-    body {
-      margin: 0;
-      font-family:
-        Inter,
-        Arial,
-        sans-serif;
-      background: #f7f7f8;
-      color: #222;
+    .sidebar.open {
+        left: 0;
     }
 
-    button,
-    textarea,
-    select,
-    input {
-      font-family: inherit;
-    }
+    .mobile-menu {
+        display: block;
 
-    button {
-      cursor: pointer;
-    }
+        border: 1px solid rgba(50,140,255,.2);
 
-    .app {
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
-    }
+        background: #091b35;
 
-    /* =========================
-       SIDEBAR
-    ========================= */
+        color: white;
 
-    #sidebar {
-      width: 270px;
-      background: #202123;
-      color: white;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-    }
+        border-radius: 8px;
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 22px;
-      font-weight: 700;
-      padding: 10px;
-      margin-bottom: 10px;
-    }
+        padding: 8px 10px;
 
-    .brand-b {
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      background: #10a37f;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-    }
-
-    #newChat,
-    #historyButton,
-    #saveButton,
-    #voiceToggle,
-    #clearHistory {
-
-      border: 0;
-      border-radius: 9px;
-      padding: 11px 12px;
-      cursor: pointer;
-      font-size: 14px;
-
-    }
-
-    #newChat {
-      background: #343541;
-      color: white;
-      text-align: left;
-      margin-bottom: 12px;
-    }
-
-    #newChat:hover,
-    #historyButton:hover,
-    #voiceToggle:hover {
-      background: #444654;
-    }
-
-    .side-title {
-      font-size: 11px;
-      color: #999;
-      padding: 8px 10px;
-      text-transform: uppercase;
-      letter-spacing: .8px;
-    }
-
-    .chat-list {
-      overflow-y: auto;
-    }
-
-    .chat-item {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: transparent;
-      color: #ddd;
-      border: 0;
-      padding: 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      text-align: left;
-      margin-bottom: 3px;
-    }
-
-    .chat-item:hover {
-      background: #343541;
-    }
-
-    .chat-item-title {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .empty-sidebar {
-      color: #777;
-      font-size: 12px;
-      padding: 10px;
-    }
-
-    .sidebar-bottom {
-      margin-top: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-    }
-
-    #historyButton,
-    #voiceToggle {
-      background: #343541;
-      color: white;
-    }
-
-    #saveButton {
-      background: #10a37f;
-      color: white;
-    }
-
-    #clearHistory {
-      background: #8b2020;
-      color: white;
-    }
-
-    /* =========================
-       MAIN
-    ========================= */
-
-    .main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
+        cursor: pointer;
     }
 
     .topbar {
-      min-height: 60px;
-      background: white;
-      border-bottom: 1px solid #ddd;
-      display: flex;
-      align-items: center;
-      padding: 0 18px;
-      gap: 12px;
-    }
-
-    #mobileMenu {
-      display: none;
-      border: 0;
-      background: #eee;
-      border-radius: 8px;
-      padding: 8px 10px;
-    }
-
-    #currentTitle {
-      font-size: 17px;
-      font-weight: 700;
-      flex: 1;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .online-status {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      color: #555;
-      font-size: 13px;
-      white-space: nowrap;
-    }
-
-    .online-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #10a37f;
-    }
-
-    #shareChat {
-      border: 0;
-      background: #f1f1f1;
-      border-radius: 8px;
-      padding: 9px 12px;
-      font-size: 13px;
-    }
-
-    #shareChat:hover {
-      background: #e5e5e5;
-    }
-
-    /* =========================
-       CHAT
-    ========================= */
-
-    #chatArea {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-    }
-
-    #conversation {
-      max-width: 900px;
-      margin: auto;
-    }
-
-    .welcome {
-      min-height: 65vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-    }
-
-    .welcome-box {
-      max-width: 600px;
-    }
-
-    .ai-logo {
-      width: 72px;
-      height: 72px;
-      border-radius: 22px;
-      margin: auto;
-      background: #10a37f;
-      color: white;
-      font-size: 40px;
-      font-weight: 800;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 12px 30px rgba(16,163,127,.2);
-    }
-
-    .welcome-box h1 {
-      margin: 18px 0 10px;
-    }
-
-    .welcome-box p {
-      color: #777;
-      line-height: 1.6;
-    }
-
-    .suggestions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 22px;
-    }
-
-    .suggestion {
-      border: 1px solid #ddd;
-      background: white;
-      border-radius: 12px;
-      padding: 14px;
-      text-align: left;
-      transition: .2s;
-    }
-
-    .suggestion:hover {
-      transform: translateY(-2px);
-      border-color: #10a37f;
-    }
-
-    .suggestion strong {
-      display: block;
-      margin-bottom: 5px;
-    }
-
-    .suggestion span {
-      color: #777;
-      font-size: 12px;
-    }
-
-    /* =========================
-       MESSAGE
-    ========================= */
-
-    .message {
-      display: flex;
-      gap: 12px;
-      padding: 18px 10px;
-      border-bottom: 1px solid #eee;
-    }
-
-    .message.user {
-      background: #fff;
-    }
-
-    .message.ai {
-      background: #f7f7f8;
-    }
-
-    .message-avatar {
-      width: 34px;
-      height: 34px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #10a37f;
-      color: white;
-      font-weight: 800;
-      flex-shrink: 0;
-    }
-
-    .message.user .message-avatar {
-      background: #555;
-    }
-
-    .message-content {
-      min-width: 0;
-      flex: 1;
-    }
-
-    .message-name {
-      font-weight: bold;
-      margin-bottom: 6px;
-    }
-
-    .message-text {
-      white-space: pre-wrap;
-      line-height: 1.65;
-      word-wrap: break-word;
-    }
-
-    /* =========================
-       MESSAGE ACTIONS
-    ========================= */
-
-    .message-actions {
-      display: flex;
-      gap: 6px;
-      margin-top: 10px;
-      flex-wrap: wrap;
-    }
-
-    .message-action {
-      border: 0;
-      background: transparent;
-      color: #666;
-      padding: 6px 8px;
-      border-radius: 7px;
-      font-size: 12px;
-    }
-
-    .message-action:hover {
-      background: #e9e9e9;
-      color: #222;
-    }
-
-    .message-action.liked {
-      color: #10a37f;
-      background: #e4f7f1;
-    }
-
-    /* =========================
-       INPUT
-    ========================= */
-
-    .input-area {
-      background: white;
-      border-top: 1px solid #ddd;
-      padding: 12px;
-    }
-
-    .input-box {
-      max-width: 900px;
-      margin: auto;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border: 1px solid #ccc;
-      border-radius: 13px;
-      padding: 7px;
-      background: white;
-      box-shadow: 0 4px 18px rgba(0,0,0,.04);
-    }
-
-    #message {
-      flex: 1;
-      border: 0;
-      outline: none;
-      resize: none;
-      font-size: 15px;
-      min-height: 38px;
-      max-height: 150px;
-      padding: 9px;
-    }
-
-    #mic,
-    #send {
-      border: 0;
-      border-radius: 9px;
-      cursor: pointer;
-      min-width: 45px;
-      height: 40px;
-    }
-
-    #mic {
-      background: #eee;
-      font-size: 18px;
-    }
-
-    #mic.listening {
-      background: #ffdcdc;
-    }
-
-    #send {
-      background: #10a37f;
-      color: white;
-      font-weight: bold;
-    }
-
-    #send:disabled {
-      opacity: .5;
-      cursor: not-allowed;
-    }
-
-    /* =========================
-       HISTORY MODAL
-    ========================= */
-
-    #historyModal,
-    #voiceModal,
-    #shareModal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.55);
-      z-index: 1000;
-      padding: 30px;
-    }
-
-    .modal-window {
-      background: white;
-      max-width: 800px;
-      max-height: 85vh;
-      overflow-y: auto;
-      margin: auto;
-      border-radius: 14px;
-      padding: 20px;
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 18px;
-    }
-
-    .modal-header h2 {
-      margin: 0;
-    }
-
-    .close-modal {
-      border: 0;
-      background: #eee;
-      border-radius: 8px;
-      padding: 8px 12px;
-    }
-
-    /* =========================
-       VOICE SETTINGS
-    ========================= */
-
-    .voice-row {
-      margin-bottom: 16px;
-    }
-
-    .voice-row label {
-      display: block;
-      font-weight: 700;
-      margin-bottom: 7px;
-    }
-
-    .voice-row select,
-    .voice-row input {
-      width: 100%;
-      border: 1px solid #ccc;
-      border-radius: 9px;
-      padding: 10px;
-    }
-
-    .voice-help {
-      color: #777;
-      font-size: 12px;
-      line-height: 1.5;
-    }
-
-    .voice-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .primary-btn {
-      background: #10a37f;
-      color: white;
-      border: 0;
-      border-radius: 8px;
-      padding: 10px 14px;
-    }
-
-    .secondary-btn {
-      background: #eee;
-      border: 0;
-      border-radius: 8px;
-      padding: 10px 14px;
-    }
-
-    .danger-btn {
-      background: #ffe0e0;
-      color: #a00;
-      border: 0;
-      border-radius: 8px;
-      padding: 10px 14px;
-    }
-
-    /* =========================
-       SHARE
-    ========================= */
-
-    .share-preview {
-      background: #f7f7f8;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      padding: 15px;
-      max-height: 400px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      line-height: 1.6;
-      margin-bottom: 14px;
-    }
-
-    .share-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    /* =========================
-       HISTORY CARD
-    ========================= */
-
-    .history-card {
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      padding: 13px;
-      margin-bottom: 10px;
-    }
-
-    .history-card-title {
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-
-    .history-card-time {
-      color: #888;
-      font-size: 12px;
-      margin-bottom: 10px;
-    }
-
-    .history-card-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .history-card-actions button {
-      border: 0;
-      border-radius: 7px;
-      padding: 8px 10px;
-      cursor: pointer;
-    }
-
-    /* =========================
-       MOBILE
-    ========================= */
-
-    @media (max-width: 700px) {
-
-      #sidebar {
-        position: fixed;
-        left: -280px;
-        top: 0;
-        bottom: 0;
-        z-index: 900;
-        transition: left .2s;
-      }
-
-      #sidebar.open {
-        left: 0;
-      }
-
-      #mobileMenu {
-        display: block;
-      }
-
-      .topbar {
         padding: 0 10px;
-      }
-
-      .online-status {
-        display: none;
-      }
-
-      #shareChat {
-        font-size: 12px;
-        padding: 8px;
-      }
-
-      #chatArea {
-        padding: 10px;
-      }
-
-      .suggestions {
-        grid-template-columns: 1fr;
-      }
-
-      #historyModal,
-      #voiceModal,
-      #shareModal {
-        padding: 10px;
-      }
-
-      .modal-window {
-        max-height: 95vh;
-      }
     }
 
-  </style>
+    .online {
+        display: none;
+    }
 
+    .chat-area {
+        padding: 10px;
+    }
+
+    .top-btn span {
+        display: none;
+    }
+
+}
+
+</style>
 </head>
 
 <body>
 
 <div class="app">
 
-  <!-- SIDEBAR -->
+    <!-- SIDEBAR -->
 
-  <aside id="sidebar">
+    <aside class="sidebar" id="sidebar">
 
-    <div class="brand">
+        <div class="logo">
 
-      <div class="brand-b">
-        B
-      </div>
-
-      <span>
-        Viggo
-      </span>
-
-    </div>
-
-
-    <button id="newChat">
-      ＋ New Chat
-    </button>
-
-
-    <div class="side-title">
-      Pinned
-    </div>
-
-    <div
-      id="pinnedList"
-      class="chat-list"
-    ></div>
-
-
-    <div class="side-title">
-      Recent
-    </div>
-
-    <div
-      id="recentList"
-      class="chat-list"
-    ></div>
-
-
-    <div class="sidebar-bottom">
-
-      <button id="historyButton">
-        🕘 History
-      </button>
-
-      <button id="saveButton">
-        💾 Save Chat
-      </button>
-
-      <button id="voiceToggle">
-        🔊 Voice ON
-      </button>
-
-      <button id="voiceSettings">
-        🎙️ Voice Settings
-      </button>
-
-      <button id="clearHistory">
-        🗑️ Clear History
-      </button>
-
-    </div>
-
-  </aside>
-
-
-  <!-- MAIN -->
-
-  <main class="main">
-
-    <header class="topbar">
-
-      <button id="mobileMenu">
-        ☰
-      </button>
-
-
-      <div id="currentTitle">
-        New Chat
-      </div>
-
-
-      <div class="online-status">
-
-        <span class="online-dot"></span>
-
-        <span>
-          Viggo Online
-        </span>
-
-      </div>
-
-
-      <button id="shareChat">
-        📤 Share
-      </button>
-
-    </header>
-
-
-    <section id="chatArea">
-
-      <div id="conversation">
-
-        <div class="welcome">
-
-          <div class="welcome-box">
-
-            <div class="ai-logo">
-              B
+            <div class="logo-b">
+                B
             </div>
 
-            <h1>
-              What can I help you with?
-            </h1>
-
-            <p>
-              Meet Viggo — your smart AI assistant
-              for learning, coding, ideas and everyday tasks.
-            </p>
-
-
-            <div class="suggestions">
-
-              <button
-                class="suggestion"
-                data-text="Explain this concept in simple words"
-              >
-
-                <strong>
-                  🧠 Explain
-                </strong>
-
-                <span>
-                  Understand difficult topics easily
-                </span>
-
-              </button>
-
-
-              <button
-                class="suggestion"
-                data-text="Help me write a program"
-              >
-
-                <strong>
-                  💻 Code
-                </strong>
-
-                <span>
-                  Build and debug your projects
-                </span>
-
-              </button>
-
-
-              <button
-                class="suggestion"
-                data-text="Give me creative ideas"
-              >
-
-                <strong>
-                  💡 Create
-                </strong>
-
-                <span>
-                  Generate fresh ideas
-                </span>
-
-              </button>
-
-
-              <button
-                class="suggestion"
-                data-text="Teach me something interesting"
-              >
-
-                <strong>
-                  🚀 Learn
-                </strong>
-
-                <span>
-                  Learn something new
-                </span>
-
-              </button>
-
+            <div class="logo-text">
+                Viggo
             </div>
-
-          </div>
 
         </div>
 
-      </div>
 
-    </section>
-
-
-    <footer class="input-area">
-
-      <div class="input-box">
-
-        <textarea
-          id="message"
-          placeholder="Message Viggo..."
-          rows="1"
-        ></textarea>
-
-
-        <button
-          id="mic"
-          title="Voice input"
-        >
-          🎤
+        <button class="new-chat" id="newChat">
+            ＋ New Chat
         </button>
 
 
-        <button
-          id="send"
-          title="Send"
-        >
-          ➤
-        </button>
+        <div class="side-title">
+            Pinned
+        </div>
 
-      </div>
-
-    </footer>
-
-  </main>
-
-</div>
+        <div class="chat-list" id="pinnedList">
+        </div>
 
 
-<!-- HISTORY -->
+        <div class="side-title">
+            Recent
+        </div>
 
-<div id="historyModal">
+        <div class="chat-list" id="recentList">
+        </div>
 
-  <div class="modal-window">
 
-    <div class="modal-header">
+        <div class="sidebar-bottom">
 
-      <h2>
-        Chat History
-      </h2>
+            <button class="side-button" id="historyButton">
+                🕘 History
+            </button>
 
-      <button
-        class="close-modal"
-        data-close="historyModal"
-      >
-        ✕
-      </button>
+            <button class="side-button" id="saveButton">
+                💾 Save
+            </button>
 
-    </div>
+            <button class="side-button" id="voiceToggle">
+                🔊 Voice ON
+            </button>
 
-    <div id="historyList"></div>
+            <button class="side-button" id="clearHistory">
+                🗑 Clear History
+            </button>
 
-  </div>
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main">
+
+        <!-- TOP -->
+
+        <header class="topbar">
+
+            <button class="mobile-menu" id="mobileMenu">
+                ☰
+            </button>
+
+
+            <div class="current-title" id="currentTitle">
+                New Chat
+            </div>
+
+
+            <div class="online">
+
+                <span class="online-dot"></span>
+
+                Viggo Online
+
+            </div>
+
+
+            <div class="top-actions">
+
+                <button class="top-btn" id="shareChat">
+                    🔗 <span>Share</span>
+                </button>
+
+                <button class="top-btn" id="voiceSettings">
+                    🎙
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <!-- CHAT -->
+
+        <section class="chat-area">
+
+            <div class="conversation" id="conversation">
+
+
+                <div class="welcome">
+
+                    <div>
+
+                        <div class="welcome-b">
+                            B
+                        </div>
+
+                        <h1>
+                            Welcome to Viggo
+                        </h1>
+
+                        <p>
+                            Your AI assistant is ready.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+        <!-- INPUT -->
+
+        <footer class="input-area">
+
+            <div class="input-box">
+
+                <textarea
+                    class="message-input"
+                    id="message"
+                    placeholder="Message Viggo..."
+                    rows="1"
+                ></textarea>
+
+
+                <button
+                    class="input-btn"
+                    id="mic"
+                    title="Voice input"
+                >
+                    🎤
+                </button>
+
+
+                <button
+                    class="input-btn send-btn"
+                    id="send"
+                    title="Send"
+                >
+                    ➤
+                </button>
+
+            </div>
+
+        </footer>
+
+    </main>
 
 </div>
 
 
 <!-- VOICE SETTINGS -->
 
-<div id="voiceModal">
+<div class="voice-panel" id="voicePanel">
 
-  <div class="modal-window">
+    <h3>
+        🎙 Voice Settings
+    </h3>
 
-    <div class="modal-header">
-
-      <h2>
-        🎙️ Voice Settings
-      </h2>
-
-      <button
-        class="close-modal"
-        data-close="voiceModal"
-      >
-        ✕
-      </button>
-
-    </div>
-
-
-    <div class="voice-row">
-
-      <label>
-        What should Viggo call you?
-      </label>
-
-      <input
-        id="nickname"
-        value="friend"
-        maxlength="30"
-        placeholder="friend"
-      >
-
-    </div>
-
-
-    <div class="voice-row">
-
-      <label>
-        Viggo Voice
-      </label>
-
-      <select id="voiceSelect">
-
-        <option value="marin">
-          Marin — Natural
+    <select
+        class="voice-select"
+        id="voiceSelect"
+    >
+        <option>
+            Default Voice
         </option>
+    </select>
 
-        <option value="cedar">
-          Cedar — Natural
-        </option>
+    <br><br>
 
-        <option value="alloy">
-          Alloy
-        </option>
-
-        <option value="ash">
-          Ash
-        </option>
-
-        <option value="ballad">
-          Ballad
-        </option>
-
-        <option value="coral">
-          Coral
-        </option>
-
-        <option value="echo">
-          Echo
-        </option>
-
-        <option value="fable">
-          Fable
-        </option>
-
-        <option value="nova">
-          Nova
-        </option>
-
-        <option value="onyx">
-          Onyx
-        </option>
-
-        <option value="sage">
-          Sage
-        </option>
-
-        <option value="shimmer">
-          Shimmer
-        </option>
-
-        <option value="verse">
-          Verse
-        </option>
-
-      </select>
-
-    </div>
-
-
-    <div class="voice-row">
-
-      <label>
-        My Voice
-      </label>
-
-      <input
-        id="voiceName"
-        placeholder="Optional voice name"
-      >
-
-      <p class="voice-help">
-
-        You can create a personal voice only when
-        your backend/account has access to custom voices.
-        Viggo requires explicit consent before using a
-        person's voice.
-
-      </p>
-
-    </div>
-
-
-    <div class="voice-row">
-
-      <label>
-        Consent recording
-      </label>
-
-      <input
-        id="consentFile"
-        type="file"
-        accept="audio/*"
-      >
-
-    </div>
-
-
-    <div class="voice-row">
-
-      <label>
-        Voice sample
-      </label>
-
-      <input
-        id="voiceSample"
-        type="file"
-        accept="audio/*"
-      >
-
-    </div>
-
-
-    <div class="voice-actions">
-
-      <button
-        id="saveVoiceSettings"
-        class="primary-btn"
-      >
-        Save Settings
-      </button>
-
-
-      <button
-        id="createCustomVoice"
-        class="secondary-btn"
-      >
-        🎙️ Create My Voice
-      </button>
-
-
-      <button
-        id="deleteCustomVoice"
-        class="danger-btn"
-      >
-        Delete My Voice
-      </button>
-
-    </div>
-
-
-    <p
-      id="voiceStatus"
-      class="voice-help"
-    ></p>
-
-  </div>
-
-</div>
-
-
-<!-- SHARE -->
-
-<div id="shareModal">
-
-  <div class="modal-window">
-
-    <div class="modal-header">
-
-      <h2>
-        📤 Share This Chat
-      </h2>
-
-      <button
-        class="close-modal"
-        data-close="shareModal"
-      >
-        ✕
-      </button>
-
-    </div>
-
-
-    <div
-      id="sharePreview"
-      class="share-preview"
-    ></div>
-
-
-    <div class="share-actions">
-
-      <button
-        id="copyChat"
-        class="secondary-btn"
-      >
-        📋 Copy Chat
-      </button>
-
-
-      <button
-        id="nativeShare"
-        class="primary-btn"
-      >
-        📤 Share
-      </button>
-
-    </div>
-
-  </div>
+    <button
+        class="top-btn"
+        id="testVoice"
+    >
+        🔊 Test Voice
+    </button>
 
 </div>
 
@@ -1200,5 +928,4 @@
 <script src="script.js"></script>
 
 </body>
-
 </html>
