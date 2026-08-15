@@ -1,4 +1,4 @@
-const API_URL = "/api/chat";
+const API_URL = "https://ai-tool-2-zpul.onrender.com/api/chat";
 
 const chat = document.getElementById("chat");
 const input = document.getElementById("message");
