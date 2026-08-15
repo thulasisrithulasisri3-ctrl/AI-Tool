@@ -1,3 +1,4 @@
+```javascript
 "use strict";
 
 const express =
@@ -11,41 +12,32 @@ const path =
 
 const {
   GoogleGenAI
-} =
-  require("@google/genai");
-
+} = require("@google/genai");
 
 const app =
   express();
 
-
 const PORT =
   process.env.PORT || 10000;
 
-
-/* =====================================
-   MIDDLEWARE
-===================================== */
-
 app.use(
-  cors({
-    origin: "*"
-  })
+  cors()
 );
-
 
 app.use(
   express.json()
 );
 
+app.use(
+  express.static(__dirname)
+);
 
-/* =====================================
+/* =========================================
    GEMINI
-===================================== */
+========================================= */
 
 const API_KEY =
   process.env.GEMINI_API_KEY;
-
 
 if (!API_KEY) {
 
@@ -58,42 +50,25 @@ if (!API_KEY) {
   console.log(
     "✅ Gemini API key found"
   );
-
 }
-
 
 const ai =
   API_KEY
     ? new GoogleGenAI({
-        apiKey:
-          API_KEY,
-
+        apiKey: API_KEY,
         httpOptions: {
-          apiVersion:
-            "v1"
+          apiVersion: "v1"
         }
       })
     : null;
 
-
-/* =====================================
-   STATIC FILES
-===================================== */
-
-app.use(
-  express.static(
-    __dirname
-  )
-);
-
-
-/* =====================================
+/* =========================================
    HOME
-===================================== */
+========================================= */
 
 app.get(
   "/",
-  function (req, res) {
+  (req, res) => {
 
     res.sendFile(
       path.join(
@@ -101,20 +76,18 @@ app.get(
         "index.html"
       )
     );
-
   }
 );
 
-
-/* =====================================
+/* =========================================
    HEALTH
-===================================== */
+========================================= */
 
 app.get(
   "/health",
-  function (req, res) {
+  (req, res) => {
 
-    res.status(200).json({
+    res.json({
 
       success:
         true,
@@ -126,32 +99,21 @@ app.get(
         "running"
 
     });
-
   }
 );
 
-
-/* =====================================
-   CHAT API
-===================================== */
+/* =========================================
+   CHAT
+========================================= */
 
 app.post(
   "/api/chat",
-  async function (req, res) {
+  async (req, res) => {
 
     try {
 
-      console.log(
-        "📩 POST /api/chat"
-      );
-
-
       const message =
-        typeof req.body?.message ===
-        "string"
-          ? req.body.message.trim()
-          : "";
-
+        req.body?.message?.trim();
 
       if (!message) {
 
@@ -166,9 +128,7 @@ app.post(
               "Message is required"
 
           });
-
       }
-
 
       if (!ai) {
 
@@ -183,15 +143,16 @@ app.post(
               "GEMINI_API_KEY is missing"
 
           });
-
       }
 
-
       console.log(
-        "👤 User:",
+        "User:",
         message
       );
 
+      /*
+        Gemini Interactions API
+      */
 
       const interaction =
         await ai.interactions.create({
@@ -204,59 +165,25 @@ app.post(
 
         });
 
-
-      console.log(
-        "Gemini interaction received"
-      );
-
-
       const reply =
         interaction.output_text ||
         interaction.outputText ||
-        "";
-
-
-      if (!reply) {
-
-        console.error(
-          "❌ Empty Gemini response:",
-          interaction
-        );
-
-
-        return res
-          .status(500)
-          .json({
-
-            success:
-              false,
-
-            error:
-              "Gemini returned an empty response"
-
-          });
-
-      }
-
+        "No response received.";
 
       console.log(
-        "🤖 Viggo:",
+        "Viggo:",
         reply
       );
 
+      return res.json({
 
-      return res
-        .status(200)
-        .json({
+        success:
+          true,
 
-          success:
-            true,
+        reply:
+          reply
 
-          reply:
-            reply
-
-        });
-
+      });
 
     } catch (error) {
 
@@ -264,7 +191,6 @@ app.post(
         "❌ GEMINI ERROR:",
         error
       );
-
 
       return res
         .status(500)
@@ -278,20 +204,16 @@ app.post(
             "Gemini request failed"
 
         });
-
     }
-
   }
 );
 
-
-/* =====================================
-   API 404
-===================================== */
+/* =========================================
+   404
+========================================= */
 
 app.use(
-  "/api",
-  function (req, res) {
+  (req, res) => {
 
     res
       .status(404)
@@ -301,22 +223,20 @@ app.use(
           false,
 
         error:
-          "API route not found"
+          "Route not found"
 
       });
-
   }
 );
 
-
-/* =====================================
-   SERVER
-===================================== */
+/* =========================================
+   START
+========================================= */
 
 app.listen(
   PORT,
   "0.0.0.0",
-  function () {
+  () => {
 
     console.log(
       `🚀 Viggo AI Assistant running on port ${PORT}`
@@ -324,3 +244,4 @@ app.listen(
 
   }
 );
+```
