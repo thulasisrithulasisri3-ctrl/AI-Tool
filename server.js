@@ -1,17 +1,31 @@
-const express = require("express");
-const cors = require("cors");
-const path = require("path");
-const { GoogleGenAI } = require("@google/genai");
+"use strict";
 
-const app = express();
+const express =
+  require("express");
+
+const cors =
+  require("cors");
+
+const path =
+  require("path");
+
+const {
+  GoogleGenAI
+} =
+  require("@google/genai");
+
+
+const app =
+  express();
+
 
 const PORT =
   process.env.PORT || 10000;
 
 
-/* =================================
+/* =====================================
    MIDDLEWARE
-================================= */
+===================================== */
 
 app.use(
   cors({
@@ -19,14 +33,15 @@ app.use(
   })
 );
 
+
 app.use(
   express.json()
 );
 
 
-/* =================================
+/* =====================================
    GEMINI
-================================= */
+===================================== */
 
 const API_KEY =
   process.env.GEMINI_API_KEY;
@@ -50,27 +65,31 @@ if (!API_KEY) {
 const ai =
   API_KEY
     ? new GoogleGenAI({
-        apiKey: API_KEY,
+        apiKey:
+          API_KEY,
 
         httpOptions: {
-          apiVersion: "v1"
+          apiVersion:
+            "v1"
         }
       })
     : null;
 
 
-/* =================================
+/* =====================================
    STATIC FILES
-================================= */
+===================================== */
 
 app.use(
-  express.static(__dirname)
+  express.static(
+    __dirname
+  )
 );
 
 
-/* =================================
+/* =====================================
    HOME
-================================= */
+===================================== */
 
 app.get(
   "/",
@@ -87,9 +106,9 @@ app.get(
 );
 
 
-/* =================================
+/* =====================================
    HEALTH
-================================= */
+===================================== */
 
 app.get(
   "/health",
@@ -112,9 +131,9 @@ app.get(
 );
 
 
-/* =================================
+/* =====================================
    CHAT API
-================================= */
+===================================== */
 
 app.post(
   "/api/chat",
@@ -123,14 +142,13 @@ app.post(
     try {
 
       console.log(
-        "POST /api/chat"
+        "📩 POST /api/chat"
       );
 
 
       const message =
-        req.body &&
-        typeof req.body.message ===
-          "string"
+        typeof req.body?.message ===
+        "string"
           ? req.body.message.trim()
           : "";
 
@@ -170,7 +188,7 @@ app.post(
 
 
       console.log(
-        "User:",
+        "👤 User:",
         message
       );
 
@@ -188,8 +206,7 @@ app.post(
 
 
       console.log(
-        "Interaction status:",
-        interaction.status
+        "Gemini interaction received"
       );
 
 
@@ -202,7 +219,7 @@ app.post(
       if (!reply) {
 
         console.error(
-          "Gemini returned no text:",
+          "❌ Empty Gemini response:",
           interaction
         );
 
@@ -223,7 +240,7 @@ app.post(
 
 
       console.log(
-        "Viggo:",
+        "🤖 Viggo:",
         reply
       );
 
@@ -268,9 +285,9 @@ app.post(
 );
 
 
-/* =================================
+/* =====================================
    API 404
-================================= */
+===================================== */
 
 app.use(
   "/api",
@@ -292,9 +309,9 @@ app.use(
 );
 
 
-/* =================================
+/* =====================================
    SERVER
-================================= */
+===================================== */
 
 app.listen(
   PORT,
