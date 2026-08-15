@@ -17,6 +17,7 @@
     }
 
     .app {
+      width: 100%;
       max-width: 850px;
       height: 100vh;
       margin: auto;
@@ -76,6 +77,7 @@
       margin-bottom: 10px;
       border-radius: 14px;
       white-space: pre-wrap;
+      word-wrap: break-word;
     }
 
     .user {
@@ -107,6 +109,7 @@
       border: 1px solid #ccc;
       border-radius: 10px;
       font-size: 16px;
+      outline: none;
     }
 
     #send {
@@ -115,6 +118,10 @@
       color: white;
       border-radius: 10px;
       font-weight: bold;
+    }
+
+    #send:disabled {
+      opacity: 0.6;
     }
 
     .controls {
@@ -154,8 +161,8 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,.55);
-      z-index: 100;
+      background: rgba(0, 0, 0, 0.55);
+      z-index: 1000;
     }
 
     .history-box {
@@ -173,6 +180,10 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+    }
+
+    .history-header h2 {
+      margin: 0;
     }
 
     #closeHistory {
@@ -196,11 +207,13 @@
 
     .history-user {
       color: #2563eb;
-      margin: 7px 0;
+      margin: 8px 0;
+      white-space: pre-wrap;
     }
 
     .history-ai {
-      margin: 7px 0;
+      margin: 8px 0;
+      white-space: pre-wrap;
     }
 
     .history-time {
@@ -232,94 +245,110 @@
       color: #777;
       padding: 30px;
     }
+
+    @media (max-width: 600px) {
+      .message {
+        max-width: 90%;
+      }
+
+      #send {
+        width: 70px;
+      }
+    }
   </style>
 </head>
 
 <body>
 
-<div class="app">
+  <div class="app">
 
-  <header>
-    <h1>🤖 Viggo AI Assistant</h1>
+    <header>
+      <h1>🤖 Viggo AI Assistant</h1>
 
-    <button id="historyButton">
-      📜 History
-    </button>
-  </header>
+      <button id="historyButton" type="button">
+        📜 History
+      </button>
+    </header>
 
-  <div class="save-bar">
-    <button id="saveButton">
-      💾 Save
-    </button>
-  </div>
 
-  <div id="chat">
+    <div class="save-bar">
 
-    <div class="message ai">
-      Hello! 👋
-      I am Viggo AI Assistant.
-      How can I help you?
-    </div>
-
-  </div>
-
-  <div class="input-area">
-
-    <div class="input-row">
-
-      <textarea
-        id="message"
-        rows="2"
-        placeholder="Type your message..."
-      ></textarea>
-
-      <button id="send">
-        Send
+      <button id="saveButton" type="button">
+        💾 Save
       </button>
 
     </div>
 
-    <div class="controls">
 
-      <button id="mic">
-        🎤
-      </button>
+    <div id="chat">
 
-      <button id="voiceToggle">
-        🔊 Voice ON
-      </button>
+      <div class="message ai">
+        Hello! 👋
+        I am Viggo AI Assistant.
+        How can I help you?
+      </div>
+
+    </div>
+
+
+    <div class="input-area">
+
+      <div class="input-row">
+
+        <textarea
+          id="message"
+          rows="2"
+          placeholder="Type your message..."
+        ></textarea>
+
+        <button id="send" type="button">
+          Send
+        </button>
+
+      </div>
+
+
+      <div class="controls">
+
+        <button id="mic" type="button">
+          🎤
+        </button>
+
+        <button id="voiceToggle" type="button">
+          🔊 Voice ON
+        </button>
+
+      </div>
 
     </div>
 
   </div>
 
-</div>
 
+  <!-- HISTORY -->
 
-<!-- HISTORY -->
+  <div id="historyPanel">
 
-<div id="historyPanel">
+    <div class="history-box">
 
-  <div class="history-box">
+      <div class="history-header">
 
-    <div class="history-header">
+        <h2>📜 History</h2>
 
-      <h2>📜 History</h2>
+        <button id="closeHistory" type="button">
+          Close
+        </button>
 
-      <button id="closeHistory">
-        Close
-      </button>
+      </div>
+
+      <div id="historyList"></div>
 
     </div>
 
-    <div id="historyList"></div>
-
   </div>
 
-</div>
 
-
-<script src="script.js"></script>
+  <script src="./script.js"></script>
 
 </body>
 </html>
