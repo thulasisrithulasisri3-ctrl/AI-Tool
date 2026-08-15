@@ -1,75 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>Viggo AI</title>
 
   <style>
+
     * {
       box-sizing: border-box;
     }
 
-    :root {
-      --bg: #080810;
-      --sidebar: #0d0d17;
-      --card: #151522;
-      --border: rgba(255,255,255,.09);
-      --text: #ffffff;
-      --muted: #9292a6;
-      --purple: #8b5cf6;
-      --blue: #3b82f6;
-    }
-
     body {
       margin: 0;
-      height: 100vh;
-      overflow: hidden;
-      font-family: Arial, sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at 20% 10%, rgba(139,92,246,.16), transparent 30%),
-        radial-gradient(circle at 90% 90%, rgba(59,130,246,.12), transparent 30%),
-        var(--bg);
+      font-family:
+        Inter,
+        Arial,
+        sans-serif;
+      background: #f7f7f8;
+      color: #222;
     }
 
     button,
-    textarea {
+    textarea,
+    select,
+    input {
       font-family: inherit;
+    }
+
+    button {
+      cursor: pointer;
     }
 
     .app {
       display: flex;
       height: 100vh;
+      overflow: hidden;
     }
 
-    /* SIDEBAR */
+    /* =========================
+       SIDEBAR
+    ========================= */
 
     #sidebar {
       width: 270px;
-      height: 100vh;
-      padding: 18px 15px;
-      background: rgba(10,10,18,.94);
-      border-right: 1px solid var(--border);
-      backdrop-filter: blur(20px);
+      background: #202123;
+      color: white;
+      padding: 14px;
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
-      z-index: 100;
     }
 
     .brand {
-      padding: 8px 10px 22px;
-      font-size: 26px;
-      font-weight: 800;
-      letter-spacing: -1px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 22px;
+      font-weight: 700;
+      padding: 10px;
+      margin-bottom: 10px;
     }
 
-    .brand-text {
-      background: linear-gradient(90deg,#fff,#bca8ff,#7db4ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .brand-b {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: #10a37f;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
     }
 
     #newChat,
@@ -77,94 +86,69 @@
     #saveButton,
     #voiceToggle,
     #clearHistory {
-      width: 100%;
-      border: 1px solid var(--border);
-      border-radius: 11px;
-      padding: 11px 13px;
+
+      border: 0;
+      border-radius: 9px;
+      padding: 11px 12px;
       cursor: pointer;
       font-size: 14px;
-      transition: .2s;
+
     }
 
     #newChat {
+      background: #343541;
       color: white;
       text-align: left;
-      margin-bottom: 18px;
-      background: linear-gradient(
-        135deg,
-        rgba(139,92,246,.25),
-        rgba(59,130,246,.12)
-      );
-    }
-
-    #historyButton,
-    #voiceToggle {
-      color: #ddd;
-      background: rgba(255,255,255,.045);
-    }
-
-    #saveButton {
-      color: white;
-      background: linear-gradient(135deg,#8b5cf6,#6366f1);
-      border: 0;
-    }
-
-    #clearHistory {
-      color: #ff9999;
-      background: rgba(239,68,68,.08);
+      margin-bottom: 12px;
     }
 
     #newChat:hover,
     #historyButton:hover,
-    #saveButton:hover,
-    #voiceToggle:hover,
-    #clearHistory:hover {
-      transform: translateY(-1px);
-      border-color: rgba(139,92,246,.45);
+    #voiceToggle:hover {
+      background: #444654;
     }
 
     .side-title {
-      padding: 8px;
-      color: #737386;
-      font-size: 10px;
-      font-weight: bold;
-      letter-spacing: 1.4px;
+      font-size: 11px;
+      color: #999;
+      padding: 8px 10px;
       text-transform: uppercase;
+      letter-spacing: .8px;
     }
 
     .chat-list {
       overflow-y: auto;
-      margin-bottom: 8px;
     }
 
     .chat-item {
       width: 100%;
-      padding: 10px;
-      border: 0;
-      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       background: transparent;
-      color: #ccc;
+      color: #ddd;
+      border: 0;
+      padding: 10px;
+      border-radius: 8px;
       cursor: pointer;
       text-align: left;
       margin-bottom: 3px;
     }
 
-    .chat-item:hover,
-    .chat-item.active {
-      background: rgba(139,92,246,.12);
-      color: white;
+    .chat-item:hover {
+      background: #343541;
     }
 
     .chat-item-title {
       overflow: hidden;
-      white-space: nowrap;
       text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .empty-sidebar {
-      padding: 10px;
-      color: #5f5f72;
+      color: #777;
       font-size: 12px;
+      padding: 10px;
     }
 
     .sidebar-bottom {
@@ -174,72 +158,102 @@
       gap: 7px;
     }
 
-    /* MAIN */
+    #historyButton,
+    #voiceToggle {
+      background: #343541;
+      color: white;
+    }
+
+    #saveButton {
+      background: #10a37f;
+      color: white;
+    }
+
+    #clearHistory {
+      background: #8b2020;
+      color: white;
+    }
+
+    /* =========================
+       MAIN
+    ========================= */
 
     .main {
       flex: 1;
-      min-width: 0;
       display: flex;
       flex-direction: column;
+      min-width: 0;
     }
 
     .topbar {
-      height: 64px;
-      padding: 0 20px;
+      min-height: 60px;
+      background: white;
+      border-bottom: 1px solid #ddd;
       display: flex;
       align-items: center;
+      padding: 0 18px;
       gap: 12px;
-      border-bottom: 1px solid var(--border);
-      background: rgba(8,8,16,.7);
-      backdrop-filter: blur(20px);
-    }
-
-    #currentTitle {
-      font-size: 15px;
-      font-weight: bold;
-    }
-
-    .status {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      color: #9999aa;
-      font-size: 12px;
-    }
-
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #22c55e;
-      box-shadow: 0 0 10px #22c55e;
     }
 
     #mobileMenu {
       display: none;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,.06);
-      color: white;
+      border: 0;
+      background: #eee;
       border-radius: 8px;
       padding: 8px 10px;
-      cursor: pointer;
     }
 
-    /* CHAT */
+    #currentTitle {
+      font-size: 17px;
+      font-weight: 700;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .online-status {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: #555;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .online-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10a37f;
+    }
+
+    #shareChat {
+      border: 0;
+      background: #f1f1f1;
+      border-radius: 8px;
+      padding: 9px 12px;
+      font-size: 13px;
+    }
+
+    #shareChat:hover {
+      background: #e5e5e5;
+    }
+
+    /* =========================
+       CHAT
+    ========================= */
 
     #chatArea {
       flex: 1;
       overflow-y: auto;
-      padding: 25px;
+      padding: 20px;
     }
 
     #conversation {
       max-width: 900px;
       margin: auto;
     }
-
-    /* WELCOME */
 
     .welcome {
       min-height: 65vh;
@@ -250,302 +264,340 @@
     }
 
     .welcome-box {
-      width: 100%;
-      max-width: 650px;
+      max-width: 600px;
     }
 
-    /* B LOGO */
-
     .ai-logo {
-      width: 90px;
-      height: 90px;
+      width: 72px;
+      height: 72px;
+      border-radius: 22px;
       margin: auto;
-      border-radius: 28px;
+      background: #10a37f;
+      color: white;
+      font-size: 40px;
+      font-weight: 800;
       display: flex;
       justify-content: center;
       align-items: center;
-
-      font-size: 45px;
-      font-weight: 900;
-
-      color: white;
-
-      background:
-        linear-gradient(
-          135deg,
-          #8b5cf6,
-          #6366f1,
-          #3b82f6
-        );
-
-      box-shadow:
-        0 0 35px rgba(139,92,246,.4),
-        inset 0 0 20px rgba(255,255,255,.12);
-
-      animation: floatLogo 4s ease-in-out infinite;
+      box-shadow: 0 12px 30px rgba(16,163,127,.2);
     }
 
-    @keyframes floatLogo {
-      0%,100% {
-        transform: translateY(0);
-      }
-
-      50% {
-        transform: translateY(-7px);
-      }
+    .welcome-box h1 {
+      margin: 18px 0 10px;
     }
 
-    .welcome h1 {
-      margin: 24px 0 10px;
-      font-size: clamp(32px,5vw,48px);
-      letter-spacing: -1.5px;
-
-      background:
-        linear-gradient(
-          90deg,
-          #fff,
-          #bda9ff,
-          #7db4ff
-        );
-
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .welcome p {
-      margin: 0 0 25px;
-      color: var(--muted);
+    .welcome-box p {
+      color: #777;
       line-height: 1.6;
     }
 
-    /* SUGGESTIONS */
-
     .suggestions {
       display: grid;
-      grid-template-columns: repeat(2,1fr);
+      grid-template-columns: 1fr 1fr;
       gap: 10px;
+      margin-top: 22px;
     }
 
     .suggestion {
-      padding: 15px;
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 12px;
+      padding: 14px;
       text-align: left;
-      border-radius: 15px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,.035);
-      color: white;
-      cursor: pointer;
       transition: .2s;
     }
 
     .suggestion:hover {
-      transform: translateY(-3px);
-      background: rgba(139,92,246,.1);
-      border-color: rgba(139,92,246,.35);
+      transform: translateY(-2px);
+      border-color: #10a37f;
     }
 
     .suggestion strong {
       display: block;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
     }
 
     .suggestion span {
-      color: #858598;
+      color: #777;
       font-size: 12px;
     }
 
-    /* MESSAGES */
+    /* =========================
+       MESSAGE
+    ========================= */
 
     .message {
       display: flex;
       gap: 12px;
-      padding: 17px 13px;
-      margin-bottom: 8px;
-      border-radius: 17px;
-      animation: messageIn .2s ease;
-    }
-
-    @keyframes messageIn {
-      from {
-        opacity: 0;
-        transform: translateY(7px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      padding: 18px 10px;
+      border-bottom: 1px solid #eee;
     }
 
     .message.user {
-      background: rgba(255,255,255,.035);
-      border: 1px solid rgba(255,255,255,.04);
+      background: #fff;
     }
 
     .message.ai {
-      background: rgba(139,92,246,.035);
+      background: #f7f7f8;
     }
 
     .message-avatar {
-      width: 36px;
-      height: 36px;
-      flex-shrink: 0;
-      border-radius: 11px;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
       display: flex;
-      justify-content: center;
       align-items: center;
-      background: linear-gradient(135deg,#8b5cf6,#3b82f6);
+      justify-content: center;
+      background: #10a37f;
       color: white;
-      font-weight: bold;
+      font-weight: 800;
+      flex-shrink: 0;
     }
 
     .message.user .message-avatar {
-      background: #30303e;
+      background: #555;
+    }
+
+    .message-content {
+      min-width: 0;
+      flex: 1;
     }
 
     .message-name {
-      margin-bottom: 5px;
-      font-size: 13px;
       font-weight: bold;
+      margin-bottom: 6px;
     }
 
     .message-text {
       white-space: pre-wrap;
-      line-height: 1.7;
-      color: #dddde8;
-      font-size: 14px;
+      line-height: 1.65;
+      word-wrap: break-word;
     }
 
-    /* INPUT */
+    /* =========================
+       MESSAGE ACTIONS
+    ========================= */
+
+    .message-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .message-action {
+      border: 0;
+      background: transparent;
+      color: #666;
+      padding: 6px 8px;
+      border-radius: 7px;
+      font-size: 12px;
+    }
+
+    .message-action:hover {
+      background: #e9e9e9;
+      color: #222;
+    }
+
+    .message-action.liked {
+      color: #10a37f;
+      background: #e4f7f1;
+    }
+
+    /* =========================
+       INPUT
+    ========================= */
 
     .input-area {
-      padding: 12px 20px 17px;
-      background: rgba(8,8,16,.94);
+      background: white;
+      border-top: 1px solid #ddd;
+      padding: 12px;
     }
 
     .input-box {
       max-width: 900px;
       margin: auto;
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       gap: 8px;
-      padding: 8px;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 17px;
-      background: rgba(20,20,33,.9);
-      transition: .2s;
-    }
-
-    .input-box:focus-within {
-      border-color: rgba(139,92,246,.6);
-      box-shadow: 0 0 0 3px rgba(139,92,246,.08);
+      border: 1px solid #ccc;
+      border-radius: 13px;
+      padding: 7px;
+      background: white;
+      box-shadow: 0 4px 18px rgba(0,0,0,.04);
     }
 
     #message {
       flex: 1;
-      min-height: 40px;
-      max-height: 150px;
-      resize: none;
-      padding: 10px;
       border: 0;
-      outline: 0;
-      background: transparent;
-      color: white;
+      outline: none;
+      resize: none;
       font-size: 15px;
-    }
-
-    #message::placeholder {
-      color: #77778b;
+      min-height: 38px;
+      max-height: 150px;
+      padding: 9px;
     }
 
     #mic,
     #send {
-      width: 44px;
-      height: 42px;
       border: 0;
-      border-radius: 11px;
+      border-radius: 9px;
       cursor: pointer;
-      transition: .2s;
+      min-width: 45px;
+      height: 40px;
     }
 
     #mic {
-      background: rgba(255,255,255,.07);
-      color: white;
-      font-size: 17px;
+      background: #eee;
+      font-size: 18px;
     }
 
     #mic.listening {
-      background: rgba(239,68,68,.2);
+      background: #ffdcdc;
     }
 
     #send {
+      background: #10a37f;
       color: white;
-      font-size: 18px;
       font-weight: bold;
-      background: linear-gradient(135deg,#8b5cf6,#6366f1,#3b82f6);
     }
 
-    #send:hover,
-    #mic:hover {
-      transform: translateY(-2px);
+    #send:disabled {
+      opacity: .5;
+      cursor: not-allowed;
     }
 
-    .input-hint {
-      max-width: 900px;
-      margin: 7px auto 0;
-      text-align: center;
-      color: #555568;
-      font-size: 10px;
-    }
+    /* =========================
+       HISTORY MODAL
+    ========================= */
 
-    /* HISTORY */
-
-    #historyModal {
+    #historyModal,
+    #voiceModal,
+    #shareModal {
       display: none;
       position: fixed;
       inset: 0;
+      background: rgba(0,0,0,.55);
       z-index: 1000;
-      padding: 25px;
-      background: rgba(0,0,0,.7);
-      backdrop-filter: blur(8px);
+      padding: 30px;
     }
 
-    .history-window {
+    .modal-window {
+      background: white;
       max-width: 800px;
-      max-height: 90vh;
+      max-height: 85vh;
       overflow-y: auto;
       margin: auto;
+      border-radius: 14px;
       padding: 20px;
-      border-radius: 18px;
-      border: 1px solid var(--border);
-      background: #11111d;
     }
 
-    .history-header {
+    .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 18px;
     }
 
-    .history-header h2 {
+    .modal-header h2 {
       margin: 0;
     }
 
-    #closeHistory {
+    .close-modal {
       border: 0;
+      background: #eee;
       border-radius: 8px;
       padding: 8px 12px;
-      background: rgba(255,255,255,.07);
-      color: white;
-      cursor: pointer;
     }
 
+    /* =========================
+       VOICE SETTINGS
+    ========================= */
+
+    .voice-row {
+      margin-bottom: 16px;
+    }
+
+    .voice-row label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 7px;
+    }
+
+    .voice-row select,
+    .voice-row input {
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 9px;
+      padding: 10px;
+    }
+
+    .voice-help {
+      color: #777;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .voice-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .primary-btn {
+      background: #10a37f;
+      color: white;
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 14px;
+    }
+
+    .secondary-btn {
+      background: #eee;
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 14px;
+    }
+
+    .danger-btn {
+      background: #ffe0e0;
+      color: #a00;
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 14px;
+    }
+
+    /* =========================
+       SHARE
+    ========================= */
+
+    .share-preview {
+      background: #f7f7f8;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 15px;
+      max-height: 400px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+
+    .share-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* =========================
+       HISTORY CARD
+    ========================= */
+
     .history-card {
-      padding: 14px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 13px;
       margin-bottom: 10px;
-      border: 1px solid var(--border);
-      border-radius: 13px;
-      background: rgba(255,255,255,.035);
     }
 
     .history-card-title {
@@ -554,36 +606,37 @@
     }
 
     .history-card-time {
-      color: #77778b;
+      color: #888;
       font-size: 12px;
       margin-bottom: 10px;
     }
 
     .history-card-actions {
       display: flex;
-      gap: 7px;
       flex-wrap: wrap;
+      gap: 6px;
     }
 
     .history-card-actions button {
       border: 0;
-      border-radius: 8px;
+      border-radius: 7px;
       padding: 8px 10px;
       cursor: pointer;
-      background: rgba(255,255,255,.07);
-      color: white;
     }
 
-    /* MOBILE */
+    /* =========================
+       MOBILE
+    ========================= */
 
     @media (max-width: 700px) {
 
       #sidebar {
         position: fixed;
-        left: -285px;
+        left: -280px;
         top: 0;
         bottom: 0;
-        transition: left .25s;
+        z-index: 900;
+        transition: left .2s;
       }
 
       #sidebar.open {
@@ -595,99 +648,107 @@
       }
 
       .topbar {
-        padding: 0 12px;
+        padding: 0 10px;
+      }
+
+      .online-status {
+        display: none;
+      }
+
+      #shareChat {
+        font-size: 12px;
+        padding: 8px;
       }
 
       #chatArea {
-        padding: 12px;
+        padding: 10px;
       }
 
       .suggestions {
         grid-template-columns: 1fr;
       }
 
-      .welcome {
-        min-height: 70vh;
-      }
-
-      .welcome h1 {
-        font-size: 34px;
-      }
-
-      .input-area {
-        padding: 8px 10px 12px;
-      }
-
-      .input-hint {
-        display: none;
-      }
-
-      #historyModal {
+      #historyModal,
+      #voiceModal,
+      #shareModal {
         padding: 10px;
       }
+
+      .modal-window {
+        max-height: 95vh;
+      }
     }
 
-    ::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,.12);
-      border-radius: 10px;
-    }
   </style>
+
 </head>
 
 <body>
 
 <div class="app">
 
+  <!-- SIDEBAR -->
+
   <aside id="sidebar">
 
     <div class="brand">
-      <div class="brand-text">Viggo</div>
+
+      <div class="brand-b">
+        B
+      </div>
+
+      <span>
+        Viggo
+      </span>
+
     </div>
+
 
     <button id="newChat">
-      ＋ &nbsp; New Chat
+      ＋ New Chat
     </button>
 
-    <div class="side-title">Pinned</div>
 
-    <div id="pinnedList" class="chat-list">
-      <div class="empty-sidebar">
-        No pinned chats
-      </div>
+    <div class="side-title">
+      Pinned
     </div>
 
-    <div class="side-title">Recent</div>
+    <div
+      id="pinnedList"
+      class="chat-list"
+    ></div>
 
-    <div id="recentList" class="chat-list">
-      <div class="empty-sidebar">
-        No recent chats
-      </div>
+
+    <div class="side-title">
+      Recent
     </div>
+
+    <div
+      id="recentList"
+      class="chat-list"
+    ></div>
+
 
     <div class="sidebar-bottom">
 
       <button id="historyButton">
-        🕘 &nbsp; History
+        🕘 History
       </button>
 
       <button id="saveButton">
-        💾 &nbsp; Save Chat
+        💾 Save Chat
       </button>
 
       <button id="voiceToggle">
-        🔊 &nbsp; Voice ON
+        🔊 Voice ON
+      </button>
+
+      <button id="voiceSettings">
+        🎙️ Voice Settings
       </button>
 
       <button id="clearHistory">
-        🗑️ &nbsp; Clear History
+        🗑️ Clear History
       </button>
 
     </div>
@@ -695,20 +756,36 @@
   </aside>
 
 
+  <!-- MAIN -->
+
   <main class="main">
 
     <header class="topbar">
 
-      <button id="mobileMenu">☰</button>
+      <button id="mobileMenu">
+        ☰
+      </button>
+
 
       <div id="currentTitle">
         New Chat
       </div>
 
-      <div class="status">
-        <span class="status-dot"></span>
-        Viggo Online
+
+      <div class="online-status">
+
+        <span class="online-dot"></span>
+
+        <span>
+          Viggo Online
+        </span>
+
       </div>
+
+
+      <button id="shareChat">
+        📤 Share
+      </button>
 
     </header>
 
@@ -721,8 +798,9 @@
 
           <div class="welcome-box">
 
-            <!-- B LOGO -->
-            <div class="ai-logo">B</div>
+            <div class="ai-logo">
+              B
+            </div>
 
             <h1>
               What can I help you with?
@@ -733,13 +811,17 @@
               for learning, coding, ideas and everyday tasks.
             </p>
 
+
             <div class="suggestions">
 
               <button
                 class="suggestion"
-                data-text="Explain this concept in simple words">
+                data-text="Explain this concept in simple words"
+              >
 
-                <strong>🧠 Explain</strong>
+                <strong>
+                  🧠 Explain
+                </strong>
 
                 <span>
                   Understand difficult topics easily
@@ -747,11 +829,15 @@
 
               </button>
 
+
               <button
                 class="suggestion"
-                data-text="Help me write a program">
+                data-text="Help me write a program"
+              >
 
-                <strong>💻 Code</strong>
+                <strong>
+                  💻 Code
+                </strong>
 
                 <span>
                   Build and debug your projects
@@ -759,11 +845,15 @@
 
               </button>
 
+
               <button
                 class="suggestion"
-                data-text="Give me creative ideas">
+                data-text="Give me creative ideas"
+              >
 
-                <strong>💡 Create</strong>
+                <strong>
+                  💡 Create
+                </strong>
 
                 <span>
                   Generate fresh ideas
@@ -771,11 +861,15 @@
 
               </button>
 
+
               <button
                 class="suggestion"
-                data-text="Teach me something interesting">
+                data-text="Teach me something interesting"
+              >
 
-                <strong>🚀 Learn</strong>
+                <strong>
+                  🚀 Learn
+                </strong>
 
                 <span>
                   Learn something new
@@ -801,20 +895,25 @@
         <textarea
           id="message"
           placeholder="Message Viggo..."
-          rows="1"></textarea>
+          rows="1"
+        ></textarea>
 
-        <button id="mic" title="Voice input">
+
+        <button
+          id="mic"
+          title="Voice input"
+        >
           🎤
         </button>
 
-        <button id="send" title="Send message">
+
+        <button
+          id="send"
+          title="Send"
+        >
           ➤
         </button>
 
-      </div>
-
-      <div class="input-hint">
-        Enter to send • Shift + Enter for new line
       </div>
 
     </footer>
@@ -828,13 +927,18 @@
 
 <div id="historyModal">
 
-  <div class="history-window">
+  <div class="modal-window">
 
-    <div class="history-header">
+    <div class="modal-header">
 
-      <h2>🕘 Chat History</h2>
+      <h2>
+        Chat History
+      </h2>
 
-      <button id="closeHistory">
+      <button
+        class="close-modal"
+        data-close="historyModal"
+      >
         ✕
       </button>
 
@@ -847,7 +951,254 @@
 </div>
 
 
+<!-- VOICE SETTINGS -->
+
+<div id="voiceModal">
+
+  <div class="modal-window">
+
+    <div class="modal-header">
+
+      <h2>
+        🎙️ Voice Settings
+      </h2>
+
+      <button
+        class="close-modal"
+        data-close="voiceModal"
+      >
+        ✕
+      </button>
+
+    </div>
+
+
+    <div class="voice-row">
+
+      <label>
+        What should Viggo call you?
+      </label>
+
+      <input
+        id="nickname"
+        value="friend"
+        maxlength="30"
+        placeholder="friend"
+      >
+
+    </div>
+
+
+    <div class="voice-row">
+
+      <label>
+        Viggo Voice
+      </label>
+
+      <select id="voiceSelect">
+
+        <option value="marin">
+          Marin — Natural
+        </option>
+
+        <option value="cedar">
+          Cedar — Natural
+        </option>
+
+        <option value="alloy">
+          Alloy
+        </option>
+
+        <option value="ash">
+          Ash
+        </option>
+
+        <option value="ballad">
+          Ballad
+        </option>
+
+        <option value="coral">
+          Coral
+        </option>
+
+        <option value="echo">
+          Echo
+        </option>
+
+        <option value="fable">
+          Fable
+        </option>
+
+        <option value="nova">
+          Nova
+        </option>
+
+        <option value="onyx">
+          Onyx
+        </option>
+
+        <option value="sage">
+          Sage
+        </option>
+
+        <option value="shimmer">
+          Shimmer
+        </option>
+
+        <option value="verse">
+          Verse
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div class="voice-row">
+
+      <label>
+        My Voice
+      </label>
+
+      <input
+        id="voiceName"
+        placeholder="Optional voice name"
+      >
+
+      <p class="voice-help">
+
+        You can create a personal voice only when
+        your backend/account has access to custom voices.
+        Viggo requires explicit consent before using a
+        person's voice.
+
+      </p>
+
+    </div>
+
+
+    <div class="voice-row">
+
+      <label>
+        Consent recording
+      </label>
+
+      <input
+        id="consentFile"
+        type="file"
+        accept="audio/*"
+      >
+
+    </div>
+
+
+    <div class="voice-row">
+
+      <label>
+        Voice sample
+      </label>
+
+      <input
+        id="voiceSample"
+        type="file"
+        accept="audio/*"
+      >
+
+    </div>
+
+
+    <div class="voice-actions">
+
+      <button
+        id="saveVoiceSettings"
+        class="primary-btn"
+      >
+        Save Settings
+      </button>
+
+
+      <button
+        id="createCustomVoice"
+        class="secondary-btn"
+      >
+        🎙️ Create My Voice
+      </button>
+
+
+      <button
+        id="deleteCustomVoice"
+        class="danger-btn"
+      >
+        Delete My Voice
+      </button>
+
+    </div>
+
+
+    <p
+      id="voiceStatus"
+      class="voice-help"
+    ></p>
+
+  </div>
+
+</div>
+
+
+<!-- SHARE -->
+
+<div id="shareModal">
+
+  <div class="modal-window">
+
+    <div class="modal-header">
+
+      <h2>
+        📤 Share This Chat
+      </h2>
+
+      <button
+        class="close-modal"
+        data-close="shareModal"
+      >
+        ✕
+      </button>
+
+    </div>
+
+
+    <div
+      id="sharePreview"
+      class="share-preview"
+    ></div>
+
+
+    <div class="share-actions">
+
+      <button
+        id="copyChat"
+        class="secondary-btn"
+      >
+        📋 Copy Chat
+      </button>
+
+
+      <button
+        id="nativeShare"
+        class="primary-btn"
+      >
+        📤 Share
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
 <script src="script.js"></script>
 
 </body>
+
 </html>
