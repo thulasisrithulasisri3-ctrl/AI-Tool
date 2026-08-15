@@ -1,438 +1,307 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>AI Voice Assistant</title>
+  <title>AI Assistant</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-        body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #111827, #312e81);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-        .app {
-            width: 100%;
-            max-width: 650px;
-            height: 700px;
-            background: white;
-            border-radius: 24px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-        }
+    .app {
+      width: 95%;
+      max-width: 700px;
+      height: 90vh;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
 
-        .header {
-            background: #4f46e5;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
+    .header {
+      padding: 20px;
+      background: #111827;
+      color: white;
+      text-align: center;
+    }
 
-        .header h1 {
-            font-size: 25px;
-        }
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
 
-        .header p {
-            margin-top: 6px;
-        }
+    .status {
+      margin-top: 6px;
+      font-size: 13px;
+      color: #86efac;
+    }
 
-        #chat {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            background: #f8fafc;
-        }
+    #chat {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
 
-        .message {
-            max-width: 80%;
-            padding: 12px 16px;
-            margin-bottom: 12px;
-            border-radius: 16px;
-            line-height: 1.5;
-            word-wrap: break-word;
-            white-space: pre-wrap;
-        }
+    .message {
+      margin-bottom: 15px;
+      display: flex;
+    }
 
-        .ai {
-            background: #e5e7eb;
-            color: #111827;
-        }
+    .user {
+      justify-content: flex-end;
+    }
 
-        .user {
-            background: #4f46e5;
-            color: white;
-            margin-left: auto;
-        }
+    .bubble {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 15px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
 
-        .bottom {
-            padding: 15px;
-            display: flex;
-            gap: 8px;
-            border-top: 1px solid #ddd;
-            background: white;
-        }
+    .user .bubble {
+      background: #2563eb;
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
 
-        #messageInput {
-            flex: 1;
-            min-width: 0;
-            padding: 14px;
-            border: 2px solid #ddd;
-            border-radius: 15px;
-            outline: none;
-            font-size: 16px;
-        }
+    .ai .bubble {
+      background: #e5e7eb;
+      color: #111827;
+      border-bottom-left-radius: 4px;
+    }
 
-        #messageInput:focus {
-            border-color: #4f46e5;
-        }
+    .input-area {
+      display: flex;
+      gap: 10px;
+      padding: 15px;
+      border-top: 1px solid #ddd;
+    }
 
-        #language {
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 15px;
-            background: white;
-        }
+    #messageInput {
+      flex: 1;
+      padding: 13px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      outline: none;
+      font-size: 16px;
+    }
 
-        button {
-            border: none;
-            border-radius: 15px;
-            padding: 12px 16px;
-            cursor: pointer;
-            font-size: 18px;
-            color: white;
-            background: #4f46e5;
-        }
+    #sendButton {
+      border: none;
+      background: #2563eb;
+      color: white;
+      padding: 0 20px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 16px;
+    }
 
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
+    #sendButton:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
 
-        #micButton {
-            background: #ef4444;
-        }
-
-        @media (max-width: 600px) {
-            .app {
-                height: 90vh;
-            }
-
-            .bottom {
-                flex-wrap: wrap;
-            }
-
-            #messageInput {
-                width: 100%;
-                flex-basis: 100%;
-            }
-
-            #language {
-                flex: 1;
-            }
-        }
-    </style>
+    .error {
+      color: #dc2626;
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="app">
+  <div class="app">
 
     <div class="header">
-        <h1>🤖 AI Voice Assistant</h1>
-        <p>Speak or type in your language 🌍</p>
+      <h1>🤖 AI Assistant</h1>
+      <div class="status" id="status">
+        Connecting...
+      </div>
     </div>
 
-    <div id="chat">
-        <div class="message ai">
-            Hello! 👋 I'm your AI assistant.
-        </div>
-    </div>
+    <div id="chat"></div>
 
-    <div class="bottom">
+    <div class="input-area">
 
-        <input
-            id="messageInput"
-            type="text"
-            placeholder="Type your message..."
-            autocomplete="off"
-        >
+      <input
+        id="messageInput"
+        type="text"
+        placeholder="Type your message..."
+        autocomplete="off"
+      >
 
-        <select id="language">
-            <option value="en-IN">🇬🇧 English</option>
-            <option value="ta-IN">🇮🇳 தமிழ்</option>
-            <option value="hi-IN">🇮🇳 हिन्दी</option>
-            <option value="te-IN">🇮🇳 తెలుగు</option>
-            <option value="ml-IN">🇮🇳 മലയാളം</option>
-            <option value="kn-IN">🇮🇳 ಕನ್ನಡ</option>
-            <option value="bn-IN">🇮🇳 বাংলা</option>
-            <option value="mr-IN">🇮🇳 मराठी</option>
-            <option value="gu-IN">🇮🇳 ગુજરાતી</option>
-            <option value="pa-IN">🇮🇳 ਪੰਜਾਬੀ</option>
-            <option value="fr-FR">🇫🇷 Français</option>
-            <option value="de-DE">🇩🇪 Deutsch</option>
-            <option value="es-ES">🇪🇸 Español</option>
-            <option value="it-IT">🇮🇹 Italiano</option>
-            <option value="pt-BR">🇧🇷 Português</option>
-            <option value="ja-JP">🇯🇵 日本語</option>
-            <option value="ko-KR">🇰🇷 한국어</option>
-            <option value="zh-CN">🇨🇳 中文</option>
-            <option value="ar-SA">🇸🇦 العربية</option>
-            <option value="ru-RU">🇷🇺 Русский</option>
-        </select>
-
-        <button id="sendButton" type="button">➤</button>
-
-        <button id="micButton" type="button">🎤</button>
+      <button id="sendButton">
+        Send
+      </button>
 
     </div>
 
-</div>
-
-<script>
-
-const BACKEND_URL =
-    "https://ai-tool-2-zpul.onrender.com/chat";
+  </div>
 
 
-const input =
-    document.getElementById("messageInput");
+  <script>
 
-const sendButton =
-    document.getElementById("sendButton");
+    const API_URL = "https://ai-tool-2-zpul.onrender.com";
 
-const micButton =
-    document.getElementById("micButton");
-
-const language =
-    document.getElementById("language");
-
-const chat =
-    document.getElementById("chat");
+    const chat = document.getElementById("chat");
+    const input = document.getElementById("messageInput");
+    const sendButton = document.getElementById("sendButton");
+    const status = document.getElementById("status");
 
 
-function addMessage(text, type) {
+    function addMessage(text, type) {
 
-    const message =
-        document.createElement("div");
+      const message = document.createElement("div");
+      message.className = `message ${type}`;
 
-    message.className =
-        "message " + type;
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
 
-    message.textContent =
-        text;
+      bubble.textContent = text;
 
-    chat.appendChild(message);
+      message.appendChild(bubble);
+      chat.appendChild(message);
 
-    chat.scrollTop =
-        chat.scrollHeight;
-
-    return message;
-}
-
-
-async function sendMessage() {
-
-    const text =
-        input.value.trim();
-
-    if (!text) {
-        return;
+      chat.scrollTop = chat.scrollHeight;
     }
 
-    addMessage(text, "user");
 
-    input.value = "";
+    async function checkBackend() {
 
-    sendButton.disabled = true;
+      try {
 
-    const aiMessage =
-        addMessage(
-            "Thinking... 🤖",
-            "ai"
-        );
+        const response = await fetch(`${API_URL}/`);
 
-    try {
+        if (!response.ok) {
+          throw new Error("Backend unavailable");
+        }
 
-        const response =
-            await fetch(
-                BACKEND_URL,
-                {
-                    method: "POST",
+        const data = await response.json();
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+        if (data.status === "online") {
+          status.textContent = "● Online";
+        } else {
+          status.textContent = "● Backend connected";
+        }
 
-                    body: JSON.stringify({
-                        message: text
-                    })
-                }
-            );
+      } catch (error) {
 
-        const data =
-            await response.json();
+        status.textContent = "● Backend offline";
+        status.style.color = "#fca5a5";
+
+        console.error("Backend error:", error);
+      }
+    }
+
+
+    async function sendMessage() {
+
+      const message = input.value.trim();
+
+      if (!message) {
+        return;
+      }
+
+      addMessage(message, "user");
+
+      input.value = "";
+
+      sendButton.disabled = true;
+      sendButton.textContent = "Thinking...";
+
+
+      try {
+
+        const response = await fetch(`${API_URL}/chat`, {
+
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            message: message
+          })
+
+        });
+
+
+        const data = await response.json();
+
 
         if (!response.ok) {
 
-            throw new Error(
-                data.error ||
-                "Server error"
-            );
+          throw new Error(
+            data.details ||
+            data.error ||
+            "AI request failed"
+          );
+
         }
 
-        aiMessage.textContent =
-            data.reply ||
-            "No response received.";
 
-    } catch (error) {
-
-        console.error(
-            "Connection error:",
-            error
+        addMessage(
+          data.reply || "No response received.",
+          "ai"
         );
 
-        aiMessage.textContent =
-            "❌ Connection error: " +
-            error.message;
 
-    } finally {
+      } catch (error) {
+
+        console.error("AI Error:", error);
+
+        addMessage(
+          "❌ " + error.message,
+          "ai"
+        );
+
+      } finally {
 
         sendButton.disabled = false;
+        sendButton.textContent = "Send";
 
         input.focus();
+      }
     }
-}
 
 
-/* Send button */
-
-sendButton.addEventListener(
-    "click",
-    sendMessage
-);
+    sendButton.addEventListener(
+      "click",
+      sendMessage
+    );
 
 
-/* Enter key */
-
-input.addEventListener(
-    "keydown",
-    function(event) {
+    input.addEventListener(
+      "keydown",
+      function(event) {
 
         if (event.key === "Enter") {
-
-            event.preventDefault();
-
-            sendMessage();
+          sendMessage();
         }
-    }
-);
+
+      }
+    );
 
 
-/* Voice input */
+    checkBackend();
 
-micButton.addEventListener(
-    "click",
-    startVoice
-);
-
-
-function startVoice() {
-
-    const SpeechRecognition =
-        window.SpeechRecognition ||
-        window.webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-
-        alert(
-            "Voice input is not supported in this browser."
-        );
-
-        return;
-    }
-
-    const recognition =
-        new SpeechRecognition();
-
-    recognition.lang =
-        language.value;
-
-    recognition.continuous =
-        false;
-
-    recognition.interimResults =
-        false;
-
-
-    recognition.onstart =
-        function() {
-
-            micButton.textContent =
-                "🎙️";
-
-            micButton.disabled =
-                true;
-        };
-
-
-    recognition.onresult =
-        function(event) {
-
-            const text =
-                event.results[0][0]
-                    .transcript;
-
-            input.value =
-                text;
-
-            sendMessage();
-        };
-
-
-    recognition.onerror =
-        function(event) {
-
-            console.error(
-                "Voice error:",
-                event.error
-            );
-
-            alert(
-                "Voice input failed. Please try again."
-            );
-        };
-
-
-    recognition.onend =
-        function() {
-
-            micButton.textContent =
-                "🎤";
-
-            micButton.disabled =
-                false;
-        };
-
-
-    recognition.start();
-}
-
-</script>
+  </script>
 
 </body>
 </html>
