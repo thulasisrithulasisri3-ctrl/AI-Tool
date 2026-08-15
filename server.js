@@ -1,247 +1,639 @@
-```javascript
-"use strict";
+/*
+=====================================================
+VIGGO AI SERVER
+server/server.js
+=====================================================
+*/
 
-const express =
-  require("express");
+const http = require("http");
+const fs = require("fs");
+const path = require("path");
 
-const cors =
-  require("cors");
+const PORT = process.env.PORT || 3000;
 
-const path =
-  require("path");
 
-const {
-  GoogleGenAI
-} = require("@google/genai");
+/* =====================================================
+   MIME TYPES
+===================================================== */
 
-const app =
-  express();
+const mimeTypes = {
 
-const PORT =
-  process.env.PORT || 10000;
+  ".html": "text/html; charset=utf-8",
 
-app.use(
-  cors()
-);
+  ".js": "application/javascript; charset=utf-8",
 
-app.use(
-  express.json()
-);
+  ".css": "text/css; charset=utf-8",
 
-app.use(
-  express.static(__dirname)
-);
+  ".json": "application/json; charset=utf-8",
 
-/* =========================================
-   GEMINI
-========================================= */
+  ".png": "image/png",
 
-const API_KEY =
-  process.env.GEMINI_API_KEY;
+  ".jpg": "image/jpeg",
 
-if (!API_KEY) {
+  ".jpeg": "image/jpeg",
 
-  console.error(
-    "❌ GEMINI_API_KEY is missing"
-  );
+  ".svg": "image/svg+xml",
 
-} else {
+  ".ico": "image/x-icon"
 
-  console.log(
-    "✅ Gemini API key found"
+};
+
+
+/* =====================================================
+   READ REQUEST BODY
+===================================================== */
+
+function readBody(req) {
+
+  return new Promise(
+    (resolve, reject) => {
+
+      let body = "";
+
+      req.on(
+        "data",
+        chunk => {
+
+          body += chunk;
+
+          if (body.length > 1e6) {
+
+            req.destroy();
+
+            reject(
+              new Error(
+                "Request too large"
+              )
+            );
+
+          }
+
+        }
+      );
+
+
+      req.on(
+        "end",
+        () => {
+
+          try {
+
+            resolve(
+              body
+                ? JSON.parse(body)
+                : {}
+            );
+
+          } catch {
+
+            reject(
+              new Error(
+                "Invalid JSON"
+              )
+            );
+
+          }
+
+        }
+      );
+
+
+      req.on(
+        "error",
+        reject
+      );
+
+    }
   );
 }
 
-const ai =
-  API_KEY
-    ? new GoogleGenAI({
-        apiKey: API_KEY,
-        httpOptions: {
-          apiVersion: "v1"
-        }
-      })
-    : null;
 
-/* =========================================
-   HOME
-========================================= */
+/* =====================================================
+   SEND JSON
+===================================================== */
 
-app.get(
-  "/",
-  (req, res) => {
+function sendJSON(
+  res,
+  status,
+  data
+) {
 
-    res.sendFile(
-      path.join(
-        __dirname,
-        "index.html"
-      )
-    );
+  res.writeHead(
+    status,
+    {
+      "Content-Type":
+        "application/json; charset=utf-8",
+
+      "Access-Control-Allow-Origin":
+        "*",
+
+      "Access-Control-Allow-Headers":
+        "Content-Type",
+
+      "Access-Control-Allow-Methods":
+        "GET, POST, OPTIONS"
+    }
+  );
+
+
+  res.end(
+    JSON.stringify(data)
+  );
+}
+
+
+/* =====================================================
+   AI RESPONSE
+===================================================== */
+
+async function getAIResponse(
+  message,
+  history
+) {
+
+  const apiKey =
+    process.env.OPENAI_API_KEY;
+
+
+  /*
+    If no API key is available,
+    return a simple response so
+    the application can still be tested.
+  */
+
+  if (!apiKey) {
+
+    return `
+Hello! I'm Viggo B.
+
+I received your message:
+
+"${message}"
+
+Your Viggo interface and server are working correctly.
+
+To connect Viggo to a real AI model, add your OPENAI_API_KEY and restart the server.
+`;
+
   }
-);
 
-/* =========================================
-   HEALTH
-========================================= */
 
-app.get(
-  "/health",
-  (req, res) => {
+  /*
+  =====================================================
+  OPENAI API
+  =====================================================
+  */
 
-    res.json({
+  const messages = [
 
-      success:
-        true,
+    {
+      role: "system",
 
-      app:
-        "Viggo AI Assistant",
+      content:
+        "You are Viggo, a helpful, friendly AI assistant. Give clear and useful answers."
+    }
 
-      status:
-        "running"
+  ];
+
+
+  if (Array.isArray(history)) {
+
+    history
+      .slice(-12)
+      .forEach(item => {
+
+        if (
+          item &&
+          (
+            item.role === "user" ||
+            item.role === "assistant"
+          )
+        ) {
+
+          messages.push({
+
+            role: item.role,
+
+            content:
+              String(
+                item.content || ""
+              )
+
+          });
+
+        }
+
+      });
+
+  }
+
+
+  /*
+    Avoid adding the same message twice.
+  */
+
+  if (
+    messages[messages.length - 1]?.content !==
+    message
+  ) {
+
+    messages.push({
+
+      role: "user",
+
+      content: message
 
     });
+
   }
-);
 
-/* =========================================
-   CHAT
-========================================= */
 
-app.post(
-  "/api/chat",
-  async (req, res) => {
+  const response =
+    await fetch(
+      "https://api.openai.com/v1/chat/completions",
+      {
 
-    try {
+        method: "POST",
 
-      const message =
-        req.body?.message?.trim();
+        headers: {
 
-      if (!message) {
+          "Content-Type":
+            "application/json",
 
-        return res
-          .status(400)
-          .json({
+          "Authorization":
+            `Bearer ${apiKey}`
 
-            success:
-              false,
+        },
 
-            error:
-              "Message is required"
+        body:
+          JSON.stringify({
 
-          });
+            model:
+              "gpt-4o-mini",
+
+            messages,
+
+            temperature:
+              0.7
+
+          })
+
       }
+    );
 
-      if (!ai) {
 
-        return res
-          .status(500)
-          .json({
+  if (!response.ok) {
 
-            success:
-              false,
+    const errorText =
+      await response.text();
 
-            error:
-              "GEMINI_API_KEY is missing"
+    console.error(
+      "OpenAI API error:",
+      errorText
+    );
 
-          });
-      }
+    throw new Error(
+      "AI API request failed"
+    );
 
-      console.log(
-        "User:",
-        message
-      );
+  }
+
+
+  const data =
+    await response.json();
+
+
+  return (
+    data
+      ?.choices?.[0]
+      ?.message
+      ?.content
+      ||
+    "I couldn't generate a response."
+  );
+}
+
+
+/* =====================================================
+   SERVER
+===================================================== */
+
+const server =
+  http.createServer(
+    async (req, res) => {
 
       /*
-        Gemini Interactions API
+      ---------------------------------------------------
+      CORS / OPTIONS
+      ---------------------------------------------------
       */
 
-      const interaction =
-        await ai.interactions.create({
+      if (req.method === "OPTIONS") {
 
-          model:
-            "gemini-3.6-flash",
+        res.writeHead(
+          204,
+          {
+            "Access-Control-Allow-Origin":
+              "*",
 
-          input:
-            message
+            "Access-Control-Allow-Headers":
+              "Content-Type",
 
-        });
+            "Access-Control-Allow-Methods":
+              "GET, POST, OPTIONS"
+          }
+        );
 
-      const reply =
-        interaction.output_text ||
-        interaction.outputText ||
-        "No response received.";
+        res.end();
 
-      console.log(
-        "Viggo:",
-        reply
+        return;
+      }
+
+
+      /*
+      ---------------------------------------------------
+      HEALTH CHECK
+      ---------------------------------------------------
+      */
+
+      if (
+        req.method === "GET" &&
+        req.url === "/api/health"
+      ) {
+
+        sendJSON(
+          res,
+          200,
+          {
+            status: "ok",
+            app: "Viggo",
+            message:
+              "Viggo server is running"
+          }
+        );
+
+        return;
+      }
+
+
+      /*
+      ---------------------------------------------------
+      CHAT API
+      ---------------------------------------------------
+      */
+
+      if (
+        req.method === "POST" &&
+        req.url === "/api/chat"
+      ) {
+
+        try {
+
+          const body =
+            await readBody(req);
+
+
+          const message =
+            String(
+              body.message || ""
+            ).trim();
+
+
+          const history =
+            Array.isArray(
+              body.history
+            )
+              ? body.history
+              : [];
+
+
+          if (!message) {
+
+            sendJSON(
+              res,
+              400,
+              {
+                error:
+                  "Message is required"
+              }
+            );
+
+            return;
+          }
+
+
+          const reply =
+            await getAIResponse(
+              message,
+              history
+            );
+
+
+          sendJSON(
+            res,
+            200,
+            {
+              reply
+            }
+          );
+
+
+        } catch (error) {
+
+          console.error(
+            "Chat error:",
+            error
+          );
+
+
+          sendJSON(
+            res,
+            500,
+            {
+              reply:
+                "Sorry, Viggo couldn't process your request right now."
+            }
+          );
+
+        }
+
+        return;
+      }
+
+
+      /*
+      ---------------------------------------------------
+      STATIC FILES
+      ---------------------------------------------------
+      */
+
+      let requestedPath =
+        req.url.split("?")[0];
+
+
+      if (
+        requestedPath === "/" ||
+        requestedPath === ""
+      ) {
+
+        requestedPath =
+          "/index.html";
+
+      }
+
+
+      const filePath =
+        path.join(
+          __dirname,
+          "..",
+          requestedPath
+        );
+
+
+      /*
+      Security:
+      Don't allow files outside
+      the project directory.
+      */
+
+      const projectRoot =
+        path.resolve(
+          __dirname,
+          ".."
+        );
+
+
+      const absoluteFile =
+        path.resolve(
+          filePath
+        );
+
+
+      if (
+        !absoluteFile.startsWith(
+          projectRoot
+        )
+      ) {
+
+        res.writeHead(403);
+
+        res.end(
+          "Forbidden"
+        );
+
+        return;
+      }
+
+
+      fs.readFile(
+        absoluteFile,
+        (error, data) => {
+
+          if (error) {
+
+            res.writeHead(
+              404,
+              {
+                "Content-Type":
+                  "text/plain"
+              }
+            );
+
+            res.end(
+              "404 - File not found"
+            );
+
+            return;
+          }
+
+
+          const ext =
+            path.extname(
+              absoluteFile
+            );
+
+
+          const contentType =
+            mimeTypes[ext] ||
+            "application/octet-stream";
+
+
+          res.writeHead(
+            200,
+            {
+              "Content-Type":
+                contentType
+            }
+          );
+
+
+          res.end(data);
+
+        }
       );
 
-      return res.json({
-
-        success:
-          true,
-
-        reply:
-          reply
-
-      });
-
-    } catch (error) {
-
-      console.error(
-        "❌ GEMINI ERROR:",
-        error
-      );
-
-      return res
-        .status(500)
-        .json({
-
-          success:
-            false,
-
-          error:
-            error.message ||
-            "Gemini request failed"
-
-        });
     }
-  }
-);
+  );
 
-/* =========================================
-   404
-========================================= */
 
-app.use(
-  (req, res) => {
+/* =====================================================
+   START SERVER
+===================================================== */
 
-    res
-      .status(404)
-      .json({
-
-        success:
-          false,
-
-        error:
-          "Route not found"
-
-      });
-  }
-);
-
-/* =========================================
-   START
-========================================= */
-
-app.listen(
+server.listen(
   PORT,
-  "0.0.0.0",
   () => {
 
     console.log(
-      `🚀 Viggo AI Assistant running on port ${PORT}`
+      "================================"
+    );
+
+    console.log(
+      "        VIGGO AI SERVER"
+    );
+
+    console.log(
+      "================================"
+    );
+
+    console.log(
+      `Viggo running at: http://localhost:${PORT}`
+    );
+
+    console.log(
+      `Health check: http://localhost:${PORT}/api/health`
+    );
+
+    console.log(
+      "================================"
     );
 
   }
 );
-```
+
+
+/* =====================================================
+   ERROR HANDLING
+===================================================== */
+
+server.on(
+  "error",
+  error => {
+
+    if (error.code === "EADDRINUSE") {
+
+      console.error(
+        `Port ${PORT} is already in use.`
+      );
+
+    } else {
+
+      console.error(
+        "Server error:",
+        error
+      );
+
+    }
+
+  }
+);
