@@ -3,34 +3,61 @@
 console.log("Viggo script.js loaded");
 
 
-/* =========================
+/* =================================
+   RENDER BACKEND URL
+================================= */
+
+const API_URL =
+  "https://ai-tool-2-zpul.onrender.com/api/chat";
+
+
+/* =================================
    ELEMENTS
-========================= */
+================================= */
 
-const chat = document.getElementById("chat");
-const messageInput = document.getElementById("message");
-const sendButton = document.getElementById("send");
+const chat =
+  document.getElementById("chat");
 
-const saveButton = document.getElementById("saveButton");
+const messageInput =
+  document.getElementById("message");
 
-const micButton = document.getElementById("mic");
-const voiceToggle = document.getElementById("voiceToggle");
+const sendButton =
+  document.getElementById("send");
 
-const historyButton = document.getElementById("historyButton");
-const historyPanel = document.getElementById("historyPanel");
-const closeHistory = document.getElementById("closeHistory");
-const historyList = document.getElementById("historyList");
+const saveButton =
+  document.getElementById("saveButton");
+
+const micButton =
+  document.getElementById("mic");
+
+const voiceToggle =
+  document.getElementById("voiceToggle");
+
+const historyButton =
+  document.getElementById("historyButton");
+
+const historyPanel =
+  document.getElementById("historyPanel");
+
+const closeHistory =
+  document.getElementById("closeHistory");
+
+const historyList =
+  document.getElementById("historyList");
 
 
-/* =========================
+/* =================================
    HISTORY
-========================= */
+================================= */
 
 let history = [];
 
 try {
+
   history = JSON.parse(
-    localStorage.getItem("viggoHistory") || "[]"
+    localStorage.getItem(
+      "viggoHistory"
+    ) || "[]"
   );
 
   if (!Array.isArray(history)) {
@@ -38,27 +65,33 @@ try {
   }
 
 } catch (error) {
-  console.error("History error:", error);
+
+  console.error(
+    "History error:",
+    error
+  );
+
   history = [];
+
 }
 
 
-/* =========================
+/* =================================
    CURRENT CHAT
-========================= */
+================================= */
 
 let currentUserMessage = "";
 let currentAIMessage = "";
 
-let hasCurrentConversation = false;
 
-
-/* =========================
+/* =================================
    VOICE
-========================= */
+================================= */
 
 let voiceEnabled =
-  localStorage.getItem("viggoVoice") !== "false";
+  localStorage.getItem(
+    "viggoVoice"
+  ) !== "false";
 
 
 function updateVoiceButton() {
@@ -68,19 +101,29 @@ function updateVoiceButton() {
     voiceToggle.textContent =
       "🔊 Voice ON";
 
-    voiceToggle.classList.remove("off");
+    voiceToggle.classList.remove(
+      "off"
+    );
 
   } else {
 
     voiceToggle.textContent =
       "🔇 Voice OFF";
 
-    voiceToggle.classList.add("off");
+    voiceToggle.classList.add(
+      "off"
+    );
 
-    if ("speechSynthesis" in window) {
-      speechSynthesis.cancel();
+    if (
+      "speechSynthesis" in window
+    ) {
+
+      window.speechSynthesis.cancel();
+
     }
+
   }
+
 }
 
 
@@ -91,7 +134,8 @@ voiceToggle.addEventListener(
   "click",
   function () {
 
-    voiceEnabled = !voiceEnabled;
+    voiceEnabled =
+      !voiceEnabled;
 
     localStorage.setItem(
       "viggoVoice",
@@ -104,38 +148,55 @@ voiceToggle.addEventListener(
 );
 
 
+/* =================================
+   TEXT TO SPEECH
+================================= */
+
 function speak(text) {
 
   if (!voiceEnabled) {
     return;
   }
 
-  if (!("speechSynthesis" in window)) {
+  if (
+    !("speechSynthesis" in window)
+  ) {
     return;
   }
 
-  speechSynthesis.cancel();
+  window.speechSynthesis.cancel();
 
   const utterance =
-    new SpeechSynthesisUtterance(text);
+    new SpeechSynthesisUtterance(
+      text
+    );
 
-  utterance.lang = "en-IN";
-  utterance.rate = 0.95;
+  utterance.lang =
+    "en-IN";
 
-  speechSynthesis.speak(
+  utterance.rate =
+    0.95;
+
+  window.speechSynthesis.speak(
     utterance
   );
+
 }
 
 
-/* =========================
-   CHAT MESSAGE
-========================= */
+/* =================================
+   ADD MESSAGE
+================================= */
 
-function addMessage(text, type) {
+function addMessage(
+  text,
+  type
+) {
 
   const div =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   div.className =
     "message " + type;
@@ -143,16 +204,19 @@ function addMessage(text, type) {
   div.textContent =
     text;
 
-  chat.appendChild(div);
+  chat.appendChild(
+    div
+  );
 
   chat.scrollTop =
     chat.scrollHeight;
+
 }
 
 
-/* =========================
-   SAVE CURRENT CHAT
-========================= */
+/* =================================
+   SAVE
+================================= */
 
 function saveCurrentChat() {
 
@@ -166,12 +230,14 @@ function saveCurrentChat() {
     );
 
     return;
+
   }
 
 
   const item = {
 
-    id: Date.now(),
+    id:
+      Date.now(),
 
     user:
       currentUserMessage,
@@ -188,7 +254,9 @@ function saveCurrentChat() {
   };
 
 
-  history.push(item);
+  history.push(
+    item
+  );
 
 
   localStorage.setItem(
@@ -200,6 +268,7 @@ function saveCurrentChat() {
   saveButton.textContent =
     "✅ Saved";
 
+
   setTimeout(
     function () {
 
@@ -210,9 +279,6 @@ function saveCurrentChat() {
     1500
   );
 
-
-  hasCurrentConversation =
-    false;
 }
 
 
@@ -222,19 +288,24 @@ saveButton.addEventListener(
 );
 
 
-/* =========================
-   HISTORY DISPLAY
-========================= */
+/* =================================
+   SHOW HISTORY
+================================= */
 
 function showHistory() {
 
-  historyList.innerHTML = "";
+  historyList.innerHTML =
+    "";
 
 
-  if (history.length === 0) {
+  if (
+    history.length === 0
+  ) {
 
     const empty =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
 
     empty.className =
       "empty";
@@ -247,6 +318,7 @@ function showHistory() {
     );
 
     return;
+
   }
 
 
@@ -269,6 +341,7 @@ function showHistory() {
         }
 
         return b.id - a.id;
+
       }
     );
 
@@ -277,21 +350,27 @@ function showHistory() {
     function (item) {
 
       const container =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
 
       container.className =
         "history-item";
 
 
       if (item.pinned) {
+
         container.classList.add(
           "pinned"
         );
+
       }
 
 
       const title =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
 
       title.className =
         "history-title";
@@ -303,7 +382,9 @@ function showHistory() {
 
 
       const user =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
 
       user.className =
         "history-user";
@@ -314,7 +395,9 @@ function showHistory() {
 
 
       const ai =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
 
       ai.className =
         "history-ai";
@@ -325,7 +408,9 @@ function showHistory() {
 
 
       const time =
-        document.createElement("small");
+        document.createElement(
+          "small"
+        );
 
       time.className =
         "history-time";
@@ -335,7 +420,9 @@ function showHistory() {
 
 
       const actions =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
 
       actions.className =
         "history-actions";
@@ -344,13 +431,15 @@ function showHistory() {
       /* PIN */
 
       const pinButton =
-        document.createElement("button");
-
-      pinButton.className =
-        "pin-btn";
+        document.createElement(
+          "button"
+        );
 
       pinButton.type =
         "button";
+
+      pinButton.className =
+        "pin-btn";
 
       pinButton.textContent =
         item.pinned
@@ -375,12 +464,15 @@ function showHistory() {
             found.pinned =
               !found.pinned;
 
+
             localStorage.setItem(
               "viggoHistory",
               JSON.stringify(history)
             );
 
+
             showHistory();
+
           }
 
         }
@@ -390,13 +482,15 @@ function showHistory() {
       /* DELETE */
 
       const deleteButton =
-        document.createElement("button");
-
-      deleteButton.className =
-        "delete-btn";
+        document.createElement(
+          "button"
+        );
 
       deleteButton.type =
         "button";
+
+      deleteButton.className =
+        "delete-btn";
 
       deleteButton.textContent =
         "🗑️ Delete";
@@ -405,6 +499,17 @@ function showHistory() {
       deleteButton.addEventListener(
         "click",
         function () {
+
+          const ok =
+            confirm(
+              "Delete this chat?"
+            );
+
+
+          if (!ok) {
+            return;
+          }
+
 
           history =
             history.filter(
@@ -462,12 +567,13 @@ function showHistory() {
 
     }
   );
+
 }
 
 
-/* =========================
+/* =================================
    HISTORY OPEN
-========================= */
+================================= */
 
 historyButton.addEventListener(
   "click",
@@ -482,9 +588,9 @@ historyButton.addEventListener(
 );
 
 
-/* =========================
+/* =================================
    HISTORY CLOSE
-========================= */
+================================= */
 
 closeHistory.addEventListener(
   "click",
@@ -514,9 +620,9 @@ historyPanel.addEventListener(
 );
 
 
-/* =========================
-   SEND
-========================= */
+/* =================================
+   SEND MESSAGE
+================================= */
 
 async function sendMessage() {
 
@@ -545,9 +651,6 @@ async function sendMessage() {
   currentAIMessage =
     "";
 
-  hasCurrentConversation =
-    false;
-
 
   sendButton.disabled =
     true;
@@ -558,11 +661,16 @@ async function sendMessage() {
 
   try {
 
+    console.log(
+      "Sending request to:",
+      API_URL
+    );
+
+
     const response =
       await fetch(
-        "/api/chat",
+        API_URL,
         {
-
           method:
             "POST",
 
@@ -573,11 +681,55 @@ async function sendMessage() {
 
           body:
             JSON.stringify({
-              message: text
+              message:
+                text
             })
-
         }
       );
+
+
+    const contentType =
+      response.headers.get(
+        "content-type"
+      ) || "";
+
+
+    console.log(
+      "HTTP status:",
+      response.status
+    );
+
+    console.log(
+      "Content-Type:",
+      contentType
+    );
+
+
+    /* IMPORTANT:
+       Prevent HTML -> JSON error
+    */
+
+    if (
+      !contentType.includes(
+        "application/json"
+      )
+    ) {
+
+      const raw =
+        await response.text();
+
+
+      console.error(
+        "Server returned:",
+        raw
+      );
+
+
+      throw new Error(
+        "Server returned HTML instead of JSON. Check Render /api/chat."
+      );
+
+    }
 
 
     const data =
@@ -602,9 +754,6 @@ async function sendMessage() {
     currentAIMessage =
       reply;
 
-    hasCurrentConversation =
-      true;
-
 
     addMessage(
       reply,
@@ -620,7 +769,7 @@ async function sendMessage() {
   } catch (error) {
 
     console.error(
-      "Viggo error:",
+      "Viggo API error:",
       error
     );
 
@@ -641,8 +790,13 @@ async function sendMessage() {
     "Send";
 
   messageInput.focus();
+
 }
 
+
+/* =================================
+   SEND BUTTON
+================================= */
 
 sendButton.addEventListener(
   "click",
@@ -650,9 +804,9 @@ sendButton.addEventListener(
 );
 
 
-/* =========================
-   ENTER
-========================= */
+/* =================================
+   ENTER KEY
+================================= */
 
 messageInput.addEventListener(
   "keydown",
@@ -673,16 +827,17 @@ messageInput.addEventListener(
 );
 
 
-/* =========================
+/* =================================
    MICROPHONE
-========================= */
+================================= */
 
 const SpeechRecognition =
   window.SpeechRecognition ||
   window.webkitSpeechRecognition;
 
 
-let recognition = null;
+let recognition =
+  null;
 
 
 if (SpeechRecognition) {
@@ -731,7 +886,7 @@ if (SpeechRecognition) {
     function (event) {
 
       console.error(
-        "Mic error:",
+        "Microphone error:",
         event.error
       );
 
@@ -752,6 +907,7 @@ if (SpeechRecognition) {
         event.results[0][0]
           .transcript;
 
+
       messageInput.value =
         transcript;
 
@@ -769,7 +925,7 @@ if (SpeechRecognition) {
       } catch (error) {
 
         console.log(
-          "Microphone already active."
+          "Microphone already running."
         );
 
       }
@@ -785,7 +941,7 @@ if (SpeechRecognition) {
     function () {
 
       alert(
-        "Microphone is not supported here. Please use Chrome."
+        "Microphone is not supported in this browser. Please use Chrome."
       );
 
     }
