@@ -1,246 +1,96 @@
-const API_URL = "https://ai-tool-2-zpul.onrender.com/api/chat";
+const express = require("express");
+const cors = require("cors");
+const { GoogleGenAI } = require("@google/genai");
 
-let messages = [];
+const app = express();
+const PORT = process.env.PORT || 10000;
 
-// ---------- DOM ----------
-const input =
-  document.querySelector("#messageInput") ||
-  document.querySelector("#userInput") ||
-  document.querySelector("textarea");
+app.use(cors());
+app.use(express.json());
 
-const sendButton =
-  document.querySelector("#sendButton") ||
-  document.querySelector("#sendBtn") ||
-  document.querySelector("button[type='submit']");
+const apiKey = process.env.GEMINI_API_KEY;
 
-const chatContainer =
-  document.querySelector("#chat") ||
-  document.querySelector("#chatContainer") ||
-  document.querySelector(".chat-container") ||
-  document.querySelector(".messages");
-
-// ---------- Add message ----------
-function addMessage(text, type) {
-  if (!chatContainer) {
-    console.log(type + ":", text);
-    return;
-  }
-
-  const message = document.createElement("div");
-
-  message.className =
-    type === "user"
-      ? "message user-message"
-      : "message ai-message";
-
-  message.textContent = text;
-
-  chatContainer.appendChild(message);
-
-  chatContainer.scrollTop = chatContainer.scrollHeight;
+if (!apiKey) {
+  console.error("GEMINI_API_KEY is missing");
+  process.exit(1);
 }
 
-// ---------- AI request ----------
-async function askAI(userMessage) {
-  const response = await fetch(API_URL, {
-    method: "POST",
+const ai = new GoogleGenAI({
+  apiKey: apiKey
+});
 
-    headers: {
-      "Content-Type": "application/json"
-    },
+console.log("Gemini AI initialized");
 
-    body: JSON.stringify({
-      message: userMessage
-    })
+// Home
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "AI Assistant is LIVE"
   });
+});
 
-  // Read text first so HTML errors don't cause
-  // "Unexpected token <" JSON errors.
-  const rawText = await response.text();
-
-  let data;
-
-  try {
-    data = JSON.parse(rawText);
-  } catch (error) {
-    console.error("Server returned:", rawText);
-
-    throw new Error(
-      "Server JSON response கிடைக்கவில்லை. Backend URL அல்லது endpoint check பண்ணுங்க."
-    );
-  }
-
-  if (!response.ok) {
-    throw new Error(
-      data.error ||
-      data.details ||
-      "AI request failed"
-    );
-  }
-
-  if (!data.reply) {
-    throw new Error("AI response empty");
-  }
-
-  return data.reply;
-}
-
-// ---------- Send message ----------
-async function sendMessage() {
-  if (!input) {
-    console.error(
-      "Message input not found. Check your HTML input ID."
-    );
-    return;
-  }
-
-  const userMessage = input.value.trim();
-
-  if (!userMessage) {
-    return;
-  }
-
-  // Disable button while waiting
-  if (sendButton) {
-    sendButton.disabled = true;
-  }
-
-  // Show user message
-  addMessage(userMessage, "user");
-
-  // Clear input
-  input.value = "";
-
-  // Store history
-  messages.push({
-    role: "user",
-    content: userMessage
+// Health
+app.get("/health", (req, res) => {
+  res.json({
+    success: true,
+    status: "healthy"
   });
+});
 
+// Chat
+app.post("/api/chat", async (req, res) => {
   try {
-    // Show loading
-    addMessage("Thinking...", "ai");
+    const message = req.body?.message;
 
-    const reply = await askAI(userMessage);
-
-    // Remove last "Thinking..." message
-    if (chatContainer) {
-      const aiMessages =
-        chatContainer.querySelectorAll(".ai-message");
-
-      const lastMessage =
-        aiMessages[aiMessages.length - 1];
-
-      if (
-        lastMessage &&
-        lastMessage.textContent === "Thinking..."
-      ) {
-        lastMessage.remove();
-      }
+    if (!message || typeof message !== "string") {
+      return res.status(400).json({
+        success: false,
+        error: "Message is required"
+      });
     }
 
-    // Show AI reply
-    addMessage(reply, "ai");
+    console.log("User:", message);
 
-    // Store history
-    messages.push({
-      role: "assistant",
-      content: reply
+    const interaction = await ai.interactions.create({
+      model: "gemini-3.6-flash",
+      input: message
     });
 
-    saveHistory();
+    const reply = interaction.output_text;
 
-  } catch (error) {
-    console.error("AI Error:", error);
-
-    // Remove Thinking message
-    if (chatContainer) {
-      const aiMessages =
-        chatContainer.querySelectorAll(".ai-message");
-
-      const lastMessage =
-        aiMessages[aiMessages.length - 1];
-
-      if (
-        lastMessage &&
-        lastMessage.textContent === "Thinking..."
-      ) {
-        lastMessage.remove();
-      }
+    if (!reply) {
+      return res.status(500).json({
+        success: false,
+        error: "Empty AI response"
+      });
     }
 
-    addMessage(
-      "❌ " + error.message,
-      "ai"
-    );
+    console.log("AI:", reply);
 
-  } finally {
-    if (sendButton) {
-      sendButton.disabled = false;
-    }
-
-    input.focus();
-  }
-}
-
-// ---------- Button ----------
-if (sendButton) {
-  sendButton.addEventListener("click", function (event) {
-    event.preventDefault();
-    sendMessage();
-  });
-}
-
-// ---------- Enter key ----------
-if (input) {
-  input.addEventListener("keydown", function (event) {
-    if (event.key === "Enter" && !event.shiftKey) {
-      event.preventDefault();
-      sendMessage();
-    }
-  });
-}
-
-// ---------- Local history ----------
-function saveHistory() {
-  localStorage.setItem(
-    "ai_chat_history",
-    JSON.stringify(messages)
-  );
-}
-
-function loadHistory() {
-  try {
-    const saved =
-      localStorage.getItem("ai_chat_history");
-
-    if (!saved) {
-      return;
-    }
-
-    messages = JSON.parse(saved);
-
-    messages.forEach((message) => {
-      addMessage(
-        message.content,
-        message.role === "user"
-          ? "user"
-          : "ai"
-      );
+    res.json({
+      success: true,
+      reply: reply
     });
 
   } catch (error) {
-    console.error(
-      "History loading error:",
-      error
-    );
+    console.error("Gemini Error:", error);
+
+    res.status(500).json({
+      success: false,
+      error: "AI request failed",
+      details: error.message
+    });
   }
-}
+});
 
-// ---------- Start ----------
-loadHistory();
+// Unknown routes
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    error: "Endpoint not found"
+  });
+});
 
-console.log(
-  "AI frontend connected to:",
-  API_URL
-);
+app.listen(PORT, () => {
+  console.log(`AI Assistant running on port ${PORT}`);
+});
