@@ -1,11 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>AI Assistant</title>
+  <title>Viggo AI Assistant</title>
 
   <style>
     * {
@@ -19,7 +17,7 @@
     }
 
     .app {
-      max-width: 800px;
+      max-width: 850px;
       height: 100vh;
       margin: auto;
       background: white;
@@ -30,10 +28,10 @@
     .header {
       background: #111827;
       color: white;
-      padding: 16px;
+      padding: 15px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
     }
 
     .header h1 {
@@ -41,13 +39,16 @@
       font-size: 21px;
     }
 
-    .header button {
+    button {
+      cursor: pointer;
+    }
+
+    #historyButton {
       border: none;
       background: #374151;
       color: white;
       padding: 9px 12px;
       border-radius: 8px;
-      cursor: pointer;
     }
 
     #chat {
@@ -57,9 +58,8 @@
     }
 
     .message {
-      position: relative;
       max-width: 82%;
-      padding: 12px 42px 12px 14px;
+      padding: 12px 15px;
       margin-bottom: 12px;
       border-radius: 15px;
       white-space: pre-wrap;
@@ -78,25 +78,9 @@
       color: #111827;
     }
 
-    .message-actions {
-      position: absolute;
-      right: 7px;
-      bottom: 6px;
-      display: flex;
-      gap: 3px;
-    }
-
-    .message-actions button {
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .bottom {
+    .input-area {
       border-top: 1px solid #ddd;
       padding: 12px;
-      background: white;
     }
 
     .input-row {
@@ -107,9 +91,9 @@
     #message {
       flex: 1;
       resize: none;
-      padding: 13px;
       border: 1px solid #ccc;
       border-radius: 12px;
+      padding: 13px;
       font-size: 16px;
       outline: none;
     }
@@ -120,7 +104,6 @@
       border-radius: 12px;
       background: #2563eb;
       color: white;
-      cursor: pointer;
       font-size: 15px;
     }
 
@@ -137,14 +120,13 @@
     }
 
     #mic {
-      width: 56px;
+      width: 58px;
       height: 45px;
       border: none;
       border-radius: 12px;
       background: #16a34a;
       color: white;
       font-size: 22px;
-      cursor: pointer;
     }
 
     #mic.listening {
@@ -153,30 +135,29 @@
 
     #voiceToggle {
       border: none;
-      padding: 9px 14px;
+      padding: 10px 15px;
       border-radius: 10px;
-      background: #e5e7eb;
-      cursor: pointer;
-    }
-
-    #voiceToggle.on {
       background: #16a34a;
       color: white;
+    }
+
+    #voiceToggle.off {
+      background: #6b7280;
     }
 
     .panel {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.45);
-      z-index: 10;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 20;
     }
 
     .panel-box {
-      width: 90%;
-      max-width: 500px;
-      height: 80vh;
-      margin: 8vh auto;
+      width: 92%;
+      max-width: 550px;
+      height: 82vh;
+      margin: 7vh auto;
       background: white;
       border-radius: 15px;
       padding: 18px;
@@ -185,50 +166,59 @@
 
     .panel-header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 15px;
+      justify-content: space-between;
     }
 
-    .panel-header button {
+    #closeHistory {
       border: none;
       background: #ef4444;
       color: white;
-      border-radius: 8px;
       padding: 8px 12px;
-      cursor: pointer;
+      border-radius: 8px;
     }
 
     .history-item {
-      padding: 12px;
       border-bottom: 1px solid #ddd;
+      padding: 13px 0;
     }
 
-    .history-item strong {
+    .history-user {
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .history-ai {
+      color: #444;
+      white-space: pre-wrap;
+    }
+
+    .history-time {
       display: block;
-      margin-bottom: 5px;
+      margin-top: 6px;
+      font-size: 12px;
+      color: #777;
     }
 
-    .history-buttons {
-      margin-top: 8px;
+    .history-actions {
+      margin-top: 9px;
       display: flex;
-      gap: 6px;
+      gap: 7px;
     }
 
-    .history-buttons button {
+    .pin {
       border: none;
-      border-radius: 7px;
-      padding: 6px 9px;
-      cursor: pointer;
-    }
-
-    .pin-btn {
       background: #facc15;
+      padding: 7px 10px;
+      border-radius: 7px;
     }
 
-    .delete-btn {
+    .delete {
+      border: none;
       background: #ef4444;
       color: white;
+      padding: 7px 10px;
+      border-radius: 7px;
     }
 
     .empty {
@@ -245,10 +235,6 @@
       .message {
         max-width: 90%;
       }
-
-      #send {
-        width: 75px;
-      }
     }
   </style>
 </head>
@@ -258,7 +244,7 @@
 <div class="app">
 
   <div class="header">
-    <h1>🤖 AI Assistant</h1>
+    <h1>🤖 Viggo AI Assistant</h1>
 
     <button id="historyButton">
       📜 History
@@ -269,14 +255,15 @@
   <div id="chat">
 
     <div class="message ai">
-      வணக்கம்! 👋
-      என்ன கேட்கணும்னாலும் கேளுங்க.
+      Hello! 👋
+      I am Viggo AI Assistant.
+      How can I help you?
     </div>
 
   </div>
 
 
-  <div class="bottom">
+  <div class="input-area">
 
     <div class="input-row">
 
@@ -293,15 +280,13 @@
     </div>
 
 
-    <!-- Microphone is BELOW Send -->
-
     <div class="voice-row">
 
       <button id="mic" title="Speak">
         🎤
       </button>
 
-      <button id="voiceToggle" class="on">
+      <button id="voiceToggle">
         🔊 Voice ON
       </button>
 
@@ -312,17 +297,13 @@
 </div>
 
 
-<!-- HISTORY PANEL -->
-
 <div id="historyPanel" class="panel">
 
   <div class="panel-box">
 
     <div class="panel-header">
 
-      <h2>
-        📜 History
-      </h2>
+      <h2>📜 Viggo History</h2>
 
       <button id="closeHistory">
         Close
@@ -338,524 +319,6 @@
 
 
 <script src="script.js"></script>
-
-
-<script>
-
-const mic =
-  document.getElementById("mic");
-
-const voiceToggle =
-  document.getElementById("voiceToggle");
-
-const historyButton =
-  document.getElementById("historyButton");
-
-const historyPanel =
-  document.getElementById("historyPanel");
-
-const closeHistory =
-  document.getElementById("closeHistory");
-
-const historyList =
-  document.getElementById("historyList");
-
-
-// ==========================
-// VOICE ON / OFF
-// ==========================
-
-let voiceEnabled =
-  localStorage.getItem("voiceEnabled") !== "false";
-
-
-function updateVoiceButton() {
-
-  if (voiceEnabled) {
-
-    voiceToggle.textContent =
-      "🔊 Voice ON";
-
-    voiceToggle.classList.add("on");
-
-  } else {
-
-    voiceToggle.textContent =
-      "🔇 Voice OFF";
-
-    voiceToggle.classList.remove("on");
-
-  }
-
-}
-
-
-updateVoiceButton();
-
-
-voiceToggle.addEventListener(
-  "click",
-  () => {
-
-    voiceEnabled =
-      !voiceEnabled;
-
-    localStorage.setItem(
-      "voiceEnabled",
-      voiceEnabled
-    );
-
-    updateVoiceButton();
-
-  }
-);
-
-
-// ==========================
-// TEXT TO SPEECH
-// ==========================
-
-function speak(text) {
-
-  if (!voiceEnabled) {
-    return;
-  }
-
-  if (!("speechSynthesis" in window)) {
-    return;
-  }
-
-  window.speechSynthesis.cancel();
-
-  const speech =
-    new SpeechSynthesisUtterance(text);
-
-  speech.lang = "ta-IN";
-
-  speech.rate = 0.95;
-
-  speech.pitch = 1;
-
-  window.speechSynthesis.speak(
-    speech
-  );
-}
-
-
-// ==========================
-// MICROPHONE
-// ==========================
-
-const SpeechRecognition =
-  window.SpeechRecognition ||
-  window.webkitSpeechRecognition;
-
-
-let recognition = null;
-
-
-if (SpeechRecognition) {
-
-  recognition =
-    new SpeechRecognition();
-
-  recognition.lang =
-    "ta-IN";
-
-  recognition.continuous =
-    false;
-
-  recognition.interimResults =
-    false;
-
-
-  recognition.onstart = () => {
-
-    mic.classList.add(
-      "listening"
-    );
-
-    mic.textContent =
-      "🔴";
-
-  };
-
-
-  recognition.onend = () => {
-
-    mic.classList.remove(
-      "listening"
-    );
-
-    mic.textContent =
-      "🎤";
-
-  };
-
-
-  recognition.onerror = () => {
-
-    mic.classList.remove(
-      "listening"
-    );
-
-    mic.textContent =
-      "🎤";
-
-  };
-
-
-  recognition.onresult =
-    (event) => {
-
-      const text =
-        event.results[0][0].transcript;
-
-      document.getElementById(
-        "message"
-      ).value = text;
-
-    };
-
-
-} else {
-
-  mic.title =
-    "Speech recognition is not supported";
-
-}
-
-
-mic.addEventListener(
-  "click",
-  () => {
-
-    if (!recognition) {
-
-      alert(
-        "இந்த browser microphone speech recognition-ஐ support செய்யவில்லை. Chrome பயன்படுத்திப் பாருங்கள்."
-      );
-
-      return;
-    }
-
-    recognition.start();
-
-  }
-);
-
-
-// ==========================
-// HISTORY
-// ==========================
-
-let history =
-  JSON.parse(
-    localStorage.getItem(
-      "aiHistory"
-    ) || "[]"
-  );
-
-
-function saveHistory(user, ai) {
-
-  history.push({
-
-    id: Date.now(),
-
-    user: user,
-
-    ai: ai,
-
-    pinned: false,
-
-    time:
-      new Date().toLocaleString()
-
-  });
-
-
-  localStorage.setItem(
-    "aiHistory",
-    JSON.stringify(history)
-  );
-
-}
-
-
-// ==========================
-// HISTORY DISPLAY
-// ==========================
-
-function showHistory() {
-
-  historyList.innerHTML = "";
-
-
-  if (history.length === 0) {
-
-    historyList.innerHTML =
-      '<div class="empty">No history yet.</div>';
-
-    return;
-
-  }
-
-
-  [...history]
-    .reverse()
-    .forEach(item => {
-
-      const div =
-        document.createElement("div");
-
-      div.className =
-        "history-item";
-
-
-      const title =
-        document.createElement("strong");
-
-      title.textContent =
-        (item.pinned ? "📌 " : "") +
-        item.user;
-
-
-      const answer =
-        document.createElement("div");
-
-      answer.textContent =
-        item.ai;
-
-
-      const time =
-        document.createElement("small");
-
-      time.textContent =
-        item.time;
-
-
-      const buttons =
-        document.createElement("div");
-
-      buttons.className =
-        "history-buttons";
-
-
-      const pin =
-        document.createElement("button");
-
-      pin.className =
-        "pin-btn";
-
-      pin.textContent =
-        item.pinned
-          ? "Unpin"
-          : "📌 Pin";
-
-
-      pin.onclick =
-        () => {
-
-          item.pinned =
-            !item.pinned;
-
-          localStorage.setItem(
-            "aiHistory",
-            JSON.stringify(history)
-          );
-
-          showHistory();
-
-        };
-
-
-      const del =
-        document.createElement("button");
-
-      del.className =
-        "delete-btn";
-
-      del.textContent =
-        "🗑️ Delete";
-
-
-      del.onclick =
-        () => {
-
-          history =
-            history.filter(
-              h => h.id !== item.id
-            );
-
-          localStorage.setItem(
-            "aiHistory",
-            JSON.stringify(history)
-          );
-
-          showHistory();
-
-        };
-
-
-      buttons.appendChild(pin);
-
-      buttons.appendChild(del);
-
-
-      div.appendChild(title);
-
-      div.appendChild(answer);
-
-      div.appendChild(time);
-
-      div.appendChild(buttons);
-
-
-      historyList.appendChild(div);
-
-    });
-
-}
-
-
-// ==========================
-// HISTORY OPEN / CLOSE
-// ==========================
-
-historyButton.addEventListener(
-  "click",
-  () => {
-
-    showHistory();
-
-    historyPanel.style.display =
-      "block";
-
-  }
-);
-
-
-closeHistory.addEventListener(
-  "click",
-  () => {
-
-    historyPanel.style.display =
-      "none";
-
-  }
-);
-
-
-// ==========================
-// SAVE AI RESPONSES
-// ==========================
-
-// Wait until the existing
-// script.js sends a message.
-//
-// We watch the chat area for
-// new AI messages.
-
-const chatArea =
-  document.getElementById("chat");
-
-
-const observer =
-  new MutationObserver(
-    mutations => {
-
-      mutations.forEach(
-        mutation => {
-
-          mutation.addedNodes.forEach(
-            node => {
-
-              if (
-                node.nodeType === 1 &&
-                node.classList.contains("ai")
-              ) {
-
-                const messages =
-                  chatArea.querySelectorAll(
-                    ".message"
-                  );
-
-                if (
-                  messages.length >= 2
-                ) {
-
-                  const lastUser =
-                    messages[
-                      messages.length - 2
-                    ];
-
-                  const lastAI =
-                    messages[
-                      messages.length - 1
-                    ];
-
-
-                  if (
-                    lastUser.classList.contains(
-                      "user"
-                    )
-                  ) {
-
-                    const userText =
-                      lastUser.textContent;
-
-                    const aiText =
-                      lastAI.textContent;
-
-
-                    const lastSaved =
-                      history[
-                        history.length - 1
-                      ];
-
-
-                    if (
-                      !lastSaved ||
-                      lastSaved.user !==
-                        userText ||
-                      lastSaved.ai !==
-                        aiText
-                    ) {
-
-                      saveHistory(
-                        userText,
-                        aiText
-                      );
-
-                      speak(aiText);
-
-                    }
-
-                  }
-
-                }
-
-              }
-
-            }
-          );
-
-        }
-      );
-
-    }
-  );
-
-
-observer.observe(
-  chatArea,
-  {
-    childList: true
-  }
-);
-
-</script>
 
 </body>
 </html>
