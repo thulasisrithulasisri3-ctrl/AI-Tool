@@ -1,115 +1,86 @@
 "use strict";
 
-
-/* =====================================
-   RENDER API
-===================================== */
-
 const API_URL =
   "https://ai-tool-2-zpul.onrender.com/api/chat";
 
-
-/* =====================================
-   ELEMENTS
-===================================== */
-
-const chat =
-  document.getElementById("chat");
-
-const messageInput =
-  document.getElementById("message");
-
-const sendButton =
-  document.getElementById("send");
-
-const saveButton =
-  document.getElementById("saveButton");
-
-const micButton =
-  document.getElementById("mic");
-
-const voiceToggle =
-  document.getElementById("voiceToggle");
-
-const historyButton =
-  document.getElementById("historyButton");
-
-const historyPanel =
-  document.getElementById("historyPanel");
-
-const closeHistory =
-  document.getElementById("closeHistory");
-
-const historyList =
-  document.getElementById("historyList");
-
-
-/* =====================================
-   CHECK ELEMENTS
-===================================== */
-
-if (
-  !chat ||
-  !messageInput ||
-  !sendButton ||
-  !saveButton ||
-  !micButton ||
-  !voiceToggle ||
-  !historyButton ||
-  !historyPanel ||
-  !closeHistory ||
-  !historyList
-) {
-
-  console.error(
-    "❌ Some HTML elements are missing."
-  );
-
-}
-
-
-/* =====================================
-   HISTORY
-===================================== */
+const chat = document.getElementById("chat");
+const messageInput = document.getElementById("message");
+const sendButton = document.getElementById("send");
+const saveButton = document.getElementById("saveButton");
+const micButton = document.getElementById("mic");
+const voiceToggle = document.getElementById("voiceToggle");
+const historyButton = document.getElementById("historyButton");
+const historyPanel = document.getElementById("historyPanel");
+const closeHistory = document.getElementById("closeHistory");
+const historyList = document.getElementById("historyList");
 
 let history = [];
-
-try {
-
-  history = JSON.parse(
-    localStorage.getItem(
-      "viggoHistory"
-    ) || "[]"
-  );
-
-  if (!Array.isArray(history)) {
-    history = [];
-  }
-
-} catch (error) {
-
-  console.error(
-    "History error:",
-    error
-  );
-
-  history = [];
-
-}
-
-
 let currentUserMessage = "";
 let currentAIMessage = "";
 
 
 /* =====================================
-   VOICE ON/OFF
+   LOAD HISTORY
+===================================== */
+
+function loadHistory() {
+  try {
+    const saved = localStorage.getItem("viggoHistory");
+
+    if (saved) {
+      const parsed = JSON.parse(saved);
+
+      if (Array.isArray(parsed)) {
+        history = parsed;
+      } else {
+        history = [];
+      }
+    } else {
+      history = [];
+    }
+
+  } catch (error) {
+    console.error("History load error:", error);
+    history = [];
+  }
+}
+
+
+/* =====================================
+   SAVE HISTORY TO BROWSER
+===================================== */
+
+function saveHistoryToStorage() {
+  try {
+    localStorage.setItem(
+      "viggoHistory",
+      JSON.stringify(history)
+    );
+
+    console.log(
+      "✅ History saved:",
+      history.length
+    );
+
+  } catch (error) {
+    console.error(
+      "❌ History save error:",
+      error
+    );
+  }
+}
+
+
+/* Load when page starts */
+loadHistory();
+
+
+/* =====================================
+   VOICE ON / OFF
 ===================================== */
 
 let voiceEnabled =
-  localStorage.getItem(
-    "viggoVoice"
-  ) !== "false";
+  localStorage.getItem("viggoVoice") !== "false";
 
 
 function updateVoiceButton() {
@@ -119,29 +90,19 @@ function updateVoiceButton() {
     voiceToggle.textContent =
       "🔊 Voice ON";
 
-    voiceToggle.classList.remove(
-      "off"
-    );
+    voiceToggle.classList.remove("off");
 
   } else {
 
     voiceToggle.textContent =
       "🔇 Voice OFF";
 
-    voiceToggle.classList.add(
-      "off"
-    );
+    voiceToggle.classList.add("off");
 
-    if (
-      "speechSynthesis" in window
-    ) {
-
+    if ("speechSynthesis" in window) {
       window.speechSynthesis.cancel();
-
     }
-
   }
-
 }
 
 
@@ -152,8 +113,7 @@ voiceToggle.addEventListener(
   "click",
   function () {
 
-    voiceEnabled =
-      !voiceEnabled;
+    voiceEnabled = !voiceEnabled;
 
     localStorage.setItem(
       "viggoVoice",
@@ -167,41 +127,24 @@ voiceToggle.addEventListener(
 
 
 /* =====================================
-   TEXT TO SPEECH
+   SPEAK
 ===================================== */
 
 function speak(text) {
 
-  if (!voiceEnabled) {
-    return;
-  }
+  if (!voiceEnabled) return;
 
-  if (
-    !("speechSynthesis" in window)
-  ) {
-    return;
-  }
+  if (!("speechSynthesis" in window)) return;
 
   window.speechSynthesis.cancel();
 
-
   const speech =
-    new SpeechSynthesisUtterance(
-      text
-    );
+    new SpeechSynthesisUtterance(text);
 
+  speech.lang = "en-IN";
+  speech.rate = 0.95;
 
-  speech.lang =
-    "en-IN";
-
-  speech.rate =
-    0.95;
-
-
-  window.speechSynthesis.speak(
-    speech
-  );
-
+  window.speechSynthesis.speak(speech);
 }
 
 
@@ -209,33 +152,61 @@ function speak(text) {
    ADD MESSAGE
 ===================================== */
 
-function addMessage(
-  text,
-  type
-) {
+function addMessage(text, type) {
 
   const div =
-    document.createElement(
-      "div"
-    );
-
+    document.createElement("div");
 
   div.className =
     "message " + type;
 
-
   div.textContent =
     text;
 
-
-  chat.appendChild(
-    div
-  );
-
+  chat.appendChild(div);
 
   chat.scrollTop =
     chat.scrollHeight;
+}
 
+
+/* =====================================
+   AUTOMATIC HISTORY SAVE
+===================================== */
+
+function saveCurrentChat() {
+
+  if (
+    !currentUserMessage ||
+    !currentAIMessage
+  ) {
+    return;
+  }
+
+
+  const chatItem = {
+
+    id: Date.now(),
+
+    user: currentUserMessage,
+
+    ai: currentAIMessage,
+
+    pinned: false,
+
+    time: new Date().toLocaleString()
+
+  };
+
+
+  history.push(chatItem);
+
+  saveHistoryToStorage();
+
+
+  console.log(
+    "✅ Chat automatically saved to history"
+  );
 }
 
 
@@ -281,8 +252,8 @@ async function sendMessage() {
   try {
 
     console.log(
-      "Sending to:",
-      API_URL
+      "📤 Sending:",
+      text
     );
 
 
@@ -290,19 +261,16 @@ async function sendMessage() {
       await fetch(
         API_URL,
         {
-          method:
-            "POST",
+          method: "POST",
 
           headers: {
             "Content-Type":
               "application/json"
           },
 
-          body:
-            JSON.stringify({
-              message:
-                text
-            })
+          body: JSON.stringify({
+            message: text
+          })
         }
       );
 
@@ -313,46 +281,23 @@ async function sendMessage() {
       ) || "";
 
 
-    console.log(
-      "Status:",
-      response.status
-    );
-
-
-    console.log(
-      "Content-Type:",
-      contentType
-    );
-
-
-    /*
-      IMPORTANT:
-      Prevent <!DOCTYPE html>
-      JSON error.
-    */
-
     if (
       !contentType
         .toLowerCase()
-        .includes(
-          "application/json"
-        )
+        .includes("application/json")
     ) {
 
       const raw =
         await response.text();
 
-
       console.error(
-        "Server response:",
+        "Server returned:",
         raw
       );
-
 
       throw new Error(
         "Server returned HTML instead of JSON."
       );
-
     }
 
 
@@ -366,7 +311,6 @@ async function sendMessage() {
         data.error ||
         "AI request failed"
       );
-
     }
 
 
@@ -385,9 +329,12 @@ async function sendMessage() {
     );
 
 
-    speak(
-      reply
-    );
+    /* AUTOMATIC HISTORY SAVE */
+    saveCurrentChat();
+
+
+    /* VOICE */
+    speak(reply);
 
 
   } catch (error) {
@@ -399,8 +346,7 @@ async function sendMessage() {
 
 
     addMessage(
-      "❌ " +
-      error.message,
+      "❌ " + error.message,
       "ai"
     );
 
@@ -413,9 +359,7 @@ async function sendMessage() {
   sendButton.textContent =
     "Send";
 
-
   messageInput.focus();
-
 }
 
 
@@ -445,7 +389,6 @@ messageInput.addEventListener(
       event.preventDefault();
 
       sendMessage();
-
     }
 
   }
@@ -453,7 +396,7 @@ messageInput.addEventListener(
 
 
 /* =====================================
-   SAVE
+   SAVE BUTTON
 ===================================== */
 
 saveButton.addEventListener(
@@ -470,34 +413,16 @@ saveButton.addEventListener(
       );
 
       return;
-
     }
 
 
-    history.push({
+    /*
+      Manual extra save.
+      Automatic save already happens
+      after every successful AI reply.
+    */
 
-      id:
-        Date.now(),
-
-      user:
-        currentUserMessage,
-
-      ai:
-        currentAIMessage,
-
-      pinned:
-        false,
-
-      time:
-        new Date().toLocaleString()
-
-    });
-
-
-    localStorage.setItem(
-      "viggoHistory",
-      JSON.stringify(history)
-    );
+    saveCurrentChat();
 
 
     saveButton.textContent =
@@ -536,7 +461,6 @@ function showHistory() {
       '<div class="empty">No saved chats yet.</div>';
 
     return;
-
   }
 
 
@@ -548,9 +472,7 @@ function showHistory() {
           a.pinned &&
           !b.pinned
         ) {
-
           return -1;
-
         }
 
 
@@ -558,9 +480,7 @@ function showHistory() {
           !a.pinned &&
           b.pinned
         ) {
-
           return 1;
-
         }
 
 
@@ -588,7 +508,6 @@ function showHistory() {
         box.classList.add(
           "pinned"
         );
-
       }
 
 
@@ -596,7 +515,6 @@ function showHistory() {
         document.createElement(
           "strong"
         );
-
 
       title.textContent =
         item.pinned
@@ -609,14 +527,11 @@ function showHistory() {
           "div"
         );
 
-
       user.className =
         "history-user";
 
-
       user.textContent =
-        "You: " +
-        item.user;
+        "You: " + item.user;
 
 
       const ai =
@@ -624,14 +539,11 @@ function showHistory() {
           "div"
         );
 
-
       ai.className =
         "history-ai";
 
-
       ai.textContent =
-        "Viggo: " +
-        item.ai;
+        "Viggo: " + item.ai;
 
 
       const time =
@@ -639,10 +551,8 @@ function showHistory() {
           "div"
         );
 
-
       time.className =
         "history-time";
-
 
       time.textContent =
         item.time;
@@ -652,7 +562,6 @@ function showHistory() {
         document.createElement(
           "div"
         );
-
 
       actions.className =
         "history-actions";
@@ -664,7 +573,6 @@ function showHistory() {
         document.createElement(
           "button"
         );
-
 
       pin.type =
         "button";
@@ -686,30 +594,24 @@ function showHistory() {
             history.find(
               function (h) {
 
-                return (
-                  h.id ===
-                  item.id
-                );
+                return h.id === item.id;
 
               }
             );
 
 
-          if (found) {
-
-            found.pinned =
-              !found.pinned;
-
-
-            localStorage.setItem(
-              "viggoHistory",
-              JSON.stringify(history)
-            );
-
-
-            showHistory();
-
+          if (!found) {
+            return;
           }
+
+
+          found.pinned =
+            !found.pinned;
+
+
+          saveHistoryToStorage();
+
+          showHistory();
 
         }
       );
@@ -721,7 +623,6 @@ function showHistory() {
         document.createElement(
           "button"
         );
-
 
       del.type =
         "button";
@@ -737,13 +638,13 @@ function showHistory() {
         "click",
         function () {
 
-          const confirmDelete =
+          const answer =
             confirm(
               "Delete this chat?"
             );
 
 
-          if (!confirmDelete) {
+          if (!answer) {
             return;
           }
 
@@ -752,20 +653,13 @@ function showHistory() {
             history.filter(
               function (h) {
 
-                return (
-                  h.id !==
-                  item.id
-                );
+                return h.id !== item.id;
 
               }
             );
 
 
-          localStorage.setItem(
-            "viggoHistory",
-            JSON.stringify(history)
-          );
-
+          saveHistoryToStorage();
 
           showHistory();
 
@@ -809,7 +703,6 @@ function showHistory() {
 
     }
   );
-
 }
 
 
@@ -846,7 +739,7 @@ closeHistory.addEventListener(
 
 
 /* =====================================
-   CLOSE HISTORY OUTSIDE
+   CLOSE OUTSIDE
 ===================================== */
 
 historyPanel.addEventListener(
@@ -854,8 +747,7 @@ historyPanel.addEventListener(
   function (event) {
 
     if (
-      event.target ===
-      historyPanel
+      event.target === historyPanel
     ) {
 
       historyPanel.style.display =
@@ -901,10 +793,8 @@ if (SpeechRecognition) {
         "listening"
       );
 
-
       micButton.textContent =
         "🔴";
-
     };
 
 
@@ -915,10 +805,8 @@ if (SpeechRecognition) {
         "listening"
       );
 
-
       micButton.textContent =
         "🎤";
-
     };
 
 
@@ -926,19 +814,16 @@ if (SpeechRecognition) {
     function (event) {
 
       console.error(
-        "Microphone error:",
+        "Mic error:",
         event.error
       );
-
 
       micButton.classList.remove(
         "listening"
       );
 
-
       micButton.textContent =
         "🎤";
-
     };
 
 
@@ -953,11 +838,6 @@ if (SpeechRecognition) {
       messageInput.value =
         text;
 
-
-      /*
-        Voice input fills the box.
-        User presses Send.
-      */
 
       messageInput.focus();
 
@@ -975,7 +855,7 @@ if (SpeechRecognition) {
       } catch (error) {
 
         console.log(
-          "Microphone already active."
+          "Microphone already active"
         );
 
       }
@@ -991,15 +871,23 @@ if (SpeechRecognition) {
     function () {
 
       alert(
-        "Microphone is not supported in this browser. Please use Chrome."
+        "Microphone is not supported. Please use Chrome."
       );
 
     }
   );
-
 }
 
 
+/* =====================================
+   DEBUG
+===================================== */
+
 console.log(
-  "✅ Viggo script.js loaded"
+  "✅ Viggo script loaded"
+);
+
+console.log(
+  "📜 Existing history:",
+  history.length
 );
