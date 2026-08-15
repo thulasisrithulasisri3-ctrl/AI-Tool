@@ -11,48 +11,40 @@ const PORT = process.env.PORT || 10000;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 if (!GEMINI_API_KEY) {
-  console.error("GEMINI_API_KEY is missing");
+  console.error("ERROR: GEMINI_API_KEY is missing");
+  process.exit(1);
 }
 
-const ai = GEMINI_API_KEY
-  ? new GoogleGenAI({
-      apiKey: GEMINI_API_KEY
-    })
-  : null;
+const ai = new GoogleGenAI({
+  apiKey: GEMINI_API_KEY
+});
 
+console.log("Gemini AI initialized");
 
-// HOME
 app.get("/", (req, res) => {
   res.json({
     status: "online",
-    message: "AI Assistant Backend is running 🤖"
+    message: "AI Assistant Backend is running",
+    model: "gemini-3.6-flash"
   });
 });
 
-
-// HEALTH CHECK
 app.get("/health", (req, res) => {
   res.json({
-    status: "ok",
-    geminiConfigured: Boolean(GEMINI_API_KEY)
+    ok: true,
+    service: "AI Assistant",
+    model: "gemini-3.6-flash"
   });
 });
 
-
-// CHAT
-app.post("/chat", async (req, res) => {
+app.post("/api/chat", async (req, res) => {
   try {
     const message = req.body?.message;
 
-    if (!message) {
+    if (!message || typeof message !== "string") {
       return res.status(400).json({
+        success: false,
         error: "Message is required"
-      });
-    }
-
-    if (!ai) {
-      return res.status(500).json({
-        error: "GEMINI_API_KEY is missing"
       });
     }
 
@@ -60,29 +52,33 @@ app.post("/chat", async (req, res) => {
 
     const interaction = await ai.interactions.create({
       model: "gemini-3.6-flash",
-      input: message
+      input: message,
+      generation_config: {
+        thinking_level: "low"
+      }
     });
 
-    const reply = interaction.output_text || "No response received.";
+    const answer = interaction.output_text || "";
 
-    console.log("AI:", reply);
+    console.log("AI:", answer);
 
     return res.json({
-      reply
+      success: true,
+      reply: answer,
+      interactionId: interaction.id
     });
 
   } catch (error) {
     console.error("Gemini Error:", error);
 
     return res.status(500).json({
+      success: false,
       error: "AI request failed",
-      details: error.message
+      details: error?.message || "Unknown Gemini error"
     });
   }
 });
 
-
-// START SERVER
-app.listen(PORT, "0.0.0.0", () => {
+app.listen(PORT, () => {
   console.log(`AI Assistant running on port ${PORT}`);
 });
