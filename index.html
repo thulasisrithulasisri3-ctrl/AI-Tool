@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -9,32 +10,14 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Viggo AI</title>
-
-    <!-- =========================
-         VIGGO APP / PWA
-    ========================== -->
-
-    <link
-        rel="manifest"
-        href="manifest.json"
-    >
-
-    <link
-        rel="icon"
-        type="image/png"
-        sizes="192x192"
-        href="icon-192.png"
-    >
-
-    <link
-        rel="apple-touch-icon"
-        href="icon-192.png"
+    <meta
+        name="theme-color"
+        content="#050b16"
     >
 
     <meta
-        name="theme-color"
-        content="#000000"
+        name="description"
+        content="Viggo AI - Your AI Friend"
     >
 
     <meta
@@ -47,22 +30,60 @@
         content="yes"
     >
 
+    <meta
+        name="apple-mobile-web-app-status-bar-style"
+        content="black-translucent"
+    >
+
+    <title>Viggo AI</title>
+
+
+    <!-- =========================
+         PWA
+    ========================== -->
+
+    <link
+        rel="manifest"
+        href="./manifest.json"
+    >
+
+    <link
+        rel="icon"
+        type="image/png"
+        sizes="192x192"
+        href="./icon-192.png"
+    >
+
+    <link
+        rel="apple-touch-icon"
+        href="./icon-192.png"
+    >
+
+
+    <!-- =========================
+         CSS
+    ========================== -->
+
     <link
         rel="stylesheet"
-        href="style.css"
+        href="./style.css"
     >
+
 </head>
+
 
 <body>
 
-    <!-- =========================
+
+    <!-- =====================================================
          SIDEBAR
-    ========================== -->
+    ====================================================== -->
 
     <aside
         class="sidebar"
         id="sidebar"
     >
+
 
         <!-- LOGO -->
 
@@ -124,6 +145,7 @@
                 id="moreMenu"
             >
 
+
                 <!-- SAVE -->
 
                 <button
@@ -156,7 +178,7 @@
                 </button>
 
 
-                <!-- CLEAR -->
+                <!-- CLEAR HISTORY -->
 
                 <button
                     id="clearHistoryBtn"
@@ -273,6 +295,7 @@
 
                 </div>
 
+
             </div>
 
         </div>
@@ -280,9 +303,9 @@
     </aside>
 
 
-    <!-- =========================
+    <!-- =====================================================
          MAIN
-    ========================== -->
+    ====================================================== -->
 
     <main class="main">
 
@@ -292,14 +315,19 @@
         <header class="header">
 
 
+            <!-- MOBILE MENU -->
+
             <button
                 class="mobile-menu"
                 id="mobileMenuBtn"
                 type="button"
+                aria-label="Open menu"
             >
                 ☰
             </button>
 
+
+            <!-- TITLE -->
 
             <div
                 class="chat-title"
@@ -309,6 +337,8 @@
             </div>
 
 
+            <!-- SHARE -->
+
             <button
                 class="share-btn"
                 id="shareBtn"
@@ -317,10 +347,13 @@
                 ↗ Share
             </button>
 
+
         </header>
 
 
-        <!-- MESSAGES -->
+        <!-- =================================================
+             MESSAGES
+        ================================================== -->
 
         <section
             class="messages"
@@ -328,13 +361,57 @@
         ></section>
 
 
-        <!-- INPUT -->
+        <!-- =================================================
+             INPUT AREA
+        ================================================== -->
 
         <footer class="input-area">
 
 
             <div class="input-box">
 
+
+                <!-- =========================
+                     PLUS BUTTON
+                ========================== -->
+
+                <button
+                    class="input-icon"
+                    id="plusBtn"
+                    type="button"
+                    title="Attach photo or image"
+                    aria-label="Attach photo or image"
+                >
+                    ＋
+                </button>
+
+
+                <!-- =========================
+                     HIDDEN IMAGE INPUT
+                ========================== -->
+
+                <input
+                    type="file"
+                    id="imageInput"
+                    accept="image/*"
+                    multiple
+                    hidden
+                >
+
+
+                <!-- =========================
+                     IMAGE PREVIEW
+                ========================== -->
+
+                <div
+                    id="imagePreview"
+                    class="image-preview"
+                ></div>
+
+
+                <!-- =========================
+                     MESSAGE INPUT
+                ========================== -->
 
                 <input
                     type="text"
@@ -344,7 +421,9 @@
                 >
 
 
-                <!-- VOICE INPUT -->
+                <!-- =========================
+                     VOICE
+                ========================== -->
 
                 <button
                     class="input-icon"
@@ -357,7 +436,9 @@
                 </button>
 
 
-                <!-- SEND -->
+                <!-- =========================
+                     SEND
+                ========================== -->
 
                 <button
                     class="send-btn"
@@ -369,19 +450,26 @@
                     ➤
                 </button>
 
+
             </div>
 
+
+            <!-- HINT -->
 
             <div class="input-hint">
                 Viggo AI can make mistakes. Check important information.
             </div>
 
+
         </footer>
+
 
     </main>
 
 
-    <!-- TOAST -->
+    <!-- =====================================================
+         TOAST
+    ====================================================== -->
 
     <div
         id="viggoToast"
@@ -389,36 +477,50 @@
     ></div>
 
 
-    <!-- MAIN JAVASCRIPT -->
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
 
-    <script src="script.js"></script>
+    <script src="./script.js"></script>
 
 
-    <!-- =========================
+    <!-- =====================================================
          SERVICE WORKER
-    ========================== -->
+    ====================================================== -->
 
     <script>
+
         if ("serviceWorker" in navigator) {
 
-            window.addEventListener("load", function () {
+            window.addEventListener(
+                "load",
+                function () {
 
-                navigator.serviceWorker
-                    .register("service-worker.js")
-                    .then(function () {
-                        console.log("Viggo Service Worker registered successfully.");
-                    })
-                    .catch(function (error) {
-                        console.log(
-                            "Viggo Service Worker registration failed:",
-                            error
-                        );
-                    });
+                    navigator.serviceWorker
+                        .register("./service-worker.js")
+                        .then(function () {
 
-            });
+                            console.log(
+                                "Viggo Service Worker registered."
+                            );
+
+                        })
+                        .catch(function (error) {
+
+                            console.error(
+                                "Service Worker error:",
+                                error
+                            );
+
+                        });
+
+                }
+            );
 
         }
+
     </script>
+
 
 </body>
 
