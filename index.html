@@ -1,557 +1,237 @@
 ```html
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Viggo AI Assistant</title>
+<meta charset="UTF-8">
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f7f7f8;
-      color: #222;
-    }
+<title>Viggo AI</title>
 
-    .app {
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
-    }
+<link
+    rel="stylesheet"
+    href="style.css"
+>
 
-    /* SIDEBAR */
-
-    #sidebar {
-      width: 270px;
-      background: #202123;
-      color: white;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-    }
-
-    .brand {
-      font-size: 22px;
-      font-weight: bold;
-      padding: 10px;
-      margin-bottom: 10px;
-    }
-
-    #newChat,
-    #historyButton,
-    #saveButton,
-    #voiceToggle,
-    #clearHistory {
-      border: 0;
-      border-radius: 8px;
-      padding: 10px 12px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    #newChat {
-      background: #343541;
-      color: white;
-      text-align: left;
-      margin-bottom: 12px;
-    }
-
-    .side-title {
-      font-size: 12px;
-      color: #aaa;
-      padding: 8px 10px;
-      text-transform: uppercase;
-    }
-
-    .chat-list {
-      overflow-y: auto;
-    }
-
-    .chat-item {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: transparent;
-      color: #ddd;
-      border: 0;
-      padding: 10px;
-      border-radius: 7px;
-      cursor: pointer;
-      text-align: left;
-      margin-bottom: 3px;
-    }
-
-    .chat-item:hover,
-    .chat-item.active {
-      background: #343541;
-    }
-
-    .chat-item-title {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .pin-icon {
-      margin-left: 5px;
-    }
-
-    .empty-sidebar {
-      color: #777;
-      font-size: 12px;
-      padding: 10px;
-    }
-
-    .sidebar-bottom {
-      margin-top: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-    }
-
-    #historyButton,
-    #voiceToggle {
-      background: #343541;
-      color: white;
-    }
-
-    #saveButton {
-      background: #10a37f;
-      color: white;
-    }
-
-    #clearHistory {
-      background: #8b2020;
-      color: white;
-    }
-
-    #mobileMenu {
-      display: none;
-    }
-
-    /* MAIN */
-
-    .main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
-
-    .topbar {
-      height: 60px;
-      background: white;
-      border-bottom: 1px solid #ddd;
-      display: flex;
-      align-items: center;
-      padding: 0 18px;
-      gap: 12px;
-    }
-
-    #currentTitle {
-      font-size: 17px;
-      font-weight: bold;
-    }
-
-    #chatArea {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-    }
-
-    #conversation {
-      max-width: 900px;
-      margin: auto;
-    }
-
-    .welcome {
-      min-height: 65vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-    }
-
-    .welcome-box {
-      max-width: 500px;
-    }
-
-    .welcome-icon {
-      font-size: 50px;
-    }
-
-    .welcome-box h1 {
-      margin: 10px 0;
-    }
-
-    .welcome-box p {
-      color: #777;
-    }
-
-    .message {
-      display: flex;
-      gap: 12px;
-      padding: 18px 10px;
-      border-bottom: 1px solid #eee;
-    }
-
-    .message.user {
-      background: #fff;
-    }
-
-    .message.ai {
-      background: #f7f7f8;
-    }
-
-    .message-avatar {
-      width: 34px;
-      height: 34px;
-      border-radius: 7px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #10a37f;
-      color: white;
-      font-weight: bold;
-      flex-shrink: 0;
-    }
-
-    .message.user .message-avatar {
-      background: #555;
-    }
-
-    .message-name {
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-
-    .message-text {
-      white-space: pre-wrap;
-      line-height: 1.6;
-    }
-
-    /* INPUT */
-
-    .input-area {
-      background: white;
-      border-top: 1px solid #ddd;
-      padding: 12px;
-    }
-
-    .input-box {
-      max-width: 900px;
-      margin: auto;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border: 1px solid #ccc;
-      border-radius: 12px;
-      padding: 7px;
-      background: white;
-    }
-
-    #message {
-      flex: 1;
-      border: 0;
-      outline: none;
-      resize: none;
-      font-size: 15px;
-      min-height: 38px;
-      padding: 9px;
-    }
-
-    #mic,
-    #send {
-      border: 0;
-      border-radius: 8px;
-      cursor: pointer;
-      min-width: 45px;
-      height: 40px;
-    }
-
-    #mic {
-      background: #eee;
-      font-size: 18px;
-    }
-
-    #mic.listening {
-      background: #ffdddd;
-    }
-
-    #send {
-      background: #10a37f;
-      color: white;
-      font-weight: bold;
-    }
-
-    #send:disabled {
-      opacity: .5;
-      cursor: not-allowed;
-    }
-
-    /* HISTORY MODAL */
-
-    #historyModal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.55);
-      z-index: 1000;
-      padding: 30px;
-    }
-
-    .history-window {
-      background: white;
-      max-width: 800px;
-      max-height: 85vh;
-      overflow-y: auto;
-      margin: auto;
-      border-radius: 12px;
-      padding: 18px;
-    }
-
-    .history-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-
-    #closeHistory {
-      border: 0;
-      background: #eee;
-      border-radius: 7px;
-      padding: 8px 12px;
-      cursor: pointer;
-    }
-
-    .history-card {
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      padding: 13px;
-      margin-bottom: 10px;
-    }
-
-    .history-card.pinned {
-      border-left: 4px solid #10a37f;
-    }
-
-    .history-card-title {
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-
-    .history-card-time {
-      color: #888;
-      font-size: 12px;
-      margin-bottom: 10px;
-    }
-
-    .history-card-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .history-card-actions button {
-      border: 0;
-      border-radius: 7px;
-      padding: 8px 10px;
-      cursor: pointer;
-    }
-
-    .pin-button {
-      background: #eee;
-    }
-
-    .delete-button {
-      background: #ffdede;
-      color: #a00;
-    }
-
-    /* MOBILE */
-
-    @media (max-width: 700px) {
-
-      #sidebar {
-        position: fixed;
-        left: -280px;
-        top: 0;
-        bottom: 0;
-        z-index: 900;
-        transition: left .2s;
-      }
-
-      #sidebar.open {
-        left: 0;
-      }
-
-      #mobileMenu {
-        display: block;
-        border: 0;
-        background: #eee;
-        border-radius: 7px;
-        padding: 8px 10px;
-        cursor: pointer;
-      }
-
-      .topbar {
-        padding: 0 10px;
-      }
-
-      #chatArea {
-        padding: 10px;
-      }
-
-      #historyModal {
-        padding: 10px;
-      }
-
-      .history-window {
-        max-height: 95vh;
-      }
-    }
-  </style>
 </head>
+
 
 <body>
 
-<div class="app">
 
-  <!-- SIDEBAR -->
+<!-- ======================================
+     SIDEBAR
+======================================= -->
 
-  <aside id="sidebar">
+<aside class="sidebar" id="sidebar">
 
-    <div class="brand">
-      Viggo
+    <div class="logo">
+
+        <div class="logo-icon">
+            V
+        </div>
+
+        <div>
+            <strong>Viggo</strong>
+            <small>AI Friend</small>
+        </div>
+
     </div>
 
-    <button id="newChat">
-      ＋ New Chat
+
+    <!-- NEW CHAT -->
+
+    <button
+        class="new-chat"
+        id="newChatBtn"
+    >
+
+        ＋ New Chat
+
     </button>
 
-    <div class="side-title">
-      Pinned
+
+    <!-- HISTORY -->
+
+    <div
+        class="history"
+        id="historyList"
+    ></div>
+
+
+    <!-- MORE -->
+
+    <div class="sidebar-more">
+
+        <button
+            id="moreBtn"
+            class="more-button"
+        >
+
+            ⋮ More
+
+        </button>
+
+
+        <div
+            id="moreMenu"
+            class="more-menu"
+        >
+
+            <button id="saveBtn">
+                💾 Save
+            </button>
+
+            <button id="clearHistoryBtn">
+                🗑 Clear History
+            </button>
+
+
+            <div class="language-title">
+                Language
+            </div>
+
+
+            <button
+                data-language="en"
+            >
+                🇬🇧 English
+            </button>
+
+            <button
+                data-language="ta"
+            >
+                🇮🇳 தமிழ்
+            </button>
+
+            <button
+                data-language="hi"
+            >
+                🇮🇳 हिन्दी
+            </button>
+
+            <button
+                data-language="ml"
+            >
+                🇮🇳 മലയാളം
+            </button>
+
+        </div>
+
     </div>
 
-    <div id="pinnedList" class="chat-list"></div>
+</aside>
 
-    <div class="side-title">
-      Recent
-    </div>
 
-    <div id="recentList" class="chat-list"></div>
 
-    <div class="sidebar-bottom">
+<!-- ======================================
+     MAIN
+======================================= -->
 
-      <button id="historyButton">
-        🕘 History
-      </button>
+<main class="main">
 
-      <button id="saveButton">
-        💾 Save
-      </button>
 
-      <button id="voiceToggle">
-        🔊 Voice ON
-      </button>
+    <!-- HEADER -->
 
-      <button id="clearHistory">
-        🗑️ Clear History
-      </button>
+    <header class="header">
 
-    </div>
+        <button
+            class="mobile-menu"
+            id="mobileMenuBtn"
+        >
+            ☰
+        </button>
 
-  </aside>
 
-  <!-- MAIN -->
+        <div
+            class="chat-title"
+            id="chatTitle"
+        >
+            New Chat
+        </div>
 
-  <main class="main">
 
-    <header class="topbar">
+        <button
+            class="share-btn"
+            id="shareBtn"
+        >
 
-      <button id="mobileMenu">
-        ☰
-      </button>
+            ↗ Share
 
-      <div id="currentTitle">
-        New Chat
-      </div>
+        </button>
 
     </header>
 
-    <section id="chatArea">
 
-      <div id="conversation"></div>
 
-    </section>
+    <!-- MESSAGES -->
+
+    <section
+        class="messages"
+        id="messages"
+    ></section>
+
+
+
+    <!-- INPUT -->
 
     <footer class="input-area">
 
-      <div class="input-box">
+        <div class="input-box">
 
-        <textarea
-          id="message"
-          placeholder="Type message..."
-          rows="1"
-        ></textarea>
 
-        <button
-          id="mic"
-          title="Microphone"
-        >
-          🎤
-        </button>
+            <input
+                type="text"
+                id="messageInput"
+                placeholder="Message Viggo..."
+                autocomplete="off"
+            >
 
-        <button
-          id="send"
-          title="Send"
-        >
-          ➤
-        </button>
 
-      </div>
+            <!-- MIC -->
+
+            <button
+                id="voiceBtn"
+                class="input-icon"
+                title="Voice"
+            >
+
+                🎤
+
+            </button>
+
+
+            <!-- SEND -->
+
+            <button
+                id="sendBtn"
+                class="send-btn"
+                title="Send"
+            >
+
+                ➤
+
+            </button>
+
+
+        </div>
 
     </footer>
 
-  </main>
 
-</div>
+</main>
 
-<!-- HISTORY -->
 
-<div id="historyModal">
-
-  <div class="history-window">
-
-    <div class="history-header">
-
-      <h2>
-        Chat History
-      </h2>
-
-      <button id="closeHistory">
-        ✕
-      </button>
-
-    </div>
-
-    <div id="historyList"></div>
-
-  </div>
-
-</div>
 
 <script src="script.js"></script>
 
 </body>
+
 </html>
 ```
