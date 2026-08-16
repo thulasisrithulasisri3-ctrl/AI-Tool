@@ -1,4 +1,4 @@
-```javascript
+
 "use strict";
 
 require("dotenv").config();
@@ -798,4 +798,3 @@ app.listen(
 
     }
 );
-```
