@@ -16,6 +16,7 @@ body {
     height: 100vh;
     display: flex;
     overflow: hidden;
+    font-size: 16px;
 }
 
 
@@ -56,25 +57,26 @@ body {
 
 .logo strong {
     display: block;
-    font-size: 17px;
+    font-size: 18px;
 }
 
 
 .logo small {
     color: #8b909a;
-    font-size: 11px;
+    font-size: 12px;
 }
 
 
 .new-chat {
     width: 100%;
-    padding: 11px;
+    padding: 12px;
     border-radius: 10px;
     border: 1px solid #30343d;
     background: #1b1e25;
     color: white;
     cursor: pointer;
     margin-bottom: 18px;
+    font-size: 15px;
 }
 
 
@@ -95,7 +97,7 @@ body {
 
 .history-section-title {
     color: #777d87;
-    font-size: 12px;
+    font-size: 13px;
     margin: 14px 8px 7px;
 }
 
@@ -105,7 +107,7 @@ body {
     align-items: center;
     justify-content: space-between;
     gap: 6px;
-    padding: 10px 8px;
+    padding: 11px 8px;
     border-radius: 8px;
     cursor: pointer;
     margin-bottom: 3px;
@@ -118,11 +120,26 @@ body {
 }
 
 
+.history-item.selected {
+    background: #1e2a44;
+    border: 1px solid #2563eb;
+}
+
+
+.history-checkbox {
+    width: 17px;
+    height: 17px;
+    cursor: pointer;
+    accent-color: #2563eb;
+    flex-shrink: 0;
+}
+
+
 .history-title {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: 13px;
+    font-size: 14px;
     flex: 1;
 }
 
@@ -139,6 +156,7 @@ body {
     color: #9da2aa;
     cursor: pointer;
     padding: 3px;
+    font-size: 15px;
 }
 
 
@@ -171,6 +189,7 @@ body {
     text-align: left;
     border-radius: 8px;
     cursor: pointer;
+    font-size: 15px;
 }
 
 
@@ -191,6 +210,8 @@ body {
     border-radius: 12px;
     padding: 6px;
     z-index: 100;
+    max-height: 70vh;
+    overflow-y: auto;
 }
 
 
@@ -205,9 +226,10 @@ body {
     border: none;
     color: #ddd;
     text-align: left;
-    padding: 10px;
+    padding: 11px 10px;
     border-radius: 8px;
     cursor: pointer;
+    font-size: 15px;
 }
 
 
@@ -218,7 +240,7 @@ body {
 
 .language-title {
     color: #777d87;
-    font-size: 11px;
+    font-size: 12px;
     padding: 8px 10px 3px;
 }
 
@@ -250,7 +272,7 @@ body {
 
 
 .chat-title {
-    font-size: 14px;
+    font-size: 15px;
     color: #e5e7eb;
 }
 
@@ -262,6 +284,7 @@ body {
     padding: 8px 14px;
     border-radius: 9px;
     cursor: pointer;
+    font-size: 14px;
 }
 
 
@@ -313,13 +336,14 @@ body {
 
 
 .welcome h1 {
-    font-size: 28px;
+    font-size: 30px;
 }
 
 
 .welcome p {
     color: #858b95;
     margin-top: 5px;
+    font-size: 16px;
 }
 
 
@@ -340,11 +364,11 @@ body {
 
 .message-bubble {
     max-width: 80%;
-    padding: 12px 15px;
+    padding: 13px 16px;
     border-radius: 14px;
-    line-height: 1.5;
+    line-height: 1.6;
     white-space: pre-wrap;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 
@@ -371,6 +395,7 @@ body {
     background: transparent;
     color: #777d87;
     cursor: pointer;
+    font-size: 15px;
 }
 
 
@@ -406,7 +431,7 @@ body {
     border: none;
     outline: none;
     color: white;
-    font-size: 14px;
+    font-size: 16px;
     min-width: 0;
 }
 
@@ -495,7 +520,7 @@ body {
 
     .share-btn {
         padding: 7px 10px;
-        font-size: 12px;
+        font-size: 13px;
     }
 
 
