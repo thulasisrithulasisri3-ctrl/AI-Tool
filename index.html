@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -10,14 +9,29 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <meta
-        name="theme-color"
-        content="#050b16"
+    <title>Viggo AI</title>
+
+    <!-- PWA -->
+    <link
+        rel="manifest"
+        href="manifest.json"
+    >
+
+    <link
+        rel="icon"
+        type="image/png"
+        sizes="192x192"
+        href="icon-192.png"
+    >
+
+    <link
+        rel="apple-touch-icon"
+        href="icon-192.png"
     >
 
     <meta
-        name="description"
-        content="Viggo AI - Your AI Friend"
+        name="theme-color"
+        content="#050b16"
     >
 
     <meta
@@ -30,60 +44,23 @@
         content="yes"
     >
 
-    <meta
-        name="apple-mobile-web-app-status-bar-style"
-        content="black-translucent"
-    >
-
-    <title>Viggo AI</title>
-
-
-    <!-- =========================
-         PWA
-    ========================== -->
-
-    <link
-        rel="manifest"
-        href="./manifest.json"
-    >
-
-    <link
-        rel="icon"
-        type="image/png"
-        sizes="192x192"
-        href="./icon-192.png"
-    >
-
-    <link
-        rel="apple-touch-icon"
-        href="./icon-192.png"
-    >
-
-
-    <!-- =========================
-         CSS
-    ========================== -->
-
     <link
         rel="stylesheet"
-        href="./style.css"
+        href="style.css"
     >
-
 </head>
 
 
 <body>
 
-
-    <!-- =====================================================
+    <!-- =================================================
          SIDEBAR
-    ====================================================== -->
+    ================================================== -->
 
     <aside
         class="sidebar"
         id="sidebar"
     >
-
 
         <!-- LOGO -->
 
@@ -144,7 +121,6 @@
                 class="more-menu"
                 id="moreMenu"
             >
-
 
                 <!-- SAVE -->
 
@@ -295,7 +271,6 @@
 
                 </div>
 
-
             </div>
 
         </div>
@@ -303,9 +278,10 @@
     </aside>
 
 
-    <!-- =====================================================
+
+    <!-- =================================================
          MAIN
-    ====================================================== -->
+    ================================================== -->
 
     <main class="main">
 
@@ -327,7 +303,7 @@
             </button>
 
 
-            <!-- TITLE -->
+            <!-- CHAT TITLE -->
 
             <div
                 class="chat-title"
@@ -347,8 +323,8 @@
                 ↗ Share
             </button>
 
-
         </header>
+
 
 
         <!-- =================================================
@@ -361,6 +337,7 @@
         ></section>
 
 
+
         <!-- =================================================
              INPUT AREA
         ================================================== -->
@@ -371,47 +348,133 @@
             <div class="input-box">
 
 
-                <!-- =========================
+                <!-- =================================================
                      PLUS BUTTON
-                ========================== -->
+                ================================================== -->
 
-                <button
-                    class="input-icon"
-                    id="plusBtn"
-                    type="button"
-                    title="Attach photo or image"
-                    aria-label="Attach photo or image"
-                >
-                    ＋
-                </button>
+                <div class="plus-container">
 
 
-                <!-- =========================
-                     HIDDEN IMAGE INPUT
-                ========================== -->
+                    <button
+                        class="input-icon plus-btn"
+                        id="plusBtn"
+                        type="button"
+                        title="Add"
+                        aria-label="Add"
+                    >
+                        ＋
+                    </button>
+
+
+                    <!-- PLUS MENU -->
+
+                    <div
+                        class="plus-menu"
+                        id="plusMenu"
+                    >
+
+
+                        <!-- CAMERA -->
+
+                        <button
+                            type="button"
+                            id="cameraBtn"
+                            class="plus-menu-item"
+                        >
+
+                            <span class="plus-menu-icon">
+                                📷
+                            </span>
+
+                            <span>
+                                Camera
+                            </span>
+
+                        </button>
+
+
+                        <!-- PHOTO -->
+
+                        <button
+                            type="button"
+                            id="photoBtn"
+                            class="plus-menu-item"
+                        >
+
+                            <span class="plus-menu-icon">
+                                🖼️
+                            </span>
+
+                            <span>
+                                Photo
+                            </span>
+
+                        </button>
+
+
+                        <!-- FILE -->
+
+                        <button
+                            type="button"
+                            id="fileBtn"
+                            class="plus-menu-item"
+                        >
+
+                            <span class="plus-menu-icon">
+                                📁
+                            </span>
+
+                            <span>
+                                File
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     HIDDEN FILE INPUT
+                ================================================== -->
+
+
+                <!-- PHOTO -->
 
                 <input
                     type="file"
-                    id="imageInput"
+                    id="photoInput"
                     accept="image/*"
-                    multiple
                     hidden
                 >
 
 
-                <!-- =========================
-                     IMAGE PREVIEW
-                ========================== -->
+                <!-- CAMERA -->
 
-                <div
-                    id="imagePreview"
-                    class="image-preview"
-                ></div>
+                <input
+                    type="file"
+                    id="cameraInput"
+                    accept="image/*"
+                    capture="environment"
+                    hidden
+                >
 
 
-                <!-- =========================
+                <!-- FILE -->
+
+                <input
+                    type="file"
+                    id="fileInput"
+                    hidden
+                >
+
+
+
+                <!-- =================================================
                      MESSAGE INPUT
-                ========================== -->
+                ================================================== -->
 
                 <input
                     type="text"
@@ -421,9 +484,10 @@
                 >
 
 
-                <!-- =========================
+
+                <!-- =================================================
                      VOICE
-                ========================== -->
+                ================================================== -->
 
                 <button
                     class="input-icon"
@@ -436,9 +500,10 @@
                 </button>
 
 
-                <!-- =========================
+
+                <!-- =================================================
                      SEND
-                ========================== -->
+                ================================================== -->
 
                 <button
                     class="send-btn"
@@ -454,22 +519,25 @@
             </div>
 
 
-            <!-- HINT -->
+            <!-- INPUT HINT -->
 
             <div class="input-hint">
-                Viggo AI can make mistakes. Check important information.
+
+                Viggo AI can make mistakes.
+                Check important information.
+
             </div>
 
 
         </footer>
 
-
     </main>
 
 
-    <!-- =====================================================
+
+    <!-- =================================================
          TOAST
-    ====================================================== -->
+    ================================================== -->
 
     <div
         id="viggoToast"
@@ -477,42 +545,414 @@
     ></div>
 
 
-    <!-- =====================================================
+
+    <!-- =================================================
          JAVASCRIPT
-    ====================================================== -->
+    ================================================== -->
 
-    <script src="./script.js"></script>
+    <script src="script.js"></script>
 
 
-    <!-- =====================================================
-         SERVICE WORKER
-    ====================================================== -->
+
+    <!-- =================================================
+         PLUS BUTTON SCRIPT
+         This makes:
+         ＋ → Camera / Photo / File
+    ================================================== -->
 
     <script>
 
-        if ("serviceWorker" in navigator) {
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+
+                const plusBtn =
+                    document.getElementById(
+                        "plusBtn"
+                    );
+
+
+                const plusMenu =
+                    document.getElementById(
+                        "plusMenu"
+                    );
+
+
+                const cameraBtn =
+                    document.getElementById(
+                        "cameraBtn"
+                    );
+
+
+                const photoBtn =
+                    document.getElementById(
+                        "photoBtn"
+                    );
+
+
+                const fileBtn =
+                    document.getElementById(
+                        "fileBtn"
+                    );
+
+
+                const cameraInput =
+                    document.getElementById(
+                        "cameraInput"
+                    );
+
+
+                const photoInput =
+                    document.getElementById(
+                        "photoInput"
+                    );
+
+
+                const fileInput =
+                    document.getElementById(
+                        "fileInput"
+                    );
+
+
+
+                /* =================================
+                   PLUS OPEN / CLOSE
+                ================================= */
+
+                if (plusBtn && plusMenu) {
+
+                    plusBtn.addEventListener(
+                        "click",
+                        function (event) {
+
+                            event.stopPropagation();
+
+                            plusMenu.classList.toggle(
+                                "show"
+                            );
+
+                        }
+                    );
+
+                }
+
+
+
+                /* =================================
+                   CAMERA
+                ================================= */
+
+                if (cameraBtn && cameraInput) {
+
+                    cameraBtn.addEventListener(
+                        "click",
+                        function () {
+
+                            cameraInput.click();
+
+                            plusMenu?.classList.remove(
+                                "show"
+                            );
+
+                        }
+                    );
+
+                }
+
+
+
+                /* =================================
+                   PHOTO
+                ================================= */
+
+                if (photoBtn && photoInput) {
+
+                    photoBtn.addEventListener(
+                        "click",
+                        function () {
+
+                            photoInput.click();
+
+                            plusMenu?.classList.remove(
+                                "show"
+                            );
+
+                        }
+                    );
+
+                }
+
+
+
+                /* =================================
+                   FILE
+                ================================= */
+
+                if (fileBtn && fileInput) {
+
+                    fileBtn.addEventListener(
+                        "click",
+                        function () {
+
+                            fileInput.click();
+
+                            plusMenu?.classList.remove(
+                                "show"
+                            );
+
+                        }
+                    );
+
+                }
+
+
+
+                /* =================================
+                   PHOTO SELECTED
+                ================================= */
+
+                if (photoInput) {
+
+                    photoInput.addEventListener(
+                        "change",
+                        function () {
+
+                            if (
+                                this.files &&
+                                this.files.length
+                            ) {
+
+                                const file =
+                                    this.files[0];
+
+
+                                showSelectedFile(
+                                    file
+                                );
+
+                            }
+
+                        }
+                    );
+
+                }
+
+
+
+                /* =================================
+                   CAMERA PHOTO
+                ================================= */
+
+                if (cameraInput) {
+
+                    cameraInput.addEventListener(
+                        "change",
+                        function () {
+
+                            if (
+                                this.files &&
+                                this.files.length
+                            ) {
+
+                                const file =
+                                    this.files[0];
+
+
+                                showSelectedFile(
+                                    file
+                                );
+
+                            }
+
+                        }
+                    );
+
+                }
+
+
+
+                /* =================================
+                   FILE SELECTED
+                ================================= */
+
+                if (fileInput) {
+
+                    fileInput.addEventListener(
+                        "change",
+                        function () {
+
+                            if (
+                                this.files &&
+                                this.files.length
+                            ) {
+
+                                const file =
+                                    this.files[0];
+
+
+                                showSelectedFile(
+                                    file
+                                );
+
+                            }
+
+                        }
+                    );
+
+                }
+
+
+
+                /* =================================
+                   CLOSE PLUS MENU
+                ================================= */
+
+                document.addEventListener(
+                    "click",
+                    function (event) {
+
+                        if (
+                            !event.target.closest(
+                                ".plus-container"
+                            )
+                        ) {
+
+                            plusMenu?.classList.remove(
+                                "show"
+                            );
+
+                        }
+
+                    }
+                );
+
+
+
+                /* =================================
+                   SHOW SELECTED FILE
+                ================================= */
+
+                window.showSelectedFile =
+                    function (file) {
+
+                        if (!file) return;
+
+
+                        const input =
+                            document.getElementById(
+                                "messageInput"
+                            );
+
+
+                        if (!input) return;
+
+
+                        /*
+                         * For now the selected
+                         * file name is shown
+                         * in the message box.
+                         *
+                         * Actual AI image/file
+                         * upload needs backend
+                         * support.
+                         */
+
+                        input.value =
+                            "📎 " +
+                            file.name;
+
+
+                        input.focus();
+
+
+                        const toast =
+                            document.getElementById(
+                                "viggoToast"
+                            );
+
+
+                        if (toast) {
+
+                            toast.textContent =
+                                "📎 " +
+                                file.name +
+                                " selected";
+
+
+                            toast.classList.add(
+                                "show"
+                            );
+
+
+                            clearTimeout(
+                                window.viggoFileToastTimer
+                            );
+
+
+                            window.viggoFileToastTimer =
+                                setTimeout(
+                                    function () {
+
+                                        toast.classList.remove(
+                                            "show"
+                                        );
+
+                                    },
+                                    2500
+                                );
+
+                        }
+
+                    };
+
+            }
+
+        );
+
+    </script>
+
+
+
+    <!-- =================================================
+         SERVICE WORKER
+    ================================================== -->
+
+    <script>
+
+        if (
+            "serviceWorker" in navigator
+        ) {
 
             window.addEventListener(
                 "load",
                 function () {
 
                     navigator.serviceWorker
-                        .register("./service-worker.js")
-                        .then(function () {
+                        .register(
+                            "service-worker.js"
+                        )
 
-                            console.log(
-                                "Viggo Service Worker registered."
-                            );
+                        .then(
+                            function () {
 
-                        })
-                        .catch(function (error) {
+                                console.log(
+                                    "Viggo Service Worker registered successfully."
+                                );
 
-                            console.error(
-                                "Service Worker error:",
-                                error
-                            );
+                            }
+                        )
 
-                        });
+                        .catch(
+                            function (error) {
+
+                                console.log(
+                                    "Viggo Service Worker registration failed:",
+                                    error
+                                );
+
+                            }
+                        );
 
                 }
             );
