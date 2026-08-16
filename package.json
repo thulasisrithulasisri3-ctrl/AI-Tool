@@ -1,4 +1,4 @@
-```json
+
 {
   "name": "viggo-ai-server",
   "version": "1.0.0",
@@ -15,4 +15,3 @@
     "express": "^4.21.2"
   }
 }
-```
