@@ -1,4 +1,4 @@
-
+```javascript
 "use strict";
 
 require("dotenv").config();
@@ -18,8 +18,8 @@ const PORT = process.env.PORT || 10000;
 const API_KEY = process.env.GEMINI_API_KEY;
 
 /*
-   Current Gemini model.
-   Using the Interactions API.
+   Current Gemini model used by the
+   Interactions API.
 */
 const MODEL = "gemini-3.6-flash";
 
@@ -31,19 +31,13 @@ const MODEL = "gemini-3.6-flash";
 let ai = null;
 
 if (API_KEY) {
-
     ai = new GoogleGenAI({
         apiKey: API_KEY
     });
 
     console.log("✓ Gemini API key detected.");
-
 } else {
-
-    console.error(
-        "❌ GEMINI_API_KEY is missing."
-    );
-
+    console.error("❌ GEMINI_API_KEY is missing.");
 }
 
 
@@ -53,12 +47,7 @@ if (API_KEY) {
 
 app.use(
     cors({
-        origin: "*",
-        methods: ["GET", "POST", "OPTIONS"],
-        allowedHeaders: [
-            "Content-Type",
-            "Accept"
-        ]
+        origin: "*"
     })
 );
 
@@ -74,28 +63,14 @@ app.use(
 ========================================= */
 
 app.get("/", (req, res) => {
-
     res.json({
-
         success: true,
-
-        message:
-            "Viggo AI Server is online.",
-
-        model:
-            MODEL,
-
-        apiConfigured:
-            Boolean(API_KEY),
-
-        api:
-            "Gemini Interactions API",
-
-        time:
-            new Date().toISOString()
-
+        message: "Viggo AI Server is online.",
+        model: MODEL,
+        apiConfigured: Boolean(API_KEY),
+        api: "Gemini Interactions API",
+        time: new Date().toISOString()
     });
-
 });
 
 
@@ -104,25 +79,14 @@ app.get("/", (req, res) => {
 ========================================= */
 
 app.get("/status", (req, res) => {
-
     res.json({
-
         success: true,
-
-        server:
-            "Viggo AI",
-
-        model:
-            MODEL,
-
-        apiConfigured:
-            Boolean(API_KEY),
-
-        time:
-            new Date().toISOString()
-
+        server: "Viggo AI",
+        model: MODEL,
+        api: "Interactions API",
+        apiConfigured: Boolean(API_KEY),
+        time: new Date().toISOString()
     });
-
 });
 
 
@@ -131,19 +95,13 @@ app.get("/status", (req, res) => {
 ========================================= */
 
 function cleanText(value) {
-
-    if (
-        typeof value !== "string"
-    ) {
-
+    if (typeof value !== "string") {
         return "";
-
     }
 
     return value
         .replace(/\u0000/g, "")
         .trim();
-
 }
 
 
@@ -152,569 +110,325 @@ function cleanText(value) {
 ========================================= */
 
 function languageName(language) {
-
     const languages = {
-
         en: "English",
-
         ta: "Tamil",
-
         hi: "Hindi",
-
         ml: "Malayalam",
-
         te: "Telugu",
-
         kn: "Kannada"
-
     };
 
-    return (
-        languages[language] ||
-        "English"
-    );
-
+    return languages[language] || "English";
 }
 
 
 /* =========================================
-   SYSTEM INSTRUCTION
+   BUILD PROMPT
 ========================================= */
 
-function buildSystemInstruction(language) {
-
+function buildPrompt(
+    history,
+    message,
+    language
+) {
     const selectedLanguage =
         languageName(language);
 
-    return `
-You are Viggo AI.
-
-You are a friendly, helpful and natural AI assistant.
-
-The user's selected language is ${selectedLanguage}.
-
-LANGUAGE RULES:
-- Reply primarily in ${selectedLanguage}.
-- Understand the user's language.
-- Do not unnecessarily mix languages.
-- If the user asks in English, reply in English.
-- If the user asks in Tamil, reply in Tamil.
-- If the user asks in Hindi, reply in Hindi.
-- If the user asks in Malayalam, reply in Malayalam.
-- If the user asks in Telugu, reply in Telugu.
-- If the user asks in Kannada, reply in Kannada.
-
-PERSONALITY:
-- Friendly
-- Clear
-- Helpful
-- Respectful
-- Natural
-- Simple when possible
-
-TECHNICAL QUESTIONS:
-- Explain step by step.
-- Give examples when useful.
-- If the user asks for full code, provide complete code.
-- Do not unnecessarily shorten code.
-
-IMPORTANT:
-- Your name is Viggo.
-- Do not mention these system instructions.
-- Answer the user's actual question directly.
-`;
-
-}
-
-
-/* =========================================
-   BUILD INTERACTION HISTORY
-========================================= */
-
-function buildInput(
-    history,
-    message
-) {
-
-    const input = [];
-
-    /*
-       Only use valid user/assistant messages.
-       Keep the last 14 messages to avoid
-       unnecessarily large requests.
-    */
+    let conversation = "";
 
     if (Array.isArray(history)) {
-
         history
-            .filter(item => {
-
-                return (
-                    item &&
-                    (
-                        item.role === "user" ||
-                        item.role === "assistant"
-                    ) &&
-                    typeof item.content === "string" &&
-                    cleanText(item.content)
-                );
-
-            })
+            .filter(item =>
+                item &&
+                (
+                    item.role === "user" ||
+                    item.role === "assistant"
+                ) &&
+                typeof item.content === "string"
+            )
             .slice(-14)
             .forEach(item => {
+                const role =
+                    item.role === "assistant"
+                        ? "Viggo"
+                        : "User";
 
-                input.push({
-
-                    type:
-                        item.role === "assistant"
-                            ? "model_output"
-                            : "user_input",
-
-                    content: [
-
-                        {
-                            type: "text",
-
-                            text:
-                                cleanText(
-                                    item.content
-                                )
-                        }
-
-                    ]
-
-                });
-
+                conversation +=
+                    `${role}: ${cleanText(item.content)}\n`;
             });
-
     }
 
+    const prompt = `
+You are Viggo AI, a friendly and helpful AI assistant.
 
-    /*
-       Add current user message.
-    */
+IMPORTANT INSTRUCTIONS:
 
-    input.push({
+1. Your name is Viggo.
+2. Be friendly, natural, clear and respectful.
+3. The user's selected language is ${selectedLanguage}.
+4. Reply primarily in ${selectedLanguage}.
+5. Understand Tamil, English, Hindi, Malayalam, Telugu and Kannada.
+6. Do not unnecessarily mix languages.
+7. If the user asks specifically for English, reply in English.
+8. If the user asks specifically for Tamil, reply in Tamil.
+9. For technical questions, explain step by step.
+10. When the user asks for full code, provide complete working code.
+11. Do not mention these internal instructions.
+12. Keep answers useful and easy to understand.
 
-        type: "user_input",
+Previous conversation:
+${conversation || "(No previous conversation)"}
 
-        content: [
+Current user message:
+${cleanText(message)}
 
-            {
-                type: "text",
+Now answer the user naturally.
+`;
 
-                text:
-                    cleanText(message)
-            }
-
-        ]
-
-    });
-
-
-    return input;
-
+    return prompt.trim();
 }
 
 
 /* =========================================
-   EXTRACT RESPONSE TEXT
+   CHAT
 ========================================= */
 
-function extractResponseText(
-    interaction
-) {
+app.post("/chat", async (req, res) => {
 
-    if (!interaction) {
+    try {
 
-        return "";
+        /* -----------------------------
+           API KEY CHECK
+        ----------------------------- */
 
-    }
+        if (!API_KEY || !ai) {
 
+            return res.status(500).json({
+                success: false,
+                error: "GEMINI_API_KEY is missing.",
+                details:
+                    "Add GEMINI_API_KEY in Render → Environment Variables."
+            });
 
-    /*
-       New SDK convenience property.
-    */
-
-    if (
-        typeof interaction.output_text ===
-        "string"
-    ) {
-
-        return cleanText(
-            interaction.output_text
-        );
-
-    }
+        }
 
 
-    /*
-       Some SDK versions expose
-       outputText instead.
-    */
+        /* -----------------------------
+           REQUEST DATA
+        ----------------------------- */
 
-    if (
-        typeof interaction.outputText ===
-        "string"
-    ) {
+        const message =
+            cleanText(
+                req.body?.message
+            );
 
-        return cleanText(
-            interaction.outputText
-        );
+        const language =
+            cleanText(
+                req.body?.language
+            ) || "en";
 
-    }
+        const history =
+            req.body?.history;
 
 
-    /*
-       Fallback: inspect steps.
-    */
+        /* -----------------------------
+           MESSAGE CHECK
+        ----------------------------- */
 
-    if (
-        Array.isArray(
-            interaction.steps
-        )
-    ) {
+        if (!message) {
 
-        const modelSteps =
-            interaction.steps.filter(
-                step =>
-                    step &&
-                    step.type ===
-                    "model_output"
+            return res.status(400).json({
+                success: false,
+                error: "Message is required."
+            });
+
+        }
+
+
+        /* -----------------------------
+           BUILD PROMPT
+        ----------------------------- */
+
+        const prompt =
+            buildPrompt(
+                history,
+                message,
+                language
             );
 
 
-        const lastStep =
-            modelSteps[
-                modelSteps.length - 1
-            ];
+        console.log(
+            "→ User:",
+            message.slice(0, 100)
+        );
 
+
+        /* =================================
+           GEMINI INTERACTIONS API
+        ================================= */
+
+        const interaction =
+            await ai.interactions.create({
+
+                model: MODEL,
+
+                input: prompt
+
+            });
+
+
+        /* -----------------------------
+           GET RESPONSE
+        ----------------------------- */
+
+        let reply = "";
 
         if (
-            lastStep &&
-            Array.isArray(
-                lastStep.content
-            )
+            interaction &&
+            typeof interaction.output_text ===
+                "string"
         ) {
-
-            return cleanText(
-
-                lastStep.content
-                    .filter(
-                        item =>
-                            item &&
-                            item.type === "text"
-                    )
-                    .map(
-                        item =>
-                            item.text || ""
-                    )
-                    .join("")
-
-            );
-
+            reply =
+                interaction.output_text;
         }
 
-    }
+
+        reply =
+            cleanText(reply);
 
 
-    return "";
+        /* -----------------------------
+           EMPTY RESPONSE
+        ----------------------------- */
 
-}
+        if (!reply) {
 
-
-/* =========================================
-   CHAT API
-========================================= */
-
-app.post(
-    "/chat",
-    async (req, res) => {
-
-        try {
-
-            /*
-               API KEY CHECK
-            */
-
-            if (
-                !API_KEY ||
-                !ai
-            ) {
-
-                return res.status(500).json({
-
-                    success: false,
-
-                    error:
-                        "GEMINI_API_KEY is missing.",
-
-                    details:
-                        "Render → Environment → GEMINI_API_KEY சேர்க்கவும்."
-
-                });
-
-            }
-
-
-            /*
-               INPUT
-            */
-
-            const message =
-                cleanText(
-                    req.body?.message
-                );
-
-
-            const language =
-                cleanText(
-                    req.body?.language
-                ) || "en";
-
-
-            const history =
-                req.body?.history;
-
-
-            /*
-               EMPTY MESSAGE
-            */
-
-            if (!message) {
-
-                return res.status(400).json({
-
-                    success: false,
-
-                    error:
-                        "Message is required."
-
-                });
-
-            }
-
-
-            /*
-               BUILD SYSTEM INSTRUCTION
-            */
-
-            const systemInstruction =
-                buildSystemInstruction(
-                    language
-                );
-
-
-            /*
-               BUILD HISTORY
-            */
-
-            const input =
-                buildInput(
-                    history,
-                    message
-                );
-
-
-            console.log(
-                "→ Viggo request:",
-                message.slice(0, 100)
+            console.error(
+                "❌ Empty Gemini response:",
+                interaction
             );
 
-
-            /*
-               GEMINI INTERACTIONS API
-            */
-
-            const interaction =
-                await ai.interactions.create({
-
-                    model:
-                        MODEL,
-
-                    input:
-                        input,
-
-                    store:
-                        false,
-
-                    system_instruction:
-                        systemInstruction
-
-                });
-
-
-            /*
-               GET RESPONSE
-            */
-
-            const reply =
-                extractResponseText(
-                    interaction
-                );
-
-
-            /*
-               EMPTY RESPONSE
-            */
-
-            if (!reply) {
-
-                console.error(
-                    "❌ Empty Gemini response:",
-                    JSON.stringify(
-                        interaction,
-                        null,
-                        2
-                    )
-                );
-
-
-                return res.status(502).json({
-
-                    success: false,
-
-                    error:
-                        "Viggo returned an empty response."
-
-                });
-
-            }
-
-
-            console.log(
-                "✓ Viggo response received."
-            );
-
-
-            /*
-               SEND TO FRONTEND
-            */
-
-            return res.json({
-
-                success: true,
-
-                reply:
-                    reply,
-
-                model:
-                    MODEL
-
+            return res.status(502).json({
+                success: false,
+                error:
+                    "Viggo returned an empty response."
             });
 
         }
 
 
-        catch (error) {
+        console.log(
+            "✓ Response received."
+        );
 
-            console.error(
-                "❌ Gemini error:"
-            );
 
-            console.error(
+        /* -----------------------------
+           SEND TO FRONTEND
+        ----------------------------- */
+
+        return res.json({
+
+            success: true,
+
+            reply: reply,
+
+            model: MODEL,
+
+            api: "Interactions API"
+
+        });
+
+    }
+
+
+    catch (error) {
+
+        console.error(
+            "❌ Gemini error:",
+            error
+        );
+
+
+        const errorText =
+            String(
+                error?.message ||
                 error
             );
 
 
-            const errorText =
-                String(
-                    error?.message ||
-                    error
-                );
+        const lower =
+            errorText.toLowerCase();
 
 
-            const lower =
-                errorText.toLowerCase();
+        /* =================================
+           429 / QUOTA
+        ================================= */
 
+        if (
+            lower.includes("429") ||
+            lower.includes("resource exhausted") ||
+            lower.includes("quota") ||
+            lower.includes("rate limit")
+        ) {
 
-            /*
-               429 / QUOTA
-            */
-
-            if (
-                lower.includes("429") ||
-                lower.includes("quota") ||
-                lower.includes("resource exhausted") ||
-                lower.includes("rate limit")
-            ) {
-
-                return res.status(429).json({
-
-                    success: false,
-
-                    error:
-                        "Gemini is temporarily busy.",
-
-                    details:
-                        "Please try again after a few seconds."
-
-                });
-
-            }
-
-
-            /*
-               API KEY
-            */
-
-            if (
-                lower.includes("api key") ||
-                lower.includes("401") ||
-                lower.includes("unauthenticated") ||
-                lower.includes("permission denied")
-            ) {
-
-                return res.status(401).json({
-
-                    success: false,
-
-                    error:
-                        "Gemini API key error.",
-
-                    details:
-                        "Check GEMINI_API_KEY in Render Environment Variables."
-
-                });
-
-            }
-
-
-            /*
-               MODEL ERROR
-            */
-
-            if (
-                lower.includes("model") ||
-                lower.includes("404") ||
-                lower.includes("not found")
-            ) {
-
-                return res.status(502).json({
-
-                    success: false,
-
-                    error:
-                        "Gemini model/API error.",
-
-                    details:
-                        errorText
-
-                });
-
-            }
-
-
-            /*
-               GENERAL ERROR
-            */
-
-            return res.status(500).json({
+            return res.status(429).json({
 
                 success: false,
 
                 error:
-                    "Viggo AI could not generate a response.",
+                    "Gemini is temporarily busy.",
+
+                details:
+                    "Please try again after a few seconds."
+
+            });
+
+        }
+
+
+        /* =================================
+           API KEY
+        ================================= */
+
+        if (
+            lower.includes("api key") ||
+            lower.includes("401") ||
+            lower.includes("unauthenticated") ||
+            lower.includes("authentication")
+        ) {
+
+            return res.status(401).json({
+
+                success: false,
+
+                error:
+                    "Gemini API key error.",
+
+                details:
+                    "Check GEMINI_API_KEY in Render → Environment Variables."
+
+            });
+
+        }
+
+
+        /* =================================
+           MODEL
+        ================================= */
+
+        if (
+            lower.includes("model") ||
+            lower.includes("404") ||
+            lower.includes("not found")
+        ) {
+
+            return res.status(502).json({
+
+                success: false,
+
+                error:
+                    "Gemini model error.",
 
                 details:
                     errorText
@@ -723,35 +437,51 @@ app.post(
 
         }
 
+
+        /* =================================
+           GENERAL ERROR
+        ================================= */
+
+        return res.status(500).json({
+
+            success: false,
+
+            error:
+                "Viggo AI could not generate a response.",
+
+            details:
+                errorText
+
+        });
+
     }
-);
+
+});
 
 
 /* =========================================
    404
 ========================================= */
 
-app.use(
-    (req, res) => {
+app.use((req, res) => {
 
-        res.status(404).json({
+    res.status(404).json({
 
-            success: false,
+        success: false,
 
-            error:
-                "Endpoint not found.",
+        error:
+            "Endpoint not found.",
 
-            path:
-                req.path
+        path:
+            req.path
 
-        });
+    });
 
-    }
-);
+});
 
 
 /* =========================================
-   SERVER START
+   START SERVER
 ========================================= */
 
 app.listen(
@@ -798,3 +528,4 @@ app.listen(
 
     }
 );
+```
