@@ -1,89 +1,49 @@
 "use strict";
 
-/*
-=========================================================
- VIGGO AI SERVER
- Node.js + Express + Google Gemini API
-=========================================================
-
-Required Render Environment Variable:
-
-GEMINI_API_KEY=your_gemini_api_key
-
-Start Command:
-
-node server.js
-
-IMPORTANT:
-This server uses:
-gemini-3.6-flash
-
-=========================================================
-*/
-
 require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
+const crypto = require("crypto");
 const { GoogleGenAI } = require("@google/genai");
 
 const app = express();
 
-/* ======================================================
-   CONFIG
-====================================================== */
-
 const PORT = process.env.PORT || 10000;
 
-/*
- IMPORTANT:
- Do NOT use gemini-2.5-flash here.
-*/
+const API_KEY = process.env.GEMINI_API_KEY;
+
 const MODEL = "gemini-3.6-flash";
 
-const API_KEY =
-    process.env.GEMINI_API_KEY;
 
-
-/* ======================================================
-   STARTUP CHECK
-====================================================== */
-
-console.log("");
-console.log("================================");
-console.log("       VIGGO AI SERVER");
-console.log("================================");
-console.log("PORT:", PORT);
-console.log("MODEL:", MODEL);
-
-if (API_KEY) {
-    console.log("API KEY: CONFIGURED");
-} else {
-    console.log("API KEY: MISSING");
-}
-
-console.log("================================");
-console.log("");
-
-
-/* ======================================================
-   GEMINI CLIENT
-====================================================== */
+/* =====================================================
+   GEMINI
+===================================================== */
 
 let ai = null;
 
 if (API_KEY) {
-
     ai = new GoogleGenAI({
         apiKey: API_KEY
     });
-
 }
 
 
-/* ======================================================
+/* =====================================================
+   SHORT SHARE STORAGE
+===================================================== */
+
+const sharedChats = new Map();
+
+const SHARE_ID_LENGTH = 8;
+
+const SHARE_EXPIRY =
+    24 * 60 * 60 * 1000;
+
+
+/* =====================================================
    MIDDLEWARE
-====================================================== */
+===================================================== */
 
 app.use(
     cors({
@@ -100,7 +60,6 @@ app.use(
     })
 );
 
-
 app.use(
     express.json({
         limit: "2mb"
@@ -108,114 +67,33 @@ app.use(
 );
 
 
-/* ======================================================
-   ROOT
-====================================================== */
-
-app.get(
-    "/",
-    (req, res) => {
-
-        res.status(200).json({
-
-            success: true,
-
-            message:
-                "Viggo AI Server is online.",
-
-            server:
-                "Viggo AI",
-
-            model:
-                MODEL,
-
-            status:
-                "online",
-
-            apiConfigured:
-                Boolean(API_KEY),
-
-            time:
-                new Date().toISOString()
-
-        });
-
-    }
-);
-
-
-/* ======================================================
-   STATUS
-====================================================== */
-
-app.get(
-    "/status",
-    (req, res) => {
-
-        res.status(200).json({
-
-            success: true,
-
-            server:
-                "Viggo AI",
-
-            model:
-                MODEL,
-
-            apiConfigured:
-                Boolean(API_KEY),
-
-            status:
-                "online",
-
-            time:
-                new Date().toISOString()
-
-        });
-
-    }
-);
-
-
-/* ======================================================
-   TEXT CLEANER
-====================================================== */
+/* =====================================================
+   HELPER
+===================================================== */
 
 function cleanText(value) {
 
     if (
         typeof value !== "string"
     ) {
-
         return "";
-
     }
 
     return value
         .replace(/\u0000/g, "")
         .trim();
-
 }
 
-
-/* ======================================================
-   LANGUAGE
-====================================================== */
 
 function getLanguageName(language) {
 
     const languages = {
 
         en: "English",
-
         ta: "Tamil",
-
         hi: "Hindi",
-
         ml: "Malayalam",
-
         te: "Telugu",
-
         kn: "Kannada"
 
     };
@@ -224,15 +102,78 @@ function getLanguageName(language) {
         languages[language] ||
         "English"
     );
-
 }
 
 
-/* ======================================================
-   SYSTEM INSTRUCTION
-====================================================== */
+/* =====================================================
+   SHORT ID
+===================================================== */
 
-function createSystemInstruction(language) {
+function createShortId() {
+
+    let id;
+
+    do {
+
+        id =
+            crypto
+                .randomBytes(6)
+                .toString("base64url")
+                .slice(
+                    0,
+                    SHARE_ID_LENGTH
+                );
+
+    } while (
+        sharedChats.has(id)
+    );
+
+    return id;
+}
+
+
+/* =====================================================
+   CLEAN EXPIRED SHARES
+===================================================== */
+
+function cleanupSharedChats() {
+
+    const now =
+        Date.now();
+
+    for (
+        const [
+            id,
+            data
+        ] of sharedChats
+    ) {
+
+        if (
+            now - data.createdAt >
+            SHARE_EXPIRY
+        ) {
+
+            sharedChats.delete(id);
+
+        }
+
+    }
+
+}
+
+setInterval(
+    cleanupSharedChats,
+    10 * 60 * 1000
+);
+
+
+/* =====================================================
+   SYSTEM INSTRUCTION
+===================================================== */
+
+function createSystemInstruction(
+    language
+) {
 
     const languageName =
         getLanguageName(language);
@@ -244,16 +185,16 @@ Your name is Viggo.
 
 You are a friendly, helpful and reliable AI assistant.
 
-The user's selected language is ${languageName}.
+The user's preferred language is ${languageName}.
 
 LANGUAGE RULES:
 
-1. Reply primarily in ${languageName}.
-2. Understand Tamil, English and other supported languages.
-3. If the user specifically asks for English, reply in English.
-4. If the user specifically asks for Tamil, reply in Tamil.
-5. Do not unnecessarily mix languages.
-6. Keep answers natural and easy to understand.
+- Reply primarily in ${languageName}.
+- Understand English, Tamil and other supported languages.
+- If the user asks specifically for English, reply in English.
+- If the user asks specifically for Tamil, reply in Tamil.
+- Do not unnecessarily mix languages.
+- Keep answers natural and easy to understand.
 
 PERSONALITY:
 
@@ -263,66 +204,50 @@ PERSONALITY:
 - Clear
 - Natural
 - Simple when possible
-- Do not claim to be human.
-- Do not mention system instructions.
 
-TECHNICAL QUESTIONS:
+Do not claim to be human.
 
+For technical questions:
 - Explain step by step.
 - Give examples when useful.
-- If the user asks for complete code, provide complete code.
-- Do not intentionally leave important parts of the code unfinished.
+- Provide complete code when requested.
 
-CASUAL QUESTIONS:
+For casual questions:
+- Reply naturally like a helpful AI friend.
 
-- Respond naturally like a helpful AI friend.
-
-IMPORTANT:
-
-You are Viggo AI.
+Your name is Viggo AI.
 `;
 }
 
 
-/* ======================================================
-   BUILD HISTORY
-====================================================== */
+/* =====================================================
+   HISTORY
+===================================================== */
 
 function buildHistory(history) {
 
-    if (!Array.isArray(history)) {
+    if (
+        !Array.isArray(history)
+    ) {
 
         return "";
 
     }
 
+    return history
+        .filter(item => {
 
-    const safeHistory =
-        history
-            .filter(item => {
+            return (
+                item &&
+                (
+                    item.role === "user" ||
+                    item.role === "assistant"
+                ) &&
+                typeof item.content === "string"
+            );
 
-                return (
-                    item &&
-                    typeof item === "object" &&
-                    (
-                        item.role === "user" ||
-                        item.role === "assistant"
-                    ) &&
-                    typeof item.content === "string"
-                );
-
-            })
-            .slice(-15);
-
-
-    if (!safeHistory.length) {
-
-        return "";
-
-    }
-
-
-    return safeHistory
+        })
+        .slice(-15)
         .map(item => {
 
             const role =
@@ -330,26 +255,85 @@ function buildHistory(history) {
                     ? "User"
                     : "Viggo";
 
-            const content =
-                cleanText(
-                    item.content
-                );
-
             return (
                 role +
                 ": " +
-                content
+                cleanText(
+                    item.content
+                )
             );
 
         })
         .join("\n\n");
-
 }
 
 
-/* ======================================================
+/* =====================================================
+   ROOT
+===================================================== */
+
+app.get(
+    "/",
+    (req, res) => {
+
+        res.json({
+
+            success: true,
+
+            server:
+                "Viggo AI",
+
+            status:
+                "online",
+
+            model:
+                MODEL,
+
+            apiConfigured:
+                Boolean(API_KEY)
+
+        });
+
+    }
+);
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+app.get(
+    "/status",
+    (req, res) => {
+
+        res.json({
+
+            success: true,
+
+            server:
+                "Viggo AI",
+
+            status:
+                "online",
+
+            model:
+                MODEL,
+
+            apiConfigured:
+                Boolean(API_KEY),
+
+            sharedChats:
+                sharedChats.size
+
+        });
+
+    }
+);
+
+
+/* =====================================================
    CHAT
-====================================================== */
+===================================================== */
 
 app.post(
     "/chat",
@@ -357,34 +341,17 @@ app.post(
 
         try {
 
-            console.log("");
-            console.log(
-                "--------------------------------"
-            );
-            console.log(
-                "NEW CHAT REQUEST"
-            );
-            console.log(
-                "--------------------------------"
-            );
-
-
-            /* ==========================================
-               API KEY CHECK
-            ========================================== */
-
-            if (!API_KEY) {
-
-                console.error(
-                    "GEMINI_API_KEY is missing."
-                );
+            if (
+                !API_KEY ||
+                !ai
+            ) {
 
                 return res.status(500).json({
 
                     success: false,
 
                     error:
-                        "Gemini API key is not configured.",
+                        "GEMINI_API_KEY is missing.",
 
                     details:
                         "Add GEMINI_API_KEY in Render Environment Variables."
@@ -393,24 +360,6 @@ app.post(
 
             }
 
-
-            if (!ai) {
-
-                return res.status(500).json({
-
-                    success: false,
-
-                    error:
-                        "Gemini client is not initialized."
-
-                });
-
-            }
-
-
-            /* ==========================================
-               REQUEST
-            ========================================== */
 
             const message =
                 cleanText(
@@ -425,24 +374,10 @@ app.post(
 
 
             const history =
-                req.body?.history;
+                buildHistory(
+                    req.body?.history
+                );
 
-
-            console.log(
-                "Language:",
-                language
-            );
-
-
-            console.log(
-                "Message:",
-                message.slice(0, 150)
-            );
-
-
-            /* ==========================================
-               VALIDATE
-            ========================================== */
 
             if (!message) {
 
@@ -458,44 +393,19 @@ app.post(
             }
 
 
-            /* ==========================================
-               HISTORY
-            ========================================== */
-
-            const previousMessages =
-                buildHistory(
-                    history
-                );
-
-
-            /* ==========================================
-               SYSTEM
-            ========================================== */
-
-            const systemInstruction =
+            let prompt =
                 createSystemInstruction(
                     language
                 );
 
 
-            /* ==========================================
-               PROMPT
-            ========================================== */
-
-            let prompt = "";
-
-
-            prompt +=
-                systemInstruction;
-
-
-            if (previousMessages) {
+            if (history) {
 
                 prompt += `
 
 CONVERSATION HISTORY:
 
-${previousMessages}
+${history}
 
 `;
 
@@ -512,12 +422,9 @@ Respond to the user now.
 `;
 
 
-            /* ==========================================
-               GEMINI REQUEST
-            ========================================== */
-
             console.log(
-                "Sending request to Gemini..."
+                "Gemini request:",
+                message.slice(0, 100)
             );
 
 
@@ -532,10 +439,6 @@ Respond to the user now.
 
                 });
 
-
-            /* ==========================================
-               RESPONSE TEXT
-            ========================================== */
 
             let reply = "";
 
@@ -552,50 +455,32 @@ Respond to the user now.
             }
 
 
-            /* ==========================================
-               FALLBACK RESPONSE EXTRACTION
-            ========================================== */
-
             if (
                 !reply &&
-                response?.candidates
+                Array.isArray(
+                    response?.candidates
+                )
             ) {
 
-                const candidates =
-                    response.candidates;
+                const parts =
+                    response
+                        .candidates?.[0]
+                        ?.content
+                        ?.parts;
 
 
                 if (
-                    Array.isArray(
-                        candidates
-                    ) &&
-                    candidates.length
+                    Array.isArray(parts)
                 ) {
 
-                    const candidate =
-                        candidates[0];
-
-
-                    const parts =
-                        candidate
-                            ?.content
-                            ?.parts;
-
-
-                    if (
-                        Array.isArray(parts)
-                    ) {
-
-                        reply =
-                            parts
-                                .map(
-                                    part =>
-                                        part?.text ||
-                                        ""
-                                )
-                                .join("");
-
-                    }
+                    reply =
+                        parts
+                            .map(
+                                part =>
+                                    part?.text ||
+                                    ""
+                            )
+                            .join("");
 
                 }
 
@@ -608,62 +493,21 @@ Respond to the user now.
                 );
 
 
-            /* ==========================================
-               EMPTY RESPONSE
-            ========================================== */
-
             if (!reply) {
-
-                console.error(
-                    "Gemini returned empty response."
-                );
-
-
-                console.error(
-                    JSON.stringify(
-                        response,
-                        null,
-                        2
-                    )
-                );
-
 
                 return res.status(502).json({
 
                     success: false,
 
                     error:
-                        "Viggo AI returned an empty response.",
-
-                    details:
-                        "The Gemini model did not return text."
+                        "Viggo returned an empty response."
 
                 });
 
             }
 
 
-            /* ==========================================
-               SUCCESS
-            ========================================== */
-
-            console.log(
-                "Gemini response received."
-            );
-
-
-            console.log(
-                "Reply:",
-                reply.slice(0, 150)
-            );
-
-
-            console.log(
-                "--------------------------------"
-            );
-
-
-            return res.status(200).json({
+            return res.json({
 
                 success:
                     true,
@@ -678,26 +522,10 @@ Respond to the user now.
 
         }
 
-
-        /* ==============================================
-           ERROR
-        ============================================== */
-
         catch (error) {
 
-            console.error("");
             console.error(
-                "================================"
-            );
-            console.error(
-                "GEMINI ERROR"
-            );
-            console.error(
-                "================================"
-            );
-
-
-            console.error(
+                "Gemini error:",
                 error
             );
 
@@ -707,53 +535,38 @@ Respond to the user now.
                 String(error);
 
 
-            const lowerError =
+            const lower =
                 errorMessage.toLowerCase();
 
 
-            /* ==========================================
-               404 MODEL ERROR
-            ========================================== */
-
             if (
-                lowerError.includes(
-                    "404"
+                lower.includes("429") ||
+                lower.includes(
+                    "resource exhausted"
                 ) ||
-                lowerError.includes(
-                    "not found"
-                ) ||
-                lowerError.includes(
-                    "not_found"
+                lower.includes(
+                    "rate limit"
                 )
             ) {
 
-                return res.status(502).json({
+                return res.status(429).json({
 
                     success: false,
 
                     error:
-                        "Gemini model is unavailable.",
+                        "Viggo AI is temporarily busy.",
 
                     details:
-                        `Model "${MODEL}" could not be used. Check the Gemini API model availability.`
+                        "Please try again in a few seconds."
 
                 });
 
             }
 
 
-            /* ==========================================
-               API KEY
-            ========================================== */
-
             if (
-                lowerError.includes(
-                    "api key"
-                ) ||
-                lowerError.includes(
-                    "invalid api"
-                ) ||
-                lowerError.includes(
+                lower.includes("api key") ||
+                lower.includes(
                     "unauthenticated"
                 )
             ) {
@@ -766,50 +579,12 @@ Respond to the user now.
                         "Gemini API key error.",
 
                     details:
-                        "Check GEMINI_API_KEY in Render Environment Variables."
+                        "Check GEMINI_API_KEY in Render."
 
                 });
 
             }
 
-
-            /* ==========================================
-               429 RATE LIMIT
-            ========================================== */
-
-            if (
-                lowerError.includes(
-                    "429"
-                ) ||
-                lowerError.includes(
-                    "resource exhausted"
-                ) ||
-                lowerError.includes(
-                    "rate limit"
-                ) ||
-                lowerError.includes(
-                    "too many requests"
-                )
-            ) {
-
-                return res.status(429).json({
-
-                    success: false,
-
-                    error:
-                        "Viggo AI is temporarily busy.",
-
-                    details:
-                        "Gemini is experiencing high demand. Please try again after a few seconds."
-
-                });
-
-            }
-
-
-            /* ==========================================
-               GENERAL ERROR
-            ========================================== */
 
             return res.status(500).json({
 
@@ -829,9 +604,226 @@ Respond to the user now.
 );
 
 
-/* ======================================================
+/* =====================================================
+   CREATE SHORT SHARE
+===================================================== */
+
+app.post(
+    "/share",
+    (req, res) => {
+
+        try {
+
+            cleanupSharedChats();
+
+
+            const title =
+                cleanText(
+                    req.body?.title
+                ) ||
+                "Viggo AI Chat";
+
+
+            const messages =
+                Array.isArray(
+                    req.body?.messages
+                )
+                    ? req.body.messages
+                    : [];
+
+
+            if (!messages.length) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    error:
+                        "No chat messages to share."
+
+                });
+
+            }
+
+
+            const id =
+                createShortId();
+
+
+            sharedChats.set(
+                id,
+                {
+
+                    title:
+                        title.slice(0, 100),
+
+                    messages:
+                        messages.slice(-100),
+
+                    createdAt:
+                        Date.now()
+
+                }
+            );
+
+
+            const protocol =
+                req.headers["x-forwarded-proto"] ||
+                req.protocol;
+
+
+            const host =
+                req.get("host");
+
+
+            const baseUrl =
+                `${protocol}://${host}`;
+
+
+            const shareUrl =
+                `${baseUrl}/s/${id}`;
+
+
+            console.log(
+                "Share created:",
+                id
+            );
+
+
+            return res.json({
+
+                success:
+                    true,
+
+                id:
+                    id,
+
+                url:
+                    shareUrl,
+
+                expiresIn:
+                    SHARE_EXPIRY
+
+            });
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Share error:",
+                error
+            );
+
+
+            return res.status(500).json({
+
+                success: false,
+
+                error:
+                    "Could not create share link."
+
+            });
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   GET SHORT SHARE
+===================================================== */
+
+app.get(
+    "/share/:id",
+    (req, res) => {
+
+        cleanupSharedChats();
+
+
+        const id =
+            cleanText(
+                req.params.id
+            );
+
+
+        const chat =
+            sharedChats.get(id);
+
+
+        if (!chat) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                error:
+                    "Shared chat not found or expired."
+
+            });
+
+        }
+
+
+        return res.json({
+
+            success:
+                true,
+
+            id:
+                id,
+
+            title:
+                chat.title,
+
+            messages:
+                chat.messages
+
+        });
+
+    }
+);
+
+
+/* =====================================================
+   SHORT URL
+===================================================== */
+
+app.get(
+    "/s/:id",
+    (req, res) => {
+
+        const id =
+            cleanText(
+                req.params.id
+            );
+
+
+        const frontend =
+            process.env.FRONTEND_URL;
+
+
+        if (frontend) {
+
+            return res.redirect(
+                `${frontend}?share=${encodeURIComponent(id)}`
+            );
+
+        }
+
+
+        return res.redirect(
+            `/?share=${encodeURIComponent(id)}`
+        );
+
+    }
+);
+
+
+/* =====================================================
    404
-====================================================== */
+===================================================== */
 
 app.use(
     (req, res) => {
@@ -852,49 +844,9 @@ app.use(
 );
 
 
-/* ======================================================
-   GLOBAL ERROR
-====================================================== */
-
-app.use(
-    (
-        error,
-        req,
-        res,
-        next
-    ) => {
-
-        console.error(
-            "Unhandled server error:",
-            error
-        );
-
-
-        if (
-            res.headersSent
-        ) {
-
-            return next(error);
-
-        }
-
-
-        return res.status(500).json({
-
-            success: false,
-
-            error:
-                "Internal server error."
-
-        });
-
-    }
-);
-
-
-/* ======================================================
+/* =====================================================
    START
-====================================================== */
+===================================================== */
 
 app.listen(
     PORT,
@@ -905,7 +857,7 @@ app.listen(
             "================================"
         );
         console.log(
-            "     VIGGO AI SERVER ONLINE"
+            "       VIGGO AI ONLINE"
         );
         console.log(
             "================================"
@@ -919,16 +871,13 @@ app.listen(
             MODEL
         );
         console.log(
+            "SHORT SHARE: ENABLED"
+        );
+        console.log(
             "API KEY:",
             API_KEY
                 ? "CONFIGURED"
                 : "MISSING"
-        );
-        console.log(
-            "CHAT ENDPOINT: /chat"
-        );
-        console.log(
-            "STATUS ENDPOINT: /status"
         );
         console.log(
             "================================"
