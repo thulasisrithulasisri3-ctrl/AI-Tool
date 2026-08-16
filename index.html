@@ -1,164 +1,62 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
-<title>Viggo AI</title>
-<link
-    rel="stylesheet"
-    href="style.css"
->
-</head>
-<body>
-<!-- ======================================
-     SIDEBAR
-======================================= -->
-<aside class="sidebar" id="sidebar">
-    <div class="logo">
-        <div class="logo-icon">
-            V
-        </div>
-        <div>
-            <strong>Viggo</strong>
-            <small>AI Friend</small>
-        </div>
-    </div>
-    <!-- NEW CHAT -->
+<!-- LANGUAGE MENU -->
+<div class="language-menu" id="languageMenu">
+
     <button
-        class="new-chat"
-        id="newChatBtn"
+        id="languageBtn"
+        class="language-main-button"
+        type="button"
     >
-        ＋ New Chat
+        🌐 Select Language
+        <span>▸</span>
     </button>
-    <!-- HISTORY -->
+
     <div
-        class="history"
-        id="historyList"
-    ></div>
-    <!-- MORE -->
-    <div class="sidebar-more">
+        id="languageSubmenu"
+        class="language-submenu"
+    >
+
         <button
-            id="moreBtn"
-            class="more-button"
+            type="button"
+            data-language="en"
         >
-            ⋮ More
+            🇬🇧 English
         </button>
-        <div
-            id="moreMenu"
-            class="more-menu"
+
+        <button
+            type="button"
+            data-language="ta"
         >
-            <button id="saveBtn">
-                💾 Save
-            </button>
-            <button id="selectChatsBtn">
-                ☑ Select Chats
-            </button>
-            <button
-                id="deleteSelectedBtn"
-                style="display:none;"
-            >
-                🗑 Delete Selected
-            </button>
-            <button id="clearHistoryBtn">
-                🗑 Clear History
-            </button>
-            <div class="language-title">
-                Language
-            </div>
-            <button
-                data-language="en"
-            >
-                🇬🇧 English
-            </button>
-            <button
-                data-language="ta"
-            >
-                🇮🇳 தமிழ்
-            </button>
-            <button
-                data-language="hi"
-            >
-                🇮🇳 हिन्दी
-            </button>
-            <button
-                data-language="ml"
-            >
-                🇮🇳 മലയാളം
-            </button>
-            <button
-                data-language="te"
-            >
-                🇮🇳 తెలుగు
-            </button>
-            <button
-                data-language="kn"
-            >
-                🇮🇳 ಕನ್ನಡ
-            </button>
-        </div>
+            🇮🇳 தமிழ்
+        </button>
+
+        <button
+            type="button"
+            data-language="hi"
+        >
+            🇮🇳 हिन्दी
+        </button>
+
+        <button
+            type="button"
+            data-language="ml"
+        >
+            🇮🇳 മലയാളം
+        </button>
+
+        <button
+            type="button"
+            data-language="te"
+        >
+            🇮🇳 తెలుగు
+        </button>
+
+        <button
+            type="button"
+            data-language="kn"
+        >
+            🇮🇳 ಕನ್ನಡ
+        </button>
+
     </div>
-</aside>
-<!-- ======================================
-     MAIN
-======================================= -->
-<main class="main">
-    <!-- HEADER -->
-    <header class="header">
-        <button
-            class="mobile-menu"
-            id="mobileMenuBtn"
-        >
-            ☰
-        </button>
-        <div
-            class="chat-title"
-            id="chatTitle"
-        >
-            New Chat
-        </div>
-        <button
-            class="share-btn"
-            id="shareBtn"
-        >
-            ↗ Share
-        </button>
-    </header>
-    <!-- MESSAGES -->
-    <section
-        class="messages"
-        id="messages"
-    ></section>
-    <!-- INPUT -->
-    <footer class="input-area">
-        <div class="input-box">
-            <input
-                type="text"
-                id="messageInput"
-                placeholder="Message Viggo..."
-                autocomplete="off"
-            >
-            <!-- MIC -->
-            <button
-                id="voiceBtn"
-                class="input-icon"
-                title="Voice"
-            >
-                🎤
-            </button>
-            <!-- SEND -->
-            <button
-                id="sendBtn"
-                class="send-btn"
-                title="Send"
-            >
-                ➤
-            </button>
-        </div>
-    </footer>
-</main>
-<script src="script.js"></script>
-</body>
-</html>
+
+</div>
