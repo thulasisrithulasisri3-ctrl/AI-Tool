@@ -1,1040 +1,903 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Viggo AI</title>
-
-    <style>
-
-        * {
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
-            margin: 0;
-            width: 100%;
-            height: 100%;
-            font-family: Arial, sans-serif;
-            background: #07111f;
-            color: #eaf4ff;
-        }
-
-        button {
-            font-family: inherit;
-        }
-
-        /* ==================================================
-           APP
-        ================================================== */
-
-        .app {
-            display: flex;
-            width: 100%;
-            height: 100vh;
-            overflow: hidden;
-            background:
-                radial-gradient(
-                    circle at 70% 20%,
-                    rgba(0, 119, 255, .12),
-                    transparent 35%
-                ),
-                #07111f;
-        }
-
-        /* ==================================================
-           SIDEBAR
-        ================================================== */
-
-        #sidebar {
-            width: 270px;
-            height: 100%;
-            flex-shrink: 0;
-
-            display: flex;
-            flex-direction: column;
-
-            padding: 16px;
-
-            background:
-                linear-gradient(
-                    180deg,
-                    #050b14,
-                    #0a1525
-                );
-
-            border-right: 1px solid #16304f;
-
-            box-shadow:
-                8px 0 30px rgba(0,0,0,.45);
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-
-            margin-bottom: 18px;
-        }
-
-        .brand-logo {
-            width: 40px;
-            height: 40px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            border-radius: 12px;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #168cff,
-                    #0754b8
-                );
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Viggo AI</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #050b14;
+    color: white;
+    height: 100vh;
+    overflow: hidden;
+}
+
+button {
+    font-family: inherit;
+}
+
+/* =========================
+   APP
+========================= */
+
+.app {
+    display: flex;
+    height: 100vh;
+    background:
+        radial-gradient(
+            circle at top right,
+            #123b68 0%,
+            #07111f 45%,
+            #03070d 100%
+        );
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar {
+    width: 270px;
+    height: 100vh;
+    background: #050b14;
+    border-right: 1px solid #18304d;
+
+    padding: 18px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-b {
+    width: 43px;
+    height: 43px;
+
+    border-radius: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: linear-gradient(
+        135deg,
+        #238cff,
+        #0755a8
+    );
+
+    font-size: 23px;
+    font-weight: bold;
+
+    box-shadow:
+        0 0 20px rgba(
+            0,
+            130,
+            255,
+            .35
+        );
+}
+
+.logo-text {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.online {
+    margin-top: 7px;
+    margin-left: 53px;
 
-            color: white;
+    font-size: 12px;
+    color: #52e08a;
+}
 
-            font-size: 22px;
-            font-weight: 900;
+.online-dot {
+    display: inline-block;
 
-            box-shadow:
-                0 0 18px rgba(0,140,255,.35);
-        }
+    width: 7px;
+    height: 7px;
 
-        .brand-name {
-            font-size: 21px;
-            font-weight: 800;
-            color: white;
-        }
+    background: #35db78;
 
-        .brand-status {
-            font-size: 11px;
-            color: #4cc9ff;
-            margin-top: 2px;
-        }
+    border-radius: 50%;
 
-        /* ==================================================
-           NEW CHAT
-        ================================================== */
+    margin-right: 5px;
 
-        #newChat {
-            width: 100%;
+    box-shadow:
+        0 0 8px #35db78;
+}
 
-            border: 1px solid #1b4d7e;
-            border-radius: 11px;
+/* =========================
+   NEW CHAT
+========================= */
 
-            padding: 12px;
+.new-chat {
+    margin-top: 25px;
 
-            background:
-                linear-gradient(
-                    135deg,
-                    #0d2946,
-                    #0a1b30
-                );
+    width: 100%;
 
-            color: #fff;
+    padding: 12px;
 
-            text-align: left;
+    border: 1px solid #1768b8;
 
-            cursor: pointer;
+    border-radius: 11px;
 
-            transition: .2s;
-        }
+    background: linear-gradient(
+        135deg,
+        #0d70c9,
+        #06437f
+    );
 
-        #newChat:hover {
-            border-color: #249cff;
-            background: #0e2d4d;
-        }
+    color: white;
 
-        /* ==================================================
-           TITLES
-        ================================================== */
+    cursor: pointer;
 
-        .side-title {
-            margin-top: 20px;
-            margin-bottom: 8px;
+    font-size: 15px;
 
-            padding-left: 6px;
+    box-shadow:
+        0 5px 20px rgba(
+            0,
+            110,
+            255,
+            .2
+        );
+}
 
-            color: #6e8cab;
+.new-chat:hover {
+    background: linear-gradient(
+        135deg,
+        #1688ec,
+        #0755a0
+    );
+}
 
-            font-size: 11px;
-            font-weight: bold;
+/* =========================
+   SIDEBAR TITLES
+========================= */
 
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+.side-title {
+    margin-top: 25px;
+    margin-bottom: 9px;
 
-        /* ==================================================
-           CHAT LIST
-        ================================================== */
+    color: #7294b8;
 
-        .chat-list {
-            overflow-y: auto;
-            max-height: 35vh;
-        }
+    font-size: 12px;
 
-        .chat-row {
-            display: flex;
-            align-items: center;
-            gap: 3px;
+    text-transform: uppercase;
+}
 
-            margin-bottom: 4px;
-        }
+.chat-list {
+    display: flex;
+    flex-direction: column;
 
-        .chat-item {
-            flex: 1;
+    gap: 5px;
 
-            min-width: 0;
+    overflow-y: auto;
+}
 
-            border: 1px solid transparent;
-            border-radius: 9px;
+/* =========================
+   CHAT ITEMS
+========================= */
 
-            padding: 10px;
+.chat-item {
+    width: 100%;
 
-            background: transparent;
+    border: 0;
 
-            color: #cbd9e8;
+    background: transparent;
 
-            cursor: pointer;
+    color: #d9e9fb;
 
-            text-align: left;
+    padding: 10px;
 
-            transition: .2s;
-        }
+    border-radius: 9px;
 
-        .chat-item:hover,
-        .chat-item.active {
-            background: #0d2239;
-            border-color: #164c7e;
-            color: white;
-        }
+    text-align: left;
 
-        .chat-item-title {
-            display: block;
+    cursor: pointer;
+}
 
-            overflow: hidden;
+.chat-item:hover {
+    background: #0b1c30;
+}
 
-            text-overflow: ellipsis;
+.empty-sidebar {
+    color: #607a97;
 
-            white-space: nowrap;
-        }
+    font-size: 12px;
 
-        .small-action {
-            width: 31px;
-            height: 31px;
+    padding: 8px;
+}
 
-            border: 0;
-            border-radius: 7px;
+/* =========================
+   MORE
+========================= */
 
-            background: transparent;
+.more-area {
+    margin-top: auto;
 
-            color: #7191b2;
+    position: relative;
+}
 
-            cursor: pointer;
-        }
+.more-button {
+    width: 100%;
 
-        .small-action:hover {
-            background: #122b45;
-            color: #fff;
-        }
+    padding: 11px;
 
-        .delete-action:hover {
-            color: #ff6b6b;
-        }
+    border-radius: 10px;
 
-        .empty-sidebar {
-            color: #526d88;
-            font-size: 12px;
-            padding: 8px;
-        }
+    border: 1px solid #244966;
 
-        /* ==================================================
-           MORE
-        ================================================== */
+    background: #0a1928;
 
-        .sidebar-bottom {
-            margin-top: auto;
-            position: relative;
-        }
+    color: #dceeff;
 
-        #moreButton {
-            width: 100%;
+    cursor: pointer;
 
-            border: 1px solid #173653;
-            border-radius: 10px;
+    text-align: left;
 
-            padding: 11px;
+    font-size: 14px;
+}
 
-            background: #0b1b2e;
+.more-button:hover {
+    background: #10304b;
+}
 
-            color: #dcecff;
+/* =========================
+   MORE MENU
+========================= */
 
-            cursor: pointer;
+.more-menu {
+    display: none;
 
-            text-align: left;
-        }
+    position: absolute;
 
-        #moreButton:hover {
-            background: #102842;
-        }
+    left: 0;
+    right: 0;
 
-        #moreMenu {
-            display: none;
+    bottom: 50px;
 
-            position: absolute;
+    background: #081522;
 
-            left: 0;
-            right: 0;
-            bottom: 52px;
+    border: 1px solid #245172;
 
-            padding: 6px;
+    border-radius: 12px;
 
-            border: 1px solid #1b4268;
-            border-radius: 12px;
+    padding: 7px;
 
-            background: #081727;
+    box-shadow:
+        0 12px 35px
+        rgba(
+            0,
+            0,
+            0,
+            .6
+        );
 
-            box-shadow:
-                0 15px 40px rgba(0,0,0,.55);
+    z-index: 1000;
+}
 
-            z-index: 500;
-        }
+.more-menu.show {
+    display: block;
+}
 
-        #moreMenu.show {
-            display: block;
-        }
+.more-menu button {
+    width: 100%;
 
-        .more-item {
-            width: 100%;
+    padding: 10px;
 
-            border: 0;
-            border-radius: 8px;
+    border: 0;
 
-            padding: 11px;
+    border-radius: 8px;
 
-            background: transparent;
+    background: transparent;
 
-            color: #dcecff;
+    color: #dceeff;
 
-            cursor: pointer;
+    text-align: left;
 
-            text-align: left;
-        }
+    cursor: pointer;
+}
 
-        .more-item:hover {
-            background: #10304e;
-        }
+.more-menu button:hover {
+    background: #10304b;
+}
 
-        /* ==================================================
-           MAIN
-        ================================================== */
+/* =========================
+   MAIN
+========================= */
 
-        .main {
-            flex: 1;
-            min-width: 0;
+.main {
+    flex: 1;
 
-            display: flex;
-            flex-direction: column;
+    min-width: 0;
 
-            background:
-                radial-gradient(
-                    circle at 50% 0%,
-                    rgba(0,119,255,.08),
-                    transparent 45%
-                );
-        }
+    height: 100vh;
 
-        /* ==================================================
-           TOPBAR
-        ================================================== */
+    display: flex;
 
-        .topbar {
-            height: 62px;
-            flex-shrink: 0;
+    flex-direction: column;
+}
 
-            display: flex;
-            align-items: center;
+/* =========================
+   TOP BAR
+========================= */
 
-            padding: 0 18px;
+.topbar {
+    height: 65px;
 
-            border-bottom: 1px solid #15314f;
+    padding: 0 20px;
 
-            background: rgba(5,14,25,.85);
+    display: flex;
 
-            backdrop-filter: blur(12px);
-        }
+    align-items: center;
 
-        #mobileMenu {
-            display: none;
+    border-bottom: 1px solid #18304d;
 
-            border: 0;
-            border-radius: 8px;
+    background: rgba(
+        4,
+        11,
+        20,
+        .92
+    );
 
-            background: #10263d;
-            color: white;
+    backdrop-filter: blur(12px);
+}
 
-            padding: 8px 11px;
+.current-title {
+    font-weight: bold;
 
-            cursor: pointer;
-        }
+    color: #eaf4ff;
+}
 
-        .top-title-area {
-            display: flex;
-            flex-direction: column;
-        }
+/* =========================
+   SHARE
+========================= */
 
-        #currentTitle {
-            font-size: 16px;
-            font-weight: bold;
-        }
+.share-button {
+    margin-left: auto;
 
-        .online-status {
-            font-size: 11px;
-            color: #4cc9ff;
-            margin-top: 3px;
-        }
+    border: 1px solid #1d78ca;
 
-        /* ==================================================
-           CHAT AREA
-        ================================================== */
+    background: #0b3157;
 
-        #chatArea {
-            flex: 1;
+    color: white;
 
-            overflow-y: auto;
+    padding: 8px 14px;
 
-            padding: 25px 18px;
-        }
+    border-radius: 9px;
 
-        #conversation {
-            max-width: 900px;
-            margin: auto;
-        }
+    cursor: pointer;
+}
 
-        /* ==================================================
-           WELCOME
-        ================================================== */
+.share-button:hover {
+    background: #0f477c;
+}
 
-        .welcome {
-            min-height: 65vh;
+/* =========================
+   CHAT AREA
+========================= */
 
-            display: flex;
-            justify-content: center;
-            align-items: center;
+.chat-area {
+    flex: 1;
 
-            text-align: center;
-        }
+    overflow-y: auto;
 
-        .welcome-b {
-            width: 70px;
-            height: 70px;
+    padding: 25px;
+}
 
-            margin: auto;
+.conversation {
+    max-width: 900px;
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
+    margin: auto;
+}
 
-            border-radius: 20px;
+/* =========================
+   WELCOME
+========================= */
 
-            background:
-                linear-gradient(
-                    135deg,
-                    #168cff,
-                    #064eae
-                );
+.welcome {
+    text-align: center;
 
-            color: white;
+    padding-top: 90px;
+}
 
-            font-size: 38px;
-            font-weight: 900;
+.welcome-logo {
+    width: 75px;
+    height: 75px;
 
-            box-shadow:
-                0 0 35px rgba(0,132,255,.35);
-        }
+    margin: auto;
 
-        .welcome h1 {
-            margin: 18px 0 8px;
-            color: white;
-        }
+    border-radius: 20px;
 
-        .welcome p {
-            color: #7892ac;
-        }
+    display: flex;
 
-        /* ==================================================
-           MESSAGE
-        ================================================== */
+    align-items: center;
 
-        .message {
-            display: flex;
-            gap: 12px;
+    justify-content: center;
 
-            padding: 18px 8px;
+    background: linear-gradient(
+        135deg,
+        #2496ff,
+        #064d91
+    );
 
-            border-bottom: 1px solid #12283f;
-        }
+    font-size: 37px;
 
-        .message.user {
-            background: rgba(9,25,42,.45);
-        }
+    font-weight: bold;
 
-        .message.ai {
-            background: rgba(5,15,27,.25);
-        }
+    box-shadow:
+        0 10px 35px
+        rgba(
+            0,
+            110,
+            255,
+            .3
+        );
+}
 
-        .avatar {
-            width: 36px;
-            height: 36px;
+.welcome h1 {
+    margin-top: 18px;
 
-            flex-shrink: 0;
+    font-size: 30px;
+}
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
+.welcome p {
+    margin-top: 8px;
 
-            border-radius: 10px;
+    color: #7893af;
+}
 
-            background:
-                linear-gradient(
-                    135deg,
-                    #168cff,
-                    #0754b8
-                );
+/* =========================
+   MESSAGE
+========================= */
 
-            color: white;
+.message {
+    display: flex;
 
-            font-weight: 900;
-        }
+    gap: 12px;
 
-        .message.user .avatar {
-            background: #25384d;
-        }
+    margin-bottom: 22px;
+}
 
-        .message-content {
-            flex: 1;
-            min-width: 0;
-        }
+.message-avatar {
+    width: 36px;
+    height: 36px;
 
-        .message-name {
-            margin-bottom: 6px;
+    min-width: 36px;
 
-            font-weight: bold;
-            color: #fff;
-        }
+    border-radius: 10px;
 
-        .message-text {
-            white-space: pre-wrap;
+    display: flex;
 
-            line-height: 1.65;
+    align-items: center;
 
-            color: #d9e7f5;
+    justify-content: center;
 
-            word-break: break-word;
-        }
+    background: #0d5da6;
 
-        /* ==================================================
-           MESSAGE ACTIONS
-        ================================================== */
+    font-weight: bold;
+}
 
-        .message-actions {
-            display: flex;
-            flex-wrap: wrap;
+.message.user .message-avatar {
+    background: #24364b;
+}
 
-            gap: 6px;
+.message-name {
+    font-size: 12px;
 
-            margin-top: 11px;
-        }
+    color: #6f9ac5;
 
-        .msg-btn {
-            border: 1px solid #193b5d;
-            border-radius: 7px;
+    margin-bottom: 5px;
+}
 
-            padding: 6px 9px;
+.message-text {
+    line-height: 1.6;
 
-            background: #0b1b2d;
+    color: #e9f3ff;
 
-            color: #8fb1d0;
+    white-space: pre-wrap;
+}
 
-            cursor: pointer;
+/* MESSAGE BUTTONS */
 
-            font-size: 12px;
+.message button {
+    border: 1px solid #24445f;
 
-            transition: .2s;
-        }
+    background: #0b1928;
 
-        .msg-btn:hover {
-            background: #123250;
-            color: white;
-            border-color: #247ec5;
-        }
+    color: #a9c8e5;
 
-        .msg-btn.active {
-            color: #4caaff;
-            border-color: #268be2;
-        }
+    padding: 6px 9px;
 
-        /* ==================================================
-           VOICE UNDER CHAT
-        ================================================== */
+    border-radius: 7px;
 
-        .message-voice-control {
-            margin-top: 9px;
-        }
+    cursor: pointer;
 
-        .message-voice-btn {
-            border: 1px solid #1b456b;
-            border-radius: 8px;
+    font-size: 12px;
+}
 
-            padding: 7px 11px;
+.message button:hover {
+    background: #10304c;
 
-            background: #0b1c30;
+    color: white;
+}
 
-            color: #8fcaff;
+/* =========================
+   INPUT
+========================= */
 
-            cursor: pointer;
+.bottom-area {
+    padding: 15px 20px 18px;
 
-            font-size: 12px;
-        }
+    border-top: 1px solid #18304d;
 
-        .message-voice-btn:hover {
-            background: #123655;
-        }
+    background: #050c15;
+}
 
-        /* ==================================================
-           INPUT AREA
-        ================================================== */
+.input-box {
+    max-width: 900px;
 
-        .input-area {
-            flex-shrink: 0;
+    margin: auto;
 
-            padding: 10px 14px 14px;
+    display: flex;
 
-            background: rgba(5,14,25,.94);
+    align-items: flex-end;
 
-            border-top: 1px solid #15314f;
-        }
+    gap: 8px;
+}
 
-        .input-box {
-            max-width: 900px;
-            margin: auto;
+#message {
+    flex: 1;
 
-            display: flex;
-            align-items: flex-end;
-            gap: 7px;
+    resize: none;
 
-            padding: 7px;
+    min-height: 48px;
 
-            border: 1px solid #1b456c;
-            border-radius: 14px;
+    max-height: 130px;
 
-            background: #081827;
+    padding: 14px;
 
-            box-shadow:
-                0 0 25px rgba(0,0,0,.25);
-        }
+    border-radius: 13px;
 
-        #message {
-            flex: 1;
+    border: 1px solid #1e4264;
 
-            min-height: 40px;
-            max-height: 150px;
+    background: #091522;
 
-            resize: none;
+    color: white;
 
-            border: 0;
-            outline: none;
+    outline: none;
+}
 
-            padding: 10px;
+#message:focus {
+    border-color: #2189e5;
 
-            background: transparent;
+    box-shadow:
+        0 0 0 2px
+        rgba(
+            33,
+            137,
+            229,
+            .12
+        );
+}
 
-            color: white;
+.input-button {
+    height: 48px;
 
-            font-size: 15px;
-        }
+    min-width: 48px;
 
-        #message::placeholder {
-            color: #5d7893;
-        }
+    border-radius: 12px;
 
-        #mic,
-        #send {
-            width: 43px;
-            height: 40px;
+    border: 1px solid #1d5f93;
 
-            flex-shrink: 0;
+    background: #0a3153;
 
-            border: 0;
-            border-radius: 9px;
+    color: white;
 
-            cursor: pointer;
-        }
+    cursor: pointer;
+}
 
-        #mic {
-            background: #102b45;
-            color: white;
-            font-size: 17px;
-        }
+.send-button {
+    background: linear-gradient(
+        135deg,
+        #1688ec,
+        #0755a0
+    );
+}
 
-        #mic.listening {
-            background: #6c2630;
-        }
+/* =========================
+   HISTORY MODAL
+========================= */
 
-        #send {
-            background:
-                linear-gradient(
-                    135deg,
-                    #168cff,
-                    #0754b8
-                );
+.modal {
+    display: none;
 
-            color: white;
+    position: fixed;
 
-            font-size: 17px;
-        }
+    inset: 0;
 
-        #send:disabled {
-            opacity: .45;
-            cursor: not-allowed;
-        }
+    background: rgba(
+        0,
+        0,
+        0,
+        .7
+    );
 
-        /* ==================================================
-           CHAT VOICE BAR
-        ================================================== */
+    z-index: 2000;
 
-        .chat-voice-bar {
-            max-width: 900px;
-            margin: 7px auto 0;
+    padding: 30px;
+}
 
-            display: flex;
-            justify-content: flex-end;
-        }
+.modal-content {
+    max-width: 700px;
 
-        #globalVoiceToggle {
-            border: 1px solid #1a466e;
-            border-radius: 8px;
+    max-height: 85vh;
 
-            padding: 7px 12px;
+    overflow-y: auto;
 
-            background: #0a1d31;
+    margin: auto;
 
-            color: #8fcaff;
+    background: #081522;
 
-            cursor: pointer;
+    border: 1px solid #214d72;
 
-            font-size: 12px;
-        }
+    border-radius: 15px;
 
-        #globalVoiceToggle:hover {
-            background: #123656;
-        }
+    padding: 20px;
 
-        /* ==================================================
-           HISTORY MODAL
-        ================================================== */
+    box-shadow:
+        0 20px 60px
+        rgba(
+            0,
+            0,
+            0,
+            .6
+        );
+}
 
-        #historyModal {
-            display: none;
+.modal-header {
+    display: flex;
 
-            position: fixed;
+    justify-content: space-between;
 
-            inset: 0;
+    align-items: center;
 
-            padding: 25px;
+    margin-bottom: 15px;
+}
 
-            background: rgba(0,0,0,.72);
+.close-history {
+    border: 0;
 
-            z-index: 5000;
-        }
+    background: transparent;
 
-        .history-window {
-            width: 100%;
-            max-width: 800px;
+    color: white;
 
-            max-height: 88vh;
+    font-size: 25px;
 
-            overflow-y: auto;
+    cursor: pointer;
+}
 
-            margin: auto;
+.history-card {
+    padding: 14px;
 
-            padding: 18px;
+    margin-bottom: 10px;
 
-            border: 1px solid #1d4d78;
-            border-radius: 15px;
+    border: 1px solid #1c3b58;
 
-            background:
-                linear-gradient(
-                    180deg,
-                    #0b1b2c,
-                    #071321
-                );
+    border-radius: 10px;
 
-            box-shadow:
-                0 20px 70px rgba(0,0,0,.65);
-        }
+    background: #0a1928;
+}
 
-        .history-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+.history-card-title {
+    font-weight: bold;
 
-            margin-bottom: 15px;
-        }
+    color: #e8f5ff;
+}
 
-        .history-header h2 {
-            margin: 0;
-        }
+.history-card-time {
+    font-size: 11px;
 
-        #closeHistory {
-            border: 0;
-            border-radius: 8px;
+    color: #6685a2;
 
-            padding: 8px 12px;
+    margin-top: 5px;
+}
 
-            background: #142b42;
+.history-card-actions {
+    display: flex;
 
-            color: white;
+    gap: 7px;
 
-            cursor: pointer;
-        }
+    margin-top: 10px;
+}
 
-        .history-card {
-            padding: 13px;
+.history-card-actions button {
+    border: 1px solid #255172;
 
-            margin-bottom: 10px;
+    background: #0b243a;
 
-            border: 1px solid #1a3c5c;
-            border-radius: 11px;
+    color: white;
 
-            background: #091a2b;
-        }
+    padding: 6px 9px;
 
-        .history-card.pinned {
-            border-left: 4px solid #168cff;
-        }
+    border-radius: 7px;
 
-        .history-card-title {
-            color: white;
-            font-weight: bold;
-        }
+    cursor: pointer;
+}
 
-        .history-card-time {
-            margin-top: 5px;
-            margin-bottom: 10px;
+/* =========================
+   MOBILE
+========================= */
 
-            color: #66819c;
+@media (max-width: 700px) {
 
-            font-size: 11px;
-        }
+    .sidebar {
+        width: 245px;
+    }
 
-        .history-card-actions {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
+    .chat-area {
+        padding: 15px;
+    }
 
-        .history-card-actions button {
-            border: 1px solid #214766;
-            border-radius: 7px;
+    .topbar {
+        padding: 0 12px;
+    }
 
-            padding: 7px 10px;
+    .bottom-area {
+        padding: 10px;
+    }
 
-            background: #10273d;
-
-            color: #cde5fa;
-
-            cursor: pointer;
-        }
-
-        .history-card-actions button:hover {
-            background: #153957;
-        }
-
-        .history-delete {
-            color: #ff8888 !important;
-        }
-
-        /* ==================================================
-           TOAST
-        ================================================== */
-
-        #viggoToast {
-            display: none;
-
-            position: fixed;
-
-            left: 50%;
-            bottom: 25px;
-
-            transform: translateX(-50%);
-
-            padding: 9px 16px;
-
-            border: 1px solid #246da9;
-            border-radius: 9px;
-
-            background: #071a2c;
-
-            color: #dff1ff;
-
-            box-shadow:
-                0 8px 30px rgba(0,0,0,.5);
-
-            z-index: 99999;
-
-            font-size: 13px;
-        }
-
-        /* ==================================================
-           MOBILE
-        ================================================== */
-
-        @media (max-width: 700px) {
-
-            #sidebar {
-                position: fixed;
-
-                left: -285px;
-                top: 0;
-                bottom: 0;
-
-                z-index: 6000;
-
-                transition: left .2s;
-            }
-
-            #sidebar.open {
-                left: 0;
-            }
-
-            #mobileMenu {
-                display: block;
-            }
-
-            .topbar {
-                padding: 0 10px;
-                gap: 10px;
-            }
-
-            #chatArea {
-                padding: 10px;
-            }
-
-            .message {
-                padding: 14px 3px;
-            }
-
-            .input-area {
-                padding: 8px;
-            }
-
-            #historyModal {
-                padding: 10px;
-            }
-
-            .history-window {
-                max-height: 95vh;
-            }
-
-        }
-
-    </style>
+    .welcome {
+        padding-top: 50px;
+    }
+}
+</style>
 </head>
-
 
 <body>
 
 <div class="app">
 
-    <!-- ==================================================
-         SIDEBAR
-    ================================================== -->
+    <!-- ==================================
+         LEFT SIDEBAR
+    =================================== -->
 
-    <aside id="sidebar">
+    <aside
+        class="sidebar"
+        id="sidebar"
+    >
 
-        <div class="brand">
+        <div class="logo">
 
-            <div class="brand-logo">
+            <div class="logo-b">
                 B
             </div>
 
-            <div>
-                <div class="brand-name">
-                    Viggo
-                </div>
-
-                <div class="brand-status">
-                    ● AI Online
-                </div>
+            <div class="logo-text">
+                Viggo
             </div>
 
         </div>
 
 
-        <button id="newChat">
-            ＋ New Chat
+        <div class="online">
+
+            <span class="online-dot"></span>
+
+            Online
+
+        </div>
+
+
+        <!-- NEW CHAT -->
+
+        <button
+            class="new-chat"
+            id="newChat"
+        >
+            + New Chat
         </button>
 
+
+        <!-- PINNED -->
 
         <div class="side-title">
             Pinned
         </div>
 
-        <div id="pinnedList"
-             class="chat-list">
-        </div>
+        <div
+            class="chat-list"
+            id="pinnedList"
+        ></div>
 
+
+        <!-- RECENT -->
 
         <div class="side-title">
             Recent
         </div>
 
-        <div id="recentList"
-             class="chat-list">
-        </div>
+        <div
+            class="chat-list"
+            id="recentList"
+        ></div>
 
 
-        <!-- MORE -->
+        <!-- ==================================
+             MORE - SIDEBAR BOTTOM
+        =================================== -->
 
-        <div class="sidebar-bottom">
+        <div class="more-area">
 
-            <button id="moreButton">
-                ⋮ &nbsp; More
+            <button
+                class="more-button"
+                id="moreButton"
+            >
+                ⋮ More
             </button>
 
 
-            <div id="moreMenu">
+            <div
+                class="more-menu"
+                id="moreMenu"
+            >
 
                 <button
-                    class="more-item"
                     id="saveButton"
                 >
-                    💾 Save Chat
+                    💾 Save
                 </button>
 
+
                 <button
-                    class="more-item"
                     id="historyButton"
                 >
                     🕘 History
                 </button>
 
-                <button
-                    class="more-item"
-                    id="shareChat"
-                >
-                    🔗 Share Chat
-                </button>
 
                 <button
-                    class="more-item"
+                    id="pinCurrentButton"
+                >
+                    📌 Pin Chat
+                </button>
+
+
+                <button
+                    id="voiceToggle"
+                >
+                    🔊 Voice ON
+                </button>
+
+
+                <button
+                    id="femaleVoiceButton"
+                >
+                    🎙️ Female Voice
+                </button>
+
+
+                <button
+                    id="maleVoiceButton"
+                >
+                    🎙️ Male Voice
+                </button>
+
+
+                <button
                     id="clearHistory"
                 >
                     🗑️ Clear History
@@ -1047,60 +910,67 @@
     </aside>
 
 
-    <!-- ==================================================
+    <!-- ==================================
          MAIN
-    ================================================== -->
+    =================================== -->
 
     <main class="main">
 
 
-        <!-- TOPBAR -->
+        <!-- TOP BAR -->
 
         <header class="topbar">
 
-            <button id="mobileMenu">
-                ☰
-            </button>
-
-
-            <div class="top-title-area">
-
-                <div id="currentTitle">
-                    New Chat
-                </div>
-
-                <div class="online-status">
-                    ● Viggo Online
-                </div>
-
+            <div
+                class="current-title"
+                id="currentTitle"
+            >
+                New Chat
             </div>
+
+
+            <!-- SHARE ONLY -->
+
+            <button
+                class="share-button"
+                id="shareButton"
+            >
+                ↗ Share
+            </button>
 
         </header>
 
 
-        <!-- CHAT -->
+        <!-- ==================================
+             CHAT
+        =================================== -->
 
-        <section id="chatArea">
+        <section
+            class="chat-area"
+            id="chatArea"
+        >
 
-            <div id="conversation">
+            <div
+                class="conversation"
+                id="conversation"
+            >
 
-                <div class="welcome">
+                <div
+                    class="welcome"
+                    id="welcome"
+                >
 
-                    <div>
-
-                        <div class="welcome-b">
-                            B
-                        </div>
-
-                        <h1>
-                            Welcome to Viggo
-                        </h1>
-
-                        <p>
-                            Your AI assistant is ready.
-                        </p>
-
+                    <div class="welcome-logo">
+                        B
                     </div>
+
+                    <h1>
+                        Viggo
+                    </h1>
+
+                    <p>
+                        Your AI friend is ready.
+                    </p>
 
                 </div>
 
@@ -1109,9 +979,11 @@
         </section>
 
 
-        <!-- INPUT -->
+        <!-- ==================================
+             INPUT
+        =================================== -->
 
-        <footer class="input-area">
+        <section class="bottom-area">
 
             <div class="input-box">
 
@@ -1123,6 +995,7 @@
 
 
                 <button
+                    class="input-button"
                     id="mic"
                     title="Voice input"
                 >
@@ -1131,6 +1004,7 @@
 
 
                 <button
+                    class="input-button send-button"
                     id="send"
                     title="Send"
                 >
@@ -1139,54 +1013,47 @@
 
             </div>
 
-
-            <!-- VOICE BELOW CHAT -->
-
-            <div class="chat-voice-bar">
-
-                <button id="globalVoiceToggle">
-                    🔊 Voice ON
-                </button>
-
-            </div>
-
-        </footer>
+        </section>
 
     </main>
 
 </div>
 
 
-<!-- ======================================================
+<!-- ==================================
      HISTORY MODAL
-====================================================== -->
+=================================== -->
 
-<div id="historyModal">
+<div
+    class="modal"
+    id="historyModal"
+>
 
-    <div class="history-window">
+    <div class="modal-content">
 
-        <div class="history-header">
+        <div class="modal-header">
 
             <h2>
-                Chat History
+                🕘 Chat History
             </h2>
 
-            <button id="closeHistory">
-                ✕
+            <button
+                class="close-history"
+                id="closeHistory"
+            >
+                ×
             </button>
 
         </div>
 
-        <div id="historyList"></div>
+
+        <div
+            id="historyList"
+        ></div>
 
     </div>
 
 </div>
-
-
-<!-- TOAST -->
-
-<div id="viggoToast"></div>
 
 
 <script src="script.js"></script>
