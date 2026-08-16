@@ -18,6 +18,9 @@ let isSending = false;
 let recognition = null;
 let isListening = false;
 
+let selectMode = false;
+let selectedChatIds = new Set();
+
 
 /* =========================================
    DOM HELPER
@@ -308,6 +311,14 @@ function newChat() {
 
 function openChat(id) {
 
+    if (selectMode) {
+
+        toggleChatSelected(id);
+
+        return;
+
+    }
+
     const chats =
         getChats();
 
@@ -525,12 +536,56 @@ function addHistory(
             "history-item";
 
         if (
-            chat.id === currentChatId
+            chat.id === currentChatId &&
+            !selectMode
         ) {
 
             row.classList.add(
                 "active"
             );
+
+        }
+
+        if (
+            selectMode &&
+            selectedChatIds.has(chat.id)
+        ) {
+
+            row.classList.add(
+                "selected"
+            );
+
+        }
+
+
+        /* CHECKBOX (select mode only) */
+
+        if (selectMode) {
+
+            const checkbox =
+                document.createElement("input");
+
+            checkbox.type =
+                "checkbox";
+
+            checkbox.className =
+                "history-checkbox";
+
+            checkbox.checked =
+                selectedChatIds.has(chat.id);
+
+            checkbox.addEventListener(
+                "click",
+                function (event) {
+
+                    event.stopPropagation();
+
+                    toggleChatSelected(chat.id);
+
+                }
+            );
+
+            row.appendChild(checkbox);
 
         }
 
@@ -552,73 +607,77 @@ function addHistory(
             "history-actions";
 
 
-        /* PIN */
+        if (!selectMode) {
 
-        const pin =
-            document.createElement("button");
+            /* PIN */
 
-        pin.type =
-            "button";
+            const pin =
+                document.createElement("button");
 
-        pin.className =
-            "history-action";
+            pin.type =
+                "button";
 
-        pin.textContent =
-            chat.pinned
-                ? "📌"
-                : "📍";
+            pin.className =
+                "history-action";
 
-        pin.title =
-            chat.pinned
-                ? "Unpin"
-                : "Pin";
+            pin.textContent =
+                chat.pinned
+                    ? "📌"
+                    : "📍";
 
-
-        pin.addEventListener(
-            "click",
-            function (event) {
-
-                event.stopPropagation();
-
-                togglePin(chat.id);
-
-            }
-        );
+            pin.title =
+                chat.pinned
+                    ? "Unpin"
+                    : "Pin";
 
 
-        /* DELETE */
+            pin.addEventListener(
+                "click",
+                function (event) {
 
-        const del =
-            document.createElement("button");
+                    event.stopPropagation();
 
-        del.type =
-            "button";
+                    togglePin(chat.id);
 
-        del.className =
-            "history-action delete";
-
-        del.textContent =
-            "🗑";
-
-        del.title =
-            "Delete chat";
+                }
+            );
 
 
-        del.addEventListener(
-            "click",
-            function (event) {
+            /* DELETE */
 
-                event.stopPropagation();
+            const del =
+                document.createElement("button");
 
-                deleteChat(chat.id);
+            del.type =
+                "button";
 
-            }
-        );
+            del.className =
+                "history-action delete";
+
+            del.textContent =
+                "🗑";
+
+            del.title =
+                "Delete chat";
 
 
-        actions.appendChild(pin);
+            del.addEventListener(
+                "click",
+                function (event) {
 
-        actions.appendChild(del);
+                    event.stopPropagation();
+
+                    deleteChat(chat.id);
+
+                }
+            );
+
+
+            actions.appendChild(pin);
+
+            actions.appendChild(del);
+
+        }
 
 
         row.appendChild(titleEl);
@@ -639,6 +698,136 @@ function addHistory(
         list.appendChild(row);
 
     });
+
+}
+
+
+/* =========================================
+   SELECT MODE
+========================================= */
+
+function toggleSelectMode() {
+
+    selectMode =
+        !selectMode;
+
+    selectedChatIds.clear();
+
+    const selectBtn =
+        $("selectChatsBtn");
+
+    const deleteBtn =
+        $("deleteSelectedBtn");
+
+    if (selectBtn) {
+
+        selectBtn.textContent =
+            selectMode
+                ? "✖ Cancel Select"
+                : "☑ Select Chats";
+
+    }
+
+    if (deleteBtn) {
+
+        deleteBtn.style.display =
+            selectMode
+                ? "block"
+                : "none";
+
+    }
+
+    renderHistory();
+
+}
+
+
+function toggleChatSelected(id) {
+
+    if (selectedChatIds.has(id)) {
+
+        selectedChatIds.delete(id);
+
+    } else {
+
+        selectedChatIds.add(id);
+
+    }
+
+    renderHistory();
+
+}
+
+
+function deleteSelectedChats() {
+
+    if (!selectedChatIds.size) {
+
+        showToast(
+            "No chats selected"
+        );
+
+        return;
+
+    }
+
+    const confirmed =
+        window.confirm(
+            "Delete " +
+            selectedChatIds.size +
+            " selected chat(s)?"
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+    let chats =
+        getChats();
+
+    chats =
+        chats.filter(function (chat) {
+
+            return !selectedChatIds.has(chat.id);
+
+        });
+
+    if (!chats.length) {
+
+        const chat =
+            createChat();
+
+        chats.push(chat);
+
+    }
+
+    saveChats(chats);
+
+    if (
+        selectedChatIds.has(currentChatId)
+    ) {
+
+        currentChatId =
+            chats[0].id;
+
+        messages =
+            Array.isArray(chats[0].messages)
+                ? chats[0].messages
+                : [];
+
+        renderMessages();
+
+        updateTitle();
+
+    }
+
+    showToast(
+        "Selected chats deleted"
+    );
+
+    toggleSelectMode();
+
+    closeMore();
 
 }
 
@@ -2136,6 +2325,44 @@ function setupEvents() {
                 event.stopPropagation();
 
                 saveCurrentChat();
+
+            }
+        );
+
+    }
+
+
+    const selectChatsButton =
+        $("selectChatsBtn");
+
+    if (selectChatsButton) {
+
+        selectChatsButton.addEventListener(
+            "click",
+            function (event) {
+
+                event.stopPropagation();
+
+                toggleSelectMode();
+
+            }
+        );
+
+    }
+
+
+    const deleteSelectedButton =
+        $("deleteSelectedBtn");
+
+    if (deleteSelectedButton) {
+
+        deleteSelectedButton.addEventListener(
+            "click",
+            function (event) {
+
+                event.stopPropagation();
+
+                deleteSelectedChats();
 
             }
         );
