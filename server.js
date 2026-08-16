@@ -1,4 +1,3 @@
-
 "use strict";
 
 const express = require("express");
@@ -253,7 +252,7 @@ app.post("/chat", async function (req, res) {
         ===================================== */
 
         const model =
-            "gemini-2.5-flash";
+            "gemini-flash-latest";
 
 
         const apiURL =
@@ -582,7 +581,7 @@ app.listen(
 
         console.log(
             "MODEL: " +
-            "gemini-2.5-flash"
+            "gemini-flash-latest"
         );
 
         console.log(
@@ -591,4 +590,3 @@ app.listen(
 
     }
 );
-
