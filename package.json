@@ -1,6 +1,7 @@
 {
-  "name": "viggo-ai-server",
+  "name": "viggo-ai",
   "version": "1.0.0",
+  "description": "Viggo AI Server",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
