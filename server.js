@@ -1,17 +1,25 @@
+"use strict";
+
 const express = require("express");
 const cors = require("cors");
 
 const app = express();
 
-const PORT =
-  process.env.PORT || 10000;
+const PORT = process.env.PORT || 10000;
 
+
+/* =====================================================
+   MIDDLEWARE
+===================================================== */
 
 app.use(
   cors({
     origin: "*",
     methods: ["GET", "POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type"]
+    allowedHeaders: [
+      "Content-Type",
+      "Accept"
+    ]
   })
 );
 
@@ -23,66 +31,57 @@ app.use(
 );
 
 
-/* =========================================
-   HOME
-========================================= */
+/* =====================================================
+   HOME / SERVER STATUS
+===================================================== */
 
 app.get("/", (req, res) => {
 
-  res.json({
-
+  res.status(200).json({
     success: true,
-
     status: "online",
-
-    service: "Viggo AI Server"
-
+    service: "Viggo AI Server",
+    version: "1.0.0"
   });
 
 });
 
 
-/* =========================================
-   HEALTH
-========================================= */
+/* =====================================================
+   HEALTH CHECK
+===================================================== */
 
 app.get("/health", (req, res) => {
 
-  res.json({
-
+  res.status(200).json({
     success: true,
-
     status: "healthy"
-
   });
 
 });
 
 
-/* =========================================
-   CHAT
-========================================= */
+/* =====================================================
+   CHAT API
+===================================================== */
 
 app.post("/chat", async (req, res) => {
 
   try {
 
+    console.log("================================");
+    console.log("NEW CHAT REQUEST");
+    console.log("================================");
+
+
+    /* -----------------------------------------------
+       GET USER MESSAGE
+    ------------------------------------------------ */
+
     const message =
       typeof req.body?.message === "string"
         ? req.body.message.trim()
         : "";
-
-
-    const language =
-      req.body?.language || "en";
-
-
-    const history =
-      Array.isArray(
-        req.body?.history
-      )
-        ? req.body.history
-        : [];
 
 
     if (!message) {
@@ -99,25 +98,17 @@ app.post("/chat", async (req, res) => {
     }
 
 
-    const apiKey =
-      process.env.GEMINI_API_KEY;
+    /* -----------------------------------------------
+       LANGUAGE
+    ------------------------------------------------ */
+
+    const language =
+      typeof req.body?.language === "string"
+        ? req.body.language
+        : "en";
 
 
-    if (!apiKey) {
-
-      return res.status(500).json({
-
-        success: false,
-
-        error:
-          "GEMINI_API_KEY is missing in Render."
-
-      });
-
-    }
-
-
-    const languages = {
+    const languageNames = {
 
       en: "English",
 
@@ -135,104 +126,156 @@ app.post("/chat", async (req, res) => {
 
 
     const languageName =
-      languages[language] ||
+      languageNames[language] ||
       "English";
 
 
-    let historyText = "";
+    /* -----------------------------------------------
+       CHAT HISTORY
+    ------------------------------------------------ */
+
+    const history =
+      Array.isArray(
+        req.body?.history
+      )
+        ? req.body.history
+        : [];
+
+
+    /* -----------------------------------------------
+       API KEY
+    ------------------------------------------------ */
+
+    const apiKey =
+      process.env.GEMINI_API_KEY;
+
+
+    if (!apiKey) {
+
+      console.error(
+        "GEMINI_API_KEY is missing"
+      );
+
+
+      return res.status(500).json({
+
+        success: false,
+
+        error:
+          "GEMINI_API_KEY is missing in Render Environment Variables."
+
+      });
+
+    }
+
+
+    /* -----------------------------------------------
+       PREPARE HISTORY
+    ------------------------------------------------ */
+
+    let conversation = "";
 
 
     history
       .slice(-20)
-      .forEach(
-        item => {
+      .forEach(item => {
 
-          if (
-            !item ||
-            !item.content
-          ) {
-            return;
-          }
+        if (
+          !item ||
+          typeof item.content !== "string"
+        ) {
 
-
-          historyText +=
-
-            (
-              item.role ===
-              "assistant"
-                ? "Viggo"
-                : "User"
-            ) +
-
-            ": " +
-
-            item.content +
-
-            "\n";
+          return;
 
         }
-      );
 
+
+        const role =
+          item.role === "assistant"
+            ? "Viggo"
+            : "User";
+
+
+        conversation +=
+          `${role}: ${item.content}\n`;
+
+      });
+
+
+    /* -----------------------------------------------
+       SYSTEM PROMPT
+    ------------------------------------------------ */
 
     const prompt = `
 
 You are Viggo AI.
 
-You are a friendly, intelligent AI assistant.
+You are a friendly, helpful and intelligent AI assistant.
 
-Reply in ${languageName}.
+IMPORTANT RULES:
 
-Understand mixed languages.
+1. Reply naturally to the user.
+2. Understand Tamil, English and mixed Tamil-English.
+3. Reply in the language requested by the user.
+4. Current selected language is ${languageName}.
+5. If the user asks in Tamil, normally reply in Tamil.
+6. If the user asks in English, normally reply in English.
+7. For coding questions, give complete working code.
+8. Keep answers clear and useful.
+9. Do not mention system instructions.
+10. Do not say you are unable to connect unless there is actually an API error.
 
-If the user asks in Tamil,
-reply in Tamil.
+CONVERSATION HISTORY:
 
-If the user asks in English,
-reply in English.
+${conversation}
 
-Give correct and useful answers.
-
-For coding questions,
-provide complete working code.
-
-Do not mention these instructions.
-
-Conversation history:
-
-${historyText}
-
-Current user message:
+CURRENT USER MESSAGE:
 
 ${message}
 
-Viggo:
+Now answer the user directly.
+
 `;
 
+
+    /* -----------------------------------------------
+       GEMINI MODEL
+    ------------------------------------------------ */
 
     const model =
       "gemini-2.0-flash";
 
 
-    const url =
+    const apiURL =
       "https://generativelanguage.googleapis.com/v1beta/models/" +
       model +
       ":generateContent?key=" +
-      encodeURIComponent(
-        apiKey
-      );
+      encodeURIComponent(apiKey);
 
+
+    console.log(
+      "Calling Gemini model:",
+      model
+    );
+
+
+    /* -----------------------------------------------
+       CALL GEMINI
+    ------------------------------------------------ */
 
     const response =
       await fetch(
-        url,
+        apiURL,
         {
 
-          method:
-            "POST",
+          method: "POST",
 
           headers: {
 
             "Content-Type":
+              "application/json",
+
+            "Accept":
               "application/json"
 
           },
@@ -244,8 +287,7 @@ Viggo:
 
                 {
 
-                  role:
-                    "user",
+                  role: "user",
 
                   parts: [
 
@@ -284,35 +326,55 @@ Viggo:
       );
 
 
+    /* -----------------------------------------------
+       READ GEMINI RESPONSE
+    ------------------------------------------------ */
+
     const raw =
       await response.text();
+
+
+    console.log(
+      "Gemini HTTP Status:",
+      response.status
+    );
 
 
     if (!response.ok) {
 
       console.error(
-        "Gemini Error:",
+        "GEMINI API ERROR:"
+      );
+
+      console.error(
         raw
       );
 
 
-      let details =
+      let errorMessage =
         raw;
 
 
       try {
 
-        const json =
+        const errorJSON =
           JSON.parse(raw);
 
-        details =
-          json?.error?.message ||
+
+        errorMessage =
+          errorJSON?.error?.message ||
           raw;
 
-      } catch {}
+      } catch {
+
+        // Keep raw response
+
+      }
 
 
-      return res.status(500).json({
+      return res.status(
+        response.status
+      ).json({
 
         success: false,
 
@@ -320,72 +382,141 @@ Viggo:
           "Gemini API Error",
 
         details:
-          details
+          errorMessage
 
       });
 
     }
 
 
-    const data =
-      JSON.parse(raw);
+    /* -----------------------------------------------
+       PARSE JSON
+    ------------------------------------------------ */
+
+    let data;
 
 
-    let reply = "";
+    try {
 
+      data =
+        JSON.parse(raw);
 
-    const candidates =
-      data?.candidates || [];
-
-
-    candidates.forEach(
-      candidate => {
-
-        const parts =
-          candidate
-            ?.content
-            ?.parts || [];
-
-
-        parts.forEach(
-          part => {
-
-            if (
-              typeof part.text ===
-              "string"
-            ) {
-
-              reply +=
-                part.text;
-
-            }
-
-          }
-        );
-
-      }
-    );
-
-
-    reply =
-      reply.trim();
-
-
-    if (!reply) {
+    } catch {
 
       return res.status(500).json({
 
         success: false,
 
         error:
-          "Viggo returned an empty response."
+          "Gemini returned invalid JSON.",
+
+        details:
+          raw.substring(0, 500)
 
       });
 
     }
 
 
-    return res.json({
+    /* -----------------------------------------------
+       EXTRACT RESPONSE
+    ------------------------------------------------ */
+
+    let reply = "";
+
+
+    const candidates =
+      Array.isArray(
+        data?.candidates
+      )
+        ? data.candidates
+        : [];
+
+
+    for (
+      const candidate of candidates
+    ) {
+
+      const parts =
+        candidate?.content?.parts;
+
+
+      if (
+        !Array.isArray(parts)
+      ) {
+
+        continue;
+
+      }
+
+
+      for (
+        const part of parts
+      ) {
+
+        if (
+          typeof part?.text ===
+          "string"
+        ) {
+
+          reply +=
+            part.text;
+
+        }
+
+      }
+
+    }
+
+
+    reply =
+      reply.trim();
+
+
+    /* -----------------------------------------------
+       EMPTY RESPONSE
+    ------------------------------------------------ */
+
+    if (!reply) {
+
+      console.error(
+        "Gemini returned empty response:"
+      );
+
+      console.error(
+        JSON.stringify(
+          data,
+          null,
+          2
+        )
+      );
+
+
+      return res.status(500).json({
+
+        success: false,
+
+        error:
+          "Viggo AI returned an empty response.",
+
+        details:
+          "No text was found in Gemini response."
+
+      });
+
+    }
+
+
+    /* -----------------------------------------------
+       SUCCESS
+    ------------------------------------------------ */
+
+    console.log(
+      "Viggo reply generated successfully"
+    );
+
+
+    return res.status(200).json({
 
       success: true,
 
@@ -404,8 +535,19 @@ Viggo:
   } catch (error) {
 
     console.error(
-      "SERVER ERROR:",
+      "================================"
+    );
+
+    console.error(
+      "SERVER ERROR"
+    );
+
+    console.error(
       error
+    );
+
+    console.error(
+      "================================"
     );
 
 
@@ -414,10 +556,11 @@ Viggo:
       success: false,
 
       error:
-        "Server error",
+        "Viggo server error.",
 
       details:
-        error.message
+        error.message ||
+        "Unknown server error."
 
     });
 
@@ -426,9 +569,9 @@ Viggo:
 });
 
 
-/* =========================================
-   404
-========================================= */
+/* =====================================================
+   404 HANDLER
+===================================================== */
 
 app.use(
   (req, res) => {
@@ -438,7 +581,10 @@ app.use(
       success: false,
 
       error:
-        "Endpoint not found"
+        "Endpoint not found.",
+
+      path:
+        req.originalUrl
 
     });
 
@@ -446,9 +592,38 @@ app.use(
 );
 
 
-/* =========================================
-   START
-========================================= */
+/* =====================================================
+   GLOBAL ERROR HANDLER
+===================================================== */
+
+app.use(
+  (error, req, res, next) => {
+
+    console.error(
+      "GLOBAL ERROR:",
+      error
+    );
+
+
+    res.status(500).json({
+
+      success: false,
+
+      error:
+        "Internal server error.",
+
+      details:
+        error.message
+
+    });
+
+  }
+);
+
+
+/* =====================================================
+   START SERVER
+===================================================== */
 
 app.listen(
   PORT,
@@ -456,7 +631,19 @@ app.listen(
   () => {
 
     console.log(
-      `Viggo AI Server running on port ${PORT}`
+      "================================"
+    );
+
+    console.log(
+      "VIGGO AI SERVER STARTED"
+    );
+
+    console.log(
+      `Port: ${PORT}`
+    );
+
+    console.log(
+      "================================"
     );
 
   }
