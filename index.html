@@ -1,217 +1,1035 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Viggo AI</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Viggo AI</title>
 
-    body {
-      background-color: #0d0f12;
-      color: #ffffff;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+<style>
 
-    /* Top Navigation Header */
-    .top-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 24px;
-      background-color: #0d0f12;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+}
 
-    .header-title {
-      font-size: 14px;
-      font-weight: 500;
-      color: #e0e0e0;
-    }
+body {
+  background-color: #0d0f12;
+  color: #ffffff;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
-    /* Combined Action Buttons Layout */
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+/* =========================
+   TOP HEADER
+========================= */
 
-    /* Shared styling for Header Buttons */
-    .btn-action {
-      background-color: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #ffffff;
-      border-radius: 8px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: background-color 0.2s ease, border-color 0.2s ease;
-    }
+.top-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-    .btn-action:hover {
-      background-color: rgba(255, 255, 255, 0.15);
-      border-color: rgba(255, 255, 255, 0.25);
-    }
+  padding: 12px 24px;
 
-    .share-btn {
-      padding: 6px 14px;
-      font-size: 13px;
-      font-weight: 500;
-      gap: 6px;
-    }
+  background-color: #0d0f12;
 
-    .icon-btn {
-      width: 32px;
-      height: 32px;
-      padding: 6px;
-    }
+  border-bottom:
+    1px solid rgba(255,255,255,0.05);
+}
 
-    /* Main Container */
-    .main-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
+.header-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #e0e0e0;
+}
 
-    .brand-icon {
-      width: 64px;
-      height: 64px;
-      background-color: #2563eb;
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 32px;
-      font-weight: bold;
-      margin-bottom: 16px;
-      box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
-    }
+/* =========================
+   HEADER ACTIONS
+========================= */
 
-    .brand-title {
-      font-size: 24px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 
-    .brand-subtitle {
-      color: #9ca3af;
-      font-size: 14px;
-    }
+  position: relative;
+}
 
-    /* Input Footer Area */
-    .chat-input-container {
-      width: 100%;
-      max-width: 768px;
-      padding: 20px;
-      margin: 0 auto;
-    }
+/* =========================
+   BUTTON
+========================= */
 
-    .chat-input-wrapper {
-      background-color: #1a1d24;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 24px;
-      display: flex;
-      align-items: center;
-      padding: 8px 16px;
-    }
+.btn-action {
+  background-color:
+    rgba(255,255,255,0.06);
 
-    .chat-input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      color: #ffffff;
-      padding: 8px;
-      font-size: 14px;
-      outline: none;
-    }
+  border:
+    1px solid rgba(255,255,255,0.12);
 
-    .chat-input::placeholder {
-      color: #6b7280;
-    }
+  color: #ffffff;
 
-    .input-btn {
-      background-color: #2563eb;
-      border: none;
-      color: white;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      margin-left: 8px;
-    }
-  </style>
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.btn-action:hover {
+  background-color:
+    rgba(255,255,255,0.15);
+
+  border-color:
+    rgba(255,255,255,0.25);
+}
+
+/* =========================
+   SHARE
+========================= */
+
+.share-btn {
+  padding: 6px 14px;
+
+  font-size: 13px;
+
+  font-weight: 500;
+
+  gap: 6px;
+}
+
+/* =========================
+   THREE DOT
+========================= */
+
+.icon-btn {
+  width: 32px;
+  height: 32px;
+
+  padding: 6px;
+}
+
+/* =========================
+   MORE MENU
+========================= */
+
+.more-menu {
+  display: none;
+
+  position: absolute;
+
+  top: 42px;
+
+  right: 78px;
+
+  width: 220px;
+
+  background: #171a20;
+
+  border:
+    1px solid rgba(255,255,255,0.12);
+
+  border-radius: 12px;
+
+  padding: 7px;
+
+  box-shadow:
+    0 15px 40px
+    rgba(0,0,0,0.55);
+
+  z-index: 9999;
+}
+
+.more-menu.show {
+  display: block;
+}
+
+.more-item {
+  width: 100%;
+
+  border: none;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  text-align: left;
+
+  padding: 11px 12px;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  font-size: 13px;
+}
+
+.more-item:hover {
+  background: rgba(37,99,235,0.18);
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.main-content {
+  flex: 1;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 20px;
+}
+
+/* =========================
+   BRAND
+========================= */
+
+.brand-icon {
+  width: 64px;
+  height: 64px;
+
+  background-color: #2563eb;
+
+  border-radius: 16px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  font-size: 32px;
+
+  font-weight: bold;
+
+  margin-bottom: 16px;
+
+  box-shadow:
+    0 4px 20px
+    rgba(37,99,235,0.3);
+}
+
+.brand-title {
+  font-size: 24px;
+
+  font-weight: 600;
+
+  margin-bottom: 8px;
+}
+
+.brand-subtitle {
+  color: #9ca3af;
+
+  font-size: 14px;
+}
+
+/* =========================
+   INPUT
+========================= */
+
+.chat-input-container {
+  width: 100%;
+
+  max-width: 768px;
+
+  padding: 20px;
+
+  margin: 0 auto;
+}
+
+.chat-input-wrapper {
+  background-color: #1a1d24;
+
+  border:
+    1px solid rgba(255,255,255,0.1);
+
+  border-radius: 24px;
+
+  display: flex;
+
+  align-items: center;
+
+  padding: 8px 16px;
+}
+
+.chat-input {
+  flex: 1;
+
+  background: transparent;
+
+  border: none;
+
+  color: #ffffff;
+
+  padding: 8px;
+
+  font-size: 14px;
+
+  outline: none;
+}
+
+.chat-input::placeholder {
+  color: #6b7280;
+}
+
+/* =========================
+   SEND
+========================= */
+
+.input-btn {
+  background-color: #2563eb;
+
+  border: none;
+
+  color: white;
+
+  width: 36px;
+
+  height: 36px;
+
+  border-radius: 50%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  cursor: pointer;
+
+  margin-left: 8px;
+
+  transition: 0.2s;
+}
+
+.input-btn:hover {
+  background-color: #3b82f6;
+
+  transform: scale(1.05);
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 600px) {
+
+  .top-header {
+    padding: 12px 14px;
+  }
+
+  .share-btn {
+    padding: 6px 10px;
+  }
+
+  .more-menu {
+    right: 0;
+  }
+
+}
+
+</style>
 </head>
+
+
 <body>
 
-  <!-- Top Header Bar -->
-  <header class="top-header">
-    <div class="header-title">New Chat</div>
-    
-    <!-- Unified Header Actions Container -->
-    <div class="header-actions">
-      <!-- Three-Dot Button Moved Right Beside Share -->
-      <button class="btn-action icon-btn" id="optionsBtn" aria-label="Options">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <circle cx="12" cy="5" r="2"/>
-          <circle cx="12" cy="12" r="2"/>
-          <circle cx="12" cy="19" r="2"/>
-        </svg>
-      </button>
 
-      <!-- Share Button -->
-      <button class="btn-action share-btn" id="shareBtn">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
-          <polyline points="16 6 12 2 8 6"></polyline>
-          <line x1="12" y1="2" x2="12" y2="15"></line>
-        </svg>
-        Share
-      </button>
-    </div>
-  </header>
+<!-- =========================
+     TOP HEADER
+========================= -->
 
-  <!-- Main Display -->
-  <main class="main-content">
-    <div class="brand-icon">B</div>
-    <h1 class="brand-title">Viggo</h1>
-    <p class="brand-subtitle">Your AI friend is ready.</p>
-  </main>
+<header class="top-header">
 
-  <!-- Chat Input Footer -->
-  <div class="chat-input-container">
-    <div class="chat-input-wrapper">
-      <input type="text" class="chat-input" placeholder="Message Viggo..." />
-      <button class="input-btn" aria-label="Send Message">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-        </svg>
-      </button>
-    </div>
+  <div class="header-title">
+    New Chat
   </div>
 
-  <script>
-    // Event listener attached for interaction functionality
-    document.getElementById('shareBtn').addEventListener('click', () => {
-      alert('Share menu opened!');
-    });
 
-    document.getElementById('optionsBtn').addEventListener('click', () => {
-      alert('More options menu opened!');
-    });
-  </script>
+  <div class="header-actions">
+
+
+    <!-- THREE DOT -->
+
+    <button
+      class="btn-action icon-btn"
+      id="optionsBtn"
+      aria-label="More Options"
+      title="More Options">
+
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="currentColor">
+
+        <circle cx="12" cy="5" r="2"/>
+        <circle cx="12" cy="12" r="2"/>
+        <circle cx="12" cy="19" r="2"/>
+
+      </svg>
+
+    </button>
+
+
+    <!-- =====================
+         MORE MENU
+    ====================== -->
+
+    <div
+      class="more-menu"
+      id="moreMenu">
+
+
+      <button
+        class="more-item"
+        id="saveBtn">
+
+        💾 Save
+
+      </button>
+
+
+      <button
+        class="more-item"
+        id="historyBtn">
+
+        🕘 History
+
+      </button>
+
+
+      <button
+        class="more-item"
+        id="pinBtn">
+
+        📌 Pin Chat
+
+      </button>
+
+
+      <button
+        class="more-item"
+        id="voiceBtn">
+
+        🔊 Voice ON
+
+      </button>
+
+
+      <button
+        class="more-item"
+        id="femaleVoiceBtn">
+
+        🎙️ Female Voice
+
+      </button>
+
+
+      <button
+        class="more-item"
+        id="maleVoiceBtn">
+
+        🎙️ Male Voice
+
+      </button>
+
+
+      <button
+        class="more-item"
+        id="clearHistoryBtn">
+
+        🗑️ Clear History
+
+      </button>
+
+
+    </div>
+
+
+    <!-- =====================
+         SHARE
+    ====================== -->
+
+    <button
+      class="btn-action share-btn"
+      id="shareBtn">
+
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2">
+
+        <path
+          d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8">
+        </path>
+
+        <polyline
+          points="16 6 12 2 8 6">
+        </polyline>
+
+        <line
+          x1="12"
+          y1="2"
+          x2="12"
+          y2="15">
+        </line>
+
+      </svg>
+
+      Share
+
+    </button>
+
+
+  </div>
+
+</header>
+
+
+<!-- =========================
+     MAIN
+========================= -->
+
+<main class="main-content">
+
+  <div class="brand-icon">
+    B
+  </div>
+
+  <h1 class="brand-title">
+    Viggo
+  </h1>
+
+  <p class="brand-subtitle">
+    Your AI friend is ready.
+  </p>
+
+</main>
+
+
+<!-- =========================
+     INPUT
+========================= -->
+
+<div class="chat-input-container">
+
+  <div class="chat-input-wrapper">
+
+
+    <input
+      type="text"
+      class="chat-input"
+      id="chatInput"
+      placeholder="Message Viggo..."
+    />
+
+
+    <button
+      class="input-btn"
+      id="sendBtn"
+      aria-label="Send Message">
+
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="currentColor">
+
+        <path
+          d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+
+      </svg>
+
+    </button>
+
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* =====================================
+   ELEMENTS
+===================================== */
+
+const optionsBtn =
+  document.getElementById("optionsBtn");
+
+const moreMenu =
+  document.getElementById("moreMenu");
+
+const shareBtn =
+  document.getElementById("shareBtn");
+
+const chatInput =
+  document.getElementById("chatInput");
+
+const sendBtn =
+  document.getElementById("sendBtn");
+
+
+/* =====================================
+   THREE DOT MENU
+===================================== */
+
+optionsBtn.addEventListener(
+  "click",
+  function(event) {
+
+    event.stopPropagation();
+
+    moreMenu.classList.toggle("show");
+
+  }
+);
+
+
+/* =====================================
+   CLOSE MENU
+===================================== */
+
+document.addEventListener(
+  "click",
+  function() {
+
+    moreMenu.classList.remove("show");
+
+  }
+);
+
+
+/* =====================================
+   PREVENT MENU CLOSE
+===================================== */
+
+moreMenu.addEventListener(
+  "click",
+  function(event) {
+
+    event.stopPropagation();
+
+  }
+);
+
+
+/* =====================================
+   SAVE
+===================================== */
+
+document
+  .getElementById("saveBtn")
+  .addEventListener(
+    "click",
+    function() {
+
+      const text =
+        chatInput.value.trim();
+
+      if (!text) {
+
+        alert(
+          "Nothing to save yet."
+        );
+
+        return;
+      }
+
+      localStorage.setItem(
+        "viggoSavedMessage",
+        text
+      );
+
+      moreMenu.classList.remove(
+        "show"
+      );
+
+      alert(
+        "Message saved successfully."
+      );
+
+    }
+  );
+
+
+/* =====================================
+   HISTORY
+===================================== */
+
+document
+  .getElementById("historyBtn")
+  .addEventListener(
+    "click",
+    function() {
+
+      const saved =
+        localStorage.getItem(
+          "viggoSavedMessage"
+        );
+
+      moreMenu.classList.remove(
+        "show"
+      );
+
+      if (saved) {
+
+        alert(
+          "Saved message:\n\n" +
+          saved
+        );
+
+      } else {
+
+        alert(
+          "No history available."
+        );
+
+      }
+
+    }
+  );
+
+
+/* =====================================
+   PIN
+===================================== */
+
+document
+  .getElementById("pinBtn")
+  .addEventListener(
+    "click",
+    function() {
+
+      localStorage.setItem(
+        "viggoPinned",
+        "true"
+      );
+
+      moreMenu.classList.remove(
+        "show"
+      );
+
+      alert(
+        "Chat pinned."
+      );
+
+    }
+  );
+
+
+/* =====================================
+   VOICE
+===================================== */
+
+let voiceEnabled = true;
+
+document
+  .getElementById("voiceBtn")
+  .addEventListener(
+    "click",
+    function() {
+
+      voiceEnabled =
+        !voiceEnabled;
+
+      this.textContent =
+        voiceEnabled
+          ? "🔊 Voice ON"
+          : "🔇 Voice OFF";
+
+    }
+  );
+
+
+/* =====================================
+   FEMALE VOICE
+===================================== */
+
+document
+  .getElementById("femaleVoiceBtn")
+  .addEventListener(
+    "click",
+    function() {
+
+      localStorage.setItem(
+        "viggoVoice",
+        "female"
+      );
+
+      moreMenu.classList.remove(
+        "show"
+      );
+
+      speak(
+        "Okay friend, female voice selected."
+      );
+
+    }
+  );
+
+
+/* =====================================
+   MALE VOICE
+===================================== */
+
+document
+  .getElementById("maleVoiceBtn")
+  .addEventListener(
+    "click",
+    function() {
+
+      localStorage.setItem(
+        "viggoVoice",
+        "male"
+      );
+
+      moreMenu.classList.remove(
+        "show"
+      );
+
+      speak(
+        "Okay friend, male voice selected."
+      );
+
+    }
+  );
+
+
+/* =====================================
+   CLEAR HISTORY
+===================================== */
+
+document
+  .getElementById("clearHistoryBtn")
+  .addEventListener(
+    "click",
+    function() {
+
+      localStorage.removeItem(
+        "viggoSavedMessage"
+      );
+
+      localStorage.removeItem(
+        "viggoPinned"
+      );
+
+      moreMenu.classList.remove(
+        "show"
+      );
+
+      alert(
+        "History cleared."
+      );
+
+    }
+  );
+
+
+/* =====================================
+   SHARE
+===================================== */
+
+shareBtn.addEventListener(
+  "click",
+  async function() {
+
+    const shareText =
+      "Check out my Viggo AI chat.";
+
+    if (
+      navigator.share
+    ) {
+
+      try {
+
+        await navigator.share({
+          title: "Viggo AI",
+          text: shareText
+        });
+
+      } catch (error) {
+
+        console.log(
+          "Share cancelled."
+        );
+
+      }
+
+    } else {
+
+      await navigator.clipboard.writeText(
+        shareText
+      );
+
+      alert(
+        "Share text copied!"
+      );
+
+    }
+
+  }
+);
+
+
+/* =====================================
+   SEND
+===================================== */
+
+function sendMessage() {
+
+  const text =
+    chatInput.value.trim();
+
+  if (!text) {
+    return;
+  }
+
+  localStorage.setItem(
+    "viggoLastMessage",
+    text
+  );
+
+  chatInput.value = "";
+
+  speak(
+    "Okay friend. " + text
+  );
+
+}
+
+
+/* =====================================
+   SEND BUTTON
+===================================== */
+
+sendBtn.addEventListener(
+  "click",
+  sendMessage
+);
+
+
+/* =====================================
+   ENTER TO SEND
+===================================== */
+
+chatInput.addEventListener(
+  "keydown",
+  function(event) {
+
+    if (
+      event.key === "Enter"
+    ) {
+
+      event.preventDefault();
+
+      sendMessage();
+
+    }
+
+  }
+);
+
+
+/* =====================================
+   TEXT TO SPEECH
+===================================== */
+
+function speak(text) {
+
+  if (!voiceEnabled) {
+    return;
+  }
+
+  if (
+    !("speechSynthesis" in window)
+  ) {
+
+    return;
+
+  }
+
+  window.speechSynthesis.cancel();
+
+  const utterance =
+    new SpeechSynthesisUtterance(
+      text
+    );
+
+  const selectedVoice =
+    localStorage.getItem(
+      "viggoVoice"
+    );
+
+  const voices =
+    speechSynthesis.getVoices();
+
+  if (selectedVoice === "female") {
+
+    const female =
+      voices.find(
+        voice =>
+          /female|zira|samantha|karen|google us english/i
+            .test(voice.name)
+      );
+
+    if (female) {
+      utterance.voice = female;
+    }
+
+  }
+
+  if (selectedVoice === "male") {
+
+    const male =
+      voices.find(
+        voice =>
+          /male|david|alex|daniel|google uk english male/i
+            .test(voice.name)
+      );
+
+    if (male) {
+      utterance.voice = male;
+    }
+
+  }
+
+  utterance.rate = 1;
+
+  utterance.pitch = 1;
+
+  speechSynthesis.speak(
+    utterance
+  );
+
+}
+
+</script>
+
 </body>
 </html>
