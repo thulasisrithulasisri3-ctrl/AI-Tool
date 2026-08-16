@@ -1,1172 +1,217 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Viggo AI</title>
-
-<style>
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    font-family: Arial, sans-serif;
-    background: #050b14;
-    color: white;
-    height: 100vh;
-    overflow: hidden;
-}
-
-button,
-textarea {
-    font-family: inherit;
-}
-
-/* =====================================
-   APP
-===================================== */
-
-.app {
-    display: flex;
-    height: 100vh;
-
-    background:
-        radial-gradient(
-            circle at top right,
-            #123b68 0%,
-            #07111f 45%,
-            #03070d 100%
-        );
-}
-
-/* =====================================
-   SIDEBAR
-===================================== */
-
-.sidebar {
-    width: 270px;
-    height: 100vh;
-
-    background: #050b14;
-
-    border-right: 1px solid #18304d;
-
-    padding: 18px;
-
-    display: flex;
-    flex-direction: column;
-}
-
-/* LOGO */
-
-.logo {
-    display: flex;
-    align-items: center;
-
-    gap: 10px;
-}
-
-.logo-b {
-    width: 43px;
-    height: 43px;
-
-    border-radius: 12px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background:
-        linear-gradient(
-            135deg,
-            #238cff,
-            #0755a8
-        );
-
-    font-size: 23px;
-    font-weight: bold;
-
-    box-shadow:
-        0 0 20px
-        rgba(0,130,255,.35);
-}
-
-.logo-text {
-    font-size: 22px;
-    font-weight: bold;
-}
-
-/* ONLINE */
-
-.online {
-    margin-top: 7px;
-    margin-left: 53px;
-
-    color: #52e08a;
-    font-size: 12px;
-}
-
-.online-dot {
-    display: inline-block;
-
-    width: 7px;
-    height: 7px;
-
-    margin-right: 5px;
-
-    border-radius: 50%;
-
-    background: #35db78;
-
-    box-shadow:
-        0 0 8px #35db78;
-}
-
-/* =====================================
-   NEW CHAT
-===================================== */
-
-.new-chat {
-    width: 100%;
-
-    margin-top: 25px;
-
-    padding: 12px;
-
-    border: 1px solid #1768b8;
-
-    border-radius: 11px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #0d70c9,
-            #06437f
-        );
-
-    color: white;
-
-    cursor: pointer;
-
-    font-size: 15px;
-
-    box-shadow:
-        0 5px 20px
-        rgba(0,110,255,.2);
-}
-
-.new-chat:hover {
-    background:
-        linear-gradient(
-            135deg,
-            #1688ec,
-            #0755a0
-        );
-}
-
-/* =====================================
-   SIDEBAR TITLES
-===================================== */
-
-.side-title {
-    margin-top: 25px;
-    margin-bottom: 9px;
-
-    color: #7294b8;
-
-    font-size: 12px;
-
-    text-transform: uppercase;
-}
-
-.chat-list {
-    display: flex;
-    flex-direction: column;
-
-    gap: 5px;
-
-    overflow-y: auto;
-}
-
-/* =====================================
-   CHAT ITEM
-===================================== */
-
-.chat-item {
-    width: 100%;
-
-    border: 0;
-
-    background: transparent;
-
-    color: #d9e9fb;
-
-    padding: 10px;
-
-    border-radius: 9px;
-
-    text-align: left;
-
-    cursor: pointer;
-}
-
-.chat-item:hover {
-    background: #0b1c30;
-}
-
-.empty-sidebar {
-    padding: 8px;
-
-    color: #607a97;
-
-    font-size: 12px;
-}
-
-/* =====================================
-   MAIN
-===================================== */
-
-.main {
-    flex: 1;
-
-    min-width: 0;
-
-    height: 100vh;
-
-    display: flex;
-    flex-direction: column;
-}
-
-/* =====================================
-   TOP BAR
-===================================== */
-
-.topbar {
-    height: 65px;
-
-    padding: 0 20px;
-
-    display: flex;
-    align-items: center;
-
-    border-bottom: 1px solid #18304d;
-
-    background:
-        rgba(4,11,20,.92);
-
-    backdrop-filter: blur(12px);
-}
-
-.current-title {
-    font-size: 16px;
-
-    font-weight: bold;
-
-    color: #eaf4ff;
-}
-
-/* =====================================
-   HEADER ACTIONS
-===================================== */
-
-.header-actions {
-    margin-left: auto;
-
-    display: flex;
-    align-items: center;
-
-    gap: 8px;
-
-    position: relative;
-}
-
-/* =====================================
-   THREE DOT BUTTON
-===================================== */
-
-.more-btn {
-    width: 40px;
-    height: 40px;
-
-    border: 1px solid #245172;
-
-    border-radius: 9px;
-
-    background: #0a1928;
-
-    color: white;
-
-    font-size: 24px;
-
-    line-height: 1;
-
-    cursor: pointer;
-}
-
-.more-btn:hover {
-    background: #10304b;
-}
-
-/* =====================================
-   MORE DROPDOWN
-===================================== */
-
-.more-dropdown {
-    display: none;
-
-    position: absolute;
-
-    right: 80px;
-
-    top: 48px;
-
-    width: 225px;
-
-    padding: 7px;
-
-    background: #081522;
-
-    border: 1px solid #245172;
-
-    border-radius: 12px;
-
-    box-shadow:
-        0 15px 40px
-        rgba(0,0,0,.6);
-
-    z-index: 9999;
-}
-
-.more-dropdown.show {
-    display: block;
-}
-
-.more-dropdown button {
-    width: 100%;
-
-    padding: 10px;
-
-    border: 0;
-
-    border-radius: 8px;
-
-    background: transparent;
-
-    color: #dceeff;
-
-    text-align: left;
-
-    cursor: pointer;
-}
-
-.more-dropdown button:hover {
-    background: #10304b;
-}
-
-/* =====================================
-   SHARE
-===================================== */
-
-.share-button {
-    border: 1px solid #1d78ca;
-
-    background: #0b3157;
-
-    color: white;
-
-    padding: 8px 14px;
-
-    border-radius: 9px;
-
-    cursor: pointer;
-}
-
-.share-button:hover {
-    background: #0f477c;
-}
-
-/* =====================================
-   CHAT AREA
-===================================== */
-
-.chat-area {
-    flex: 1;
-
-    overflow-y: auto;
-
-    padding: 25px;
-}
-
-.conversation {
-    max-width: 900px;
-
-    margin: auto;
-}
-
-/* =====================================
-   WELCOME
-===================================== */
-
-.welcome {
-    text-align: center;
-
-    padding-top: 90px;
-}
-
-.welcome-logo {
-    width: 75px;
-    height: 75px;
-
-    margin: auto;
-
-    border-radius: 20px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background:
-        linear-gradient(
-            135deg,
-            #2496ff,
-            #064d91
-        );
-
-    font-size: 37px;
-
-    font-weight: bold;
-
-    box-shadow:
-        0 10px 35px
-        rgba(0,110,255,.3);
-}
-
-.welcome h1 {
-    margin-top: 18px;
-
-    font-size: 30px;
-}
-
-.welcome p {
-    margin-top: 8px;
-
-    color: #7893af;
-}
-
-/* =====================================
-   MESSAGE
-===================================== */
-
-.message {
-    display: flex;
-
-    gap: 12px;
-
-    margin-bottom: 22px;
-}
-
-.message-avatar {
-    width: 36px;
-    height: 36px;
-
-    min-width: 36px;
-
-    border-radius: 10px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: #0d5da6;
-
-    font-weight: bold;
-}
-
-.message.user .message-avatar {
-    background: #24364b;
-}
-
-.message-name {
-    margin-bottom: 5px;
-
-    color: #6f9ac5;
-
-    font-size: 12px;
-}
-
-.message-text {
-    color: #e9f3ff;
-
-    line-height: 1.6;
-
-    white-space: pre-wrap;
-}
-
-/* =====================================
-   MESSAGE ACTIONS
-===================================== */
-
-.message-actions {
-    display: flex;
-
-    gap: 7px;
-
-    margin-top: 10px;
-}
-
-.message-actions button {
-    border: 1px solid #24445f;
-
-    background: #0b1928;
-
-    color: #a9c8e5;
-
-    padding: 6px 9px;
-
-    border-radius: 7px;
-
-    cursor: pointer;
-
-    font-size: 12px;
-}
-
-.message-actions button:hover {
-    background: #10304c;
-
-    color: white;
-}
-
-/* =====================================
-   BOTTOM INPUT
-===================================== */
-
-.bottom-area {
-    padding: 15px 20px 18px;
-
-    border-top: 1px solid #18304d;
-
-    background: #050c15;
-}
-
-.input-box {
-    max-width: 900px;
-
-    margin: auto;
-
-    display: flex;
-
-    align-items: flex-end;
-
-    gap: 8px;
-}
-
-#message {
-    flex: 1;
-
-    resize: none;
-
-    min-height: 48px;
-
-    max-height: 130px;
-
-    padding: 14px;
-
-    border-radius: 13px;
-
-    border: 1px solid #1e4264;
-
-    background: #091522;
-
-    color: white;
-
-    outline: none;
-}
-
-#message::placeholder {
-    color: #607a97;
-}
-
-#message:focus {
-    border-color: #2189e5;
-
-    box-shadow:
-        0 0 0 2px
-        rgba(33,137,229,.12);
-}
-
-.input-button {
-    height: 48px;
-
-    min-width: 48px;
-
-    border-radius: 12px;
-
-    border: 1px solid #1d5f93;
-
-    background: #0a3153;
-
-    color: white;
-
-    cursor: pointer;
-}
-
-.input-button:hover {
-    background: #103f64;
-}
-
-.send-button {
-    background:
-        linear-gradient(
-            135deg,
-            #1688ec,
-            #0755a0
-        );
-}
-
-/* =====================================
-   HISTORY MODAL
-===================================== */
-
-.modal {
-    display: none;
-
-    position: fixed;
-
-    inset: 0;
-
-    padding: 30px;
-
-    background:
-        rgba(0,0,0,.7);
-
-    z-index: 20000;
-}
-
-.modal-content {
-    max-width: 700px;
-
-    max-height: 85vh;
-
-    overflow-y: auto;
-
-    margin: auto;
-
-    padding: 20px;
-
-    background: #081522;
-
-    border: 1px solid #214d72;
-
-    border-radius: 15px;
-
-    box-shadow:
-        0 20px 60px
-        rgba(0,0,0,.6);
-}
-
-.modal-header {
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    margin-bottom: 15px;
-}
-
-.close-history {
-    border: 0;
-
-    background: transparent;
-
-    color: white;
-
-    font-size: 25px;
-
-    cursor: pointer;
-}
-
-.history-card {
-    padding: 14px;
-
-    margin-bottom: 10px;
-
-    border: 1px solid #1c3b58;
-
-    border-radius: 10px;
-
-    background: #0a1928;
-}
-
-.history-card-title {
-    color: #e8f5ff;
-
-    font-weight: bold;
-}
-
-.history-card-time {
-    margin-top: 5px;
-
-    color: #6685a2;
-
-    font-size: 11px;
-}
-
-.history-card-actions {
-    display: flex;
-
-    gap: 7px;
-
-    margin-top: 10px;
-}
-
-.history-card-actions button {
-    border: 1px solid #255172;
-
-    background: #0b243a;
-
-    color: white;
-
-    padding: 6px 9px;
-
-    border-radius: 7px;
-
-    cursor: pointer;
-}
-
-/* =====================================
-   MOBILE
-===================================== */
-
-@media (max-width: 700px) {
-
-    .sidebar {
-        width: 235px;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Viggo AI</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
-    .chat-area {
-        padding: 15px;
+    body {
+      background-color: #0d0f12;
+      color: #ffffff;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
-    .topbar {
-        padding: 0 10px;
+    /* Top Navigation Header */
+    .top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px;
+      background-color: #0d0f12;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    .bottom-area {
-        padding: 10px;
+    .header-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #e0e0e0;
     }
 
-    .welcome {
-        padding-top: 50px;
+    /* Combined Action Buttons Layout */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .more-dropdown {
-        right: 0;
+    /* Shared styling for Header Buttons */
+    .btn-action {
+      background-color: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
     }
 
-    .share-button {
-        padding: 8px 10px;
+    .btn-action:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.25);
     }
-}
 
-</style>
+    .share-btn {
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      gap: 6px;
+    }
+
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      padding: 6px;
+    }
+
+    /* Main Container */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .brand-icon {
+      width: 64px;
+      height: 64px;
+      background-color: #2563eb;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
+    }
+
+    .brand-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .brand-subtitle {
+      color: #9ca3af;
+      font-size: 14px;
+    }
+
+    /* Input Footer Area */
+    .chat-input-container {
+      width: 100%;
+      max-width: 768px;
+      padding: 20px;
+      margin: 0 auto;
+    }
+
+    .chat-input-wrapper {
+      background-color: #1a1d24;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      padding: 8px 16px;
+    }
+
+    .chat-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #ffffff;
+      padding: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .chat-input::placeholder {
+      color: #6b7280;
+    }
+
+    .input-btn {
+      background-color: #2563eb;
+      border: none;
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+  </style>
 </head>
-
-
 <body>
 
-<div class="app">
+  <!-- Top Header Bar -->
+  <header class="top-header">
+    <div class="header-title">New Chat</div>
+    
+    <!-- Unified Header Actions Container -->
+    <div class="header-actions">
+      <!-- Three-Dot Button Moved Right Beside Share -->
+      <button class="btn-action icon-btn" id="optionsBtn" aria-label="Options">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="5" r="2"/>
+          <circle cx="12" cy="12" r="2"/>
+          <circle cx="12" cy="19" r="2"/>
+        </svg>
+      </button>
 
-<!-- =====================================
-     SIDEBAR
-===================================== -->
-
-<aside class="sidebar">
-
-    <div class="logo">
-
-        <div class="logo-b">
-            B
-        </div>
-
-        <div class="logo-text">
-            Viggo
-        </div>
-
+      <!-- Share Button -->
+      <button class="btn-action share-btn" id="shareBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+          <polyline points="16 6 12 2 8 6"></polyline>
+          <line x1="12" y1="2" x2="12" y2="15"></line>
+        </svg>
+        Share
+      </button>
     </div>
+  </header>
 
+  <!-- Main Display -->
+  <main class="main-content">
+    <div class="brand-icon">B</div>
+    <h1 class="brand-title">Viggo</h1>
+    <p class="brand-subtitle">Your AI friend is ready.</p>
+  </main>
 
-    <div class="online">
-
-        <span class="online-dot"></span>
-
-        Online
-
+  <!-- Chat Input Footer -->
+  <div class="chat-input-container">
+    <div class="chat-input-wrapper">
+      <input type="text" class="chat-input" placeholder="Message Viggo..." />
+      <button class="input-btn" aria-label="Send Message">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+        </svg>
+      </button>
     </div>
-
-
-    <!-- NEW CHAT -->
-
-    <button
-        type="button"
-        class="new-chat"
-        id="newChat">
-
-        + New Chat
-
-    </button>
-
-
-    <!-- PINNED -->
-
-    <div class="side-title">
-        Pinned
-    </div>
-
-    <div
-        class="chat-list"
-        id="pinnedList">
-    </div>
-
-
-    <!-- RECENT -->
-
-    <div class="side-title">
-        Recent
-    </div>
-
-    <div
-        class="chat-list"
-        id="recentList">
-    </div>
-
-</aside>
-
-
-<!-- =====================================
-     MAIN
-===================================== -->
-
-<main class="main">
-
-
-    <!-- TOP BAR -->
-
-    <header class="topbar">
-
-        <div
-            class="current-title"
-            id="currentTitle">
-
-            New Chat
-
-        </div>
-
-
-        <!-- RIGHT ACTIONS -->
-
-        <div class="header-actions">
-
-
-            <!-- THREE DOT -->
-
-            <button
-                type="button"
-                class="more-btn"
-                id="moreBtn"
-                title="More">
-
-                ⋮
-
-            </button>
-
-
-            <!-- DROPDOWN -->
-
-            <div
-                class="more-dropdown"
-                id="moreDropdown">
-
-
-                <button
-                    type="button"
-                    id="saveButton">
-
-                    💾 Save
-
-                </button>
-
-
-                <button
-                    type="button"
-                    id="historyButton">
-
-                    🕘 History
-
-                </button>
-
-
-                <button
-                    type="button"
-                    id="pinCurrentButton">
-
-                    📌 Pin Chat
-
-                </button>
-
-
-                <button
-                    type="button"
-                    id="voiceToggle">
-
-                    🔊 Voice ON
-
-                </button>
-
-
-                <button
-                    type="button"
-                    id="femaleVoiceButton">
-
-                    🎙️ Female Voice
-
-                </button>
-
-
-                <button
-                    type="button"
-                    id="maleVoiceButton">
-
-                    🎙️ Male Voice
-
-                </button>
-
-
-                <button
-                    type="button"
-                    id="clearHistory">
-
-                    🗑️ Clear History
-
-                </button>
-
-
-            </div>
-
-
-            <!-- SHARE ONLY -->
-
-            <button
-                type="button"
-                class="share-button"
-                id="shareButton">
-
-                ↗ Share
-
-            </button>
-
-
-        </div>
-
-    </header>
-
-
-    <!-- =====================================
-         CHAT
-    ====================================== -->
-
-    <section
-        class="chat-area"
-        id="chatArea">
-
-
-        <div
-            class="conversation"
-            id="conversation">
-
-
-            <div
-                class="welcome"
-                id="welcome">
-
-
-                <div class="welcome-logo">
-                    B
-                </div>
-
-
-                <h1>
-                    Viggo
-                </h1>
-
-
-                <p>
-                    Your AI friend is ready.
-                </p>
-
-
-            </div>
-
-
-        </div>
-
-
-    </section>
-
-
-    <!-- =====================================
-         INPUT
-    ====================================== -->
-
-    <section class="bottom-area">
-
-        <div class="input-box">
-
-
-            <textarea
-                id="message"
-                rows="1"
-                placeholder="Message Viggo..."
-            ></textarea>
-
-
-            <button
-                type="button"
-                class="input-button"
-                id="mic"
-                title="Voice input">
-
-                🎤
-
-            </button>
-
-
-            <button
-                type="button"
-                class="input-button send-button"
-                id="send"
-                title="Send">
-
-                ➤
-
-            </button>
-
-
-        </div>
-
-    </section>
-
-</main>
-
-</div>
-
-
-<!-- =====================================
-     HISTORY
-===================================== -->
-
-<div
-    class="modal"
-    id="historyModal">
-
-
-    <div class="modal-content">
-
-
-        <div class="modal-header">
-
-
-            <h2>
-                🕘 Chat History
-            </h2>
-
-
-            <button
-                type="button"
-                class="close-history"
-                id="closeHistory">
-
-                ×
-
-            </button>
-
-
-        </div>
-
-
-        <div
-            id="historyList">
-        </div>
-
-
-    </div>
-
-</div>
-
-
-<!-- =====================================
-     BASIC MENU SCRIPT
-===================================== -->
-
-<script>
-
-const moreBtn =
-    document.getElementById("moreBtn");
-
-const moreDropdown =
-    document.getElementById("moreDropdown");
-
-
-if (moreBtn && moreDropdown) {
-
-    moreBtn.addEventListener(
-        "click",
-        function(event) {
-
-            event.stopPropagation();
-
-            moreDropdown.classList.toggle(
-                "show"
-            );
-
-        }
-    );
-
-
-    moreDropdown.addEventListener(
-        "click",
-        function(event) {
-
-            event.stopPropagation();
-
-        }
-    );
-
-
-    document.addEventListener(
-        "click",
-        function() {
-
-            moreDropdown.classList.remove(
-                "show"
-            );
-
-        }
-    );
-
-}
-
-</script>
-
-
-<!-- YOUR MAIN JAVASCRIPT -->
-
-<script src="script.js"></script>
-
+  </div>
+
+  <script>
+    // Event listener attached for interaction functionality
+    document.getElementById('shareBtn').addEventListener('click', () => {
+      alert('Share menu opened!');
+    });
+
+    document.getElementById('optionsBtn').addEventListener('click', () => {
+      alert('More options menu opened!');
+    });
+  </script>
 </body>
 </html>
