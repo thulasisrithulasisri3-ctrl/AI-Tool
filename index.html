@@ -6,778 +6,544 @@
 <title>Viggo AI</title>
 
 <style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#07101a;
+    color:#fff;
+    height:100vh;
+    overflow:hidden;
+}
+
+.app{
+    display:flex;
+    height:100vh;
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:260px;
+    min-width:260px;
+    height:100vh;
+    background:#050b12;
+    border-right:1px solid #1d354d;
+    padding:18px;
+    display:flex;
+    flex-direction:column;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
 }
 
-body {
-    background: #07101a;
-    color: white;
-    height: 100vh;
-    overflow: hidden;
-}
-
-.app {
-    display: flex;
-    height: 100vh;
-    background:
-        radial-gradient(
-            circle at top right,
-            #123b68,
-            #07101a 48%,
-            #03070c
-        );
-}
-
-/* ================= SIDEBAR ================= */
-
-.sidebar {
-    width: 260px;
-    min-width: 260px;
-    height: 100vh;
-
-    background: rgba(5, 11, 18, .97);
-
-    border-right: 1px solid #1d354d;
-
-    padding: 18px;
-
-    display: flex;
-    flex-direction: column;
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.logo-icon {
-    width: 42px;
-    height: 42px;
-
-    border-radius: 12px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: linear-gradient(
-        135deg,
-        #2695ff,
-        #07559d
-    );
-
-    font-size: 22px;
-    font-weight: bold;
-}
-
-.logo-name {
-    font-size: 21px;
-    font-weight: 600;
-}
-
-.online {
-    margin-left: 52px;
-    margin-top: 5px;
-
-    color: #48df89;
-    font-size: 11px;
-}
-
-.online-dot {
-    display: inline-block;
-
-    width: 6px;
-    height: 6px;
-
-    border-radius: 50%;
-
-    background: #35dc79;
-
-    margin-right: 5px;
-}
-
-/* ================= NEW CHAT ================= */
-
-.new-chat {
-    width: 100%;
-
-    margin-top: 25px;
-
-    padding: 11px;
-
-    border-radius: 10px;
-
-    border: 1px solid #1768ae;
-
-    background: linear-gradient(
-        135deg,
-        #116fc4,
-        #073d70
-    );
-
-    color: white;
-
-    cursor: pointer;
-
-    text-align: left;
-
-    font-size: 14px;
-}
-
-.new-chat:hover {
-    background: #116eb8;
-}
-
-/* ================= SECTION ================= */
-
-.section-title {
-    margin-top: 24px;
-    margin-bottom: 8px;
-
-    color: #718ba5;
-
-    font-size: 11px;
-    font-weight: bold;
-
-    text-transform: uppercase;
-}
-
-.chat-list {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-
-    overflow-y: auto;
-}
-
-.chat-item {
-    width: 100%;
-
-    padding: 9px 10px;
-
-    border: none;
-
-    border-radius: 8px;
+.logo-icon{
+    width:42px;
+    height:42px;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(135deg,#2695ff,#07559d);
+    font-size:22px;
+    font-weight:bold;
+}
+
+.logo-name{
+    font-size:21px;
+    font-weight:600;
+}
+
+.online{
+    margin-left:52px;
+    margin-top:5px;
+    color:#48df89;
+    font-size:11px;
+}
+
+.online-dot{
+    display:inline-block;
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:#35dc79;
+    margin-right:5px;
+}
+
+.new-chat{
+    width:100%;
+    margin-top:25px;
+    padding:11px;
+    border-radius:10px;
+    border:1px solid #1768ae;
+    background:linear-gradient(135deg,#116fc4,#073d70);
+    color:white;
+    cursor:pointer;
+    text-align:left;
+    font-size:14px;
+}
+
+.new-chat:hover{
+    background:#116eb8;
+}
+
+.section-title{
+    margin-top:24px;
+    margin-bottom:8px;
+    color:#718ba5;
+    font-size:11px;
+    font-weight:bold;
+    text-transform:uppercase;
+}
+
+.chat-list{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    overflow-y:auto;
+}
 
-    background: transparent;
-
-    color: #d7e7f7;
-
-    cursor: pointer;
-
-    text-align: left;
-
-    font-size: 13px;
-
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.chat-item:hover {
-    background: #102437;
+.chat-item{
+    width:100%;
+    padding:9px 10px;
+    border:none;
+    border-radius:8px;
+    background:transparent;
+    color:#d7e7f7;
+    cursor:pointer;
+    text-align:left;
+    font-size:13px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
 }
 
-.empty-list {
-    padding: 8px 10px;
-
-    color: #557089;
-
-    font-size: 12px;
+.chat-item:hover{
+    background:#102437;
 }
-
-/* ================= MORE ================= */
-
-.more-area {
-    margin-top: auto;
-    position: relative;
+
+.empty-list{
+    padding:8px 10px;
+    color:#557089;
+    font-size:12px;
 }
-
-.more-button {
-    width: 100%;
-
-    padding: 11px;
-
-    border-radius: 10px;
 
-    border: 1px solid #284761;
-
-    background: #0b1724;
-
-    color: #dcecff;
-
-    cursor: pointer;
-
-    text-align: left;
-
-    font-size: 14px;
+/* MORE */
+.more-area{
+    margin-top:auto;
+    position:relative;
 }
 
-.more-button:hover {
-    background: #102b42;
+.more-button{
+    width:100%;
+    padding:11px;
+    border-radius:10px;
+    border:1px solid #284761;
+    background:#0b1724;
+    color:#dcecff;
+    cursor:pointer;
+    text-align:left;
+    font-size:14px;
 }
-
-.more-menu {
-    display: none;
-
-    position: absolute;
-
-    left: 0;
-    right: 0;
-    bottom: 52px;
-
-    padding: 7px;
-
-    background: #091522;
-
-    border: 1px solid #284b67;
-
-    border-radius: 12px;
-
-    box-shadow:
-        0 15px 40px rgba(0,0,0,.7);
-
-    z-index: 1000;
+
+.more-menu{
+    display:none;
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:52px;
+    padding:7px;
+    background:#091522;
+    border:1px solid #284b67;
+    border-radius:12px;
+    box-shadow:0 15px 40px rgba(0,0,0,.7);
+    z-index:1000;
 }
 
-.more-menu.show {
-    display: block;
+.more-menu.show{
+    display:block;
 }
 
-.more-menu button {
-    width: 100%;
-
-    padding: 10px;
-
-    border: none;
-
-    border-radius: 8px;
-
-    background: transparent;
-
-    color: #dcecff;
-
-    cursor: pointer;
-
-    text-align: left;
-
-    font-size: 13px;
+.more-menu button{
+    width:100%;
+    padding:10px;
+    border:none;
+    border-radius:8px;
+    background:transparent;
+    color:#dcecff;
+    cursor:pointer;
+    text-align:left;
+    font-size:13px;
 }
 
-.more-menu button:hover {
-    background: #10304b;
+.more-menu button:hover{
+    background:#10304b;
 }
-
-/* ================= MAIN ================= */
-
-.main {
-    flex: 1;
 
-    min-width: 0;
-
-    height: 100vh;
-
-    display: flex;
-    flex-direction: column;
+/* MAIN */
+.main{
+    flex:1;
+    min-width:0;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
 }
-
-/* ================= HEADER ================= */
-
-.top-header {
-    height: 60px;
 
-    display: flex;
-    align-items: center;
-
-    padding: 0 20px;
-
-    background: rgba(5,11,18,.9);
-
-    border-bottom: 1px solid #1a3046;
+.top-header{
+    height:60px;
+    display:flex;
+    align-items:center;
+    padding:0 20px;
+    background:#050b12;
+    border-bottom:1px solid #1a3046;
 }
 
-.header-title {
-    font-size: 14px;
-    color: #e6f1fc;
+.header-title{
+    font-size:14px;
 }
-
-.share-button {
-    margin-left: auto;
-
-    padding: 7px 14px;
-
-    border-radius: 8px;
-
-    border: 1px solid #216ca8;
 
-    background: #0b3154;
-
-    color: white;
-
-    cursor: pointer;
-
-    font-size: 13px;
+.share-button{
+    margin-left:auto;
+    padding:7px 14px;
+    border-radius:8px;
+    border:1px solid #216ca8;
+    background:#0b3154;
+    color:white;
+    cursor:pointer;
 }
 
-.share-button:hover {
-    background: #12517f;
+.share-button:hover{
+    background:#12517f;
 }
-
-/* ================= CHAT AREA ================= */
 
-.chat-area {
-    flex: 1;
-
-    overflow-y: auto;
-
-    padding: 25px 20px;
+/* CHAT */
+.chat-area{
+    flex:1;
+    overflow-y:auto;
+    padding:25px 20px;
 }
 
-.conversation {
-    width: 100%;
-    max-width: 850px;
-
-    margin: auto;
+.conversation{
+    width:100%;
+    max-width:850px;
+    margin:auto;
 }
-
-/* ================= WELCOME ================= */
 
-.welcome {
-    min-height: 100%;
-
-    padding-top: 80px;
-
-    text-align: center;
+.welcome{
+    min-height:100%;
+    padding-top:80px;
+    text-align:center;
 }
-
-.welcome-icon {
-    width: 70px;
-    height: 70px;
-
-    margin: auto;
-
-    border-radius: 18px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: linear-gradient(
-        135deg,
-        #2695ff,
-        #07559d
-    );
 
-    font-size: 34px;
-    font-weight: bold;
-
-    box-shadow:
-        0 10px 35px rgba(0,120,255,.3);
+.welcome-icon{
+    width:70px;
+    height:70px;
+    margin:auto;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(135deg,#2695ff,#07559d);
+    font-size:34px;
+    font-weight:bold;
 }
 
-.welcome h1 {
-    margin-top: 16px;
-    font-size: 28px;
+.welcome h1{
+    margin-top:16px;
+    font-size:28px;
 }
-
-.welcome p {
-    margin-top: 7px;
-
-    color: #718ba5;
 
-    font-size: 14px;
+.welcome p{
+    margin-top:7px;
+    color:#718ba5;
+    font-size:14px;
 }
 
-/* ================= MESSAGE ================= */
-
-.message {
-    display: flex;
-
-    gap: 11px;
-
-    margin-bottom: 22px;
+/* MESSAGE */
+.message{
+    display:flex;
+    gap:11px;
+    margin-bottom:22px;
 }
-
-.avatar {
-    width: 36px;
-    height: 36px;
 
-    min-width: 36px;
-
-    border-radius: 10px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: #0c63a9;
-
-    font-size: 14px;
-    font-weight: bold;
+.avatar{
+    width:36px;
+    height:36px;
+    min-width:36px;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#0c63a9;
+    font-size:14px;
+    font-weight:bold;
 }
 
-.user-avatar {
-    background: #263a50;
+.user-avatar{
+    background:#263a50;
 }
 
-.message-content {
-    min-width: 0;
+.message-content{
+    min-width:0;
 }
-
-.message-name {
-    margin-bottom: 5px;
 
-    color: #6d9bc5;
-
-    font-size: 11px;
+.message-name{
+    margin-bottom:5px;
+    color:#6d9bc5;
+    font-size:11px;
 }
-
-.message-text {
-    color: #e7f1fa;
 
-    font-size: 14px;
-
-    line-height: 1.65;
-
-    white-space: pre-wrap;
-
-    word-break: break-word;
+.message-text{
+    color:#e7f1fa;
+    font-size:14px;
+    line-height:1.65;
+    white-space:pre-wrap;
+    word-break:break-word;
 }
 
-/* ================= MESSAGE ACTIONS ================= */
-
-.message-actions {
-    display: flex;
-
-    gap: 6px;
-
-    margin-top: 9px;
+.message-actions{
+    display:flex;
+    gap:6px;
+    margin-top:9px;
 }
-
-.message-actions button {
-    padding: 5px 8px;
 
-    border-radius: 7px;
-
-    border: 1px solid #24445f;
-
-    background: #0a1724;
-
-    color: #9db9d2;
-
-    cursor: pointer;
-
-    font-size: 11px;
+.message-actions button{
+    padding:5px 8px;
+    border-radius:7px;
+    border:1px solid #24445f;
+    background:#0a1724;
+    color:#9db9d2;
+    cursor:pointer;
+    font-size:11px;
 }
 
-.message-actions button:hover {
-    background: #10304b;
-
-    color: white;
+.message-actions button:hover{
+    background:#10304b;
+    color:white;
 }
-
-/* ================= INPUT ================= */
 
-.input-area {
-    padding: 12px 20px 18px;
-
-    border-top: 1px solid #1a3046;
-
-    background: #060c14;
+/* INPUT */
+.input-area{
+    padding:12px 20px 18px;
+    border-top:1px solid #1a3046;
+    background:#060c14;
 }
-
-.input-wrapper {
-    max-width: 850px;
-
-    margin: auto;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 8px;
 
-    padding: 7px 8px 7px 14px;
-
-    border-radius: 20px;
-
-    background: #151b24;
-
-    border: 1px solid #26394d;
+.input-wrapper{
+    max-width:850px;
+    margin:auto;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:7px 8px 7px 14px;
+    border-radius:20px;
+    background:#151b24;
+    border:1px solid #26394d;
 }
-
-.message-input {
-    flex: 1;
-
-    min-width: 0;
-
-    padding: 8px 3px;
-
-    border: none;
 
-    outline: none;
-
-    background: transparent;
-
-    color: white;
-
-    font-size: 14px;
+.message-input{
+    flex:1;
+    min-width:0;
+    padding:8px 3px;
+    border:none;
+    outline:none;
+    background:transparent;
+    color:white;
+    font-size:14px;
 }
 
-.message-input::placeholder {
-    color: #61758a;
+.message-input::placeholder{
+    color:#61758a;
 }
-
-/* ================= MIC ================= */
-
-.mic-button {
-    width: 38px;
-    height: 38px;
-
-    min-width: 38px;
-
-    border-radius: 50%;
 
-    border: 1px solid #31536f;
-
-    background: #10283e;
-
-    color: white;
-
-    cursor: pointer;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.mic-button,
+.send-button{
+    width:38px;
+    height:38px;
+    min-width:38px;
+    border-radius:50%;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 
-.mic-button:hover {
-    background: #16476d;
+.mic-button{
+    border:1px solid #31536f;
+    background:#10283e;
+    color:white;
 }
-
-.mic-button.recording {
-    background: #b52d3a;
 
-    border-color: #ef5967;
+.mic-button.recording{
+    background:#b52d3a;
 }
-
-/* ================= SEND ================= */
-
-.send-button {
-    width: 38px;
-    height: 38px;
-
-    min-width: 38px;
-
-    border: none;
-
-    border-radius: 50%;
-
-    background: linear-gradient(
-        135deg,
-        #2695ff,
-        #07559d
-    );
-
-    color: white;
-
-    cursor: pointer;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
 
-    font-size: 16px;
+.send-button{
+    border:none;
+    background:linear-gradient(135deg,#2695ff,#07559d);
+    color:white;
 }
 
-.send-button:hover {
-    transform: scale(1.05);
+/* HISTORY MODAL */
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:5000;
+    background:rgba(0,0,0,.75);
+    padding:30px;
 }
 
-/* ================= HISTORY MODAL ================= */
-
-.modal {
-    display: none;
-
-    position: fixed;
-
-    inset: 0;
-
-    z-index: 5000;
-
-    background: rgba(0,0,0,.72);
-
-    padding: 30px;
+.modal.show{
+    display:flex;
 }
 
-.modal.show {
-    display: flex;
+.modal-box{
+    width:100%;
+    max-width:700px;
+    max-height:80vh;
+    overflow-y:auto;
+    margin:auto;
+    padding:20px;
+    border-radius:15px;
+    border:1px solid #274b68;
+    background:#0a1623;
 }
-
-.modal-box {
-    width: 100%;
-    max-width: 700px;
 
-    max-height: 80vh;
-
-    overflow-y: auto;
-
-    margin: auto;
-
-    padding: 20px;
-
-    border-radius: 15px;
-
-    border: 1px solid #274b68;
-
-    background: #0a1623;
+.modal-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
 }
-
-.modal-header {
-    display: flex;
 
-    justify-content: space-between;
-    align-items: center;
-
-    margin-bottom: 15px;
+.close-button{
+    border:none;
+    background:transparent;
+    color:white;
+    font-size:25px;
+    cursor:pointer;
 }
-
-.close-button {
-    border: none;
-
-    background: transparent;
 
-    color: white;
-
-    font-size: 25px;
-
-    cursor: pointer;
+/* HISTORY ITEM */
+.history-item{
+    padding:12px;
+    margin-bottom:8px;
+    border-radius:9px;
+    border:1px solid #203b53;
+    background:#0d1c2b;
 }
-
-/* ================= HISTORY ================= */
-
-.history-item {
-    padding: 12px;
 
-    margin-bottom: 8px;
-
-    border-radius: 9px;
-
-    border: 1px solid #203b53;
-
-    background: #0d1c2b;
+.history-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    width:100%;
 }
 
-.history-item:hover {
-    background: #102b42;
+.history-checkbox{
+    width:18px;
+    height:18px;
+    flex-shrink:0;
+    cursor:pointer;
+    accent-color:#2695ff;
 }
 
-.history-row {
-    display: flex;
-
-    align-items: center;
-
-    gap: 12px;
-
-    cursor: pointer;
+.history-info{
+    flex:1;
+    min-width:0;
+    cursor:pointer;
 }
-
-.history-checkbox {
-    width: 17px;
-    height: 17px;
 
-    cursor: pointer;
-
-    accent-color: #2695ff;
+.history-time{
+    margin-top:5px;
+    color:#637d95;
+    font-size:10px;
 }
 
-.history-info {
-    flex: 1;
-
-    min-width: 0;
+/* SINGLE DELETE */
+.single-delete{
+    width:34px;
+    height:34px;
+    min-width:34px;
+    flex-shrink:0;
+    border:1px solid #63313a;
+    border-radius:8px;
+    background:#241218;
+    color:#ff7885;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:15px;
 }
-
-.history-time {
-    margin-top: 5px;
 
-    color: #637d95;
-
-    font-size: 10px;
+.single-delete:hover{
+    background:#5a2029;
+    color:white;
 }
-
-.history-controls {
-    display: flex;
 
-    gap: 8px;
-
-    margin-top: 15px;
+/* HISTORY CONTROLS */
+.history-controls{
+    display:flex;
+    gap:8px;
+    margin-top:15px;
 }
-
-.history-controls button {
-    flex: 1;
 
-    padding: 10px;
-
-    border-radius: 9px;
-
-    border: 1px solid #284b67;
-
-    background: #0d1c2b;
-
-    color: #dcecff;
-
-    cursor: pointer;
+.history-controls button{
+    flex:1;
+    padding:11px;
+    border-radius:9px;
+    border:1px solid #284b67;
+    background:#0d1c2b;
+    color:#dcecff;
+    cursor:pointer;
 }
 
-.history-controls button:hover {
-    background: #123752;
+.history-controls button:hover{
+    background:#123752;
 }
-
-.history-controls button:last-child {
-    color: #ff7b86;
 
-    border-color: #63313a;
+.delete-selected{
+    color:#ff7885 !important;
+    border-color:#63313a !important;
 }
-
-/* ================= MOBILE ================= */
-
-@media(max-width:700px) {
 
-    .sidebar {
-        width: 220px;
-        min-width: 220px;
+/* MOBILE */
+@media(max-width:700px){
 
-        padding: 13px;
+    .sidebar{
+        width:220px;
+        min-width:220px;
+        padding:13px;
     }
 
-    .chat-area {
-        padding: 18px 12px;
+    .chat-area{
+        padding:18px 12px;
     }
 
-    .input-area {
-        padding: 10px;
+    .input-area{
+        padding:10px;
     }
 
-    .top-header {
-        padding: 0 12px;
+    .top-header{
+        padding:0 12px;
     }
 }
 </style>
 </head>
 
-
 <body>
 
 <div class="app">
 
-<!-- ==================================================
-     SIDEBAR
-================================================== -->
+<!-- ================= SIDEBAR ================= -->
 
 <aside class="sidebar">
 
@@ -794,26 +560,15 @@ body {
     </div>
 
     <div class="online">
-
         <span class="online-dot"></span>
-
         Online
-
     </div>
-
-
-    <!-- NEW CHAT -->
 
     <button
         class="new-chat"
         id="newChat">
-
         ＋ New Chat
-
     </button>
-
-
-    <!-- PINNED -->
 
     <div class="section-title">
         Pinned
@@ -822,15 +577,7 @@ body {
     <div
         class="chat-list"
         id="pinnedList">
-
-        <div class="empty-list">
-            No pinned chats
-        </div>
-
     </div>
-
-
-    <!-- RECENT -->
 
     <div class="section-title">
         Recent
@@ -839,13 +586,7 @@ body {
     <div
         class="chat-list"
         id="recentList">
-
-        <div class="empty-list">
-            No recent chats
-        </div>
-
     </div>
-
 
     <!-- MORE -->
 
@@ -854,11 +595,8 @@ body {
         <button
             class="more-button"
             id="moreButton">
-
             ⋮ More
-
         </button>
-
 
         <div
             class="more-menu"
@@ -899,9 +637,7 @@ body {
 </aside>
 
 
-<!-- ==================================================
-     MAIN
-================================================== -->
+<!-- ================= MAIN ================= -->
 
 <main class="main">
 
@@ -910,26 +646,17 @@ body {
         <div
             class="header-title"
             id="headerTitle">
-
             New Chat
-
         </div>
-
-
-        <!-- SHARE ONLY -->
 
         <button
             class="share-button"
             id="shareButton">
-
             ↗ Share
-
         </button>
 
     </header>
 
-
-    <!-- CHAT AREA -->
 
     <section
         class="chat-area"
@@ -976,28 +703,18 @@ body {
                 autocomplete="off"
             >
 
-
-            <!-- MIC -->
-
             <button
                 id="micButton"
                 class="mic-button"
                 title="Voice Input">
-
                 🎤
-
             </button>
-
-
-            <!-- SEND -->
 
             <button
                 id="sendButton"
                 class="send-button"
                 title="Send">
-
                 ➤
-
             </button>
 
         </div>
@@ -1009,9 +726,7 @@ body {
 </div>
 
 
-<!-- ==================================================
-     HISTORY MODAL
-================================================== -->
+<!-- ================= HISTORY MODAL ================= -->
 
 <div
     class="modal"
@@ -1028,9 +743,7 @@ body {
             <button
                 class="close-button"
                 id="closeHistory">
-
                 ×
-
             </button>
 
         </div>
@@ -1044,99 +757,53 @@ body {
 
 <script>
 
-/* ==================================================
-   API
-================================================== */
-
-/*
-   REAL VIGGO SERVER URL இருந்தால்
-   இங்கே மட்டும் மாற்றவும்.
-
-   Example:
-
-   const API_URL =
-   "https://your-server.onrender.com/chat";
-
-   இப்போது blank.
-   அதனால் UI test செய்ய demo reply வரும்.
-*/
-
-const API_URL = "";
-
-
-/* ==================================================
+/* =====================================================
    ELEMENTS
-================================================== */
+===================================================== */
 
 const messageInput =
-    document.getElementById(
-        "messageInput"
-    );
+    document.getElementById("messageInput");
 
 const sendButton =
-    document.getElementById(
-        "sendButton"
-    );
+    document.getElementById("sendButton");
 
 const micButton =
-    document.getElementById(
-        "micButton"
-    );
+    document.getElementById("micButton");
 
 const conversation =
-    document.getElementById(
-        "conversation"
-    );
+    document.getElementById("conversation");
 
 const newChat =
-    document.getElementById(
-        "newChat"
-    );
+    document.getElementById("newChat");
 
 const moreButton =
-    document.getElementById(
-        "moreButton"
-    );
+    document.getElementById("moreButton");
 
 const moreMenu =
-    document.getElementById(
-        "moreMenu"
-    );
-
-const shareButton =
-    document.getElementById(
-        "shareButton"
-    );
+    document.getElementById("moreMenu");
 
 const pinnedList =
-    document.getElementById(
-        "pinnedList"
-    );
+    document.getElementById("pinnedList");
 
 const recentList =
-    document.getElementById(
-        "recentList"
-    );
+    document.getElementById("recentList");
 
 const historyModal =
-    document.getElementById(
-        "historyModal"
-    );
+    document.getElementById("historyModal");
 
 const historyList =
-    document.getElementById(
-        "historyList"
-    );
+    document.getElementById("historyList");
 
 const closeHistory =
-    document.getElementById(
-        "closeHistory"
-    );
+    document.getElementById("closeHistory");
+
+const shareButton =
+    document.getElementById("shareButton");
 
 
-/* ==================================================
-   STATE
-================================================== */
+/* =====================================================
+   DATA
+===================================================== */
 
 let chats = [];
 
@@ -1145,182 +812,105 @@ let voiceEnabled = true;
 let currentVoice = "female";
 
 
-/* ==================================================
-   LOAD STORAGE SAFELY
-================================================== */
+try{
 
-try {
-
-    const stored =
-        localStorage.getItem(
-            "viggoChats"
-        );
+    const saved =
+        localStorage.getItem("viggoChats");
 
     chats =
-        stored
-            ? JSON.parse(stored)
+        saved
+            ? JSON.parse(saved)
             : [];
 
-    if (!Array.isArray(chats)) {
+    if(!Array.isArray(chats)){
         chats = [];
     }
 
-} catch(error) {
-
-    console.error(
-        "Storage error:",
-        error
-    );
+}catch(error){
 
     chats = [];
 
 }
 
 
-/* ==================================================
-   CLEAN OLD DATA
-================================================== */
+/* =====================================================
+   STORAGE
+===================================================== */
 
-chats = chats
-    .filter(
-        chat =>
-            chat &&
-            typeof chat === "object"
-    )
-    .map(
-        chat => {
+function saveChats(){
 
-            return {
-
-                id:
-                    chat.id ||
-                    Date.now() +
-                    Math.random(),
-
-                title:
-                    chat.title ||
-                    chat.message ||
-                    chat.text ||
-                    "New Chat",
-
-                message:
-                    chat.message ||
-                    chat.text ||
-                    "",
-
-                time:
-                    chat.time ||
-                    new Date().toLocaleString(),
-
-                pinned:
-                    chat.pinned === true
-
-            };
-
-        }
-    )
-    .filter(
-        chat =>
-            chat.message &&
-            String(
-                chat.message
-            ).trim()
+    localStorage.setItem(
+        "viggoChats",
+        JSON.stringify(chats)
     );
 
+}
 
-saveChats();
 
-
-/* ==================================================
+/* =====================================================
    MORE MENU
-================================================== */
+===================================================== */
 
 moreButton.addEventListener(
     "click",
-    function(event) {
+    function(event){
 
         event.stopPropagation();
 
-        moreMenu.classList.toggle(
-            "show"
-        );
+        moreMenu.classList.toggle("show");
 
     }
 );
-
 
 moreMenu.addEventListener(
     "click",
-    function(event) {
+    function(event){
 
         event.stopPropagation();
 
     }
 );
 
-
 document.addEventListener(
     "click",
-    function() {
+    function(){
 
-        moreMenu.classList.remove(
-            "show"
-        );
+        moreMenu.classList.remove("show");
 
     }
 );
 
 
-/* ==================================================
+/* =====================================================
    ADD MESSAGE
-================================================== */
+===================================================== */
 
-function addMessage(
-    text,
-    sender
-) {
+function addMessage(text, sender){
 
-    if (
+    if(
         text === undefined ||
-        text === null
-    ) {
+        text === null ||
+        !String(text).trim()
+    ){
         return;
     }
-
-
-    text = String(text);
-
-
-    if (!text.trim()) {
-        return;
-    }
-
 
     const welcome =
-        document.getElementById(
-            "welcome"
-        );
+        document.getElementById("welcome");
 
-
-    if (welcome) {
-        welcome.style.display =
-            "none";
+    if(welcome){
+        welcome.style.display = "none";
     }
 
 
     const message =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
-    message.className =
-        "message";
+    message.className = "message";
 
 
     const avatar =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     avatar.className =
         "avatar " +
@@ -1337,18 +927,14 @@ function addMessage(
 
 
     const content =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     content.className =
         "message-content";
 
 
     const name =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     name.className =
         "message-name";
@@ -1360,160 +946,105 @@ function addMessage(
 
 
     const textDiv =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     textDiv.className =
         "message-text";
 
     textDiv.textContent =
-        text;
+        String(text);
 
 
-    content.appendChild(
-        name
-    );
-
-    content.appendChild(
-        textDiv
-    );
+    content.appendChild(name);
+    content.appendChild(textDiv);
 
 
-    /* AI ACTION BUTTONS */
-
-    if (
-        sender === "assistant"
-    ) {
+    if(sender === "assistant"){
 
         const actions =
-            document.createElement(
-                "div"
-            );
+            document.createElement("div");
 
         actions.className =
             "message-actions";
 
 
         const copy =
-            document.createElement(
-                "button"
+            document.createElement("button");
+
+        copy.textContent = "📋 Copy";
+
+        copy.onclick = function(){
+
+            navigator.clipboard.writeText(
+                String(text)
             );
 
-        copy.textContent =
-            "📋 Copy";
+            copy.textContent = "✓ Copied";
 
+            setTimeout(
+                function(){
+                    copy.textContent = "📋 Copy";
+                },
+                1200
+            );
 
-        copy.onclick =
-            function() {
-
-                navigator.clipboard
-                    .writeText(text)
-                    .then(
-                        function() {
-
-                            copy.textContent =
-                                "✓ Copied";
-
-                            setTimeout(
-                                function() {
-
-                                    copy.textContent =
-                                        "📋 Copy";
-
-                                },
-                                1200
-                            );
-
-                        }
-                    );
-
-            };
+        };
 
 
         const speaker =
-            document.createElement(
-                "button"
-            );
+            document.createElement("button");
 
         speaker.textContent =
             "🔊 Speaker";
 
+        speaker.onclick = function(){
 
-        speaker.onclick =
-            function() {
+            speakText(text);
 
-                speakText(text);
-
-            };
+        };
 
 
         const like =
-            document.createElement(
-                "button"
-            );
+            document.createElement("button");
 
         like.textContent =
             "👍 Like";
 
+        like.onclick = function(){
 
-        like.onclick =
-            function() {
+            like.textContent =
+                "❤️ Liked";
 
-                like.textContent =
-                    "❤️ Liked";
-
-            };
+        };
 
 
-        actions.appendChild(
-            copy
-        );
+        actions.appendChild(copy);
+        actions.appendChild(speaker);
+        actions.appendChild(like);
 
-        actions.appendChild(
-            speaker
-        );
-
-        actions.appendChild(
-            like
-        );
-
-        content.appendChild(
-            actions
-        );
+        content.appendChild(actions);
 
     }
 
 
-    message.appendChild(
-        avatar
-    );
+    message.appendChild(avatar);
+    message.appendChild(content);
 
-    message.appendChild(
-        content
-    );
-
-
-    conversation.appendChild(
-        message
-    );
-
+    conversation.appendChild(message);
 
     scrollChat();
 
 }
 
 
-/* ==================================================
+/* =====================================================
    SCROLL
-================================================== */
+===================================================== */
 
-function scrollChat() {
+function scrollChat(){
 
     const area =
-        document.getElementById(
-            "chatArea"
-        );
+        document.getElementById("chatArea");
 
     area.scrollTop =
         area.scrollHeight;
@@ -1521,50 +1052,16 @@ function scrollChat() {
 }
 
 
-/* ==================================================
-   SAVE STORAGE
-================================================== */
-
-function saveChats() {
-
-    try {
-
-        localStorage.setItem(
-            "viggoChats",
-            JSON.stringify(chats)
-        );
-
-    } catch(error) {
-
-        console.error(
-            "Could not save chats:",
-            error
-        );
-
-    }
-
-}
-
-
-/* ==================================================
+/* =====================================================
    SAVE CHAT
-================================================== */
+===================================================== */
 
-function saveChat(text) {
+function saveChat(text){
 
-    if (
-        text === undefined ||
-        text === null
-    ) {
-        return;
-    }
-
-
-    text =
-        String(text).trim();
-
-
-    if (!text) {
+    if(
+        !text ||
+        !String(text).trim()
+    ){
         return;
     }
 
@@ -1572,32 +1069,26 @@ function saveChat(text) {
     const chat = {
 
         id:
-            Date.now(),
+            Date.now() +
+            Math.random(),
 
         title:
-            text.length > 35
-                ? text.substring(
-                    0,
-                    35
-                ) + "..."
-                : text,
+            String(text).length > 35
+                ? String(text).substring(0,35) + "..."
+                : String(text),
 
         message:
-            text,
+            String(text),
 
         time:
             new Date().toLocaleString(),
 
-        pinned:
-            false
+        pinned:false
 
     };
 
 
-    chats.push(
-        chat
-    );
-
+    chats.push(chat);
 
     saveChats();
 
@@ -1608,17 +1099,16 @@ function saveChat(text) {
 }
 
 
-/* ==================================================
+/* =====================================================
    SEND
-================================================== */
+===================================================== */
 
-async function sendMessage() {
+function sendMessage(){
 
     const text =
         messageInput.value.trim();
 
-
-    if (!text) {
+    if(!text){
         return;
     }
 
@@ -1629,125 +1119,24 @@ async function sendMessage() {
     );
 
 
-    saveChat(
-        text
-    );
+    saveChat(text);
 
+    messageInput.value = "";
 
-    messageInput.value =
-        "";
-
-
-    if (API_URL) {
-
-        try {
-
-            const response =
-                await fetch(
-                    API_URL,
-                    {
-
-                        method:
-                            "POST",
-
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body:
-                            JSON.stringify({
-                                message:
-                                    text
-                            })
-
-                    }
-                );
-
-
-            if (!response.ok) {
-
-                throw new Error(
-                    "Server error"
-                );
-
-            }
-
-
-            const data =
-                await response.json();
-
-
-            const reply =
-                data.reply ??
-                data.response ??
-                data.message ??
-                data.answer ??
-                "";
-
-
-            if (
-                String(reply).trim()
-            ) {
-
-                addMessage(
-                    String(reply),
-                    "assistant"
-                );
-
-                speakText(
-                    String(reply)
-                );
-
-            } else {
-
-                addMessage(
-                    "Viggo connected, but no reply was returned.",
-                    "assistant"
-                );
-
-            }
-
-
-        } catch(error) {
-
-            console.error(
-                error
-            );
-
-
-            addMessage(
-                "Sorry friend, I couldn't connect to Viggo AI right now.",
-                "assistant"
-            );
-
-        }
-
-
-        return;
-
-    }
-
-
-    /* DEMO */
 
     setTimeout(
-        function() {
+        function(){
 
             const reply =
                 "Okay friend, I received your message: " +
                 text;
-
 
             addMessage(
                 reply,
                 "assistant"
             );
 
-
-            speakText(
-                reply
-            );
+            speakText(reply);
 
         },
         500
@@ -1756,9 +1145,9 @@ async function sendMessage() {
 }
 
 
-/* ==================================================
+/* =====================================================
    SEND BUTTON
-================================================== */
+===================================================== */
 
 sendButton.addEventListener(
     "click",
@@ -1766,17 +1155,15 @@ sendButton.addEventListener(
 );
 
 
-/* ==================================================
+/* =====================================================
    ENTER
-================================================== */
+===================================================== */
 
 messageInput.addEventListener(
     "keydown",
-    function(event) {
+    function(event){
 
-        if (
-            event.key === "Enter"
-        ) {
+        if(event.key === "Enter"){
 
             event.preventDefault();
 
@@ -1788,54 +1175,42 @@ messageInput.addEventListener(
 );
 
 
-/* ==================================================
+/* =====================================================
    NEW CHAT
-================================================== */
+===================================================== */
 
 newChat.addEventListener(
     "click",
-    function() {
+    function(){
 
-        conversation.innerHTML = "";
+        conversation.innerHTML = `
 
+            <div
+                class="welcome"
+                id="welcome">
 
-        const welcome =
-            document.createElement(
-                "div"
-            );
+                <div class="welcome-icon">
+                    B
+                </div>
 
-        welcome.className =
-            "welcome";
+                <h1>
+                    Viggo
+                </h1>
 
-        welcome.innerHTML = `
-            <div class="welcome-icon">
-                B
+                <p>
+                    Your AI friend is ready.
+                </p>
+
             </div>
 
-            <h1>
-                Viggo
-            </h1>
-
-            <p>
-                Your AI friend is ready.
-            </p>
         `;
-
-
-        conversation.appendChild(
-            welcome
-        );
-
 
         document.getElementById(
             "headerTitle"
         ).textContent =
             "New Chat";
 
-
-        messageInput.value =
-            "";
-
+        messageInput.value = "";
 
         speechSynthesis.cancel();
 
@@ -1843,19 +1218,15 @@ newChat.addEventListener(
 );
 
 
-/* ==================================================
+/* =====================================================
    RECENT
-================================================== */
+===================================================== */
 
-function renderRecent() {
+function renderRecent(){
 
-    recentList.innerHTML =
-        "";
+    recentList.innerHTML = "";
 
-
-    if (
-        chats.length === 0
-    ) {
+    if(chats.length === 0){
 
         recentList.innerHTML =
             `<div class="empty-list">
@@ -1869,48 +1240,37 @@ function renderRecent() {
     chats
         .slice()
         .reverse()
-        .slice(
-            0,
-            8
-        )
+        .slice(0,8)
         .forEach(
-            function(chat) {
+            function(chat){
 
-                const item =
-                    document.createElement(
-                        "button"
-                    );
+                const button =
+                    document.createElement("button");
 
-                item.className =
+                button.className =
                     "chat-item";
 
-
-                const title =
-                    chat.title ||
-                    chat.message ||
-                    "New Chat";
-
-
-                item.textContent =
+                button.textContent =
                     "💬 " +
-                    title;
+                    (
+                        chat.title ||
+                        chat.message ||
+                        "New Chat"
+                    );
 
 
-                item.onclick =
-                    function() {
+                button.onclick =
+                    function(){
 
                         messageInput.value =
-                            chat.message ||
-                            "";
+                            chat.message || "";
 
                         messageInput.focus();
 
                     };
 
 
-                recentList.appendChild(
-                    item
-                );
+                recentList.appendChild(button);
 
             }
         );
@@ -1918,32 +1278,23 @@ function renderRecent() {
 }
 
 
-/* ==================================================
+/* =====================================================
    PINNED
-================================================== */
+===================================================== */
 
-function renderPinned() {
+function renderPinned(){
 
-    pinnedList.innerHTML =
-        "";
-
+    pinnedList.innerHTML = "";
 
     const pinned =
         chats.filter(
-            function(chat) {
-
-                return (
-                    chat &&
-                    chat.pinned === true
-                );
-
+            function(chat){
+                return chat.pinned === true;
             }
         );
 
 
-    if (
-        pinned.length === 0
-    ) {
+    if(pinned.length === 0){
 
         pinnedList.innerHTML =
             `<div class="empty-list">
@@ -1958,18 +1309,15 @@ function renderPinned() {
         .slice()
         .reverse()
         .forEach(
-            function(chat) {
+            function(chat){
 
-                const item =
-                    document.createElement(
-                        "button"
-                    );
+                const button =
+                    document.createElement("button");
 
-                item.className =
+                button.className =
                     "chat-item";
 
-
-                item.textContent =
+                button.textContent =
                     "📌 " +
                     (
                         chat.title ||
@@ -1978,21 +1326,18 @@ function renderPinned() {
                     );
 
 
-                item.onclick =
-                    function() {
+                button.onclick =
+                    function(){
 
                         messageInput.value =
-                            chat.message ||
-                            "";
+                            chat.message || "";
 
                         messageInput.focus();
 
                     };
 
 
-                pinnedList.appendChild(
-                    item
-                );
+                pinnedList.appendChild(button);
 
             }
         );
@@ -2000,331 +1345,308 @@ function renderPinned() {
 }
 
 
-/* ==================================================
-   PIN
-================================================== */
+/* =====================================================
+   PIN CHAT
+===================================================== */
 
 document
-    .getElementById(
-        "pinButton"
-    )
-    .addEventListener(
-        "click",
-        function() {
+.getElementById("pinButton")
+.addEventListener(
+    "click",
+    function(){
 
-            if (
-                chats.length === 0
-            ) {
+        if(chats.length === 0){
 
-                moreMenu.classList.remove(
-                    "show"
-                );
+            moreMenu.classList.remove("show");
 
-                return;
-            }
-
-
-            const last =
-                chats[
-                    chats.length - 1
-                ];
-
-
-            if (last) {
-
-                last.pinned =
-                    true;
-
-            }
-
-
-            saveChats();
-
-            renderPinned();
-
-            renderRecent();
-
-
-            moreMenu.classList.remove(
-                "show"
-            );
-
+            return;
         }
-    );
 
 
-/* ==================================================
+        chats[
+            chats.length - 1
+        ].pinned = true;
+
+
+        saveChats();
+
+        renderPinned();
+
+        renderRecent();
+
+        moreMenu.classList.remove("show");
+
+    }
+);
+
+
+/* =====================================================
    HISTORY
-================================================== */
+===================================================== */
 
-function renderHistory() {
+function renderHistory(){
 
-    historyList.innerHTML =
-        "";
+    historyList.innerHTML = "";
 
 
-    if (
-        chats.length === 0
-    ) {
+    if(!chats || chats.length === 0){
 
-        historyList.innerHTML =
-            `<p style="color:#718ba5">
-                No chat history.
-            </p>`;
+        historyList.innerHTML = `
+
+            <div class="empty-list">
+                No chat history
+            </div>
+
+        `;
 
         return;
     }
 
 
     chats
-        .slice()
-        .reverse()
-        .forEach(
-            function(chat) {
+    .slice()
+    .reverse()
+    .forEach(
+        function(chat){
 
-                const item =
-                    document.createElement(
-                        "div"
-                    );
+            const item =
+                document.createElement("div");
 
-                item.className =
-                    "history-item";
+            item.className =
+                "history-item";
 
 
-                const row =
-                    document.createElement(
-                        "label"
-                    );
+            const row =
+                document.createElement("div");
 
-                row.className =
-                    "history-row";
+            row.className =
+                "history-row";
 
 
-                const checkbox =
-                    document.createElement(
-                        "input"
-                    );
+            /* CHECKBOX */
 
-                checkbox.type =
-                    "checkbox";
+            const checkbox =
+                document.createElement("input");
 
-                checkbox.className =
-                    "history-checkbox";
+            checkbox.type =
+                "checkbox";
 
-                checkbox.dataset.id =
-                    String(chat.id);
+            checkbox.className =
+                "history-checkbox";
 
-
-                const info =
-                    document.createElement(
-                        "div"
-                    );
-
-                info.className =
-                    "history-info";
+            checkbox.dataset.id =
+                String(chat.id);
 
 
-                const title =
-                    document.createElement(
-                        "div"
-                    );
+            /* INFO */
 
-                title.textContent =
-                    "💬 " +
-                    (
-                        chat.title ||
-                        chat.message ||
-                        "New Chat"
-                    );
+            const info =
+                document.createElement("div");
+
+            info.className =
+                "history-info";
 
 
-                const time =
-                    document.createElement(
-                        "div"
-                    );
+            const title =
+                document.createElement("div");
 
-                time.className =
-                    "history-time";
-
-                time.textContent =
-                    chat.time ||
-                    "";
-
-
-                info.appendChild(
-                    title
-                );
-
-                info.appendChild(
-                    time
+            title.textContent =
+                "💬 " +
+                (
+                    chat.title ||
+                    chat.message ||
+                    "New Chat"
                 );
 
 
-                row.appendChild(
-                    checkbox
-                );
+            const time =
+                document.createElement("div");
 
-                row.appendChild(
-                    info
-                );
+            time.className =
+                "history-time";
 
-
-                item.appendChild(
-                    row
-                );
+            time.textContent =
+                chat.time || "";
 
 
-                /*
-                   Checkbox click செய்தால்
-                   modal close ஆகக்கூடாது.
-                */
-
-                row.addEventListener(
-                    "click",
-                    function(event) {
-
-                        if (
-                            event.target ===
-                            checkbox
-                        ) {
-                            return;
-                        }
+            info.appendChild(title);
+            info.appendChild(time);
 
 
-                        messageInput.value =
-                            chat.message ||
-                            "";
+            /* DELETE BUTTON */
 
-                        historyModal.classList.remove(
-                            "show"
+            const deleteButton =
+                document.createElement("button");
+
+            deleteButton.className =
+                "single-delete";
+
+            deleteButton.textContent =
+                "🗑";
+
+            deleteButton.title =
+                "Delete this chat";
+
+
+            deleteButton.addEventListener(
+                "click",
+                function(event){
+
+                    event.preventDefault();
+                    event.stopPropagation();
+
+
+                    const id =
+                        String(
+                            chat.id
                         );
 
-                    }
-                );
+
+                    chats =
+                        chats.filter(
+                            function(c){
+
+                                return String(c.id) !== id;
+
+                            }
+                        );
 
 
-                historyList.appendChild(
-                    item
-                );
+                    saveChats();
 
-            }
-        );
+                    renderRecent();
+
+                    renderPinned();
+
+                    renderHistory();
+
+                }
+            );
 
 
-    /* ================= CONTROLS ================= */
+            /* OPEN CHAT */
+
+            info.addEventListener(
+                "click",
+                function(){
+
+                    messageInput.value =
+                        chat.message || "";
+
+                    historyModal.classList.remove(
+                        "show"
+                    );
+
+                    messageInput.focus();
+
+                }
+            );
+
+
+            row.appendChild(
+                checkbox
+            );
+
+            row.appendChild(
+                info
+            );
+
+            row.appendChild(
+                deleteButton
+            );
+
+
+            item.appendChild(row);
+
+            historyList.appendChild(item);
+
+        }
+    );
+
+
+    /* CONTROLS */
 
     const controls =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     controls.className =
         "history-controls";
 
 
     const selectAll =
-        document.createElement(
-            "button"
-        );
+        document.createElement("button");
 
     selectAll.textContent =
         "☑ Select All";
 
 
     const deleteSelected =
-        document.createElement(
-            "button"
-        );
+        document.createElement("button");
+
+    deleteSelected.className =
+        "delete-selected";
 
     deleteSelected.textContent =
         "🗑 Delete Selected";
 
 
-    controls.appendChild(
-        selectAll
-    );
+    controls.appendChild(selectAll);
 
-    controls.appendChild(
-        deleteSelected
-    );
+    controls.appendChild(deleteSelected);
+
+    historyList.appendChild(controls);
 
 
-    historyList.appendChild(
-        controls
-    );
-
-
-    /* ================= SELECT ALL ================= */
+    /* SELECT ALL */
 
     selectAll.onclick =
-        function() {
+        function(){
 
             const boxes =
-                [
-                    ...document.querySelectorAll(
-                        ".history-checkbox"
-                    )
-                ];
+                document.querySelectorAll(
+                    ".history-checkbox"
+                );
 
 
-            if (
-                boxes.length === 0
-            ) {
-                return;
-            }
-
-
-            const allChecked =
-                boxes.every(
-                    function(box) {
+            const allSelected =
+                [...boxes].every(
+                    function(box){
                         return box.checked;
                     }
                 );
 
 
             boxes.forEach(
-                function(box) {
+                function(box){
 
                     box.checked =
-                        !allChecked;
+                        !allSelected;
 
                 }
             );
 
 
             selectAll.textContent =
-                allChecked
+                allSelected
                     ? "☑ Select All"
                     : "☐ Unselect All";
 
         };
 
 
-    /* ================= DELETE SELECTED ================= */
+    /* DELETE SELECTED */
 
     deleteSelected.onclick =
-        function() {
+        function(){
 
-            const boxes =
+            const selected =
                 [
                     ...document.querySelectorAll(
                         ".history-checkbox:checked"
                     )
-                ];
-
-
-            if (
-                boxes.length === 0
-            ) {
-
-                return;
-
-            }
-
-
-            const selectedIds =
-                boxes.map(
-                    function(box) {
+                ]
+                .map(
+                    function(box){
 
                         return String(
                             box.dataset.id
@@ -2334,11 +1656,18 @@ function renderHistory() {
                 );
 
 
+            if(selected.length === 0){
+
+                return;
+
+            }
+
+
             chats =
                 chats.filter(
-                    function(chat) {
+                    function(chat){
 
-                        return !selectedIds.includes(
+                        return !selected.includes(
                             String(chat.id)
                         );
 
@@ -2359,41 +1688,33 @@ function renderHistory() {
 }
 
 
-/* ==================================================
-   HISTORY BUTTON
-================================================== */
+/* =====================================================
+   OPEN HISTORY
+===================================================== */
 
 document
-    .getElementById(
-        "historyButton"
-    )
-    .addEventListener(
-        "click",
-        function() {
+.getElementById("historyButton")
+.addEventListener(
+    "click",
+    function(){
 
-            renderHistory();
+        renderHistory();
 
+        historyModal.classList.add("show");
 
-            historyModal.classList.add(
-                "show"
-            );
+        moreMenu.classList.remove("show");
 
-
-            moreMenu.classList.remove(
-                "show"
-            );
-
-        }
-    );
+    }
+);
 
 
-/* ==================================================
+/* =====================================================
    CLOSE HISTORY
-================================================== */
+===================================================== */
 
 closeHistory.addEventListener(
     "click",
-    function() {
+    function(){
 
         historyModal.classList.remove(
             "show"
@@ -2403,111 +1724,88 @@ closeHistory.addEventListener(
 );
 
 
-/* ==================================================
+/* =====================================================
    CLEAR HISTORY
-================================================== */
+===================================================== */
 
 document
-    .getElementById(
-        "clearHistory"
-    )
-    .addEventListener(
-        "click",
-        function() {
+.getElementById("clearHistory")
+.addEventListener(
+    "click",
+    function(){
 
-            chats = [];
+        chats = [];
 
-            saveChats();
+        saveChats();
 
-            renderRecent();
+        renderRecent();
 
-            renderPinned();
+        renderPinned();
 
-            historyList.innerHTML =
-                "";
+        renderHistory();
 
-            moreMenu.classList.remove(
-                "show"
-            );
+        moreMenu.classList.remove(
+            "show"
+        );
 
-        }
-    );
+    }
+);
 
 
-/* ==================================================
-   SAVE BUTTON
-================================================== */
+/* =====================================================
+   SAVE
+===================================================== */
 
 document
-    .getElementById(
-        "saveButton"
-    )
-    .addEventListener(
-        "click",
-        function() {
+.getElementById("saveButton")
+.addEventListener(
+    "click",
+    function(){
 
-            saveChats();
+        saveChats();
 
-            moreMenu.classList.remove(
-                "show"
-            );
+        moreMenu.classList.remove(
+            "show"
+        );
 
-        }
-    );
+    }
+);
 
 
-/* ==================================================
+/* =====================================================
    SHARE
-================================================== */
+===================================================== */
 
 shareButton.addEventListener(
     "click",
-    async function() {
+    async function(){
 
-        const messages =
-            [
-                ...document.querySelectorAll(
-                    ".message"
-                )
-            ];
-
-
-        if (
-            messages.length === 0
-        ) {
-
-            return;
-
-        }
-
-
-        let shareText =
+        let text =
             "Viggo AI Chat\n\n";
 
 
-        messages.forEach(
-            function(message) {
+        document
+        .querySelectorAll(".message")
+        .forEach(
+            function(message){
 
                 const name =
                     message.querySelector(
                         ".message-name"
                     );
 
-                const text =
+                const content =
                     message.querySelector(
                         ".message-text"
                     );
 
 
-                if (
-                    name &&
-                    text
-                ) {
+                if(name && content){
 
-                    shareText +=
+                    text +=
                         name.textContent +
                         ": " +
-                        text.textContent +
+                        content.textContent +
                         "\n\n";
 
                 }
@@ -2516,41 +1814,26 @@ shareButton.addEventListener(
         );
 
 
-        if (
-            navigator.share
-        ) {
+        if(navigator.share){
 
-            try {
+            try{
 
                 await navigator.share({
-
-                    title:
-                        "Viggo AI",
-
-                    text:
-                        shareText
-
+                    title:"Viggo AI",
+                    text:text
                 });
 
-            } catch(error) {
+            }catch(error){}
 
-                console.log(
-                    "Share cancelled"
-                );
+        }else{
 
-            }
-
-        } else {
-
-            navigator.clipboard.writeText(
-                shareText
-            );
+            navigator.clipboard.writeText(text);
 
             shareButton.textContent =
                 "✓ Copied";
 
             setTimeout(
-                function() {
+                function(){
 
                     shareButton.textContent =
                         "↗ Share";
@@ -2565,111 +1848,93 @@ shareButton.addEventListener(
 );
 
 
-/* ==================================================
-   VOICE ON / OFF
-================================================== */
+/* =====================================================
+   VOICE
+===================================================== */
 
 document
-    .getElementById(
-        "voiceToggle"
-    )
-    .addEventListener(
-        "click",
-        function() {
+.getElementById("voiceToggle")
+.addEventListener(
+    "click",
+    function(){
 
-            voiceEnabled =
-                !voiceEnabled;
+        voiceEnabled =
+            !voiceEnabled;
 
+        this.textContent =
+            voiceEnabled
+                ? "🔊 Voice ON"
+                : "🔇 Voice OFF";
 
-            this.textContent =
-                voiceEnabled
-                    ? "🔊 Voice ON"
-                    : "🔇 Voice OFF";
-
-        }
-    );
+    }
+);
 
 
-/* ==================================================
+/* =====================================================
    FEMALE VOICE
-================================================== */
+===================================================== */
 
 document
-    .getElementById(
-        "femaleVoice"
-    )
-    .addEventListener(
-        "click",
-        function() {
+.getElementById("femaleVoice")
+.addEventListener(
+    "click",
+    function(){
 
-            currentVoice =
-                "female";
+        currentVoice =
+            "female";
 
-            voiceEnabled =
-                true;
+        voiceEnabled = true;
 
+        speakText(
+            "Okay friend, female voice selected."
+        );
 
-            speakText(
-                "Okay friend, female voice selected."
-            );
+        moreMenu.classList.remove(
+            "show"
+        );
 
-
-            moreMenu.classList.remove(
-                "show"
-            );
-
-        }
-    );
+    }
+);
 
 
-/* ==================================================
+/* =====================================================
    MALE VOICE
-================================================== */
+===================================================== */
 
 document
-    .getElementById(
-        "maleVoice"
-    )
-    .addEventListener(
-        "click",
-        function() {
+.getElementById("maleVoice")
+.addEventListener(
+    "click",
+    function(){
 
-            currentVoice =
-                "male";
+        currentVoice =
+            "male";
 
-            voiceEnabled =
-                true;
+        voiceEnabled = true;
 
+        speakText(
+            "Okay friend, male voice selected."
+        );
 
-            speakText(
-                "Okay friend, male voice selected."
-            );
+        moreMenu.classList.remove(
+            "show"
+        );
 
-
-            moreMenu.classList.remove(
-                "show"
-            );
-
-        }
-    );
+    }
+);
 
 
-/* ==================================================
-   SPEAK
-================================================== */
+/* =====================================================
+   SPEECH
+===================================================== */
 
-function speakText(text) {
+function speakText(text){
 
-    if (
-        !voiceEnabled
-    ) {
+    if(!voiceEnabled){
         return;
     }
 
-
-    if (
-        !("speechSynthesis" in window)
-    ) {
+    if(!("speechSynthesis" in window)){
         return;
     }
 
@@ -2687,36 +1952,29 @@ function speakText(text) {
         speechSynthesis.getVoices();
 
 
-    let selectedVoice =
-        null;
+    let selected = null;
 
 
-    if (
-        currentVoice === "female"
-    ) {
+    if(currentVoice === "female"){
 
-        selectedVoice =
+        selected =
             voices.find(
-                function(voice) {
+                function(v){
 
                     return /female|zira|samantha|karen|susan|google us english/i
-                        .test(
-                            voice.name
-                        );
+                    .test(v.name);
 
                 }
             );
 
-    } else {
+    }else{
 
-        selectedVoice =
+        selected =
             voices.find(
-                function(voice) {
+                function(v){
 
                     return /male|david|alex|daniel|google uk english/i
-                        .test(
-                            voice.name
-                        );
+                    .test(v.name);
 
                 }
             );
@@ -2724,22 +1982,13 @@ function speakText(text) {
     }
 
 
-    if (
-        selectedVoice
-    ) {
-
-        utterance.voice =
-            selectedVoice;
-
+    if(selected){
+        utterance.voice = selected;
     }
 
 
-    utterance.rate =
-        1;
-
-    utterance.pitch =
-        1;
-
+    utterance.rate = 1;
+    utterance.pitch = 1;
 
     speechSynthesis.speak(
         utterance
@@ -2748,26 +1997,22 @@ function speakText(text) {
 }
 
 
-/* ==================================================
-   MIC
-================================================== */
+/* =====================================================
+   MICROPHONE
+===================================================== */
 
 const SpeechRecognition =
     window.SpeechRecognition ||
     window.webkitSpeechRecognition;
 
 
-let recognition =
-    null;
+let recognition = null;
 
 
-if (
-    SpeechRecognition
-) {
+if(SpeechRecognition){
 
     recognition =
         new SpeechRecognition();
-
 
     recognition.lang =
         "en-IN";
@@ -2780,7 +2025,7 @@ if (
 
 
     recognition.onstart =
-        function() {
+        function(){
 
             micButton.classList.add(
                 "recording"
@@ -2793,20 +2038,7 @@ if (
 
 
     recognition.onend =
-        function() {
-
-            micButton.classList.remove(
-                "recording"
-            );
-
-            micButton.textContent =
-                "🎤";
-
-        };
-
-
-    recognition.onerror =
-        function() {
+        function(){
 
             micButton.classList.remove(
                 "recording"
@@ -2819,16 +2051,11 @@ if (
 
 
     recognition.onresult =
-        function(event) {
-
-            const result =
-                event.results[0][0]
-                    .transcript;
-
+        function(event){
 
             messageInput.value =
-                result;
-
+                event.results[0][0]
+                .transcript;
 
             messageInput.focus();
 
@@ -2839,36 +2066,23 @@ if (
 
 micButton.addEventListener(
     "click",
-    function() {
+    function(){
 
-        if (
-            !recognition
-        ) {
-
+        if(!recognition){
             return;
-
         }
 
-
-        try {
-
+        try{
             recognition.start();
-
-        } catch(error) {
-
-            console.log(
-                "Microphone already running"
-            );
-
-        }
+        }catch(error){}
 
     }
 );
 
 
-/* ==================================================
-   INITIAL LOAD
-================================================== */
+/* =====================================================
+   INITIAL
+===================================================== */
 
 renderRecent();
 
