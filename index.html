@@ -1,62 +1,425 @@
-<!-- LANGUAGE MENU -->
-<div class="language-menu" id="languageMenu">
+<!DOCTYPE html>
+<html lang="en">
 
-    <button
-        id="languageBtn"
-        class="language-main-button"
-        type="button"
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
     >
-        🌐 Select Language
-        <span>▸</span>
-    </button>
+
+    <meta
+        name="theme-color"
+        content="#05070d"
+    >
+
+    <title>Viggo AI</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+</head>
+
+<body>
+
+    <!-- ======================================
+         SIDEBAR
+    ======================================= -->
+
+    <aside
+        class="sidebar"
+        id="sidebar"
+    >
+
+        <!-- LOGO -->
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                V
+            </div>
+
+            <div class="logo-text">
+
+                <strong>Viggo</strong>
+
+                <small>AI Friend</small>
+
+            </div>
+
+        </div>
+
+
+        <!-- NEW CHAT -->
+
+        <button
+            class="new-chat"
+            id="newChatBtn"
+            type="button"
+        >
+
+            <span>＋</span>
+
+            <span>New Chat</span>
+
+        </button>
+
+
+        <!-- CHAT HISTORY -->
+
+        <div
+            class="history"
+            id="historyList"
+        ></div>
+
+
+        <!-- ==================================
+             MORE MENU
+        =================================== -->
+
+        <div class="sidebar-more">
+
+            <button
+                class="more-button"
+                id="moreBtn"
+                type="button"
+            >
+
+                <span>⋮</span>
+
+                <span>More</span>
+
+            </button>
+
+
+            <div
+                class="more-menu"
+                id="moreMenu"
+            >
+
+                <!-- SAVE -->
+
+                <button
+                    id="saveBtn"
+                    type="button"
+                >
+
+                    <span>💾</span>
+
+                    <span>Save</span>
+
+                </button>
+
+
+                <!-- SELECT CHATS -->
+
+                <button
+                    id="selectChatsBtn"
+                    type="button"
+                >
+
+                    <span>☑</span>
+
+                    <span>Select Chats</span>
+
+                </button>
+
+
+                <!-- DELETE SELECTED -->
+
+                <button
+                    id="deleteSelectedBtn"
+                    type="button"
+                    class="danger-button"
+                    style="display: none;"
+                >
+
+                    <span>🗑</span>
+
+                    <span>Delete Selected</span>
+
+                </button>
+
+
+                <!-- CLEAR HISTORY -->
+
+                <button
+                    id="clearHistoryBtn"
+                    type="button"
+                    class="danger-button"
+                >
+
+                    <span>🗑</span>
+
+                    <span>Clear History</span>
+
+                </button>
+
+
+                <div class="menu-divider"></div>
+
+
+                <!-- ==================================
+                     LANGUAGE
+                =================================== -->
+
+                <div class="language-title">
+
+                    🌐 Select Language
+
+                </div>
+
+
+                <!-- ENGLISH -->
+
+                <button
+                    type="button"
+                    data-language="en"
+                >
+
+                    <span>🇬🇧</span>
+
+                    <span>English</span>
+
+                </button>
+
+
+                <!-- TAMIL -->
+
+                <button
+                    type="button"
+                    data-language="ta"
+                >
+
+                    <span>🇮🇳</span>
+
+                    <span>தமிழ்</span>
+
+                </button>
+
+
+                <!-- HINDI -->
+
+                <button
+                    type="button"
+                    data-language="hi"
+                >
+
+                    <span>🇮🇳</span>
+
+                    <span>हिन्दी</span>
+
+                </button>
+
+
+                <!-- MALAYALAM -->
+
+                <button
+                    type="button"
+                    data-language="ml"
+                >
+
+                    <span>🇮🇳</span>
+
+                    <span>മലയാളം</span>
+
+                </button>
+
+
+                <!-- TELUGU -->
+
+                <button
+                    type="button"
+                    data-language="te"
+                >
+
+                    <span>🇮🇳</span>
+
+                    <span>తెలుగు</span>
+
+                </button>
+
+
+                <!-- KANNADA -->
+
+                <button
+                    type="button"
+                    data-language="kn"
+                >
+
+                    <span>🇮🇳</span>
+
+                    <span>ಕನ್ನಡ</span>
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- ======================================
+         MAIN
+    ======================================= -->
+
+    <main class="main">
+
+
+        <!-- HEADER -->
+
+        <header class="header">
+
+
+            <!-- MOBILE MENU -->
+
+            <button
+                class="mobile-menu"
+                id="mobileMenuBtn"
+                type="button"
+                aria-label="Open menu"
+            >
+
+                ☰
+
+            </button>
+
+
+            <!-- CHAT TITLE -->
+
+            <div
+                class="chat-title"
+                id="chatTitle"
+            >
+
+                New Chat
+
+            </div>
+
+
+            <!-- SHARE -->
+
+            <button
+                class="share-btn"
+                id="shareBtn"
+                type="button"
+            >
+
+                ↗ Share
+
+            </button>
+
+        </header>
+
+
+
+        <!-- ==================================
+             MESSAGES
+        =================================== -->
+
+        <section
+            class="messages"
+            id="messages"
+            aria-live="polite"
+        >
+
+        </section>
+
+
+
+        <!-- ==================================
+             INPUT AREA
+        =================================== -->
+
+        <footer class="input-area">
+
+
+            <div class="input-box">
+
+
+                <!-- MESSAGE INPUT -->
+
+                <input
+                    type="text"
+                    id="messageInput"
+                    placeholder="Message Viggo..."
+                    autocomplete="off"
+                    aria-label="Message Viggo"
+                >
+
+
+                <!-- VOICE -->
+
+                <button
+                    class="input-icon"
+                    id="voiceBtn"
+                    type="button"
+                    title="Voice input"
+                    aria-label="Voice input"
+                >
+
+                    🎤
+
+                </button>
+
+
+                <!-- SEND -->
+
+                <button
+                    class="send-btn"
+                    id="sendBtn"
+                    type="button"
+                    title="Send message"
+                    aria-label="Send message"
+                >
+
+                    ➤
+
+                </button>
+
+
+            </div>
+
+
+            <!-- WARNING -->
+
+            <div class="input-hint">
+
+                Viggo AI can make mistakes.
+                Check important information.
+
+            </div>
+
+
+        </footer>
+
+    </main>
+
+
+
+    <!-- ======================================
+         TOAST
+    ======================================= -->
 
     <div
-        id="languageSubmenu"
-        class="language-submenu"
-    >
+        id="viggoToast"
+        class="toast"
+        role="status"
+        aria-live="polite"
+    ></div>
 
-        <button
-            type="button"
-            data-language="en"
-        >
-            🇬🇧 English
-        </button>
 
-        <button
-            type="button"
-            data-language="ta"
-        >
-            🇮🇳 தமிழ்
-        </button>
 
-        <button
-            type="button"
-            data-language="hi"
-        >
-            🇮🇳 हिन्दी
-        </button>
+    <!-- ======================================
+         SCRIPT
+    ======================================= -->
 
-        <button
-            type="button"
-            data-language="ml"
-        >
-            🇮🇳 മലയാളം
-        </button>
+    <script src="script.js"></script>
 
-        <button
-            type="button"
-            data-language="te"
-        >
-            🇮🇳 తెలుగు
-        </button>
+</body>
 
-        <button
-            type="button"
-            data-language="kn"
-        >
-            🇮🇳 ಕನ್ನಡ
-        </button>
-
-    </div>
-
-</div>
+</html>
