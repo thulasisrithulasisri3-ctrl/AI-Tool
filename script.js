@@ -1,12 +1,12 @@
-// ======================================================
-// VIGGO AI - COMPLETE SCRIPT
-// ======================================================
+// =====================================================
+// VIGGO AI - FULL SCRIPT
+// =====================================================
 
 const SERVER_URL = "https://ai-tool-1-fgmc.onrender.com";
 
-// ======================================================
+// =====================================================
 // ELEMENTS
-// ======================================================
+// =====================================================
 
 const messageInput = document.getElementById("message");
 const sendButton = document.getElementById("send");
@@ -43,9 +43,10 @@ const mobileMenu =
 const sidebar =
     document.getElementById("sidebar");
 
-// ======================================================
+
+// =====================================================
 // STATE
-// ======================================================
+// =====================================================
 
 let messages = [];
 let currentChatId = null;
@@ -55,34 +56,31 @@ let voiceEnabled =
     localStorage.getItem("viggo_voice_enabled") !== "false";
 
 let selectedGender =
-    localStorage.getItem("viggo_voice_gender") ||
-    "female";
-
-let selectedVoiceName =
-    localStorage.getItem("viggo_voice_name") ||
-    "";
+    localStorage.getItem("viggo_voice_gender") || "female";
 
 let availableVoices = [];
-let recognition = null;
 
-// ======================================================
+
+// =====================================================
 // STORAGE
-// ======================================================
+// =====================================================
 
 function getChats() {
 
     try {
 
         return JSON.parse(
-            localStorage.getItem("viggo_chats") ||
-            "[]"
+            localStorage.getItem("viggo_chats") || "[]"
         );
 
-    } catch {
+    } catch (error) {
+
+        console.error(error);
 
         return [];
     }
 }
+
 
 function saveChats(chats) {
 
@@ -92,423 +90,148 @@ function saveChats(chats) {
     );
 }
 
-// ======================================================
-// VOICE SETTINGS
-// ======================================================
 
-function saveVoiceSettings() {
+// =====================================================
+// ESCAPE HTML
+// =====================================================
 
-    localStorage.setItem(
-        "viggo_voice_enabled",
-        voiceEnabled
-    );
+function escapeHTML(text) {
 
-    localStorage.setItem(
-        "viggo_voice_gender",
-        selectedGender
-    );
+    const div =
+        document.createElement("div");
 
-    localStorage.setItem(
-        "viggo_voice_name",
-        selectedVoiceName
-    );
+    div.textContent =
+        text || "";
+
+    return div.innerHTML;
 }
 
-function updateVoiceButton() {
 
-    if (!voiceToggle) return;
+// =====================================================
+// SAVE CURRENT CHAT
+// =====================================================
 
-    voiceToggle.textContent =
-        voiceEnabled
-            ? "🔊 Voice ON"
-            : "🔇 Voice OFF";
-}
+function saveCurrentChat() {
 
-// ======================================================
-// LOAD VOICES
-// ======================================================
-
-function loadVoices() {
-
-    if (!("speechSynthesis" in window)) {
+    if (
+        !messages ||
+        messages.length === 0
+    ) {
         return;
     }
 
-    availableVoices =
-        window.speechSynthesis.getVoices();
+    let chats =
+        getChats();
 
-    if (!selectedVoiceName) {
+    if (!currentChatId) {
 
-        const voice =
-            findVoice(selectedGender);
-
-        if (voice) {
-
-            selectedVoiceName =
-                voice.name;
-
-            saveVoiceSettings();
-        }
-    }
-}
-
-if ("speechSynthesis" in window) {
-
-    window.speechSynthesis.onvoiceschanged =
-        loadVoices;
-
-    setTimeout(loadVoices, 500);
-    setTimeout(loadVoices, 1500);
-}
-
-// ======================================================
-// FIND VOICE
-// ======================================================
-
-function findVoice(gender) {
-
-    if (!availableVoices.length) {
-        return null;
+        currentChatId =
+            Date.now().toString();
     }
 
-    const femaleNames = [
-        "female",
-        "zira",
-        "samantha",
-        "karen",
-        "hazel",
-        "aria",
-        "jenny",
-        "susan",
-        "veena",
-        "neerja"
-    ];
-
-    const maleNames = [
-        "male",
-        "david",
-        "mark",
-        "daniel",
-        "george",
-        "ryan",
-        "guy",
-        "ravi",
-        "hemant"
-    ];
-
-    const names =
-        gender === "female"
-            ? femaleNames
-            : maleNames;
-
-    let voice =
-        availableVoices.find(v => {
-
-            const name =
-                v.name.toLowerCase();
-
-            return names.some(
-                word =>
-                    name.includes(word)
-            );
-        });
-
-    if (voice) {
-        return voice;
-    }
-
-    voice =
-        availableVoices.find(v =>
-            v.lang &&
-            v.lang.toLowerCase() === "en-in"
+    const firstUserMessage =
+        messages.find(
+            message =>
+                message.role === "user"
         );
 
-    if (voice) {
-        return voice;
-    }
+    const title =
+        firstUserMessage
+            ? firstUserMessage.content
+                .substring(0, 45)
+            : "New Chat";
 
-    voice =
-        availableVoices.find(v =>
-            v.lang &&
-            v.lang.toLowerCase().startsWith("en")
+    const existingIndex =
+        chats.findIndex(
+            chat =>
+                chat.id === currentChatId
         );
 
-    if (voice) {
-        return voice;
-    }
+    const chat = {
 
-    return availableVoices[0];
-}
+        id:
+            currentChatId,
 
-// ======================================================
-// SPEAK
-// ======================================================
+        title:
+            title,
 
-function speak(text) {
+        messages:
+            [...messages],
 
-    if (!voiceEnabled) {
-        return;
-    }
+        pinned:
+            existingIndex >= 0
+                ? !!chats[existingIndex].pinned
+                : false,
 
-    if (!("speechSynthesis" in window)) {
-        return;
-    }
+        time:
+            new Date().toISOString()
+    };
 
-    window.speechSynthesis.cancel();
 
-    loadVoices();
+    if (existingIndex >= 0) {
 
-    let voice = null;
-
-    if (selectedVoiceName) {
-
-        voice =
-            availableVoices.find(
-                v =>
-                    v.name === selectedVoiceName
-            );
-    }
-
-    if (!voice) {
-
-        voice =
-            findVoice(selectedGender);
-    }
-
-    const speech =
-        new SpeechSynthesisUtterance(text);
-
-    if (voice) {
-
-        speech.voice = voice;
-        speech.lang =
-            voice.lang || "en-IN";
+        chats[existingIndex] =
+            chat;
 
     } else {
 
-        speech.lang = "en-IN";
+        chats.unshift(chat);
     }
 
-    speech.rate = 1;
-    speech.pitch =
-        selectedGender === "female"
-            ? 1.05
-            : 0.95;
 
-    speech.volume = 1;
+    saveChats(chats);
 
-    window.speechSynthesis.speak(
-        speech
-    );
+    currentTitle.textContent =
+        title;
+
+    renderHistory();
 }
 
-// ======================================================
-// CHANGE VOICE
-// ======================================================
 
-function changeVoice(gender) {
+// =====================================================
+// LOAD CHAT
+// =====================================================
 
-    loadVoices();
+function loadChat(chat) {
 
-    const voice =
-        findVoice(gender);
-
-    if (!voice) {
-
-        speak(
-            "Sorry friend, a suitable voice was not found."
-        );
-
+    if (!chat) {
         return;
     }
 
-    selectedGender = gender;
-    selectedVoiceName = voice.name;
+    currentChatId =
+        chat.id;
 
-    saveVoiceSettings();
+    messages =
+        Array.isArray(chat.messages)
+            ? [...chat.messages]
+            : [];
 
-    const reply =
-        gender === "female"
-            ? "Okay friend, female voice changed."
-            : "Okay friend, male voice changed.";
+    conversation.innerHTML =
+        "";
 
-    speak(reply);
-}
+    currentTitle.textContent =
+        chat.title || "Chat";
 
-// ======================================================
-// VOICE COMMAND
-// ======================================================
 
-function handleVoiceCommand(text) {
+    messages.forEach(
+        message => {
 
-    const command =
-        text.toLowerCase().trim();
-
-    // FEMALE
-    if (
-        command.includes("female voice") ||
-        command.includes("பெண் குரல்") ||
-        command.includes("பெண் வாய்ஸ்")
-    ) {
-
-        changeVoice("female");
-
-        return true;
-    }
-
-    // MALE
-    if (
-        command.includes("male voice") ||
-        command.includes("ஆண் குரல்") ||
-        command.includes("ஆண் வாய்ஸ்")
-    ) {
-
-        changeVoice("male");
-
-        return true;
-    }
-
-    // VOICE OFF
-    if (
-        command === "voice off" ||
-        command.includes("turn off voice") ||
-        command.includes("voice off பண்ணு") ||
-        command.includes("வாய்ஸ் ஆஃப்")
-    ) {
-
-        voiceEnabled = false;
-
-        saveVoiceSettings();
-
-        if ("speechSynthesis" in window) {
-            window.speechSynthesis.cancel();
-        }
-
-        updateVoiceButton();
-
-        return true;
-    }
-
-    // VOICE ON
-    if (
-        command === "voice on" ||
-        command.includes("turn on voice") ||
-        command.includes("voice on பண்ணு") ||
-        command.includes("வாய்ஸ் ஆன்")
-    ) {
-
-        voiceEnabled = true;
-
-        saveVoiceSettings();
-
-        updateVoiceButton();
-
-        speak(
-            "Okay friend, voice is on."
-        );
-
-        return true;
-    }
-
-    return false;
-}
-
-// ======================================================
-// CHECK SERVER
-// ======================================================
-
-async function checkServer() {
-
-    try {
-
-        const response =
-            await fetch(
-                SERVER_URL +
-                "/api/health",
-                {
-                    method: "GET"
-                }
+            addMessage(
+                message.role,
+                message.content,
+                false
             );
-
-        if (!response.ok) {
-            return false;
         }
-
-        const data =
-            await response.json();
-
-        return (
-            data &&
-            data.status === "online"
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Server error:",
-            error
-        );
-
-        return false;
-    }
-}
-
-// ======================================================
-// ASK VIGGO
-// ======================================================
-
-async function askViggo(text) {
-
-    const response =
-        await fetch(
-            SERVER_URL +
-            "/api/chat",
-            {
-                method: "POST",
-
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
-
-                body: JSON.stringify({
-                    message: text
-                })
-            }
-        );
-
-    let data;
-
-    try {
-
-        data =
-            await response.json();
-
-    } catch {
-
-        throw new Error(
-            "Invalid server response"
-        );
-    }
-
-    if (!response.ok) {
-
-        throw new Error(
-            data.error ||
-            "Chat request failed"
-        );
-    }
-
-    return (
-        data.reply ||
-        data.message ||
-        "Sorry friend, I didn't get a response."
     );
+
+
+    scrollToBottom();
 }
 
-// ======================================================
+
+// =====================================================
 // ADD MESSAGE
-// ======================================================
+// =====================================================
 
 function addMessage(
     role,
@@ -522,6 +245,7 @@ function addMessage(
     message.className =
         "message " + role;
 
+
     const avatar =
         document.createElement("div");
 
@@ -533,8 +257,10 @@ function addMessage(
             ? "U"
             : "B";
 
+
     const content =
         document.createElement("div");
+
 
     const name =
         document.createElement("div");
@@ -547,6 +273,7 @@ function addMessage(
             ? "You"
             : "Viggo";
 
+
     const textElement =
         document.createElement("div");
 
@@ -556,28 +283,45 @@ function addMessage(
     textElement.textContent =
         text;
 
-    content.appendChild(name);
-    content.appendChild(textElement);
 
-    // AI ACTIONS
+    content.appendChild(name);
+
+    content.appendChild(
+        textElement
+    );
+
+
+    // ================================================
+    // AI BUTTONS
+    // ================================================
+
     if (role === "ai") {
 
         const actions =
             document.createElement("div");
 
-        actions.style.display = "flex";
-        actions.style.gap = "6px";
-        actions.style.marginTop = "10px";
-        actions.style.flexWrap = "wrap";
+        actions.style.display =
+            "flex";
+
+        actions.style.gap =
+            "6px";
+
+        actions.style.marginTop =
+            "10px";
+
+        actions.style.flexWrap =
+            "wrap";
+
 
         // COPY
-        const copy =
+        const copyButton =
             document.createElement("button");
 
-        copy.textContent =
+        copyButton.textContent =
             "📋 Copy";
 
-        copy.onclick =
+
+        copyButton.onclick =
             async function () {
 
                 try {
@@ -585,87 +329,130 @@ function addMessage(
                     await navigator.clipboard
                         .writeText(text);
 
-                    copy.textContent =
+                    copyButton.textContent =
                         "✓ Copied";
 
-                    setTimeout(() => {
+                    setTimeout(
+                        () => {
 
-                        copy.textContent =
-                            "📋 Copy";
+                            copyButton.textContent =
+                                "📋 Copy";
 
-                    }, 1200);
+                        },
+                        1200
+                    );
 
                 } catch {
 
-                    console.log(
-                        "Copy failed"
+                    const area =
+                        document.createElement(
+                            "textarea"
+                        );
+
+                    area.value =
+                        text;
+
+                    document.body.appendChild(
+                        area
                     );
+
+                    area.select();
+
+                    document.execCommand(
+                        "copy"
+                    );
+
+                    area.remove();
                 }
             };
 
+
         // SPEAKER
-        const speaker =
+        const speakerButton =
             document.createElement("button");
 
-        speaker.textContent =
+        speakerButton.textContent =
             "🔊 Speak";
 
-        speaker.onclick =
+
+        speakerButton.onclick =
             function () {
-
-                if (!voiceEnabled) {
-
-                    voiceEnabled = true;
-
-                    saveVoiceSettings();
-
-                    updateVoiceButton();
-                }
 
                 speak(text);
             };
 
+
         // LIKE
-        const like =
+        const likeButton =
             document.createElement("button");
 
-        like.textContent =
+        likeButton.textContent =
             "👍 Like";
 
-        like.onclick =
+
+        likeButton.onclick =
             function () {
 
-                like.textContent =
+                likeButton.textContent =
                     "👍 Liked";
             };
 
-        actions.appendChild(copy);
-        actions.appendChild(speaker);
-        actions.appendChild(like);
 
-        content.appendChild(actions);
+        actions.appendChild(
+            copyButton
+        );
+
+        actions.appendChild(
+            speakerButton
+        );
+
+        actions.appendChild(
+            likeButton
+        );
+
+
+        content.appendChild(
+            actions
+        );
     }
 
-    message.appendChild(avatar);
-    message.appendChild(content);
 
-    conversation.appendChild(message);
+    message.appendChild(
+        avatar
+    );
+
+    message.appendChild(
+        content
+    );
+
+    conversation.appendChild(
+        message
+    );
+
 
     messages.push({
-        role: role,
-        content: text
+
+        role:
+            role,
+
+        content:
+            text
     });
 
+
     if (save) {
+
         saveCurrentChat();
     }
+
 
     scrollToBottom();
 }
 
-// ======================================================
+
+// =====================================================
 // SEND MESSAGE
-// ======================================================
+// =====================================================
 
 async function sendMessage() {
 
@@ -680,52 +467,69 @@ async function sendMessage() {
         return;
     }
 
-    isSending = true;
 
-    sendButton.disabled = true;
+    isSending =
+        true;
 
-    messageInput.value = "";
+    sendButton.disabled =
+        true;
 
-    // VOICE COMMAND
-    if (handleVoiceCommand(text)) {
 
-        addMessage(
-            "user",
-            text,
-            true
-        );
+    messageInput.value =
+        "";
 
-        isSending = false;
-        sendButton.disabled = false;
 
-        return;
-    }
-
-    // USER MESSAGE
     addMessage(
         "user",
         text,
         false
     );
 
+
     try {
 
-        const online =
-            await checkServer();
+        const response =
+            await fetch(
+                SERVER_URL +
+                "/api/chat",
+                {
 
-        if (!online) {
+                    method:
+                        "POST",
 
-            addMessage(
-                "ai",
-                "Viggo server is not connected. Please start the server and try again.",
-                false
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+                            message:
+                                text
+                        })
+                }
             );
 
-            return;
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                "Server error"
+            );
         }
 
+
         const reply =
-            await askViggo(text);
+            data.reply ||
+            data.message ||
+            "Sorry friend, I did not receive a response.";
+
 
         addMessage(
             "ai",
@@ -733,18 +537,23 @@ async function sendMessage() {
             false
         );
 
+
+        saveCurrentChat();
+
+
         if (voiceEnabled) {
+
             speak(reply);
         }
 
-        saveCurrentChat();
 
     } catch (error) {
 
         console.error(
-            "Viggo chat error:",
+            "Viggo error:",
             error
         );
+
 
         addMessage(
             "ai",
@@ -754,17 +563,33 @@ async function sendMessage() {
 
     } finally {
 
-        isSending = false;
+        isSending =
+            false;
 
-        sendButton.disabled = false;
+        sendButton.disabled =
+            false;
 
         messageInput.focus();
     }
 }
 
-// ======================================================
+
+// =====================================================
+// SEND BUTTON
+// =====================================================
+
+if (sendButton) {
+
+    sendButton.addEventListener(
+        "click",
+        sendMessage
+    );
+}
+
+
+// =====================================================
 // ENTER KEY
-// ======================================================
+// =====================================================
 
 if (messageInput) {
 
@@ -785,21 +610,10 @@ if (messageInput) {
     );
 }
 
-// ======================================================
-// SEND BUTTON
-// ======================================================
 
-if (sendButton) {
-
-    sendButton.addEventListener(
-        "click",
-        sendMessage
-    );
-}
-
-// ======================================================
+// =====================================================
 // NEW CHAT
-// ======================================================
+// =====================================================
 
 if (newChatButton) {
 
@@ -807,9 +621,15 @@ if (newChatButton) {
         "click",
         function () {
 
+            // SAVE OLD CHAT FIRST
+            saveCurrentChat();
+
+
+            // NEW CHAT
             messages = [];
 
-            currentChatId = null;
+            currentChatId =
+                null;
 
             conversation.innerHTML =
                 "";
@@ -817,161 +637,62 @@ if (newChatButton) {
             currentTitle.textContent =
                 "New Chat";
 
-            messageInput.value = "";
+            messageInput.value =
+                "";
 
             renderHistory();
+
+            messageInput.focus();
         }
     );
 }
 
-// ======================================================
-// SAVE CHAT
-// ======================================================
 
-function saveCurrentChat() {
-
-    if (
-        !messages ||
-        messages.length === 0
-    ) {
-        return;
-    }
-
-    const chats =
-        getChats();
-
-    const firstUser =
-        messages.find(
-            m => m.role === "user"
-        );
-
-    const title =
-        firstUser
-            ? firstUser.content.substring(
-                0,
-                40
-            )
-            : "New Chat";
-
-    if (!currentChatId) {
-
-        currentChatId =
-            Date.now().toString();
-    }
-
-    const oldChat =
-        chats.find(
-            c =>
-                c.id === currentChatId
-        );
-
-    const chat = {
-
-        id: currentChatId,
-
-        title: title,
-
-        messages: messages,
-
-        pinned:
-            oldChat
-                ? oldChat.pinned
-                : false,
-
-        time:
-            new Date().toISOString()
-    };
-
-    const index =
-        chats.findIndex(
-            c =>
-                c.id === currentChatId
-        );
-
-    if (index >= 0) {
-
-        chats[index] = chat;
-
-    } else {
-
-        chats.unshift(chat);
-    }
-
-    saveChats(chats);
-
-    currentTitle.textContent =
-        title;
-
-    renderHistory();
-}
-
-// ======================================================
-// LOAD CHAT
-// ======================================================
-
-function loadChat(chat) {
-
-    currentChatId =
-        chat.id;
-
-    messages =
-        Array.isArray(chat.messages)
-            ? chat.messages
-            : [];
-
-    conversation.innerHTML =
-        "";
-
-    currentTitle.textContent =
-        chat.title ||
-        "Chat";
-
-    messages.forEach(
-        message => {
-
-            addMessage(
-                message.role,
-                message.content,
-                false
-            );
-        }
-    );
-
-    scrollToBottom();
-}
-
-// ======================================================
-// RENDER HISTORY
-// ======================================================
+// =====================================================
+// HISTORY
+// =====================================================
 
 function renderHistory() {
 
     const chats =
         getChats();
 
+
+    // CLEAR
     if (pinnedList) {
-        pinnedList.innerHTML = "";
+        pinnedList.innerHTML =
+            "";
     }
 
     if (recentList) {
-        recentList.innerHTML = "";
+        recentList.innerHTML =
+            "";
     }
 
     if (historyList) {
-        historyList.innerHTML = "";
+        historyList.innerHTML =
+            "";
     }
+
 
     const pinned =
         chats.filter(
-            chat => chat.pinned
+            chat =>
+                chat.pinned === true
         );
+
 
     const recent =
         chats.filter(
-            chat => !chat.pinned
+            chat =>
+                chat.pinned !== true
         );
 
+
+    // ================================================
     // PINNED
+    // ================================================
+
     if (pinned.length === 0) {
 
         if (pinnedList) {
@@ -985,15 +706,21 @@ function renderHistory() {
     } else {
 
         pinned.forEach(
-            chat =>
+            chat => {
+
                 createSidebarChat(
                     chat,
                     pinnedList
-                )
+                );
+            }
         );
     }
 
+
+    // ================================================
     // RECENT
+    // ================================================
+
     if (recent.length === 0) {
 
         if (recentList) {
@@ -1007,130 +734,144 @@ function renderHistory() {
     } else {
 
         recent.forEach(
-            chat =>
+            chat => {
+
                 createSidebarChat(
                     chat,
                     recentList
-                )
+                );
+            }
         );
     }
 
+
+    // ================================================
     // MODAL
+    // ================================================
+
     if (!historyList) {
         return;
     }
 
+
     if (chats.length === 0) {
 
         historyList.innerHTML =
-            "<p>No chat history yet.</p>";
+            `<p>No chat history yet.</p>`;
 
         return;
     }
 
-    chats.forEach(chat => {
 
-        const card =
-            document.createElement("div");
+    chats.forEach(
+        chat => {
 
-        card.className =
-            "history-card";
+            const card =
+                document.createElement(
+                    "div"
+                );
 
-        if (chat.pinned) {
-            card.classList.add("pinned");
+            card.className =
+                "history-card";
+
+
+            if (chat.pinned) {
+
+                card.classList.add(
+                    "pinned"
+                );
+            }
+
+
+            card.innerHTML = `
+
+                <div class="history-card-title">
+                    ${escapeHTML(chat.title)}
+                </div>
+
+                <div class="history-card-time">
+                    ${new Date(chat.time).toLocaleString()}
+                </div>
+
+                <div class="history-card-actions">
+
+                    <button class="open-chat">
+                        Open
+                    </button>
+
+                    <button class="pin-chat">
+                        ${
+                            chat.pinned
+                                ? "📌 Unpin"
+                                : "📌 Pin"
+                        }
+                    </button>
+
+                    <button class="delete-chat">
+                        🗑 Delete
+                    </button>
+
+                </div>
+            `;
+
+
+            const openButton =
+                card.querySelector(
+                    ".open-chat"
+                );
+
+
+            const pinButton =
+                card.querySelector(
+                    ".pin-chat"
+                );
+
+
+            const deleteButton =
+                card.querySelector(
+                    ".delete-chat"
+                );
+
+
+            openButton.onclick =
+                function () {
+
+                    loadChat(chat);
+
+                    historyModal.style.display =
+                        "none";
+                };
+
+
+            pinButton.onclick =
+                function () {
+
+                    togglePin(
+                        chat.id
+                    );
+                };
+
+
+            deleteButton.onclick =
+                function () {
+
+                    deleteChat(
+                        chat.id
+                    );
+                };
+
+
+            historyList.appendChild(
+                card
+            );
         }
-
-        const title =
-            document.createElement("div");
-
-        title.className =
-            "history-card-title";
-
-        title.textContent =
-            chat.title;
-
-        const time =
-            document.createElement("div");
-
-        time.className =
-            "history-card-time";
-
-        time.textContent =
-            new Date(
-                chat.time
-            ).toLocaleString();
-
-        const actions =
-            document.createElement("div");
-
-        actions.className =
-            "history-card-actions";
-
-        // OPEN
-        const open =
-            document.createElement("button");
-
-        open.textContent =
-            "Open";
-
-        open.onclick =
-            function () {
-
-                loadChat(chat);
-
-                historyModal.style.display =
-                    "none";
-            };
-
-        // PIN
-        const pin =
-            document.createElement("button");
-
-        pin.className =
-            "pin-button";
-
-        pin.textContent =
-            chat.pinned
-                ? "📌 Unpin"
-                : "📌 Pin";
-
-        pin.onclick =
-            function () {
-
-                togglePin(chat.id);
-            };
-
-        // DELETE
-        const del =
-            document.createElement("button");
-
-        del.className =
-            "delete-button";
-
-        del.textContent =
-            "🗑 Delete";
-
-        del.onclick =
-            function () {
-
-                deleteChat(chat.id);
-            };
-
-        actions.appendChild(open);
-        actions.appendChild(pin);
-        actions.appendChild(del);
-
-        card.appendChild(title);
-        card.appendChild(time);
-        card.appendChild(actions);
-
-        historyList.appendChild(card);
-    });
+    );
 }
 
-// ======================================================
+
+// =====================================================
 // SIDEBAR CHAT
-// ======================================================
+// =====================================================
 
 function createSidebarChat(
     chat,
@@ -1141,34 +882,30 @@ function createSidebarChat(
         return;
     }
 
+
     const button =
-        document.createElement("button");
+        document.createElement(
+            "button"
+        );
 
     button.className =
         "chat-item";
 
-    const title =
-        document.createElement("span");
 
-    title.className =
-        "chat-item-title";
+    button.innerHTML = `
 
-    title.textContent =
-        chat.title;
+        <span class="chat-item-title">
+            ${escapeHTML(chat.title)}
+        </span>
 
-    const pin =
-        document.createElement("span");
+        ${
+            chat.pinned
+                ? `<span class="pin-icon">📌</span>`
+                : ""
+        }
 
-    pin.className =
-        "pin-icon";
+    `;
 
-    pin.textContent =
-        chat.pinned
-            ? "📌"
-            : "";
-
-    button.appendChild(title);
-    button.appendChild(pin);
 
     button.onclick =
         function () {
@@ -1176,70 +913,16 @@ function createSidebarChat(
             loadChat(chat);
         };
 
-    container.appendChild(button);
+
+    container.appendChild(
+        button
+    );
 }
 
-// ======================================================
-// PIN
-// ======================================================
 
-function togglePin(id) {
-
-    const chats =
-        getChats();
-
-    const chat =
-        chats.find(
-            c => c.id === id
-        );
-
-    if (!chat) {
-        return;
-    }
-
-    chat.pinned =
-        !chat.pinned;
-
-    saveChats(chats);
-
-    renderHistory();
-}
-
-// ======================================================
-// DELETE
-// ======================================================
-
-function deleteChat(id) {
-
-    const chats =
-        getChats();
-
-    const updated =
-        chats.filter(
-            c => c.id !== id
-        );
-
-    saveChats(updated);
-
-    if (currentChatId === id) {
-
-        currentChatId = null;
-
-        messages = [];
-
-        conversation.innerHTML =
-            "";
-
-        currentTitle.textContent =
-            "New Chat";
-    }
-
-    renderHistory();
-}
-
-// ======================================================
+// =====================================================
 // HISTORY BUTTON
-// ======================================================
+// =====================================================
 
 if (historyButton) {
 
@@ -1255,9 +938,10 @@ if (historyButton) {
     );
 }
 
-// ======================================================
+
+// =====================================================
 // CLOSE HISTORY
-// ======================================================
+// =====================================================
 
 if (closeHistory) {
 
@@ -1271,9 +955,10 @@ if (closeHistory) {
     );
 }
 
-// ======================================================
+
+// =====================================================
 // SAVE BUTTON
-// ======================================================
+// =====================================================
 
 if (saveButton) {
 
@@ -1283,8 +968,10 @@ if (saveButton) {
 
             saveCurrentChat();
 
+
             saveButton.textContent =
                 "✓ Saved";
+
 
             setTimeout(
                 () => {
@@ -1299,9 +986,88 @@ if (saveButton) {
     );
 }
 
-// ======================================================
-// CLEAR HISTORY
-// ======================================================
+
+// =====================================================
+// PIN
+// =====================================================
+
+function togglePin(id) {
+
+    const chats =
+        getChats();
+
+
+    const chat =
+        chats.find(
+            item =>
+                item.id === id
+        );
+
+
+    if (!chat) {
+        return;
+    }
+
+
+    chat.pinned =
+        !chat.pinned;
+
+
+    saveChats(
+        chats
+    );
+
+
+    renderHistory();
+}
+
+
+// =====================================================
+// DELETE
+// =====================================================
+
+function deleteChat(id) {
+
+    let chats =
+        getChats();
+
+
+    chats =
+        chats.filter(
+            chat =>
+                chat.id !== id
+        );
+
+
+    saveChats(
+        chats
+    );
+
+
+    if (
+        currentChatId === id
+    ) {
+
+        currentChatId =
+            null;
+
+        messages = [];
+
+        conversation.innerHTML =
+            "";
+
+        currentTitle.textContent =
+            "New Chat";
+    }
+
+
+    renderHistory();
+}
+
+
+// =====================================================
+// CLEAR ALL HISTORY
+// =====================================================
 
 if (clearHistoryButton) {
 
@@ -1313,9 +1079,12 @@ if (clearHistoryButton) {
                 "viggo_chats"
             );
 
-            currentChatId = null;
+
+            currentChatId =
+                null;
 
             messages = [];
+
 
             conversation.innerHTML =
                 "";
@@ -1323,14 +1092,136 @@ if (clearHistoryButton) {
             currentTitle.textContent =
                 "New Chat";
 
+
             renderHistory();
         }
     );
 }
 
-// ======================================================
-// VOICE TOGGLE
-// ======================================================
+
+// =====================================================
+// VOICE
+// =====================================================
+
+function loadVoices() {
+
+    if (
+        !("speechSynthesis" in window)
+    ) {
+        return;
+    }
+
+
+    availableVoices =
+        speechSynthesis.getVoices();
+}
+
+
+if (
+    "speechSynthesis" in window
+) {
+
+    speechSynthesis.onvoiceschanged =
+        loadVoices;
+
+    loadVoices();
+}
+
+
+function speak(text) {
+
+    if (!voiceEnabled) {
+        return;
+    }
+
+
+    if (
+        !("speechSynthesis" in window)
+    ) {
+        return;
+    }
+
+
+    speechSynthesis.cancel();
+
+
+    const utterance =
+        new SpeechSynthesisUtterance(
+            text
+        );
+
+
+    loadVoices();
+
+
+    let voice =
+        availableVoices.find(
+            v =>
+                v.name
+                    .toLowerCase()
+                    .includes(
+                        selectedGender
+                    )
+        );
+
+
+    if (!voice) {
+
+        voice =
+            availableVoices.find(
+                v =>
+                    v.lang &&
+                    v.lang
+                        .toLowerCase()
+                        .startsWith(
+                            "en"
+                        )
+            );
+    }
+
+
+    if (voice) {
+
+        utterance.voice =
+            voice;
+
+        utterance.lang =
+            voice.lang;
+    }
+
+
+    utterance.rate =
+        1;
+
+    utterance.pitch =
+        selectedGender === "female"
+            ? 1.05
+            : 0.95;
+
+
+    speechSynthesis.speak(
+        utterance
+    );
+}
+
+
+// =====================================================
+// VOICE ON / OFF
+// =====================================================
+
+function updateVoiceButton() {
+
+    if (!voiceToggle) {
+        return;
+    }
+
+
+    voiceToggle.textContent =
+        voiceEnabled
+            ? "🔊 Voice ON"
+            : "🔇 Voice OFF";
+}
+
 
 if (voiceToggle) {
 
@@ -1341,9 +1232,15 @@ if (voiceToggle) {
             voiceEnabled =
                 !voiceEnabled;
 
-            saveVoiceSettings();
+
+            localStorage.setItem(
+                "viggo_voice_enabled",
+                voiceEnabled
+            );
+
 
             updateVoiceButton();
+
 
             if (!voiceEnabled) {
 
@@ -1352,23 +1249,59 @@ if (voiceToggle) {
                     in window
                 ) {
 
-                    window.speechSynthesis
-                        .cancel();
+                    speechSynthesis.cancel();
                 }
-
-            } else {
-
-                speak(
-                    "Okay friend, voice is on."
-                );
             }
         }
     );
 }
 
-// ======================================================
+
+// =====================================================
+// CHANGE VOICE
+// =====================================================
+
+function changeVoice(gender) {
+
+    selectedGender =
+        gender;
+
+
+    localStorage.setItem(
+        "viggo_voice_gender",
+        gender
+    );
+
+
+    const message =
+        gender === "female"
+            ? "Okay friend, female voice changed."
+            : "Okay friend, male voice changed.";
+
+
+    voiceEnabled =
+        true;
+
+
+    localStorage.setItem(
+        "viggo_voice_enabled",
+        "true"
+    );
+
+
+    updateVoiceButton();
+
+
+    speak(message);
+}
+
+
+// =====================================================
 // MICROPHONE
-// ======================================================
+// =====================================================
+
+let recognition = null;
+
 
 if (
     "SpeechRecognition" in window ||
@@ -1379,17 +1312,22 @@ if (
         window.SpeechRecognition ||
         window.webkitSpeechRecognition;
 
+
     recognition =
         new SpeechRecognition();
+
 
     recognition.lang =
         "en-IN";
 
+
     recognition.continuous =
         false;
 
+
     recognition.interimResults =
         false;
+
 
     recognition.onstart =
         function () {
@@ -1402,6 +1340,7 @@ if (
             }
         };
 
+
     recognition.onend =
         function () {
 
@@ -1413,6 +1352,7 @@ if (
             }
         };
 
+
     recognition.onresult =
         function (event) {
 
@@ -1420,30 +1360,14 @@ if (
                 event.results[0][0]
                     .transcript;
 
+
             messageInput.value =
                 text;
 
-            if (
-                handleVoiceCommand(text)
-            ) {
-
-                messageInput.value =
-                    "";
-
-                return;
-            }
 
             sendMessage();
         };
 
-    recognition.onerror =
-        function (event) {
-
-            console.error(
-                "Mic error:",
-                event.error
-            );
-        };
 
     if (micButton) {
 
@@ -1458,64 +1382,54 @@ if (
                 } catch {
 
                     console.log(
-                        "Mic already running"
+                        "Microphone already running."
                     );
                 }
             }
         );
     }
-
-} else {
-
-    if (micButton) {
-
-        micButton.addEventListener(
-            "click",
-            function () {
-
-                alert(
-                    "Voice input is not supported in this browser."
-                );
-            }
-        );
-    }
 }
 
-// ======================================================
+
+// =====================================================
 // SHARE WHOLE CHAT
-// ======================================================
+// =====================================================
 
 async function shareWholeChat() {
 
-    if (!messages.length) {
-
-        alert(
-            "No messages to share."
-        );
+    if (
+        !messages ||
+        messages.length === 0
+    ) {
 
         return;
     }
 
-    let text =
+
+    let shareText =
         "Viggo Chat\n\n";
+
 
     messages.forEach(
         message => {
 
-            text +=
+            shareText +=
                 message.role === "user"
                     ? "You:\n"
                     : "Viggo:\n";
 
-            text +=
+            shareText +=
                 message.content +
                 "\n\n";
         }
     );
 
+
     try {
 
-        if (navigator.share) {
+        if (
+            navigator.share
+        ) {
 
             await navigator.share({
 
@@ -1523,17 +1437,15 @@ async function shareWholeChat() {
                     "Viggo Chat",
 
                 text:
-                    text
+                    shareText
             });
 
         } else {
 
             await navigator.clipboard
-                .writeText(text);
-
-            alert(
-                "Whole chat copied."
-            );
+                .writeText(
+                    shareText
+                );
         }
 
     } catch {
@@ -1544,64 +1456,302 @@ async function shareWholeChat() {
     }
 }
 
-// ======================================================
-// SHARE BUTTON
-// ======================================================
 
-function createShareButton() {
+// =====================================================
+// MORE MENU
+// =====================================================
+
+function createMoreMenu() {
 
     const topbar =
         document.querySelector(
             ".topbar"
         );
 
+
     if (!topbar) {
         return;
     }
 
+
     if (
         document.getElementById(
-            "viggoShareButton"
+            "viggoMoreButton"
         )
     ) {
         return;
     }
 
-    const button =
-        document.createElement("button");
 
-    button.id =
-        "viggoShareButton";
+    const wrapper =
+        document.createElement(
+            "div"
+        );
 
-    button.textContent =
-        "↗ Share";
 
-    button.style.marginLeft =
+    wrapper.style.position =
+        "relative";
+
+
+    wrapper.style.marginLeft =
         "auto";
 
-    button.style.border =
+
+    const moreButton =
+        document.createElement(
+            "button"
+        );
+
+
+    moreButton.id =
+        "viggoMoreButton";
+
+
+    moreButton.textContent =
+        "⋮";
+
+
+    moreButton.style.border =
         "0";
 
-    button.style.borderRadius =
+    moreButton.style.background =
+        "#eee";
+
+    moreButton.style.borderRadius =
         "8px";
 
-    button.style.padding =
-        "8px 12px";
+    moreButton.style.padding =
+        "8px 13px";
 
-    button.style.cursor =
+    moreButton.style.fontSize =
+        "20px";
+
+    moreButton.style.cursor =
         "pointer";
 
-    button.onclick =
-        shareWholeChat;
+
+    const menu =
+        document.createElement(
+            "div"
+        );
+
+
+    menu.style.display =
+        "none";
+
+    menu.style.position =
+        "absolute";
+
+    menu.style.right =
+        "0";
+
+    menu.style.top =
+        "45px";
+
+    menu.style.background =
+        "white";
+
+    menu.style.border =
+        "1px solid #ddd";
+
+    menu.style.borderRadius =
+        "10px";
+
+    menu.style.padding =
+        "6px";
+
+    menu.style.minWidth =
+        "180px";
+
+    menu.style.boxShadow =
+        "0 8px 25px rgba(0,0,0,.15)";
+
+    menu.style.zIndex =
+        "2000";
+
+
+    function menuItem(
+        text,
+        action
+    ) {
+
+        const button =
+            document.createElement(
+                "button"
+            );
+
+
+        button.textContent =
+            text;
+
+
+        button.style.display =
+            "block";
+
+        button.style.width =
+            "100%";
+
+        button.style.border =
+            "0";
+
+        button.style.background =
+            "transparent";
+
+        button.style.padding =
+            "10px";
+
+        button.style.textAlign =
+            "left";
+
+        button.style.cursor =
+            "pointer";
+
+        button.style.borderRadius =
+            "7px";
+
+
+        button.onclick =
+            function () {
+
+                action();
+
+                menu.style.display =
+                    "none";
+            };
+
+
+        menu.appendChild(
+            button
+        );
+    }
+
+
+    menuItem(
+        "💾 Save",
+        saveCurrentChat
+    );
+
+
+    menuItem(
+        "🕘 History",
+        function () {
+
+            renderHistory();
+
+            historyModal.style.display =
+                "block";
+        }
+    );
+
+
+    menuItem(
+        "🔊 Voice ON/OFF",
+        function () {
+
+            voiceEnabled =
+                !voiceEnabled;
+
+            localStorage.setItem(
+                "viggo_voice_enabled",
+                voiceEnabled
+            );
+
+            updateVoiceButton();
+        }
+    );
+
+
+    menuItem(
+        "🎙️ Female Voice",
+        function () {
+
+            changeVoice(
+                "female"
+            );
+        }
+    );
+
+
+    menuItem(
+        "🎙️ Male Voice",
+        function () {
+
+            changeVoice(
+                "male"
+            );
+        }
+    );
+
+
+    menuItem(
+        "↗️ Share Chat",
+        shareWholeChat
+    );
+
+
+    menuItem(
+        "🗑️ Clear History",
+        function () {
+
+            localStorage.removeItem(
+                "viggo_chats"
+            );
+
+            messages = [];
+
+            currentChatId =
+                null;
+
+            conversation.innerHTML =
+                "";
+
+            currentTitle.textContent =
+                "New Chat";
+
+            renderHistory();
+        }
+    );
+
+
+    moreButton.onclick =
+        function (event) {
+
+            event.stopPropagation();
+
+            menu.style.display =
+                menu.style.display === "none"
+                    ? "block"
+                    : "none";
+        };
+
+
+    document.addEventListener(
+        "click",
+        function () {
+
+            menu.style.display =
+                "none";
+        }
+    );
+
+
+    wrapper.appendChild(
+        moreButton
+    );
+
+    wrapper.appendChild(
+        menu
+    );
 
     topbar.appendChild(
-        button
+        wrapper
     );
 }
 
-// ======================================================
+
+// =====================================================
 // MOBILE MENU
-// ======================================================
+// =====================================================
 
 if (mobileMenu) {
 
@@ -1609,16 +1759,43 @@ if (mobileMenu) {
         "click",
         function () {
 
-            sidebar.classList.toggle(
-                "open"
-            );
+            if (sidebar) {
+
+                sidebar.classList.toggle(
+                    "open"
+                );
+            }
         }
     );
 }
 
-// ======================================================
+
+// =====================================================
+// CLOSE MODAL WHEN CLICK OUTSIDE
+// =====================================================
+
+if (historyModal) {
+
+    historyModal.addEventListener(
+        "click",
+        function (event) {
+
+            if (
+                event.target ===
+                historyModal
+            ) {
+
+                historyModal.style.display =
+                    "none";
+            }
+        }
+    );
+}
+
+
+// =====================================================
 // SCROLL
-// ======================================================
+// =====================================================
 
 function scrollToBottom() {
 
@@ -1627,6 +1804,7 @@ function scrollToBottom() {
             "chatArea"
         );
 
+
     if (chatArea) {
 
         chatArea.scrollTop =
@@ -1634,36 +1812,22 @@ function scrollToBottom() {
     }
 }
 
-// ======================================================
-// START
-// ======================================================
+
+// =====================================================
+// INITIALIZE
+// =====================================================
 
 updateVoiceButton();
 
-loadVoices();
-
 renderHistory();
 
-createShareButton();
+createMoreMenu();
 
 console.log(
-    "================================"
-);
-
-console.log(
-    "VIGGO AI READY"
+    "VIGGO READY"
 );
 
 console.log(
     "Server:",
     SERVER_URL
-);
-
-console.log(
-    "Voice:",
-    voiceEnabled
-);
-
-console.log(
-    "================================"
 );
