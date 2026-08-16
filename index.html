@@ -3,9 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Viggo AI</title>
 
 <style>
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -20,17 +22,19 @@ body {
     overflow: hidden;
 }
 
-button {
+button,
+textarea {
     font-family: inherit;
 }
 
-/* =========================
+/* =====================================
    APP
-========================= */
+===================================== */
 
 .app {
     display: flex;
     height: 100vh;
+
     background:
         radial-gradient(
             circle at top right,
@@ -40,14 +44,16 @@ button {
         );
 }
 
-/* =========================
+/* =====================================
    SIDEBAR
-========================= */
+===================================== */
 
 .sidebar {
     width: 270px;
     height: 100vh;
+
     background: #050b14;
+
     border-right: 1px solid #18304d;
 
     padding: 18px;
@@ -56,9 +62,12 @@ button {
     flex-direction: column;
 }
 
+/* LOGO */
+
 .logo {
     display: flex;
     align-items: center;
+
     gap: 10px;
 }
 
@@ -72,22 +81,19 @@ button {
     align-items: center;
     justify-content: center;
 
-    background: linear-gradient(
-        135deg,
-        #238cff,
-        #0755a8
-    );
+    background:
+        linear-gradient(
+            135deg,
+            #238cff,
+            #0755a8
+        );
 
     font-size: 23px;
     font-weight: bold;
 
     box-shadow:
-        0 0 20px rgba(
-            0,
-            130,
-            255,
-            .35
-        );
+        0 0 20px
+        rgba(0,130,255,.35);
 }
 
 .logo-text {
@@ -95,12 +101,14 @@ button {
     font-weight: bold;
 }
 
+/* ONLINE */
+
 .online {
     margin-top: 7px;
     margin-left: 53px;
 
-    font-size: 12px;
     color: #52e08a;
+    font-size: 12px;
 }
 
 .online-dot {
@@ -109,24 +117,24 @@ button {
     width: 7px;
     height: 7px;
 
-    background: #35db78;
+    margin-right: 5px;
 
     border-radius: 50%;
 
-    margin-right: 5px;
+    background: #35db78;
 
     box-shadow:
         0 0 8px #35db78;
 }
 
-/* =========================
+/* =====================================
    NEW CHAT
-========================= */
+===================================== */
 
 .new-chat {
-    margin-top: 25px;
-
     width: 100%;
+
+    margin-top: 25px;
 
     padding: 12px;
 
@@ -134,11 +142,12 @@ button {
 
     border-radius: 11px;
 
-    background: linear-gradient(
-        135deg,
-        #0d70c9,
-        #06437f
-    );
+    background:
+        linear-gradient(
+            135deg,
+            #0d70c9,
+            #06437f
+        );
 
     color: white;
 
@@ -147,25 +156,22 @@ button {
     font-size: 15px;
 
     box-shadow:
-        0 5px 20px rgba(
-            0,
-            110,
-            255,
-            .2
-        );
+        0 5px 20px
+        rgba(0,110,255,.2);
 }
 
 .new-chat:hover {
-    background: linear-gradient(
-        135deg,
-        #1688ec,
-        #0755a0
-    );
+    background:
+        linear-gradient(
+            135deg,
+            #1688ec,
+            #0755a0
+        );
 }
 
-/* =========================
+/* =====================================
    SIDEBAR TITLES
-========================= */
+===================================== */
 
 .side-title {
     margin-top: 25px;
@@ -187,9 +193,9 @@ button {
     overflow-y: auto;
 }
 
-/* =========================
-   CHAT ITEMS
-========================= */
+/* =====================================
+   CHAT ITEM
+===================================== */
 
 .chat-item {
     width: 100%;
@@ -214,60 +220,114 @@ button {
 }
 
 .empty-sidebar {
+    padding: 8px;
+
     color: #607a97;
 
     font-size: 12px;
-
-    padding: 8px;
 }
 
-/* =========================
-   MORE
-========================= */
+/* =====================================
+   MAIN
+===================================== */
 
-.more-area {
-    margin-top: auto;
+.main {
+    flex: 1;
+
+    min-width: 0;
+
+    height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+}
+
+/* =====================================
+   TOP BAR
+===================================== */
+
+.topbar {
+    height: 65px;
+
+    padding: 0 20px;
+
+    display: flex;
+    align-items: center;
+
+    border-bottom: 1px solid #18304d;
+
+    background:
+        rgba(4,11,20,.92);
+
+    backdrop-filter: blur(12px);
+}
+
+.current-title {
+    font-size: 16px;
+
+    font-weight: bold;
+
+    color: #eaf4ff;
+}
+
+/* =====================================
+   HEADER ACTIONS
+===================================== */
+
+.header-actions {
+    margin-left: auto;
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
 
     position: relative;
 }
 
-.more-button {
-    width: 100%;
+/* =====================================
+   THREE DOT BUTTON
+===================================== */
 
-    padding: 11px;
+.more-btn {
+    width: 40px;
+    height: 40px;
 
-    border-radius: 10px;
+    border: 1px solid #245172;
 
-    border: 1px solid #244966;
+    border-radius: 9px;
 
     background: #0a1928;
 
-    color: #dceeff;
+    color: white;
+
+    font-size: 24px;
+
+    line-height: 1;
 
     cursor: pointer;
-
-    text-align: left;
-
-    font-size: 14px;
 }
 
-.more-button:hover {
+.more-btn:hover {
     background: #10304b;
 }
 
-/* =========================
-   MORE MENU
-========================= */
+/* =====================================
+   MORE DROPDOWN
+===================================== */
 
-.more-menu {
+.more-dropdown {
     display: none;
 
     position: absolute;
 
-    left: 0;
-    right: 0;
+    right: 80px;
 
-    bottom: 50px;
+    top: 48px;
+
+    width: 225px;
+
+    padding: 7px;
 
     background: #081522;
 
@@ -275,25 +335,18 @@ button {
 
     border-radius: 12px;
 
-    padding: 7px;
-
     box-shadow:
-        0 12px 35px
-        rgba(
-            0,
-            0,
-            0,
-            .6
-        );
+        0 15px 40px
+        rgba(0,0,0,.6);
 
-    z-index: 1000;
+    z-index: 9999;
 }
 
-.more-menu.show {
+.more-dropdown.show {
     display: block;
 }
 
-.more-menu button {
+.more-dropdown button {
     width: 100%;
 
     padding: 10px;
@@ -311,64 +364,15 @@ button {
     cursor: pointer;
 }
 
-.more-menu button:hover {
+.more-dropdown button:hover {
     background: #10304b;
 }
 
-/* =========================
-   MAIN
-========================= */
-
-.main {
-    flex: 1;
-
-    min-width: 0;
-
-    height: 100vh;
-
-    display: flex;
-
-    flex-direction: column;
-}
-
-/* =========================
-   TOP BAR
-========================= */
-
-.topbar {
-    height: 65px;
-
-    padding: 0 20px;
-
-    display: flex;
-
-    align-items: center;
-
-    border-bottom: 1px solid #18304d;
-
-    background: rgba(
-        4,
-        11,
-        20,
-        .92
-    );
-
-    backdrop-filter: blur(12px);
-}
-
-.current-title {
-    font-weight: bold;
-
-    color: #eaf4ff;
-}
-
-/* =========================
+/* =====================================
    SHARE
-========================= */
+===================================== */
 
 .share-button {
-    margin-left: auto;
-
     border: 1px solid #1d78ca;
 
     background: #0b3157;
@@ -386,9 +390,9 @@ button {
     background: #0f477c;
 }
 
-/* =========================
+/* =====================================
    CHAT AREA
-========================= */
+===================================== */
 
 .chat-area {
     flex: 1;
@@ -404,9 +408,9 @@ button {
     margin: auto;
 }
 
-/* =========================
+/* =====================================
    WELCOME
-========================= */
+===================================== */
 
 .welcome {
     text-align: center;
@@ -423,16 +427,15 @@ button {
     border-radius: 20px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
-    background: linear-gradient(
-        135deg,
-        #2496ff,
-        #064d91
-    );
+    background:
+        linear-gradient(
+            135deg,
+            #2496ff,
+            #064d91
+        );
 
     font-size: 37px;
 
@@ -440,12 +443,7 @@ button {
 
     box-shadow:
         0 10px 35px
-        rgba(
-            0,
-            110,
-            255,
-            .3
-        );
+        rgba(0,110,255,.3);
 }
 
 .welcome h1 {
@@ -460,9 +458,9 @@ button {
     color: #7893af;
 }
 
-/* =========================
+/* =====================================
    MESSAGE
-========================= */
+===================================== */
 
 .message {
     display: flex;
@@ -481,9 +479,7 @@ button {
     border-radius: 10px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
     background: #0d5da6;
@@ -496,24 +492,34 @@ button {
 }
 
 .message-name {
-    font-size: 12px;
+    margin-bottom: 5px;
 
     color: #6f9ac5;
 
-    margin-bottom: 5px;
+    font-size: 12px;
 }
 
 .message-text {
-    line-height: 1.6;
-
     color: #e9f3ff;
+
+    line-height: 1.6;
 
     white-space: pre-wrap;
 }
 
-/* MESSAGE BUTTONS */
+/* =====================================
+   MESSAGE ACTIONS
+===================================== */
 
-.message button {
+.message-actions {
+    display: flex;
+
+    gap: 7px;
+
+    margin-top: 10px;
+}
+
+.message-actions button {
     border: 1px solid #24445f;
 
     background: #0b1928;
@@ -529,15 +535,15 @@ button {
     font-size: 12px;
 }
 
-.message button:hover {
+.message-actions button:hover {
     background: #10304c;
 
     color: white;
 }
 
-/* =========================
-   INPUT
-========================= */
+/* =====================================
+   BOTTOM INPUT
+===================================== */
 
 .bottom-area {
     padding: 15px 20px 18px;
@@ -581,17 +587,16 @@ button {
     outline: none;
 }
 
+#message::placeholder {
+    color: #607a97;
+}
+
 #message:focus {
     border-color: #2189e5;
 
     box-shadow:
         0 0 0 2px
-        rgba(
-            33,
-            137,
-            229,
-            .12
-        );
+        rgba(33,137,229,.12);
 }
 
 .input-button {
@@ -610,17 +615,22 @@ button {
     cursor: pointer;
 }
 
-.send-button {
-    background: linear-gradient(
-        135deg,
-        #1688ec,
-        #0755a0
-    );
+.input-button:hover {
+    background: #103f64;
 }
 
-/* =========================
+.send-button {
+    background:
+        linear-gradient(
+            135deg,
+            #1688ec,
+            #0755a0
+        );
+}
+
+/* =====================================
    HISTORY MODAL
-========================= */
+===================================== */
 
 .modal {
     display: none;
@@ -629,16 +639,12 @@ button {
 
     inset: 0;
 
-    background: rgba(
-        0,
-        0,
-        0,
-        .7
-    );
-
-    z-index: 2000;
-
     padding: 30px;
+
+    background:
+        rgba(0,0,0,.7);
+
+    z-index: 20000;
 }
 
 .modal-content {
@@ -650,30 +656,25 @@ button {
 
     margin: auto;
 
+    padding: 20px;
+
     background: #081522;
 
     border: 1px solid #214d72;
 
     border-radius: 15px;
 
-    padding: 20px;
-
     box-shadow:
         0 20px 60px
-        rgba(
-            0,
-            0,
-            0,
-            .6
-        );
+        rgba(0,0,0,.6);
 }
 
 .modal-header {
     display: flex;
 
-    justify-content: space-between;
-
     align-items: center;
+
+    justify-content: space-between;
 
     margin-bottom: 15px;
 }
@@ -703,17 +704,17 @@ button {
 }
 
 .history-card-title {
-    font-weight: bold;
-
     color: #e8f5ff;
+
+    font-weight: bold;
 }
 
 .history-card-time {
-    font-size: 11px;
+    margin-top: 5px;
 
     color: #6685a2;
 
-    margin-top: 5px;
+    font-size: 11px;
 }
 
 .history-card-actions {
@@ -738,14 +739,14 @@ button {
     cursor: pointer;
 }
 
-/* =========================
+/* =====================================
    MOBILE
-========================= */
+===================================== */
 
 @media (max-width: 700px) {
 
     .sidebar {
-        width: 245px;
+        width: 235px;
     }
 
     .chat-area {
@@ -753,7 +754,7 @@ button {
     }
 
     .topbar {
-        padding: 0 12px;
+        padding: 0 10px;
     }
 
     .bottom-area {
@@ -763,298 +764,407 @@ button {
     .welcome {
         padding-top: 50px;
     }
+
+    .more-dropdown {
+        right: 0;
+    }
+
+    .share-button {
+        padding: 8px 10px;
+    }
 }
+
 </style>
 </head>
+
 
 <body>
 
 <div class="app">
 
-    <!-- ==================================
-         LEFT SIDEBAR
-    =================================== -->
+<!-- =====================================
+     SIDEBAR
+===================================== -->
 
-    <aside
-        class="sidebar"
-        id="sidebar"
-    >
+<aside class="sidebar">
 
-        <div class="logo">
+    <div class="logo">
 
-            <div class="logo-b">
-                B
-            </div>
-
-            <div class="logo-text">
-                Viggo
-            </div>
-
+        <div class="logo-b">
+            B
         </div>
 
-
-        <div class="online">
-
-            <span class="online-dot"></span>
-
-            Online
-
+        <div class="logo-text">
+            Viggo
         </div>
 
-
-        <!-- NEW CHAT -->
-
-        <button
-            class="new-chat"
-            id="newChat"
-        >
-            + New Chat
-        </button>
+    </div>
 
 
-        <!-- PINNED -->
+    <div class="online">
 
-        <div class="side-title">
-            Pinned
-        </div>
+        <span class="online-dot"></span>
+
+        Online
+
+    </div>
+
+
+    <!-- NEW CHAT -->
+
+    <button
+        type="button"
+        class="new-chat"
+        id="newChat">
+
+        + New Chat
+
+    </button>
+
+
+    <!-- PINNED -->
+
+    <div class="side-title">
+        Pinned
+    </div>
+
+    <div
+        class="chat-list"
+        id="pinnedList">
+    </div>
+
+
+    <!-- RECENT -->
+
+    <div class="side-title">
+        Recent
+    </div>
+
+    <div
+        class="chat-list"
+        id="recentList">
+    </div>
+
+</aside>
+
+
+<!-- =====================================
+     MAIN
+===================================== -->
+
+<main class="main">
+
+
+    <!-- TOP BAR -->
+
+    <header class="topbar">
 
         <div
-            class="chat-list"
-            id="pinnedList"
-        ></div>
+            class="current-title"
+            id="currentTitle">
 
+            New Chat
 
-        <!-- RECENT -->
-
-        <div class="side-title">
-            Recent
         </div>
 
-        <div
-            class="chat-list"
-            id="recentList"
-        ></div>
+
+        <!-- RIGHT ACTIONS -->
+
+        <div class="header-actions">
 
 
-        <!-- ==================================
-             MORE - SIDEBAR BOTTOM
-        =================================== -->
-
-        <div class="more-area">
+            <!-- THREE DOT -->
 
             <button
-                class="more-button"
-                id="moreButton"
-            >
-                ⋮ More
+                type="button"
+                class="more-btn"
+                id="moreBtn"
+                title="More">
+
+                ⋮
+
             </button>
 
 
+            <!-- DROPDOWN -->
+
             <div
-                class="more-menu"
-                id="moreMenu"
-            >
+                class="more-dropdown"
+                id="moreDropdown">
+
 
                 <button
-                    id="saveButton"
-                >
+                    type="button"
+                    id="saveButton">
+
                     💾 Save
+
                 </button>
 
 
                 <button
-                    id="historyButton"
-                >
+                    type="button"
+                    id="historyButton">
+
                     🕘 History
+
                 </button>
 
 
                 <button
-                    id="pinCurrentButton"
-                >
+                    type="button"
+                    id="pinCurrentButton">
+
                     📌 Pin Chat
+
                 </button>
 
 
                 <button
-                    id="voiceToggle"
-                >
+                    type="button"
+                    id="voiceToggle">
+
                     🔊 Voice ON
+
                 </button>
 
 
                 <button
-                    id="femaleVoiceButton"
-                >
+                    type="button"
+                    id="femaleVoiceButton">
+
                     🎙️ Female Voice
+
                 </button>
 
 
                 <button
-                    id="maleVoiceButton"
-                >
+                    type="button"
+                    id="maleVoiceButton">
+
                     🎙️ Male Voice
+
                 </button>
 
 
                 <button
-                    id="clearHistory"
-                >
+                    type="button"
+                    id="clearHistory">
+
                     🗑️ Clear History
+
                 </button>
 
-            </div>
 
-        </div>
-
-    </aside>
-
-
-    <!-- ==================================
-         MAIN
-    =================================== -->
-
-    <main class="main">
-
-
-        <!-- TOP BAR -->
-
-        <header class="topbar">
-
-            <div
-                class="current-title"
-                id="currentTitle"
-            >
-                New Chat
             </div>
 
 
             <!-- SHARE ONLY -->
 
             <button
+                type="button"
                 class="share-button"
-                id="shareButton"
-            >
+                id="shareButton">
+
                 ↗ Share
+
             </button>
 
-        </header>
+
+        </div>
+
+    </header>
 
 
-        <!-- ==================================
-             CHAT
-        =================================== -->
+    <!-- =====================================
+         CHAT
+    ====================================== -->
 
-        <section
-            class="chat-area"
-            id="chatArea"
-        >
+    <section
+        class="chat-area"
+        id="chatArea">
+
+
+        <div
+            class="conversation"
+            id="conversation">
+
 
             <div
-                class="conversation"
-                id="conversation"
-            >
+                class="welcome"
+                id="welcome">
 
-                <div
-                    class="welcome"
-                    id="welcome"
-                >
 
-                    <div class="welcome-logo">
-                        B
-                    </div>
-
-                    <h1>
-                        Viggo
-                    </h1>
-
-                    <p>
-                        Your AI friend is ready.
-                    </p>
-
+                <div class="welcome-logo">
+                    B
                 </div>
 
-            </div>
 
-        </section>
-
-
-        <!-- ==================================
-             INPUT
-        =================================== -->
-
-        <section class="bottom-area">
-
-            <div class="input-box">
-
-                <textarea
-                    id="message"
-                    placeholder="Message Viggo..."
-                    rows="1"
-                ></textarea>
+                <h1>
+                    Viggo
+                </h1>
 
 
-                <button
-                    class="input-button"
-                    id="mic"
-                    title="Voice input"
-                >
-                    🎤
-                </button>
+                <p>
+                    Your AI friend is ready.
+                </p>
 
-
-                <button
-                    class="input-button send-button"
-                    id="send"
-                    title="Send"
-                >
-                    ➤
-                </button>
 
             </div>
 
-        </section>
 
-    </main>
+        </div>
+
+
+    </section>
+
+
+    <!-- =====================================
+         INPUT
+    ====================================== -->
+
+    <section class="bottom-area">
+
+        <div class="input-box">
+
+
+            <textarea
+                id="message"
+                rows="1"
+                placeholder="Message Viggo..."
+            ></textarea>
+
+
+            <button
+                type="button"
+                class="input-button"
+                id="mic"
+                title="Voice input">
+
+                🎤
+
+            </button>
+
+
+            <button
+                type="button"
+                class="input-button send-button"
+                id="send"
+                title="Send">
+
+                ➤
+
+            </button>
+
+
+        </div>
+
+    </section>
+
+</main>
 
 </div>
 
 
-<!-- ==================================
-     HISTORY MODAL
-=================================== -->
+<!-- =====================================
+     HISTORY
+===================================== -->
 
 <div
     class="modal"
-    id="historyModal"
->
+    id="historyModal">
+
 
     <div class="modal-content">
 
+
         <div class="modal-header">
+
 
             <h2>
                 🕘 Chat History
             </h2>
 
+
             <button
+                type="button"
                 class="close-history"
-                id="closeHistory"
-            >
+                id="closeHistory">
+
                 ×
+
             </button>
+
 
         </div>
 
 
         <div
-            id="historyList"
-        ></div>
+            id="historyList">
+        </div>
+
 
     </div>
 
 </div>
 
+
+<!-- =====================================
+     BASIC MENU SCRIPT
+===================================== -->
+
+<script>
+
+const moreBtn =
+    document.getElementById("moreBtn");
+
+const moreDropdown =
+    document.getElementById("moreDropdown");
+
+
+if (moreBtn && moreDropdown) {
+
+    moreBtn.addEventListener(
+        "click",
+        function(event) {
+
+            event.stopPropagation();
+
+            moreDropdown.classList.toggle(
+                "show"
+            );
+
+        }
+    );
+
+
+    moreDropdown.addEventListener(
+        "click",
+        function(event) {
+
+            event.stopPropagation();
+
+        }
+    );
+
+
+    document.addEventListener(
+        "click",
+        function() {
+
+            moreDropdown.classList.remove(
+                "show"
+            );
+
+        }
+    );
+
+}
+
+</script>
+
+
+<!-- YOUR MAIN JAVASCRIPT -->
 
 <script src="script.js"></script>
 
