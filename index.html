@@ -3,549 +3,898 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Viggo AI</title>
 
 <style>
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-    font-family:Arial,sans-serif;
-}
-
-body{
-    background:#07101a;
-    color:#fff;
-    height:100vh;
-    overflow:hidden;
-}
-
-.app{
-    display:flex;
-    height:100vh;
-}
-
-/* SIDEBAR */
-.sidebar{
-    width:260px;
-    min-width:260px;
-    height:100vh;
-    background:#050b12;
-    border-right:1px solid #1d354d;
-    padding:18px;
-    display:flex;
-    flex-direction:column;
-}
-
-.logo{
-    display:flex;
-    align-items:center;
-    gap:10px;
+
+/* =========================
+   RESET
+========================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #07101a;
+    color: white;
+    height: 100vh;
+    overflow: hidden;
+}
+
+
+/* =========================
+   APP
+========================= */
+
+.app {
+    display: flex;
+    height: 100vh;
+}
+
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar {
+    width: 260px;
+    min-width: 260px;
+    height: 100vh;
+
+    background: #050b12;
+
+    border-right: 1px solid #1d354d;
+
+    padding: 18px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* LOGO */
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-icon {
+    width: 42px;
+    height: 42px;
+
+    border-radius: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: linear-gradient(
+        135deg,
+        #2695ff,
+        #07559d
+    );
+
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.logo-name {
+    font-size: 21px;
+    font-weight: 600;
+}
+
+.online {
+    margin-left: 52px;
+    margin-top: 5px;
+
+    color: #48df89;
+
+    font-size: 11px;
+}
+
+.online-dot {
+    display: inline-block;
+
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: #35dc79;
+
+    margin-right: 5px;
+}
+
+
+/* NEW CHAT */
+
+.new-chat {
+    width: 100%;
+
+    margin-top: 25px;
+
+    padding: 11px;
+
+    border-radius: 10px;
+
+    border: 1px solid #1768ae;
+
+    background: linear-gradient(
+        135deg,
+        #116fc4,
+        #073d70
+    );
+
+    color: white;
+
+    cursor: pointer;
+
+    text-align: left;
+
+    font-size: 14px;
+}
+
+.new-chat:hover {
+    background: #116eb8;
+}
+
+
+/* SECTION */
+
+.section-title {
+    margin-top: 24px;
+    margin-bottom: 8px;
+
+    color: #718ba5;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+    text-transform: uppercase;
+}
+
+
+/* CHAT LIST */
+
+.chat-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+
+    overflow-y: auto;
+}
+
+.chat-item {
+    width: 100%;
+
+    padding: 9px 10px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: transparent;
+
+    color: #d7e7f7;
+
+    cursor: pointer;
+
+    text-align: left;
+
+    font-size: 13px;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+.chat-item:hover {
+    background: #102437;
+}
+
+.empty-list {
+    padding: 8px 10px;
+
+    color: #557089;
+
+    font-size: 12px;
+}
+
+
+/* =========================
+   MORE
+========================= */
+
+.more-area {
+    margin-top: auto;
+
+    position: relative;
 }
+
+.more-button {
+    width: 100%;
 
-.logo-icon{
-    width:42px;
-    height:42px;
-    border-radius:12px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:linear-gradient(135deg,#2695ff,#07559d);
-    font-size:22px;
-    font-weight:bold;
-}
-
-.logo-name{
-    font-size:21px;
-    font-weight:600;
-}
-
-.online{
-    margin-left:52px;
-    margin-top:5px;
-    color:#48df89;
-    font-size:11px;
-}
-
-.online-dot{
-    display:inline-block;
-    width:6px;
-    height:6px;
-    border-radius:50%;
-    background:#35dc79;
-    margin-right:5px;
-}
-
-.new-chat{
-    width:100%;
-    margin-top:25px;
-    padding:11px;
-    border-radius:10px;
-    border:1px solid #1768ae;
-    background:linear-gradient(135deg,#116fc4,#073d70);
-    color:white;
-    cursor:pointer;
-    text-align:left;
-    font-size:14px;
-}
-
-.new-chat:hover{
-    background:#116eb8;
-}
-
-.section-title{
-    margin-top:24px;
-    margin-bottom:8px;
-    color:#718ba5;
-    font-size:11px;
-    font-weight:bold;
-    text-transform:uppercase;
-}
-
-.chat-list{
-    display:flex;
-    flex-direction:column;
-    gap:4px;
-    overflow-y:auto;
-}
+    padding: 11px;
 
-.chat-item{
-    width:100%;
-    padding:9px 10px;
-    border:none;
-    border-radius:8px;
-    background:transparent;
-    color:#d7e7f7;
-    cursor:pointer;
-    text-align:left;
-    font-size:13px;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
+    border-radius: 10px;
+
+    border: 1px solid #284761;
+
+    background: #0b1724;
+
+    color: #dcecff;
+
+    cursor: pointer;
+
+    text-align: left;
+
+    font-size: 14px;
 }
+
+.more-button:hover {
+    background: #10283c;
+}
+
+.more-menu {
+    display: none;
 
-.chat-item:hover{
-    background:#102437;
+    position: absolute;
+
+    left: 0;
+    right: 0;
+
+    bottom: 52px;
+
+    padding: 7px;
+
+    background: #091522;
+
+    border: 1px solid #284b67;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 15px 40px rgba(0,0,0,.7);
+
+    z-index: 1000;
 }
-
-.empty-list{
-    padding:8px 10px;
-    color:#557089;
-    font-size:12px;
+
+.more-menu.show {
+    display: block;
 }
+
+.more-menu button {
+    width: 100%;
 
-/* MORE */
-.more-area{
-    margin-top:auto;
-    position:relative;
+    padding: 10px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: transparent;
+
+    color: #dcecff;
+
+    cursor: pointer;
+
+    text-align: left;
+
+    font-size: 13px;
 }
 
-.more-button{
-    width:100%;
-    padding:11px;
-    border-radius:10px;
-    border:1px solid #284761;
-    background:#0b1724;
-    color:#dcecff;
-    cursor:pointer;
-    text-align:left;
-    font-size:14px;
+.more-menu button:hover {
+    background: #10304b;
 }
-
-.more-menu{
-    display:none;
-    position:absolute;
-    left:0;
-    right:0;
-    bottom:52px;
-    padding:7px;
-    background:#091522;
-    border:1px solid #284b67;
-    border-radius:12px;
-    box-shadow:0 15px 40px rgba(0,0,0,.7);
-    z-index:1000;
+
+
+/* =========================
+   MAIN
+========================= */
+
+.main {
+    flex: 1;
+
+    min-width: 0;
+
+    height: 100vh;
+
+    display: flex;
+
+    flex-direction: column;
 }
+
+
+/* =========================
+   HEADER
+========================= */
+
+.top-header {
+    height: 60px;
+
+    display: flex;
 
-.more-menu.show{
-    display:block;
+    align-items: center;
+
+    padding: 0 20px;
+
+    background: #050b12;
+
+    border-bottom: 1px solid #1a3046;
 }
 
-.more-menu button{
-    width:100%;
-    padding:10px;
-    border:none;
-    border-radius:8px;
-    background:transparent;
-    color:#dcecff;
-    cursor:pointer;
-    text-align:left;
-    font-size:13px;
+.header-title {
+    font-size: 14px;
 }
+
+
+/* SHARE */
+
+.share-button {
+    margin-left: auto;
+
+    padding: 7px 14px;
+
+    border-radius: 8px;
+
+    border: 1px solid #216ca8;
 
-.more-menu button:hover{
-    background:#10304b;
+    background: #0b3154;
+
+    color: white;
+
+    cursor: pointer;
 }
 
-/* MAIN */
-.main{
-    flex:1;
-    min-width:0;
-    height:100vh;
-    display:flex;
-    flex-direction:column;
+.share-button:hover {
+    background: #12517f;
 }
+
+
+/* =========================
+   CHAT AREA
+========================= */
+
+.chat-area {
+    flex: 1;
 
-.top-header{
-    height:60px;
-    display:flex;
-    align-items:center;
-    padding:0 20px;
-    background:#050b12;
-    border-bottom:1px solid #1a3046;
+    overflow-y: auto;
+
+    padding: 25px 20px;
 }
+
+.conversation {
+    width: 100%;
 
-.header-title{
-    font-size:14px;
+    max-width: 850px;
+
+    margin: auto;
 }
+
+
+/* WELCOME */
 
-.share-button{
-    margin-left:auto;
-    padding:7px 14px;
-    border-radius:8px;
-    border:1px solid #216ca8;
-    background:#0b3154;
-    color:white;
-    cursor:pointer;
+.welcome {
+    min-height: 100%;
+
+    padding-top: 80px;
+
+    text-align: center;
 }
+
+.welcome-icon {
+    width: 70px;
+    height: 70px;
+
+    margin: auto;
+
+    border-radius: 18px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: linear-gradient(
+        135deg,
+        #2695ff,
+        #07559d
+    );
 
-.share-button:hover{
-    background:#12517f;
+    font-size: 34px;
+
+    font-weight: bold;
 }
+
+.welcome h1 {
+    margin-top: 16px;
 
-/* CHAT */
-.chat-area{
-    flex:1;
-    overflow-y:auto;
-    padding:25px 20px;
+    font-size: 28px;
 }
+
+.welcome p {
+    margin-top: 7px;
+
+    color: #718ba5;
 
-.conversation{
-    width:100%;
-    max-width:850px;
-    margin:auto;
+    font-size: 14px;
 }
 
-.welcome{
-    min-height:100%;
-    padding-top:80px;
-    text-align:center;
+
+/* =========================
+   MESSAGES
+========================= */
+
+.message {
+    display: flex;
+
+    gap: 11px;
+
+    margin-bottom: 22px;
 }
+
+.avatar {
+    width: 36px;
+    height: 36px;
 
-.welcome-icon{
-    width:70px;
-    height:70px;
-    margin:auto;
-    border-radius:18px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:linear-gradient(135deg,#2695ff,#07559d);
-    font-size:34px;
-    font-weight:bold;
+    min-width: 36px;
+
+    border-radius: 10px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #0c63a9;
+
+    font-size: 14px;
+
+    font-weight: bold;
 }
 
-.welcome h1{
-    margin-top:16px;
-    font-size:28px;
+.user-avatar {
+    background: #263a50;
 }
 
-.welcome p{
-    margin-top:7px;
-    color:#718ba5;
-    font-size:14px;
+.message-content {
+    min-width: 0;
 }
+
+.message-name {
+    margin-bottom: 5px;
+
+    color: #6d9bc5;
 
-/* MESSAGE */
-.message{
-    display:flex;
-    gap:11px;
-    margin-bottom:22px;
+    font-size: 11px;
 }
 
-.avatar{
-    width:36px;
-    height:36px;
-    min-width:36px;
-    border-radius:10px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:#0c63a9;
-    font-size:14px;
-    font-weight:bold;
+.message-text {
+    color: #e7f1fa;
+
+    font-size: 14px;
+
+    line-height: 1.65;
+
+    white-space: pre-wrap;
+
+    word-break: break-word;
 }
+
 
-.user-avatar{
-    background:#263a50;
+/* MESSAGE BUTTONS */
+
+.message-actions {
+    display: flex;
+
+    gap: 6px;
+
+    margin-top: 9px;
 }
+
+.message-actions button {
+    padding: 5px 8px;
+
+    border-radius: 7px;
 
-.message-content{
-    min-width:0;
+    border: 1px solid #24445f;
+
+    background: #0a1724;
+
+    color: #9db9d2;
+
+    cursor: pointer;
+
+    font-size: 11px;
 }
 
-.message-name{
-    margin-bottom:5px;
-    color:#6d9bc5;
-    font-size:11px;
+.message-actions button:hover {
+    background: #10304b;
+
+    color: white;
 }
+
+
+/* =========================
+   INPUT
+========================= */
+
+.input-area {
+    padding: 12px 20px 18px;
+
+    border-top: 1px solid #1a3046;
 
-.message-text{
-    color:#e7f1fa;
-    font-size:14px;
-    line-height:1.65;
-    white-space:pre-wrap;
-    word-break:break-word;
+    background: #060c14;
 }
 
-.message-actions{
-    display:flex;
-    gap:6px;
-    margin-top:9px;
+.input-wrapper {
+    max-width: 850px;
+
+    margin: auto;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 7px 8px 7px 14px;
+
+    border-radius: 20px;
+
+    background: #151b24;
+
+    border: 1px solid #26394d;
 }
+
+.message-input {
+    flex: 1;
 
-.message-actions button{
-    padding:5px 8px;
-    border-radius:7px;
-    border:1px solid #24445f;
-    background:#0a1724;
-    color:#9db9d2;
-    cursor:pointer;
-    font-size:11px;
+    min-width: 0;
+
+    padding: 8px 3px;
+
+    border: none;
+
+    outline: none;
+
+    background: transparent;
+
+    color: white;
+
+    font-size: 14px;
 }
 
-.message-actions button:hover{
-    background:#10304b;
-    color:white;
+.message-input::placeholder {
+    color: #61758a;
 }
+
+
+/* MIC */
+
+.mic-button {
+    width: 38px;
+    height: 38px;
 
-/* INPUT */
-.input-area{
-    padding:12px 20px 18px;
-    border-top:1px solid #1a3046;
-    background:#060c14;
+    min-width: 38px;
+
+    border-radius: 50%;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border: 1px solid #31536f;
+
+    background: #10283e;
+
+    color: white;
 }
 
-.input-wrapper{
-    max-width:850px;
-    margin:auto;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    padding:7px 8px 7px 14px;
-    border-radius:20px;
-    background:#151b24;
-    border:1px solid #26394d;
+.mic-button:hover {
+    background: #17405f;
 }
 
-.message-input{
-    flex:1;
-    min-width:0;
-    padding:8px 3px;
-    border:none;
-    outline:none;
-    background:transparent;
-    color:white;
-    font-size:14px;
+.mic-button.recording {
+    background: #b52d3a;
 }
+
+
+/* SEND */
 
-.message-input::placeholder{
-    color:#61758a;
+.send-button {
+    width: 38px;
+    height: 38px;
+
+    min-width: 38px;
+
+    border-radius: 50%;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border: none;
+
+    background: linear-gradient(
+        135deg,
+        #2695ff,
+        #07559d
+    );
+
+    color: white;
 }
 
-.mic-button,
-.send-button{
-    width:38px;
-    height:38px;
-    min-width:38px;
-    border-radius:50%;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+.send-button:hover {
+    transform: scale(1.05);
 }
 
-.mic-button{
-    border:1px solid #31536f;
-    background:#10283e;
-    color:white;
+
+/* =========================
+   HISTORY MODAL
+========================= */
+
+.modal {
+    display: none;
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 5000;
+
+    background: rgba(0,0,0,.75);
+
+    padding: 30px;
 }
 
-.mic-button.recording{
-    background:#b52d3a;
+.modal.show {
+    display: flex;
 }
+
+.modal-box {
+    width: 100%;
+
+    max-width: 700px;
 
-.send-button{
-    border:none;
-    background:linear-gradient(135deg,#2695ff,#07559d);
-    color:white;
+    max-height: 80vh;
+
+    overflow-y: auto;
+
+    margin: auto;
+
+    padding: 20px;
+
+    border-radius: 15px;
+
+    border: 1px solid #274b68;
+
+    background: #0a1623;
 }
+
+.modal-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
 
-/* HISTORY MODAL */
-.modal{
-    display:none;
-    position:fixed;
-    inset:0;
-    z-index:5000;
-    background:rgba(0,0,0,.75);
-    padding:30px;
+    margin-bottom: 15px;
 }
 
-.modal.show{
-    display:flex;
+.close-button {
+    border: none;
+
+    background: transparent;
+
+    color: white;
+
+    font-size: 25px;
+
+    cursor: pointer;
 }
+
+
+/* =========================
+   HISTORY
+========================= */
+
+.history-item {
+    padding: 12px;
+
+    margin-bottom: 8px;
+
+    border-radius: 10px;
+
+    border: 1px solid #203b53;
 
-.modal-box{
-    width:100%;
-    max-width:700px;
-    max-height:80vh;
-    overflow-y:auto;
-    margin:auto;
-    padding:20px;
-    border-radius:15px;
-    border:1px solid #274b68;
-    background:#0a1623;
+    background: #0d1c2b;
 }
 
-.modal-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:15px;
+.history-main {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
 }
+
+
+/* CHECKBOX HIDDEN UNTIL DOUBLE CLICK */
 
-.close-button{
-    border:none;
-    background:transparent;
-    color:white;
-    font-size:25px;
-    cursor:pointer;
+.history-checkbox {
+    width: 18px;
+    height: 18px;
+
+    cursor: pointer;
+
+    accent-color: #2695ff;
+
+    display: none;
 }
 
-/* HISTORY ITEM */
-.history-item{
-    padding:12px;
-    margin-bottom:8px;
-    border-radius:9px;
-    border:1px solid #203b53;
-    background:#0d1c2b;
+.history-item.selection-mode
+.history-checkbox {
+    display: block;
 }
+
+
+.history-info {
+    flex: 1;
 
-.history-row{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    width:100%;
+    cursor: pointer;
+
+    min-width: 0;
 }
 
-.history-checkbox{
-    width:18px;
-    height:18px;
-    flex-shrink:0;
-    cursor:pointer;
-    accent-color:#2695ff;
+.history-info:hover {
+    color: #55adff;
 }
+
+.history-time {
+    margin-top: 5px;
 
-.history-info{
-    flex:1;
-    min-width:0;
-    cursor:pointer;
+    color: #637d95;
+
+    font-size: 10px;
 }
+
 
-.history-time{
-    margin-top:5px;
-    color:#637d95;
-    font-size:10px;
+/* CHAT DELETE BELOW CHAT */
+
+.history-delete-area {
+    margin-top: 9px;
+
+    padding-left: 28px;
 }
+
+.history-delete-btn {
+    padding: 5px 10px;
+
+    border-radius: 7px;
+
+    border: 1px solid #63313a;
 
-/* SINGLE DELETE */
-.single-delete{
-    width:34px;
-    height:34px;
-    min-width:34px;
-    flex-shrink:0;
-    border:1px solid #63313a;
-    border-radius:8px;
-    background:#241218;
-    color:#ff7885;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:15px;
+    background: #241218;
+
+    color: #ff7885;
+
+    cursor: pointer;
+
+    font-size: 11px;
 }
+
+.history-delete-btn:hover {
+    background: #5a2029;
 
-.single-delete:hover{
-    background:#5a2029;
-    color:white;
+    color: white;
 }
 
-/* HISTORY CONTROLS */
-.history-controls{
-    display:flex;
-    gap:8px;
-    margin-top:15px;
+
+/* CONTROLS */
+
+.history-controls {
+    display: flex;
+
+    gap: 8px;
+
+    margin-top: 15px;
 }
+
+.history-controls button {
+    flex: 1;
 
-.history-controls button{
-    flex:1;
-    padding:11px;
-    border-radius:9px;
-    border:1px solid #284b67;
-    background:#0d1c2b;
-    color:#dcecff;
-    cursor:pointer;
+    padding: 11px;
+
+    border-radius: 9px;
+
+    border: 1px solid #284b67;
+
+    background: #0d1c2b;
+
+    color: #dcecff;
+
+    cursor: pointer;
 }
 
-.history-controls button:hover{
-    background:#123752;
+.history-controls button:hover {
+    background: #123752;
 }
 
-.delete-selected{
-    color:#ff7885 !important;
-    border-color:#63313a !important;
+.delete-selected {
+    border-color: #63313a !important;
+
+    color: #ff7885 !important;
 }
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:700px) {
+
+    .sidebar {
+        width: 220px;
 
-/* MOBILE */
-@media(max-width:700px){
+        min-width: 220px;
 
-    .sidebar{
-        width:220px;
-        min-width:220px;
-        padding:13px;
+        padding: 13px;
     }
 
-    .chat-area{
-        padding:18px 12px;
+    .chat-area {
+        padding: 18px 12px;
     }
 
-    .input-area{
-        padding:10px;
+    .input-area {
+        padding: 10px;
     }
 
-    .top-header{
-        padding:0 12px;
+    .top-header {
+        padding: 0 12px;
     }
+
 }
+
 </style>
 </head>
 
+
 <body>
+
 
 <div class="app">
 
-<!-- ================= SIDEBAR ================= -->
+
+<!-- =================================================
+     SIDEBAR
+================================================= -->
 
 <aside class="sidebar">
+
+
+    <!-- LOGO -->
 
     <div class="logo">
 
@@ -559,141 +908,228 @@ body{
 
     </div>
 
+
     <div class="online">
+
         <span class="online-dot"></span>
+
         Online
+
     </div>
+
+
+    <!-- NEW CHAT -->
 
     <button
         class="new-chat"
         id="newChat">
+
         ＋ New Chat
+
     </button>
 
+
+    <!-- PINNED -->
+
     <div class="section-title">
+
         Pinned
+
     </div>
+
 
     <div
         class="chat-list"
         id="pinnedList">
+
     </div>
 
+
+    <!-- RECENT -->
+
     <div class="section-title">
+
         Recent
+
     </div>
+
 
     <div
         class="chat-list"
         id="recentList">
+
     </div>
+
 
     <!-- MORE -->
 
     <div class="more-area">
 
+
         <button
             class="more-button"
             id="moreButton">
+
             ⋮ More
+
         </button>
+
 
         <div
             class="more-menu"
             id="moreMenu">
 
+
             <button id="saveButton">
+
                 💾 Save
+
             </button>
+
 
             <button id="historyButton">
+
                 🕘 History
+
             </button>
+
 
             <button id="pinButton">
+
                 📌 Pin Chat
+
             </button>
+
 
             <button id="voiceToggle">
+
                 🔊 Voice ON
+
             </button>
+
 
             <button id="femaleVoice">
+
                 🎙️ Female Voice
+
             </button>
+
 
             <button id="maleVoice">
+
                 🎙️ Male Voice
+
             </button>
 
+
             <button id="clearHistory">
+
                 🗑️ Clear History
+
             </button>
+
 
         </div>
 
+
     </div>
+
 
 </aside>
 
 
-<!-- ================= MAIN ================= -->
+
+<!-- =================================================
+     MAIN
+================================================= -->
 
 <main class="main">
 
+
+    <!-- HEADER -->
+
     <header class="top-header">
+
 
         <div
             class="header-title"
             id="headerTitle">
+
             New Chat
+
         </div>
+
+
+        <!-- SHARE ONLY -->
 
         <button
             class="share-button"
             id="shareButton">
+
             ↗ Share
+
         </button>
+
 
     </header>
 
+
+
+    <!-- CHAT -->
 
     <section
         class="chat-area"
         id="chatArea">
 
+
         <div
             class="conversation"
             id="conversation">
+
 
             <div
                 class="welcome"
                 id="welcome">
 
+
                 <div class="welcome-icon">
+
                     B
+
                 </div>
 
+
                 <h1>
+
                     Viggo
+
                 </h1>
 
+
                 <p>
+
                     Your AI friend is ready.
+
                 </p>
+
 
             </div>
 
+
         </div>
 
+
     </section>
+
 
 
     <!-- INPUT -->
 
     <div class="input-area">
 
+
         <div class="input-wrapper">
+
 
             <input
                 type="text"
@@ -703,56 +1139,89 @@ body{
                 autocomplete="off"
             >
 
+
+            <!-- MIC -->
+
             <button
                 id="micButton"
                 class="mic-button"
                 title="Voice Input">
+
                 🎤
+
             </button>
+
+
+            <!-- SEND -->
 
             <button
                 id="sendButton"
                 class="send-button"
                 title="Send">
+
                 ➤
+
             </button>
+
 
         </div>
 
+
     </div>
 
+
 </main>
+
 
 </div>
 
 
-<!-- ================= HISTORY MODAL ================= -->
+
+<!-- =================================================
+     HISTORY MODAL
+================================================= -->
 
 <div
     class="modal"
     id="historyModal">
 
+
     <div class="modal-box">
+
 
         <div class="modal-header">
 
+
             <h3>
+
                 🕘 Chat History
+
             </h3>
+
 
             <button
                 class="close-button"
                 id="closeHistory">
+
                 ×
+
             </button>
+
 
         </div>
 
-        <div id="historyList"></div>
+
+        <div
+            id="historyList">
+
+        </div>
+
 
     </div>
 
+
 </div>
+
 
 
 <script>
@@ -812,7 +1281,11 @@ let voiceEnabled = true;
 let currentVoice = "female";
 
 
-try{
+/* =====================================================
+   LOAD LOCAL STORAGE
+===================================================== */
+
+try {
 
     const saved =
         localStorage.getItem("viggoChats");
@@ -822,11 +1295,15 @@ try{
             ? JSON.parse(saved)
             : [];
 
-    if(!Array.isArray(chats)){
+    if (!Array.isArray(chats)) {
+
         chats = [];
+
     }
 
-}catch(error){
+} catch (error) {
+
+    console.error(error);
 
     chats = [];
 
@@ -834,10 +1311,10 @@ try{
 
 
 /* =====================================================
-   STORAGE
+   SAVE
 ===================================================== */
 
-function saveChats(){
+function saveChats() {
 
     localStorage.setItem(
         "viggoChats",
@@ -853,29 +1330,35 @@ function saveChats(){
 
 moreButton.addEventListener(
     "click",
-    function(event){
+    function(event) {
 
         event.stopPropagation();
 
-        moreMenu.classList.toggle("show");
+        moreMenu.classList.toggle(
+            "show"
+        );
 
     }
 );
+
 
 moreMenu.addEventListener(
     "click",
-    function(event){
+    function(event) {
 
         event.stopPropagation();
 
     }
 );
 
+
 document.addEventListener(
     "click",
-    function(){
+    function() {
 
-        moreMenu.classList.remove("show");
+        moreMenu.classList.remove(
+            "show"
+        );
 
     }
 );
@@ -885,28 +1368,39 @@ document.addEventListener(
    ADD MESSAGE
 ===================================================== */
 
-function addMessage(text, sender){
+function addMessage(
+    text,
+    sender
+) {
 
-    if(
+    if (
         text === undefined ||
         text === null ||
         !String(text).trim()
-    ){
+    ) {
+
         return;
+
     }
+
 
     const welcome =
         document.getElementById("welcome");
 
-    if(welcome){
-        welcome.style.display = "none";
+
+    if (welcome) {
+
+        welcome.style.display =
+            "none";
+
     }
 
 
     const message =
         document.createElement("div");
 
-    message.className = "message";
+    message.className =
+        "message";
 
 
     const avatar =
@@ -919,6 +1413,7 @@ function addMessage(text, sender){
                 ? "user-avatar"
                 : ""
         );
+
 
     avatar.textContent =
         sender === "user"
@@ -939,6 +1434,7 @@ function addMessage(text, sender){
     name.className =
         "message-name";
 
+
     name.textContent =
         sender === "user"
             ? "You"
@@ -951,15 +1447,19 @@ function addMessage(text, sender){
     textDiv.className =
         "message-text";
 
+
     textDiv.textContent =
         String(text);
 
 
     content.appendChild(name);
+
     content.appendChild(textDiv);
 
 
-    if(sender === "assistant"){
+    /* ASSISTANT ACTIONS */
+
+    if (sender === "assistant") {
 
         const actions =
             document.createElement("div");
@@ -968,28 +1468,40 @@ function addMessage(text, sender){
             "message-actions";
 
 
+        /* COPY */
+
         const copy =
             document.createElement("button");
 
-        copy.textContent = "📋 Copy";
+        copy.textContent =
+            "📋 Copy";
 
-        copy.onclick = function(){
 
-            navigator.clipboard.writeText(
-                String(text)
-            );
+        copy.onclick =
+            function() {
 
-            copy.textContent = "✓ Copied";
+                navigator.clipboard.writeText(
+                    String(text)
+                );
 
-            setTimeout(
-                function(){
-                    copy.textContent = "📋 Copy";
-                },
-                1200
-            );
+                copy.textContent =
+                    "✓ Copied";
 
-        };
 
+                setTimeout(
+                    function() {
+
+                        copy.textContent =
+                            "📋 Copy";
+
+                    },
+                    1200
+                );
+
+            };
+
+
+        /* SPEAKER */
 
         const speaker =
             document.createElement("button");
@@ -997,12 +1509,16 @@ function addMessage(text, sender){
         speaker.textContent =
             "🔊 Speaker";
 
-        speaker.onclick = function(){
 
-            speakText(text);
+        speaker.onclick =
+            function() {
 
-        };
+                speakText(text);
 
+            };
+
+
+        /* LIKE */
 
         const like =
             document.createElement("button");
@@ -1010,16 +1526,20 @@ function addMessage(text, sender){
         like.textContent =
             "👍 Like";
 
-        like.onclick = function(){
 
-            like.textContent =
-                "❤️ Liked";
+        like.onclick =
+            function() {
 
-        };
+                like.textContent =
+                    "❤️ Liked";
+
+            };
 
 
         actions.appendChild(copy);
+
         actions.appendChild(speaker);
+
         actions.appendChild(like);
 
         content.appendChild(actions);
@@ -1028,9 +1548,11 @@ function addMessage(text, sender){
 
 
     message.appendChild(avatar);
+
     message.appendChild(content);
 
     conversation.appendChild(message);
+
 
     scrollChat();
 
@@ -1041,10 +1563,13 @@ function addMessage(text, sender){
    SCROLL
 ===================================================== */
 
-function scrollChat(){
+function scrollChat() {
 
     const area =
-        document.getElementById("chatArea");
+        document.getElementById(
+            "chatArea"
+        );
+
 
     area.scrollTop =
         area.scrollHeight;
@@ -1056,13 +1581,15 @@ function scrollChat(){
    SAVE CHAT
 ===================================================== */
 
-function saveChat(text){
+function saveChat(text) {
 
-    if(
+    if (
         !text ||
         !String(text).trim()
-    ){
+    ) {
+
         return;
+
     }
 
 
@@ -1074,7 +1601,10 @@ function saveChat(text){
 
         title:
             String(text).length > 35
-                ? String(text).substring(0,35) + "..."
+                ? String(text).substring(
+                    0,
+                    35
+                  ) + "..."
                 : String(text),
 
         message:
@@ -1083,7 +1613,8 @@ function saveChat(text){
         time:
             new Date().toLocaleString(),
 
-        pinned:false
+        pinned:
+            false
 
     };
 
@@ -1100,16 +1631,19 @@ function saveChat(text){
 
 
 /* =====================================================
-   SEND
+   SEND MESSAGE
 ===================================================== */
 
-function sendMessage(){
+function sendMessage() {
 
     const text =
         messageInput.value.trim();
 
-    if(!text){
+
+    if (!text) {
+
         return;
+
     }
 
 
@@ -1121,20 +1655,23 @@ function sendMessage(){
 
     saveChat(text);
 
+
     messageInput.value = "";
 
 
     setTimeout(
-        function(){
+        function() {
 
             const reply =
                 "Okay friend, I received your message: " +
                 text;
 
+
             addMessage(
                 reply,
                 "assistant"
             );
+
 
             speakText(reply);
 
@@ -1161,9 +1698,11 @@ sendButton.addEventListener(
 
 messageInput.addEventListener(
     "keydown",
-    function(event){
+    function(event) {
 
-        if(event.key === "Enter"){
+        if (
+            event.key === "Enter"
+        ) {
 
             event.preventDefault();
 
@@ -1181,7 +1720,8 @@ messageInput.addEventListener(
 
 newChat.addEventListener(
     "click",
-    function(){
+    function() {
+
 
         conversation.innerHTML = `
 
@@ -1205,12 +1745,15 @@ newChat.addEventListener(
 
         `;
 
+
         document.getElementById(
             "headerTitle"
         ).textContent =
             "New Chat";
 
+
         messageInput.value = "";
+
 
         speechSynthesis.cancel();
 
@@ -1222,33 +1765,43 @@ newChat.addEventListener(
    RECENT
 ===================================================== */
 
-function renderRecent(){
+function renderRecent() {
 
     recentList.innerHTML = "";
 
-    if(chats.length === 0){
 
-        recentList.innerHTML =
-            `<div class="empty-list">
+    if (chats.length === 0) {
+
+        recentList.innerHTML = `
+
+            <div class="empty-list">
                 No recent chats
-            </div>`;
+            </div>
+
+        `;
 
         return;
+
     }
 
 
     chats
         .slice()
         .reverse()
-        .slice(0,8)
+        .slice(0, 8)
         .forEach(
-            function(chat){
+            function(chat) {
+
 
                 const button =
-                    document.createElement("button");
+                    document.createElement(
+                        "button"
+                    );
+
 
                 button.className =
                     "chat-item";
+
 
                 button.textContent =
                     "💬 " +
@@ -1260,7 +1813,7 @@ function renderRecent(){
 
 
                 button.onclick =
-                    function(){
+                    function() {
 
                         messageInput.value =
                             chat.message || "";
@@ -1270,7 +1823,9 @@ function renderRecent(){
                     };
 
 
-                recentList.appendChild(button);
+                recentList.appendChild(
+                    button
+                );
 
             }
         );
@@ -1282,26 +1837,33 @@ function renderRecent(){
    PINNED
 ===================================================== */
 
-function renderPinned(){
+function renderPinned() {
 
     pinnedList.innerHTML = "";
 
+
     const pinned =
         chats.filter(
-            function(chat){
+            function(chat) {
+
                 return chat.pinned === true;
+
             }
         );
 
 
-    if(pinned.length === 0){
+    if (pinned.length === 0) {
 
-        pinnedList.innerHTML =
-            `<div class="empty-list">
+        pinnedList.innerHTML = `
+
+            <div class="empty-list">
                 No pinned chats
-            </div>`;
+            </div>
+
+        `;
 
         return;
+
     }
 
 
@@ -1309,13 +1871,18 @@ function renderPinned(){
         .slice()
         .reverse()
         .forEach(
-            function(chat){
+            function(chat) {
+
 
                 const button =
-                    document.createElement("button");
+                    document.createElement(
+                        "button"
+                    );
+
 
                 button.className =
                     "chat-item";
+
 
                 button.textContent =
                     "📌 " +
@@ -1327,7 +1894,7 @@ function renderPinned(){
 
 
                 button.onclick =
-                    function(){
+                    function() {
 
                         messageInput.value =
                             chat.message || "";
@@ -1337,7 +1904,9 @@ function renderPinned(){
                     };
 
 
-                pinnedList.appendChild(button);
+                pinnedList.appendChild(
+                    button
+                );
 
             }
         );
@@ -1353,13 +1922,17 @@ document
 .getElementById("pinButton")
 .addEventListener(
     "click",
-    function(){
+    function() {
 
-        if(chats.length === 0){
 
-            moreMenu.classList.remove("show");
+        if (chats.length === 0) {
+
+            moreMenu.classList.remove(
+                "show"
+            );
 
             return;
+
         }
 
 
@@ -1374,7 +1947,10 @@ document
 
         renderRecent();
 
-        moreMenu.classList.remove("show");
+
+        moreMenu.classList.remove(
+            "show"
+        );
 
     }
 );
@@ -1384,12 +1960,15 @@ document
    HISTORY
 ===================================================== */
 
-function renderHistory(){
+function renderHistory() {
 
     historyList.innerHTML = "";
 
 
-    if(!chats || chats.length === 0){
+    if (
+        !chats ||
+        chats.length === 0
+    ) {
 
         historyList.innerHTML = `
 
@@ -1400,207 +1979,237 @@ function renderHistory(){
         `;
 
         return;
+
     }
 
 
+    /* HISTORY ITEMS */
+
     chats
-    .slice()
-    .reverse()
-    .forEach(
-        function(chat){
-
-            const item =
-                document.createElement("div");
-
-            item.className =
-                "history-item";
+        .slice()
+        .reverse()
+        .forEach(
+            function(chat) {
 
 
-            const row =
-                document.createElement("div");
-
-            row.className =
-                "history-row";
-
-
-            /* CHECKBOX */
-
-            const checkbox =
-                document.createElement("input");
-
-            checkbox.type =
-                "checkbox";
-
-            checkbox.className =
-                "history-checkbox";
-
-            checkbox.dataset.id =
-                String(chat.id);
-
-
-            /* INFO */
-
-            const info =
-                document.createElement("div");
-
-            info.className =
-                "history-info";
-
-
-            const title =
-                document.createElement("div");
-
-            title.textContent =
-                "💬 " +
-                (
-                    chat.title ||
-                    chat.message ||
-                    "New Chat"
-                );
-
-
-            const time =
-                document.createElement("div");
-
-            time.className =
-                "history-time";
-
-            time.textContent =
-                chat.time || "";
-
-
-            info.appendChild(title);
-            info.appendChild(time);
-
-
-            /* DELETE BUTTON */
-
-            const deleteButton =
-                document.createElement("button");
-
-            deleteButton.className =
-                "single-delete";
-
-            deleteButton.textContent =
-                "🗑";
-
-            deleteButton.title =
-                "Delete this chat";
-
-
-            deleteButton.addEventListener(
-                "click",
-                function(event){
-
-                    event.preventDefault();
-                    event.stopPropagation();
-
-
-                    const id =
-                        String(
-                            chat.id
-                        );
-
-
-                    chats =
-                        chats.filter(
-                            function(c){
-
-                                return String(c.id) !== id;
-
-                            }
-                        );
-
-
-                    saveChats();
-
-                    renderRecent();
-
-                    renderPinned();
-
-                    renderHistory();
-
-                }
-            );
-
-
-            /* OPEN CHAT */
-
-            info.addEventListener(
-                "click",
-                function(){
-
-                    messageInput.value =
-                        chat.message || "";
-
-                    historyModal.classList.remove(
-                        "show"
+                const item =
+                    document.createElement(
+                        "div"
                     );
 
-                    messageInput.focus();
 
-                }
-            );
-
-
-            row.appendChild(
-                checkbox
-            );
-
-            row.appendChild(
-                info
-            );
-
-            row.appendChild(
-                deleteButton
-            );
+                item.className =
+                    "history-item";
 
 
-            item.appendChild(row);
-
-            historyList.appendChild(item);
-
-        }
-    );
+                item.dataset.id =
+                    String(chat.id);
 
 
-    /* CONTROLS */
+                item.innerHTML = `
+
+                    <div class="history-main">
+
+                        <input
+                            type="checkbox"
+                            class="history-checkbox"
+                            data-id="${chat.id}"
+                        >
+
+                        <div class="history-info">
+
+                            <div>
+                                💬 ${
+                                    chat.title ||
+                                    chat.message ||
+                                    "New Chat"
+                                }
+                            </div>
+
+                            <div class="history-time">
+
+                                ${
+                                    chat.time || ""
+                                }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="history-delete-area">
+
+                        <button
+                            class="history-delete-btn"
+                            data-id="${chat.id}">
+
+                            🗑 Delete
+
+                        </button>
+
+                    </div>
+
+                `;
+
+
+                historyList.appendChild(
+                    item
+                );
+
+            }
+        );
+
+
+    /* =================================================
+       SINGLE DELETE
+    ================================================= */
+
+    document
+        .querySelectorAll(
+            ".history-delete-btn"
+        )
+        .forEach(
+            function(button) {
+
+
+                button.addEventListener(
+                    "click",
+                    function(event) {
+
+
+                        event.preventDefault();
+
+                        event.stopPropagation();
+
+
+                        const id =
+                            String(
+                                this.dataset.id
+                            );
+
+
+                        chats =
+                            chats.filter(
+                                function(chat) {
+
+                                    return String(
+                                        chat.id
+                                    ) !== id;
+
+                                }
+                            );
+
+
+                        saveChats();
+
+                        renderRecent();
+
+                        renderPinned();
+
+                        renderHistory();
+
+                    }
+                );
+
+            }
+        );
+
+
+    /* =================================================
+       DOUBLE CLICK = SELECTION MODE
+    ================================================= */
+
+    document
+        .querySelectorAll(
+            ".history-item"
+        )
+        .forEach(
+            function(item) {
+
+
+                item.addEventListener(
+                    "dblclick",
+                    function(event) {
+
+
+                        event.preventDefault();
+
+
+                        this.classList.toggle(
+                            "selection-mode"
+                        );
+
+
+                        const checkbox =
+                            this.querySelector(
+                                ".history-checkbox"
+                            );
+
+
+                        checkbox.checked =
+                            this.classList.contains(
+                                "selection-mode"
+                            );
+
+                    }
+                );
+
+            }
+        );
+
+
+    /* =================================================
+       SELECT ALL + DELETE
+    ================================================= */
 
     const controls =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     controls.className =
         "history-controls";
 
 
-    const selectAll =
-        document.createElement("button");
+    controls.innerHTML = `
 
-    selectAll.textContent =
-        "☑ Select All";
+        <button id="selectAllHistory">
 
+            ☑ Select All
 
-    const deleteSelected =
-        document.createElement("button");
-
-    deleteSelected.className =
-        "delete-selected";
-
-    deleteSelected.textContent =
-        "🗑 Delete Selected";
+        </button>
 
 
-    controls.appendChild(selectAll);
+        <button
+            id="deleteSelectedHistory"
+            class="delete-selected">
 
-    controls.appendChild(deleteSelected);
+            🗑 Delete Selected
 
-    historyList.appendChild(controls);
+        </button>
+
+    `;
 
 
-    /* SELECT ALL */
+    historyList.appendChild(
+        controls
+    );
 
-    selectAll.onclick =
-        function(){
+
+    /* =================================================
+       SELECT ALL
+    ================================================= */
+
+    document
+        .getElementById(
+            "selectAllHistory"
+        )
+        .onclick =
+        function() {
+
 
             const boxes =
                 document.querySelectorAll(
@@ -1608,45 +2217,48 @@ function renderHistory(){
                 );
 
 
-            const allSelected =
-                [...boxes].every(
-                    function(box){
-                        return box.checked;
-                    }
-                );
-
-
             boxes.forEach(
-                function(box){
+                function(box) {
+
 
                     box.checked =
-                        !allSelected;
+                        true;
+
+
+                    box
+                        .closest(
+                            ".history-item"
+                        )
+                        .classList.add(
+                            "selection-mode"
+                        );
 
                 }
             );
 
-
-            selectAll.textContent =
-                allSelected
-                    ? "☑ Select All"
-                    : "☐ Unselect All";
-
         };
 
 
-    /* DELETE SELECTED */
+    /* =================================================
+       DELETE SELECTED
+    ================================================= */
 
-    deleteSelected.onclick =
-        function(){
+    document
+        .getElementById(
+            "deleteSelectedHistory"
+        )
+        .onclick =
+        function() {
+
 
             const selected =
-                [
-                    ...document.querySelectorAll(
+                Array.from(
+                    document.querySelectorAll(
                         ".history-checkbox:checked"
                     )
-                ]
+                )
                 .map(
-                    function(box){
+                    function(box) {
 
                         return String(
                             box.dataset.id
@@ -1656,7 +2268,9 @@ function renderHistory(){
                 );
 
 
-            if(selected.length === 0){
+            if (
+                selected.length === 0
+            ) {
 
                 return;
 
@@ -1665,7 +2279,8 @@ function renderHistory(){
 
             chats =
                 chats.filter(
-                    function(chat){
+                    function(chat) {
+
 
                         return !selected.includes(
                             String(chat.id)
@@ -1693,16 +2308,25 @@ function renderHistory(){
 ===================================================== */
 
 document
-.getElementById("historyButton")
+.getElementById(
+    "historyButton"
+)
 .addEventListener(
     "click",
-    function(){
+    function() {
+
 
         renderHistory();
 
-        historyModal.classList.add("show");
 
-        moreMenu.classList.remove("show");
+        historyModal.classList.add(
+            "show"
+        );
+
+
+        moreMenu.classList.remove(
+            "show"
+        );
 
     }
 );
@@ -1714,7 +2338,7 @@ document
 
 closeHistory.addEventListener(
     "click",
-    function(){
+    function() {
 
         historyModal.classList.remove(
             "show"
@@ -1729,20 +2353,33 @@ closeHistory.addEventListener(
 ===================================================== */
 
 document
-.getElementById("clearHistory")
+.getElementById(
+    "clearHistory"
+)
 .addEventListener(
     "click",
-    function(){
+    function() {
+
 
         chats = [];
 
+
         saveChats();
+
 
         renderRecent();
 
         renderPinned();
 
-        renderHistory();
+
+        historyList.innerHTML = `
+
+            <div class="empty-list">
+                No chat history
+            </div>
+
+        `;
+
 
         moreMenu.classList.remove(
             "show"
@@ -1753,16 +2390,20 @@ document
 
 
 /* =====================================================
-   SAVE
+   SAVE BUTTON
 ===================================================== */
 
 document
-.getElementById("saveButton")
+.getElementById(
+    "saveButton"
+)
 .addEventListener(
     "click",
-    function(){
+    function() {
+
 
         saveChats();
+
 
         moreMenu.classList.remove(
             "show"
@@ -1778,62 +2419,84 @@ document
 
 shareButton.addEventListener(
     "click",
-    async function(){
+    async function() {
+
 
         let text =
             "Viggo AI Chat\n\n";
 
 
         document
-        .querySelectorAll(".message")
-        .forEach(
-            function(message){
-
-                const name =
-                    message.querySelector(
-                        ".message-name"
-                    );
-
-                const content =
-                    message.querySelector(
-                        ".message-text"
-                    );
+            .querySelectorAll(
+                ".message"
+            )
+            .forEach(
+                function(message) {
 
 
-                if(name && content){
+                    const name =
+                        message.querySelector(
+                            ".message-name"
+                        );
 
-                    text +=
-                        name.textContent +
-                        ": " +
-                        content.textContent +
-                        "\n\n";
+
+                    const content =
+                        message.querySelector(
+                            ".message-text"
+                        );
+
+
+                    if (
+                        name &&
+                        content
+                    ) {
+
+                        text +=
+                            name.textContent +
+                            ": " +
+                            content.textContent +
+                            "\n\n";
+
+                    }
 
                 }
-
-            }
-        );
+            );
 
 
-        if(navigator.share){
+        if (
+            navigator.share
+        ) {
 
-            try{
+            try {
 
                 await navigator.share({
-                    title:"Viggo AI",
-                    text:text
+
+                    title:
+                        "Viggo AI",
+
+                    text:
+                        text
+
                 });
 
-            }catch(error){}
+            }
+            catch(error) {}
 
-        }else{
+        }
+        else {
 
-            navigator.clipboard.writeText(text);
+
+            navigator.clipboard.writeText(
+                text
+            );
+
 
             shareButton.textContent =
                 "✓ Copied";
 
+
             setTimeout(
-                function(){
+                function() {
 
                     shareButton.textContent =
                         "↗ Share";
@@ -1849,17 +2512,21 @@ shareButton.addEventListener(
 
 
 /* =====================================================
-   VOICE
+   VOICE TOGGLE
 ===================================================== */
 
 document
-.getElementById("voiceToggle")
+.getElementById(
+    "voiceToggle"
+)
 .addEventListener(
     "click",
-    function(){
+    function() {
+
 
         voiceEnabled =
             !voiceEnabled;
+
 
         this.textContent =
             voiceEnabled
@@ -1875,19 +2542,26 @@ document
 ===================================================== */
 
 document
-.getElementById("femaleVoice")
+.getElementById(
+    "femaleVoice"
+)
 .addEventListener(
     "click",
-    function(){
+    function() {
+
 
         currentVoice =
             "female";
 
-        voiceEnabled = true;
+
+        voiceEnabled =
+            true;
+
 
         speakText(
             "Okay friend, female voice selected."
         );
+
 
         moreMenu.classList.remove(
             "show"
@@ -1902,19 +2576,26 @@ document
 ===================================================== */
 
 document
-.getElementById("maleVoice")
+.getElementById(
+    "maleVoice"
+)
 .addEventListener(
     "click",
-    function(){
+    function() {
+
 
         currentVoice =
             "male";
 
-        voiceEnabled = true;
+
+        voiceEnabled =
+            true;
+
 
         speakText(
             "Okay friend, male voice selected."
         );
+
 
         moreMenu.classList.remove(
             "show"
@@ -1925,17 +2606,25 @@ document
 
 
 /* =====================================================
-   SPEECH
+   TEXT TO SPEECH
 ===================================================== */
 
-function speakText(text){
+function speakText(text) {
 
-    if(!voiceEnabled){
+
+    if (!voiceEnabled) {
+
         return;
+
     }
 
-    if(!("speechSynthesis" in window)){
+
+    if (
+        !("speechSynthesis" in window)
+    ) {
+
         return;
+
     }
 
 
@@ -1952,29 +2641,39 @@ function speakText(text){
         speechSynthesis.getVoices();
 
 
-    let selected = null;
+    let selected =
+        null;
 
 
-    if(currentVoice === "female"){
+    if (
+        currentVoice === "female"
+    ) {
+
 
         selected =
             voices.find(
-                function(v){
+                function(voice) {
 
                     return /female|zira|samantha|karen|susan|google us english/i
-                    .test(v.name);
+                        .test(
+                            voice.name
+                        );
 
                 }
             );
 
-    }else{
+    }
+    else {
+
 
         selected =
             voices.find(
-                function(v){
+                function(voice) {
 
                     return /male|david|alex|daniel|google uk english/i
-                    .test(v.name);
+                        .test(
+                            voice.name
+                        );
 
                 }
             );
@@ -1982,13 +2681,20 @@ function speakText(text){
     }
 
 
-    if(selected){
-        utterance.voice = selected;
+    if (selected) {
+
+        utterance.voice =
+            selected;
+
     }
 
 
-    utterance.rate = 1;
-    utterance.pitch = 1;
+    utterance.rate =
+        1;
+
+    utterance.pitch =
+        1;
+
 
     speechSynthesis.speak(
         utterance
@@ -2006,30 +2712,37 @@ const SpeechRecognition =
     window.webkitSpeechRecognition;
 
 
-let recognition = null;
+let recognition =
+    null;
 
 
-if(SpeechRecognition){
+if (SpeechRecognition) {
+
 
     recognition =
         new SpeechRecognition();
 
+
     recognition.lang =
         "en-IN";
 
+
     recognition.continuous =
         false;
+
 
     recognition.interimResults =
         false;
 
 
     recognition.onstart =
-        function(){
+        function() {
+
 
             micButton.classList.add(
                 "recording"
             );
+
 
             micButton.textContent =
                 "🔴";
@@ -2038,11 +2751,13 @@ if(SpeechRecognition){
 
 
     recognition.onend =
-        function(){
+        function() {
+
 
             micButton.classList.remove(
                 "recording"
             );
+
 
             micButton.textContent =
                 "🎤";
@@ -2051,11 +2766,14 @@ if(SpeechRecognition){
 
 
     recognition.onresult =
-        function(event){
+        function(event) {
+
 
             messageInput.value =
-                event.results[0][0]
-                .transcript;
+                event
+                    .results[0][0]
+                    .transcript;
+
 
             messageInput.focus();
 
@@ -2064,24 +2782,35 @@ if(SpeechRecognition){
 }
 
 
+/* =====================================================
+   MIC BUTTON
+===================================================== */
+
 micButton.addEventListener(
     "click",
-    function(){
+    function() {
 
-        if(!recognition){
+
+        if (!recognition) {
+
             return;
+
         }
 
-        try{
+
+        try {
+
             recognition.start();
-        }catch(error){}
+
+        }
+        catch(error) {}
 
     }
 );
 
 
 /* =====================================================
-   INITIAL
+   INITIAL LOAD
 ===================================================== */
 
 renderRecent();
