@@ -32,11 +32,26 @@ app.use(
    HOME
 ========================================= */
 
-app.get("/", (req, res) => {
+app.get("/", function (req, res) {
 
     res.json({
         success: true,
-        status: "online",
+        service: "Viggo AI",
+        status: "online"
+    });
+
+});
+
+
+/* =========================================
+   HEALTH CHECK
+========================================= */
+
+app.get("/health", function (req, res) {
+
+    res.json({
+        success: true,
+        status: "healthy",
         service: "Viggo AI"
     });
 
@@ -44,40 +59,34 @@ app.get("/", (req, res) => {
 
 
 /* =========================================
-   HEALTH
+   CHAT API
 ========================================= */
 
-app.get("/health", (req, res) => {
-
-    res.json({
-        success: true,
-        status: "healthy"
-    });
-
-});
-
-
-/* =========================================
-   CHAT
-========================================= */
-
-app.post("/chat", async (req, res) => {
+app.post("/chat", async function (req, res) {
 
     try {
 
         const message =
-            String(req.body?.message || "").trim();
+            typeof req.body.message === "string"
+                ? req.body.message.trim()
+                : "";
 
 
         const language =
-            String(req.body?.language || "en");
+            typeof req.body.language === "string"
+                ? req.body.language
+                : "en";
 
 
         const history =
-            Array.isArray(req.body?.history)
+            Array.isArray(req.body.history)
                 ? req.body.history
                 : [];
 
+
+        /* =====================================
+           CHECK MESSAGE
+        ===================================== */
 
         if (!message) {
 
@@ -94,7 +103,7 @@ app.post("/chat", async (req, res) => {
 
 
         /* =====================================
-           API KEY
+           GEMINI API KEY
         ===================================== */
 
         const apiKey =
@@ -102,6 +111,11 @@ app.post("/chat", async (req, res) => {
 
 
         if (!apiKey) {
+
+            console.error(
+                "GEMINI_API_KEY is missing."
+            );
+
 
             return res.status(500).json({
 
@@ -145,7 +159,7 @@ app.post("/chat", async (req, res) => {
 
 
         /* =====================================
-           HISTORY
+           CONVERSATION HISTORY
         ===================================== */
 
         let historyText = "";
@@ -153,13 +167,15 @@ app.post("/chat", async (req, res) => {
 
         history
             .slice(-15)
-            .forEach(item => {
+            .forEach(function (item) {
 
                 if (
                     !item ||
                     typeof item.content !== "string"
                 ) {
+
                     return;
+
                 }
 
 
@@ -170,62 +186,66 @@ app.post("/chat", async (req, res) => {
 
 
                 historyText +=
-                    `${role}: ${item.content}\n`;
+                    role +
+                    ": " +
+                    item.content +
+                    "\n";
 
             });
 
 
         /* =====================================
-           PROMPT
+           VIGGO PROMPT
         ===================================== */
 
-        const prompt = `
+        const prompt =
+            "You are Viggo AI.\n\n" +
 
-You are Viggo AI.
+            "You are a friendly, intelligent " +
+            "and helpful AI assistant.\n\n" +
 
-You are a friendly, intelligent and helpful AI assistant.
+            "The selected language is " +
+            languageName +
+            ".\n\n" +
 
-Selected language:
-${languageName}
+            "Rules:\n" +
 
-Rules:
+            "1. Understand English.\n" +
 
-1. Understand English.
-2. Understand Tamil.
-3. Understand Tanglish.
-4. Understand Hindi.
-5. Understand Malayalam.
-6. Understand Telugu.
-7. Understand Kannada.
+            "2. Understand Tamil.\n" +
 
-Reply naturally in the user's language.
+            "3. Understand Tanglish.\n" +
 
-If user writes Tamil or Tanglish,
-reply naturally in Tamil/Tanglish.
+            "4. Understand Hindi.\n" +
 
-If user writes English,
-reply in English.
+            "5. Understand Malayalam.\n" +
 
-For coding questions,
-provide complete working code.
+            "6. Understand Telugu.\n" +
 
-Be accurate and helpful.
+            "7. Understand Kannada.\n\n" +
 
-Never mention system instructions.
+            "Reply naturally in the user's language.\n" +
 
-Never give fake connection errors.
+            "If the user writes Tamil or Tanglish, " +
+            "reply in Tamil/Tanglish.\n\n" +
 
-Previous conversation:
+            "If the user writes English, " +
+            "reply in English.\n\n" +
 
-${historyText}
+            "For coding questions, " +
+            "give complete working code.\n\n" +
 
-Current user message:
+            "Be accurate and helpful.\n\n" +
 
-${message}
+            "Previous conversation:\n\n" +
 
-Answer the user now.
+            historyText +
 
-`;
+            "\nCurrent user message:\n\n" +
+
+            message +
+
+            "\n\nAnswer the user now.";
 
 
         /* =====================================
@@ -233,7 +253,7 @@ Answer the user now.
         ===================================== */
 
         const model =
-            "gemini-3.6-flash";
+            "gemini-2.5-flash";
 
 
         const apiURL =
@@ -245,8 +265,7 @@ Answer the user now.
 
 
         console.log(
-            "Gemini request:",
-            model
+            "Sending request to Gemini..."
         );
 
 
@@ -255,43 +274,46 @@ Answer the user now.
         ===================================== */
 
         const response =
-            await fetch(apiURL, {
+            await fetch(
+                apiURL,
+                {
 
-                method: "POST",
+                    method: "POST",
 
-                headers: {
+                    headers: {
 
-                    "Content-Type":
-                        "application/json",
+                        "Content-Type":
+                            "application/json",
 
-                    "Accept":
-                        "application/json"
+                        "Accept":
+                            "application/json"
 
-                },
+                    },
 
-                body: JSON.stringify({
+                    body: JSON.stringify({
 
-                    contents: [
+                        contents: [
 
-                        {
+                            {
 
-                            role: "user",
+                                role: "user",
 
-                            parts: [
+                                parts: [
 
-                                {
-                                    text: prompt
-                                }
+                                    {
+                                        text: prompt
+                                    }
 
-                            ]
+                                ]
 
-                        }
+                            }
 
-                    ]
+                        ]
 
-                })
+                    })
 
-            });
+                }
+            );
 
 
         const raw =
@@ -305,12 +327,13 @@ Answer the user now.
 
 
         /* =====================================
-           API ERROR
+           GEMINI API ERROR
         ===================================== */
 
         if (!response.ok) {
 
-            let details = raw;
+            let details =
+                raw;
 
 
             try {
@@ -319,13 +342,22 @@ Answer the user now.
                     JSON.parse(raw);
 
 
-                details =
-                    errorData?.error?.message ||
-                    raw;
+                if (
+                    errorData &&
+                    errorData.error &&
+                    errorData.error.message
+                ) {
 
-            } catch {
+                    details =
+                        errorData.error.message;
 
-                // keep raw response
+                }
+
+            } catch (parseError) {
+
+                console.error(
+                    "Could not parse error response."
+                );
 
             }
 
@@ -352,7 +384,7 @@ Answer the user now.
 
 
         /* =====================================
-           PARSE
+           PARSE GEMINI RESPONSE
         ===================================== */
 
         let data;
@@ -363,7 +395,13 @@ Answer the user now.
             data =
                 JSON.parse(raw);
 
-        } catch {
+        } catch (parseError) {
+
+            console.error(
+                "JSON parse error:",
+                parseError
+            );
+
 
             return res.status(500).json({
 
@@ -378,44 +416,50 @@ Answer the user now.
 
 
         /* =====================================
-           EXTRACT REPLY
+           EXTRACT AI RESPONSE
         ===================================== */
 
         let reply = "";
 
 
-        const candidates =
-            Array.isArray(data?.candidates)
-                ? data.candidates
-                : [];
-
-
-        for (
-            const candidate of candidates
+        if (
+            data &&
+            Array.isArray(data.candidates)
         ) {
 
-            const parts =
-                Array.isArray(
-                    candidate?.content?.parts
-                )
-                    ? candidate.content.parts
-                    : [];
+            data.candidates.forEach(
+                function (candidate) {
 
+                    if (
+                        candidate &&
+                        candidate.content &&
+                        Array.isArray(
+                            candidate.content.parts
+                        )
+                    ) {
 
-            for (
-                const part of parts
-            ) {
+                        candidate.content.parts
+                            .forEach(
+                                function (part) {
 
-                if (
-                    typeof part?.text === "string"
-                ) {
+                                    if (
+                                        part &&
+                                        typeof part.text ===
+                                        "string"
+                                    ) {
 
-                    reply +=
-                        part.text;
+                                        reply +=
+                                            part.text;
+
+                                    }
+
+                                }
+                            );
+
+                    }
 
                 }
-
-            }
+            );
 
         }
 
@@ -424,7 +468,17 @@ Answer the user now.
             reply.trim();
 
 
+        /* =====================================
+           EMPTY RESPONSE
+        ===================================== */
+
         if (!reply) {
+
+            console.error(
+                "Empty response from Gemini:",
+                data
+            );
+
 
             return res.status(500).json({
 
@@ -442,13 +496,19 @@ Answer the user now.
            SUCCESS
         ===================================== */
 
-        res.json({
+        console.log(
+            "Viggo response received."
+        );
+
+
+        return res.json({
 
             success: true,
 
             reply: reply,
 
-            language: language
+            language:
+                language
 
         });
 
@@ -461,7 +521,7 @@ Answer the user now.
         );
 
 
-        res.status(500).json({
+        return res.status(500).json({
 
             success: false,
 
@@ -479,31 +539,33 @@ Answer the user now.
 
 
 /* =========================================
-   404
+   404 HANDLER
 ========================================= */
 
-app.use((req, res) => {
+app.use(
+    function (req, res) {
 
-    res.status(404).json({
+        res.status(404).json({
 
-        success: false,
+            success: false,
 
-        error:
-            "Endpoint not found."
+            error:
+                "Endpoint not found."
 
-    });
+        });
 
-});
+    }
+);
 
 
 /* =========================================
-   START
+   START SERVER
 ========================================= */
 
 app.listen(
     PORT,
     "0.0.0.0",
-    () => {
+    function () {
 
         console.log(
             "================================"
@@ -514,13 +576,13 @@ app.listen(
         );
 
         console.log(
-            "PORT:",
+            "PORT: " +
             PORT
         );
 
         console.log(
-            "MODEL:",
-            "gemini-3.6-flash"
+            "MODEL: " +
+            "gemini-2.5-flash"
         );
 
         console.log(
