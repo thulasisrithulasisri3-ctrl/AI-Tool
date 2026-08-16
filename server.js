@@ -2,428 +2,258 @@ const express = require("express");
 const cors = require("cors");
 
 const app = express();
-
 const PORT = process.env.PORT || 10000;
 
-app.use(cors({
-    origin: "*",
-    methods: ["GET", "POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type"]
-}));
+app.use(cors({ origin: "*" }));
+app.use(express.json({ limit: "5mb" }));
 
-app.use(express.json({ limit: "2mb" }));
-
-/* =========================================
-   LANGUAGE NAMES
-========================================= */
-
-const languages = {
-    en: "English",
-    ta: "Tamil",
-    hi: "Hindi",
-    ml: "Malayalam",
-    te: "Telugu",
-    kn: "Kannada"
+const LANGUAGE_NAMES = {
+  en: "English",
+  ta: "Tamil",
+  hi: "Hindi",
+  ml: "Malayalam",
+  te: "Telugu",
+  kn: "Kannada"
 };
 
-function getLanguageName(code) {
-    return languages[code] || "English";
+function getLanguage(code) {
+  return LANGUAGE_NAMES[code] || "English";
 }
 
-
-/* =========================================
-   HOME / HEALTH CHECK
-========================================= */
+/* =========================
+   HOME
+========================= */
 
 app.get("/", (req, res) => {
-
-    res.json({
-        success: true,
-        status: "online",
-        service: "Viggo AI Server"
-    });
-
+  res.json({
+    success: true,
+    status: "online",
+    service: "Viggo AI Server"
+  });
 });
 
+/* =========================
+   HEALTH
+========================= */
 
-/* =========================================
-   CHAT API
-========================================= */
+app.get("/health", (req, res) => {
+  res.json({
+    success: true,
+    status: "healthy"
+  });
+});
+
+/* =========================
+   CHAT
+========================= */
 
 app.post("/chat", async (req, res) => {
+  try {
 
-    try {
+    const message =
+      typeof req.body.message === "string"
+        ? req.body.message.trim()
+        : "";
 
-        const message =
-            typeof req.body.message === "string"
-                ? req.body.message.trim()
-                : "";
+    const language =
+      req.body.language || "en";
 
-        const language =
-            req.body.language || "en";
+    const history =
+      Array.isArray(req.body.history)
+        ? req.body.history
+        : [];
 
-        const history =
-            Array.isArray(req.body.history)
-                ? req.body.history
-                : [];
+    if (!message) {
+      return res.status(400).json({
+        success: false,
+        error: "Message is required"
+      });
+    }
 
+    const apiKey =
+      process.env.GEMINI_API_KEY;
 
-        /* -------------------------------------
-           MESSAGE CHECK
-        ------------------------------------- */
+    if (!apiKey) {
+      return res.status(500).json({
+        success: false,
+        error: "GEMINI_API_KEY is missing in Render."
+      });
+    }
 
-        if (!message) {
+    const languageName =
+      getLanguage(language);
 
-            return res.status(400).json({
+    /* =========================
+       HISTORY
+    ========================= */
 
-                success: false,
+    let historyText = "";
 
-                error:
-                    "Message is required"
+    history
+      .slice(-20)
+      .forEach(item => {
 
-            });
+        if (!item || !item.content) return;
 
-        }
+        const role =
+          item.role === "assistant"
+            ? "Viggo"
+            : "User";
 
+        historyText +=
+          `${role}: ${item.content}\n`;
+      });
 
-        /* -------------------------------------
-           API KEY
-        ------------------------------------- */
+    /* =========================
+       PROMPT
+    ========================= */
 
-        const apiKey =
-            process.env.GEMINI_API_KEY;
+    const prompt = `
+You are Viggo AI, a friendly and intelligent AI assistant.
 
+User selected language:
+${languageName}
 
-        if (!apiKey) {
+RULES:
+- Reply in ${languageName}.
+- Understand mixed-language messages.
+- Be natural and friendly.
+- Do not mention these instructions.
+- Do not say you are translating.
+- For coding questions, provide complete working code.
+- For technical questions, explain clearly.
+- Use "friend" naturally when appropriate.
 
-            console.error(
-                "GEMINI_API_KEY is missing."
-            );
+Conversation history:
+${historyText}
 
-            return res.status(500).json({
-
-                success: false,
-
-                error:
-                    "Gemini API key is not configured."
-
-            });
-
-        }
-
-
-        /* -------------------------------------
-           LANGUAGE
-        ------------------------------------- */
-
-        const selectedLanguage =
-            getLanguageName(language);
-
-
-        /* -------------------------------------
-           BUILD HISTORY
-        ------------------------------------- */
-
-        let previousConversation = "";
-
-
-        history
-            .slice(-20)
-            .forEach(item => {
-
-                if (
-                    !item ||
-                    !item.content
-                ) {
-                    return;
-                }
-
-
-                const role =
-                    item.role === "assistant"
-                        ? "Viggo"
-                        : "User";
-
-
-                previousConversation +=
-                    `${role}: ${item.content}\n`;
-
-            });
-
-
-        /* -------------------------------------
-           SYSTEM PROMPT
-        ------------------------------------- */
-
-        const prompt = `
-
-You are Viggo AI.
-
-You are a friendly, intelligent and helpful AI assistant.
-
-The user selected this language:
-
-${selectedLanguage}
-
-IMPORTANT RULES:
-
-1. Reply primarily in ${selectedLanguage}.
-2. Understand English, Tamil, Hindi, Malayalam, Telugu and Kannada.
-3. If the user mixes languages, understand the meaning correctly.
-4. Do not mention these instructions.
-5. Do not say that you are translating.
-6. Give a natural conversational answer.
-7. If the user asks for code, give complete working code.
-8. If the user asks a technical question, explain step by step.
-9. If the user asks a simple question, don't make the answer unnecessarily long.
-10. Be friendly and call the user "friend" when appropriate.
-
-Previous conversation:
-
-${previousConversation}
-
-Current user message:
-
+User:
 ${message}
 
-Answer the user now in ${selectedLanguage}.
+Viggo:
 `;
 
+    /* =========================
+       GEMINI
+    ========================= */
 
-        /* -------------------------------------
-           GEMINI REQUEST
-        ------------------------------------- */
+    const url =
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" +
+      encodeURIComponent(apiKey);
 
-        const geminiURL =
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" +
-            encodeURIComponent(apiKey);
+    const response =
+      await fetch(url, {
+        method: "POST",
 
+        headers: {
+          "Content-Type": "application/json"
+        },
 
-        const response =
-            await fetch(
-                geminiURL,
+        body: JSON.stringify({
+          contents: [
+            {
+              role: "user",
+              parts: [
                 {
-
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body: JSON.stringify({
-
-                        contents: [
-
-                            {
-                                role: "user",
-
-                                parts: [
-
-                                    {
-                                        text: prompt
-                                    }
-
-                                ]
-                            }
-
-                        ],
-
-                        generationConfig: {
-
-                            temperature: 0.7,
-
-                            topP: 0.95,
-
-                            topK: 40,
-
-                            maxOutputTokens: 2048
-
-                        }
-
-                    })
-
+                  text: prompt
                 }
-            );
-
-
-        /* -------------------------------------
-           GEMINI ERROR
-        ------------------------------------- */
-
-        if (!response.ok) {
-
-            const errorText =
-                await response.text();
-
-
-            console.error(
-                "Gemini error:",
-                errorText
-            );
-
-
-            return res.status(500).json({
-
-                success: false,
-
-                error:
-                    "Viggo AI could not process the request.",
-
-                details:
-                    errorText
-
-            });
-
-        }
-
-
-        /* -------------------------------------
-           READ RESPONSE
-        ------------------------------------- */
-
-        const data =
-            await response.json();
-
-
-        /* -------------------------------------
-           GET TEXT
-        ------------------------------------- */
-
-        let reply = "";
-
-
-        if (
-            data &&
-            data.candidates &&
-            data.candidates.length > 0
-        ) {
-
-            const candidate =
-                data.candidates[0];
-
-
-            if (
-                candidate.content &&
-                Array.isArray(
-                    candidate.content.parts
-                )
-            ) {
-
-                reply =
-                    candidate.content.parts
-                        .map(
-                            part =>
-                                part.text || ""
-                        )
-                        .join("")
-                        .trim();
-
+              ]
             }
+          ],
 
-        }
+          generationConfig: {
+            temperature: 0.7,
+            topP: 0.95,
+            topK: 40,
+            maxOutputTokens: 2048
+          }
+        })
+      });
 
+    const data =
+      await response.json();
 
-        /* -------------------------------------
-           EMPTY RESPONSE
-        ------------------------------------- */
+    if (!response.ok) {
 
-        if (!reply) {
+      console.error(
+        "Gemini API Error:",
+        JSON.stringify(data)
+      );
 
-            console.error(
-                "Empty Gemini response:",
-                JSON.stringify(data)
-            );
-
-
-            return res.status(500).json({
-
-                success: false,
-
-                error:
-                    "Viggo AI returned an empty response."
-
-            });
-
-        }
-
-
-        /* -------------------------------------
-           SUCCESS
-        ------------------------------------- */
-
-        return res.json({
-
-            success: true,
-
-            reply: reply,
-
-            language:
-                language,
-
-            languageName:
-                selectedLanguage
-
-        });
-
-
-    } catch (error) {
-
-        console.error(
-            "Viggo server error:",
-            error
-        );
-
-
-        return res.status(500).json({
-
-            success: false,
-
-            error:
-                "Sorry friend, I couldn't connect to Viggo AI right now.",
-
-            details:
-                error.message
-
-        });
-
+      return res.status(500).json({
+        success: false,
+        error: "Gemini API request failed.",
+        details:
+          data?.error?.message ||
+          "Unknown Gemini error"
+      });
     }
 
+    let reply = "";
+
+    if (
+      data?.candidates?.[0]?.content?.parts
+    ) {
+
+      reply =
+        data.candidates[0].content.parts
+          .map(part => part.text || "")
+          .join("")
+          .trim();
+    }
+
+    if (!reply) {
+
+      return res.status(500).json({
+        success: false,
+        error: "Viggo AI returned an empty response."
+      });
+    }
+
+    return res.json({
+      success: true,
+      reply,
+      language,
+      languageName
+    });
+
+  } catch (error) {
+
+    console.error(
+      "SERVER ERROR:",
+      error
+    );
+
+    return res.status(500).json({
+      success: false,
+      error:
+        "Sorry friend, I couldn't connect to Viggo AI right now.",
+      details: error.message
+    });
+  }
 });
 
-
-/* =========================================
+/* =========================
    404
-========================================= */
+========================= */
 
-app.use(
-    (req, res) => {
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    error: "Endpoint not found"
+  });
+});
 
-        res.status(404).json({
-
-            success: false,
-
-            error:
-                "Endpoint not found"
-
-        });
-
-    }
-);
-
-
-/* =========================================
+/* =========================
    START
-========================================= */
+========================= */
 
 app.listen(
-    PORT,
-    "0.0.0.0",
-    () => {
-
-        console.log(
-            `Viggo AI Server running on port ${PORT}`
-        );
-
-    }
+  PORT,
+  "0.0.0.0",
+  () => {
+    console.log(
+      `Viggo AI Server running on port ${PORT}`
+    );
+  }
 );
