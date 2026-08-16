@@ -2,36 +2,75 @@
 // VIGGO AI - SCRIPT.JS
 // ======================================================
 
-const API_URL = "https://ai-tool-1-fgmc.onrender.com";
+const API_URL =
+    "https://ai-tool-1-fgmc.onrender.com";
 
 
 // ======================================================
 // ELEMENTS
 // ======================================================
 
-const sidebar = document.getElementById("sidebar");
-const conversation = document.getElementById("conversation");
-const messageInput = document.getElementById("message");
-const sendButton = document.getElementById("send");
-const micButton = document.getElementById("mic");
-const currentTitle = document.getElementById("currentTitle");
+const sidebar =
+    document.getElementById("sidebar");
 
-const voiceToggle = document.getElementById("voiceToggle");
-const voicePanel = document.getElementById("voicePanel");
-const voiceSelect = document.getElementById("voiceSelect");
+const conversation =
+    document.getElementById("conversation");
 
-const pinnedList = document.getElementById("pinnedList");
-const recentList = document.getElementById("recentList");
+const messageInput =
+    document.getElementById("message");
 
-const newChatButton = document.getElementById("newChat");
-const saveButton = document.getElementById("saveButton");
-const historyButton = document.getElementById("historyButton");
-const clearHistoryButton = document.getElementById("clearHistory");
+const sendButton =
+    document.getElementById("send");
 
-const shareChatButton = document.getElementById("shareChat");
-const voiceSettingsButton = document.getElementById("voiceSettings");
+const micButton =
+    document.getElementById("mic");
 
-const mobileMenu = document.getElementById("mobileMenu");
+const currentTitle =
+    document.getElementById("currentTitle");
+
+const newChatButton =
+    document.getElementById("newChat");
+
+const pinnedList =
+    document.getElementById("pinnedList");
+
+const recentList =
+    document.getElementById("recentList");
+
+const moreButton =
+    document.getElementById("moreButton");
+
+const moreMenu =
+    document.getElementById("moreMenu");
+
+const saveButton =
+    document.getElementById("saveButton");
+
+const historyButton =
+    document.getElementById("historyButton");
+
+const clearHistoryButton =
+    document.getElementById("clearHistory");
+
+const shareChatButton =
+    document.getElementById("shareChat");
+
+const historyModal =
+    document.getElementById("historyModal");
+
+const historyList =
+    document.getElementById("historyList");
+
+const closeHistory =
+    document.getElementById("closeHistory");
+
+const globalVoiceToggle =
+    document.getElementById(
+        "globalVoiceToggle"
+    );
+
+const mobileMenu =
+    document.getElementById("mobileMenu");
 
 
 // ======================================================
@@ -40,9 +79,10 @@ const mobileMenu = document.getElementById("mobileMenu");
 
 let chatMessages = [];
 
-let voiceEnabled = true;
+let currentChatId =
+    Date.now().toString();
 
-let currentChatId = Date.now().toString();
+let voiceEnabled = true;
 
 let recognition = null;
 
@@ -53,51 +93,70 @@ let voices = [];
 // TOAST
 // ======================================================
 
-function showToast(message) {
+function toast(message) {
 
-    let toast = document.getElementById("viggoToast");
+    const element =
+        document.getElementById(
+            "viggoToast"
+        );
 
-    if (!toast) {
+    if (!element) return;
 
-        toast = document.createElement("div");
+    element.textContent =
+        message;
 
-        toast.id = "viggoToast";
+    element.style.display =
+        "block";
 
-        toast.style.position = "fixed";
-        toast.style.bottom = "25px";
-        toast.style.left = "50%";
-        toast.style.transform = "translateX(-50%)";
+    clearTimeout(
+        element.timer
+    );
 
-        toast.style.background = "#071a35";
-        toast.style.color = "#ffffff";
+    element.timer =
+        setTimeout(() => {
 
-        toast.style.border = "1px solid #238cff";
+            element.style.display =
+                "none";
 
-        toast.style.padding = "11px 20px";
+        }, 1600);
+}
 
-        toast.style.borderRadius = "10px";
 
-        toast.style.boxShadow =
-            "0 0 20px rgba(20,130,255,.35)";
+// ======================================================
+// ESCAPE
+// ======================================================
 
-        toast.style.zIndex = "99999";
+function escapeHtml(text) {
 
-        toast.style.fontSize = "14px";
+    const div =
+        document.createElement("div");
 
-        document.body.appendChild(toast);
-    }
+    div.textContent =
+        text;
 
-    toast.textContent = message;
+    return div.innerHTML;
+}
 
-    toast.style.display = "block";
 
-    clearTimeout(toast.timer);
+// ======================================================
+// SCROLL
+// ======================================================
 
-    toast.timer = setTimeout(() => {
+function scrollBottom() {
 
-        toast.style.display = "none";
+    const area =
+        document.getElementById(
+            "chatArea"
+        );
 
-    }, 2200);
+    if (!area) return;
+
+    setTimeout(() => {
+
+        area.scrollTop =
+            area.scrollHeight;
+
+    }, 50);
 }
 
 
@@ -108,26 +167,13 @@ function showToast(message) {
 function removeWelcome() {
 
     const welcome =
-        document.querySelector(".welcome");
+        document.querySelector(
+            ".welcome"
+        );
 
     if (welcome) {
         welcome.remove();
     }
-}
-
-
-// ======================================================
-// ESCAPE HTML
-// ======================================================
-
-function escapeHtml(text) {
-
-    const div =
-        document.createElement("div");
-
-    div.textContent = text;
-
-    return div.innerHTML;
 }
 
 
@@ -138,10 +184,11 @@ function escapeHtml(text) {
 function addMessage(
     role,
     text,
-    saveToMemory = true
+    saveMemory = true
 ) {
 
     removeWelcome();
+
 
     const message =
         document.createElement("div");
@@ -150,14 +197,11 @@ function addMessage(
         "message " + role;
 
 
-    // ==================================================
-    // AVATAR
-    // ==================================================
-
     const avatar =
         document.createElement("div");
 
-    avatar.className = "avatar";
+    avatar.className =
+        "avatar";
 
     avatar.textContent =
         role === "user"
@@ -165,20 +209,12 @@ function addMessage(
             : "B";
 
 
-    // ==================================================
-    // CONTENT
-    // ==================================================
-
     const content =
         document.createElement("div");
 
     content.className =
         "message-content";
 
-
-    // ==================================================
-    // NAME
-    // ==================================================
 
     const name =
         document.createElement("div");
@@ -192,10 +228,6 @@ function addMessage(
             : "Viggo";
 
 
-    // ==================================================
-    // TEXT
-    // ==================================================
-
     const textElement =
         document.createElement("div");
 
@@ -206,12 +238,17 @@ function addMessage(
         text;
 
 
-    content.appendChild(name);
-    content.appendChild(textElement);
+    content.appendChild(
+        name
+    );
+
+    content.appendChild(
+        textElement
+    );
 
 
     // ==================================================
-    // AI ACTION BUTTONS
+    // AI ACTIONS
     // ==================================================
 
     if (role === "ai") {
@@ -223,65 +260,53 @@ function addMessage(
             "message-actions";
 
 
-        // ----------------------------------------------
         // COPY
-        // ----------------------------------------------
 
-        const copyButton =
+        const copy =
             document.createElement("button");
 
-        copyButton.className =
+        copy.className =
             "msg-btn";
 
-        copyButton.innerHTML =
+        copy.textContent =
             "📋 Copy";
 
-
-        copyButton.onclick =
+        copy.onclick =
             async () => {
 
                 try {
 
-                    await navigator.clipboard.writeText(
-                        text
-                    );
+                    await navigator
+                        .clipboard
+                        .writeText(text);
 
-                    copyButton.innerHTML =
+                    copy.textContent =
                         "✓ Copied";
 
                     setTimeout(() => {
 
-                        copyButton.innerHTML =
+                        copy.textContent =
                             "📋 Copy";
 
-                    }, 1500);
+                    }, 1200);
 
-                } catch {
-
-                    showToast(
-                        "Copy failed"
-                    );
-
-                }
+                } catch {}
 
             };
 
 
-        // ----------------------------------------------
-        // SPEAKER
-        // ----------------------------------------------
+        // SPEAK
 
-        const speakerButton =
+        const speak =
             document.createElement("button");
 
-        speakerButton.className =
+        speak.className =
             "msg-btn";
 
-        speakerButton.innerHTML =
+        speak.textContent =
             "🔊 Speak";
 
-
-        speakerButton.onclick =
+        speak.onclick =
             () => {
 
                 if (
@@ -290,146 +315,274 @@ function addMessage(
 
                     speechSynthesis.cancel();
 
-                    speakerButton.innerHTML =
+                    speak.textContent =
                         "🔊 Speak";
 
-                    return;
+                } else {
+
+                    speakText(text);
+
+                    speak.textContent =
+                        "🔇 Stop";
+
                 }
-
-
-                speakText(text);
-
-                speakerButton.innerHTML =
-                    "🔇 Stop";
 
             };
 
 
-        // ----------------------------------------------
         // LIKE
-        // ----------------------------------------------
 
-        const likeButton =
+        const like =
             document.createElement("button");
 
-        likeButton.className =
+        like.className =
             "msg-btn";
 
-        likeButton.innerHTML =
+        like.textContent =
             "👍";
 
-
-        likeButton.onclick =
+        like.onclick =
             () => {
 
-                likeButton.classList.toggle(
+                like.classList.toggle(
                     "active"
                 );
 
-                dislikeButton.classList.remove(
+                dislike.classList.remove(
                     "active"
                 );
-
-                if (
-                    likeButton.classList.contains(
-                        "active"
-                    )
-                ) {
-
-                    showToast(
-                        "Thanks for your feedback 👍"
-                    );
-                }
 
             };
 
 
-        // ----------------------------------------------
         // DISLIKE
-        // ----------------------------------------------
 
-        const dislikeButton =
+        const dislike =
             document.createElement("button");
 
-        dislikeButton.className =
+        dislike.className =
             "msg-btn";
 
-        dislikeButton.innerHTML =
+        dislike.textContent =
             "👎";
 
-
-        dislikeButton.onclick =
+        dislike.onclick =
             () => {
 
-                dislikeButton.classList.toggle(
+                dislike.classList.toggle(
                     "active"
                 );
 
-                likeButton.classList.remove(
+                like.classList.remove(
                     "active"
                 );
-
-                if (
-                    dislikeButton.classList.contains(
-                        "active"
-                    )
-                ) {
-
-                    showToast(
-                        "Thanks for your feedback 👎"
-                    );
-                }
 
             };
 
 
-        actions.appendChild(copyButton);
-        actions.appendChild(speakerButton);
-        actions.appendChild(likeButton);
-        actions.appendChild(dislikeButton);
+        actions.appendChild(copy);
+        actions.appendChild(speak);
+        actions.appendChild(like);
+        actions.appendChild(dislike);
 
         content.appendChild(actions);
+
+
+        // ==================================================
+        // VOICE CONTROL UNDER ANSWER
+        // ==================================================
+
+        const voiceControl =
+            document.createElement("div");
+
+        voiceControl.className =
+            "message-voice-control";
+
+
+        const voiceButton =
+            document.createElement("button");
+
+        voiceButton.className =
+            "message-voice-btn";
+
+
+        voiceButton.textContent =
+            voiceEnabled
+                ? "🔊 Voice ON"
+                : "🔇 Voice OFF";
+
+
+        voiceButton.onclick =
+            () => {
+
+                voiceEnabled =
+                    !voiceEnabled;
+
+
+                if (!voiceEnabled) {
+
+                    speechSynthesis.cancel();
+
+                }
+
+
+                updateVoiceButtons();
+
+
+                voiceButton.textContent =
+                    voiceEnabled
+                        ? "🔊 Voice ON"
+                        : "🔇 Voice OFF";
+
+            };
+
+
+        voiceControl.appendChild(
+            voiceButton
+        );
+
+        content.appendChild(
+            voiceControl
+        );
     }
 
 
-    message.appendChild(avatar);
-    message.appendChild(content);
+    message.appendChild(
+        avatar
+    );
 
-    conversation.appendChild(message);
+    message.appendChild(
+        content
+    );
 
-    scrollToBottom();
+    conversation.appendChild(
+        message
+    );
 
 
-    if (saveToMemory) {
+    scrollBottom();
+
+
+    if (saveMemory) {
 
         chatMessages.push({
 
-            role: role,
-
+            role,
             content: text
 
         });
+
     }
 }
 
 
 // ======================================================
-// SCROLL
+// UPDATE VOICE BUTTONS
 // ======================================================
 
-function scrollToBottom() {
+function updateVoiceButtons() {
 
-    const chatArea =
-        document.querySelector(".chat-area");
+    if (!globalVoiceToggle) {
+        return;
+    }
 
-    if (!chatArea) return;
+    globalVoiceToggle.textContent =
+        voiceEnabled
+            ? "🔊 Voice ON"
+            : "🔇 Voice OFF";
+}
 
-    setTimeout(() => {
 
-        chatArea.scrollTop =
-            chatArea.scrollHeight;
+// ======================================================
+// VOICE ON / OFF
+// ======================================================
 
-    }, 50);
+if (globalVoiceToggle) {
+
+    globalVoiceToggle.onclick =
+        () => {
+
+            voiceEnabled =
+                !voiceEnabled;
+
+
+            if (!voiceEnabled) {
+
+                speechSynthesis.cancel();
+
+            }
+
+
+            updateVoiceButtons();
+
+
+            document
+                .querySelectorAll(
+                    ".message-voice-btn"
+                )
+                .forEach(button => {
+
+                    button.textContent =
+                        voiceEnabled
+                            ? "🔊 Voice ON"
+                            : "🔇 Voice OFF";
+
+                });
+
+        };
+}
+
+
+// ======================================================
+// SPEECH
+// ======================================================
+
+function loadVoices() {
+
+    voices =
+        speechSynthesis.getVoices();
+}
+
+
+if (
+    "speechSynthesis" in window
+) {
+
+    speechSynthesis.onvoiceschanged =
+        loadVoices;
+
+    loadVoices();
+
+}
+
+
+function speakText(text) {
+
+    if (
+        !("speechSynthesis" in window)
+    ) {
+
+        return;
+    }
+
+
+    speechSynthesis.cancel();
+
+
+    const utterance =
+        new SpeechSynthesisUtterance(
+            text
+        );
+
+
+    utterance.rate = 1;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+
+
+    speechSynthesis.speak(
+        utterance
+    );
 }
 
 
@@ -442,6 +595,7 @@ async function sendMessage() {
     const text =
         messageInput.value.trim();
 
+
     if (!text) {
         return;
     }
@@ -453,25 +607,26 @@ async function sendMessage() {
     );
 
 
-    messageInput.value = "";
+    messageInput.value =
+        "";
 
     messageInput.style.height =
         "auto";
 
 
-    sendButton.disabled = true;
+    sendButton.disabled =
+        true;
 
 
-    // ==================================================
-    // CHAT TITLE
-    // ==================================================
-
-    if (chatMessages.length === 1) {
+    if (
+        chatMessages.length === 1
+    ) {
 
         currentTitle.textContent =
-            text.length > 32
-                ? text.substring(0, 32) + "..."
+            text.length > 35
+                ? text.substring(0, 35) + "..."
                 : text;
+
     }
 
 
@@ -484,7 +639,6 @@ async function sendMessage() {
 
     loading.className =
         "message ai";
-
 
     loading.innerHTML = `
 
@@ -506,10 +660,11 @@ async function sendMessage() {
 
     `;
 
+    conversation.appendChild(
+        loading
+    );
 
-    conversation.appendChild(loading);
-
-    scrollToBottom();
+    scrollBottom();
 
 
     try {
@@ -526,14 +681,15 @@ async function sendMessage() {
                             "application/json"
                     },
 
-                    body: JSON.stringify({
+                    body:
+                        JSON.stringify({
 
-                        message: text,
+                            message: text,
 
-                        history:
-                            chatMessages
+                            history:
+                                chatMessages
 
-                    })
+                        })
 
                 }
             );
@@ -544,6 +700,7 @@ async function sendMessage() {
             throw new Error(
                 "Server error"
             );
+
         }
 
 
@@ -556,8 +713,7 @@ async function sendMessage() {
 
         const reply =
             data.reply ||
-            data.message ||
-            "Sorry, Viggo could not generate a response.";
+            "Viggo could not generate a response.";
 
 
         addMessage(
@@ -578,10 +734,7 @@ async function sendMessage() {
 
     } catch (error) {
 
-        console.error(
-            "Viggo Error:",
-            error
-        );
+        console.error(error);
 
 
         loading.remove();
@@ -595,292 +748,63 @@ async function sendMessage() {
     }
 
 
-    sendButton.disabled = false;
+    sendButton.disabled =
+        false;
 }
 
 
 // ======================================================
-// SEND BUTTON
+// SEND
 // ======================================================
 
-if (sendButton) {
-
-    sendButton.addEventListener(
-        "click",
-        sendMessage
-    );
-
-}
+sendButton.addEventListener(
+    "click",
+    sendMessage
+);
 
 
 // ======================================================
-// ENTER TO SEND
-// SHIFT + ENTER = NEW LINE
+// ENTER
 // ======================================================
 
-if (messageInput) {
+messageInput.addEventListener(
+    "keydown",
+    event => {
 
-    messageInput.addEventListener(
-        "keydown",
-        function(event) {
+        if (
+            event.key === "Enter" &&
+            !event.shiftKey
+        ) {
 
-            if (
-                event.key === "Enter" &&
-                !event.shiftKey
-            ) {
+            event.preventDefault();
 
-                event.preventDefault();
+            sendMessage();
 
-                sendMessage();
-
-            }
-
-        }
-    );
-
-
-    // ==================================================
-    // AUTO TEXTAREA HEIGHT
-    // ==================================================
-
-    messageInput.addEventListener(
-        "input",
-        function() {
-
-            this.style.height =
-                "auto";
-
-            this.style.height =
-                Math.min(
-                    this.scrollHeight,
-                    150
-                ) + "px";
-
-        }
-    );
-
-}
-
-
-// ======================================================
-// VOICE ON / OFF
-// ======================================================
-
-if (voiceToggle) {
-
-    voiceToggle.addEventListener(
-        "click",
-        () => {
-
-            voiceEnabled =
-                !voiceEnabled;
-
-
-            if (!voiceEnabled) {
-
-                speechSynthesis.cancel();
-
-                voiceToggle.textContent =
-                    "🔇 Voice OFF";
-
-                showToast(
-                    "Viggo voice OFF"
-                );
-
-            } else {
-
-                voiceToggle.textContent =
-                    "🔊 Voice ON";
-
-                showToast(
-                    "Viggo voice ON"
-                );
-
-            }
-
-        }
-    );
-
-}
-
-
-// ======================================================
-// TEXT TO SPEECH
-// ======================================================
-
-function speakText(text) {
-
-    if (
-        !("speechSynthesis" in window)
-    ) {
-
-        showToast(
-            "Voice is not supported"
-        );
-
-        return;
-    }
-
-
-    speechSynthesis.cancel();
-
-
-    const utterance =
-        new SpeechSynthesisUtterance(
-            text
-        );
-
-
-    const selectedName =
-        voiceSelect
-            ? voiceSelect.value
-            : "";
-
-
-    if (selectedName) {
-
-        const selectedVoice =
-            voices.find(
-                voice =>
-                    voice.name ===
-                    selectedName
-            );
-
-
-        if (selectedVoice) {
-
-            utterance.voice =
-                selectedVoice;
         }
 
     }
-
-
-    utterance.rate = 1;
-    utterance.pitch = 1;
-    utterance.volume = 1;
-
-
-    speechSynthesis.speak(
-        utterance
-    );
-}
+);
 
 
 // ======================================================
-// LOAD VOICES
+// TEXTAREA SIZE
 // ======================================================
 
-function loadVoices() {
+messageInput.addEventListener(
+    "input",
+    function () {
 
-    if (!("speechSynthesis" in window)) {
-        return;
+        this.style.height =
+            "auto";
+
+        this.style.height =
+            Math.min(
+                this.scrollHeight,
+                150
+            ) + "px";
+
     }
-
-
-    voices =
-        speechSynthesis.getVoices();
-
-
-    if (!voiceSelect) {
-        return;
-    }
-
-
-    voiceSelect.innerHTML = "";
-
-
-    const defaultOption =
-        document.createElement("option");
-
-    defaultOption.value = "";
-
-    defaultOption.textContent =
-        "Default Voice";
-
-    voiceSelect.appendChild(
-        defaultOption
-    );
-
-
-    voices.forEach(
-        voice => {
-
-            const option =
-                document.createElement("option");
-
-            option.value =
-                voice.name;
-
-            option.textContent =
-                voice.name +
-                " (" +
-                voice.lang +
-                ")";
-
-
-            voiceSelect.appendChild(
-                option
-            );
-
-        }
-    );
-}
-
-
-if (
-    "speechSynthesis" in window
-) {
-
-    speechSynthesis.onvoiceschanged =
-        loadVoices;
-
-    loadVoices();
-}
-
-
-// ======================================================
-// VOICE SETTINGS
-// ======================================================
-
-if (voiceSettingsButton) {
-
-    voiceSettingsButton.onclick =
-        () => {
-
-            if (voicePanel) {
-
-                voicePanel.classList.toggle(
-                    "show"
-                );
-
-            }
-
-        };
-}
-
-
-// ======================================================
-// TEST VOICE
-// ======================================================
-
-const testVoice =
-    document.getElementById(
-        "testVoice"
-    );
-
-
-if (testVoice) {
-
-    testVoice.onclick =
-        () => {
-
-            speakText(
-                "Hello friend! I am Viggo, your AI assistant."
-            );
-
-        };
-}
+);
 
 
 // ======================================================
@@ -908,72 +832,36 @@ if (SpeechRecognition) {
         false;
 
 
-    if (micButton) {
+    micButton.onclick =
+        () => {
 
-        micButton.onclick =
-            () => {
+            try {
 
-                try {
+                recognition.start();
 
-                    recognition.start();
+                micButton.classList.add(
+                    "listening"
+                );
 
-                    micButton.textContent =
-                        "🔴";
+                micButton.textContent =
+                    "🔴";
 
-                } catch {
+            } catch {}
 
-                    console.log(
-                        "Recognition already running"
-                    );
-
-                }
-
-            };
-
-    }
+        };
 
 
     recognition.onresult =
         event => {
 
-            const transcript =
-                event.results[0][0].transcript;
-
-
             messageInput.value =
-                transcript;
+                event.results[0][0]
+                    .transcript;
 
 
             messageInput.dispatchEvent(
                 new Event("input")
             );
-
-
-            if (micButton) {
-
-                micButton.textContent =
-                    "🎤";
-
-            }
-
-        };
-
-
-    recognition.onerror =
-        event => {
-
-            console.log(
-                "Speech Error:",
-                event.error
-            );
-
-
-            if (micButton) {
-
-                micButton.textContent =
-                    "🎤";
-
-            }
 
         };
 
@@ -981,123 +869,71 @@ if (SpeechRecognition) {
     recognition.onend =
         () => {
 
-            if (micButton) {
+            micButton.classList.remove(
+                "listening"
+            );
 
-                micButton.textContent =
-                    "🎤";
+            micButton.textContent =
+                "🎤";
 
-            }
+        };
+
+
+    recognition.onerror =
+        () => {
+
+            micButton.classList.remove(
+                "listening"
+            );
+
+            micButton.textContent =
+                "🎤";
 
         };
 
 } else {
 
-    if (micButton) {
+    micButton.onclick =
+        () => {};
 
-        micButton.onclick =
-            () => {
+}
 
-                showToast(
-                    "Voice input is not supported in this browser"
-                );
 
-            };
+// ======================================================
+// MORE MENU
+// ======================================================
+
+moreButton.addEventListener(
+    "click",
+    event => {
+
+        event.stopPropagation();
+
+        moreMenu.classList.toggle(
+            "show"
+        );
 
     }
-
-}
-
-
-// ======================================================
-// SHARE COMPLETE CHAT
-// ======================================================
-
-if (shareChatButton) {
-
-    shareChatButton.onclick =
-        async () => {
-
-            if (
-                chatMessages.length === 0
-            ) {
-
-                showToast(
-                    "No chat available to share"
-                );
-
-                return;
-            }
+);
 
 
-            let shareText =
-                "Viggo AI Chat\n\n";
+document.addEventListener(
+    "click",
+    event => {
 
+        if (
+            !moreMenu.contains(event.target) &&
+            event.target !== moreButton
+        ) {
 
-            chatMessages.forEach(
-                item => {
-
-                    shareText +=
-                        (
-                            item.role === "user"
-                                ? "You"
-                                : "Viggo"
-                        ) +
-                        ":\n" +
-                        item.content +
-                        "\n\n";
-
-                }
+            moreMenu.classList.remove(
+                "show"
             );
 
+        }
 
-            if (
-                navigator.share
-            ) {
-
-                try {
-
-                    await navigator.share({
-
-                        title:
-                            "Viggo AI Chat",
-
-                        text:
-                            shareText
-
-                    });
-
-                } catch {
-
-                    console.log(
-                        "Share cancelled"
-                    );
-
-                }
-
-                return;
-            }
-
-
-            try {
-
-                await navigator.clipboard.writeText(
-                    shareText
-                );
-
-                showToast(
-                    "Complete chat copied!"
-                );
-
-            } catch {
-
-                showToast(
-                    "Sharing not supported"
-                );
-
-            }
-
-        };
-}
+    }
+);
 
 
 // ======================================================
@@ -1122,24 +958,18 @@ function saveCurrentChat() {
         );
 
 
-    const firstUserMessage =
-        chatMessages.find(
-            item =>
-                item.role === "user"
-        );
-
-
-    const title =
-        firstUserMessage
-            ? firstUserMessage.content
-            : "New Chat";
-
-
-    const oldChat =
+    const old =
         chats.find(
             chat =>
                 chat.id ===
                 currentChatId
+        );
+
+
+    const firstUser =
+        chatMessages.find(
+            item =>
+                item.role === "user"
         );
 
 
@@ -1149,7 +979,12 @@ function saveCurrentChat() {
             currentChatId,
 
         title:
-            title.substring(0, 40),
+            firstUser
+                ? firstUser.content.substring(
+                    0,
+                    45
+                )
+                : "New Chat",
 
         messages:
             chatMessages,
@@ -1158,8 +993,8 @@ function saveCurrentChat() {
             new Date().toLocaleString(),
 
         pinned:
-            oldChat
-                ? oldChat.pinned
+            old
+                ? old.pinned
                 : false
 
     };
@@ -1167,8 +1002,8 @@ function saveCurrentChat() {
 
     const index =
         chats.findIndex(
-            item =>
-                item.id ===
+            chat =>
+                chat.id ===
                 currentChatId
         );
 
@@ -1197,41 +1032,22 @@ function saveCurrentChat() {
 }
 
 
-// ======================================================
-// SAVE BUTTON
-// ======================================================
+saveButton.addEventListener(
+    "click",
+    () => {
 
-if (saveButton) {
+        saveCurrentChat();
 
-    saveButton.onclick =
-        () => {
+        moreMenu.classList.remove(
+            "show"
+        );
 
-            if (
-                chatMessages.length === 0
-            ) {
-
-                showToast(
-                    "No chat to save"
-                );
-
-                return;
-            }
-
-
-            saveCurrentChat();
-
-
-            showToast(
-                "Chat saved successfully 💾"
-            );
-
-        };
-
-}
+    }
+);
 
 
 // ======================================================
-// RENDER SIDEBAR
+// SIDEBAR
 // ======================================================
 
 function renderSidebar() {
@@ -1247,14 +1063,14 @@ function renderSidebar() {
     const pinned =
         chats.filter(
             chat =>
-                chat.pinned === true
+                chat.pinned
         );
 
 
     const recent =
         chats.filter(
             chat =>
-                chat.pinned !== true
+                !chat.pinned
         );
 
 
@@ -1262,7 +1078,6 @@ function renderSidebar() {
         pinnedList,
         pinned
     );
-
 
     renderChatList(
         recentList,
@@ -1272,7 +1087,7 @@ function renderSidebar() {
 
 
 // ======================================================
-// RENDER CHAT LIST
+// CHAT LIST
 // ======================================================
 
 function renderChatList(
@@ -1280,12 +1095,8 @@ function renderChatList(
     chats
 ) {
 
-    if (!container) {
-        return;
-    }
-
-
-    container.innerHTML = "";
+    container.innerHTML =
+        "";
 
 
     if (
@@ -1295,18 +1106,11 @@ function renderChatList(
         const empty =
             document.createElement("div");
 
-        empty.style.color =
-            "#506b8e";
-
-        empty.style.fontSize =
-            "12px";
-
-        empty.style.padding =
-            "8px";
+        empty.className =
+            "empty-sidebar";
 
         empty.textContent =
             "No chats";
-
 
         container.appendChild(
             empty
@@ -1319,38 +1123,18 @@ function renderChatList(
     chats.forEach(
         chat => {
 
-            // ==================================================
-            // CHAT ROW
-            // ==================================================
-
             const row =
                 document.createElement("div");
 
-            row.style.display =
-                "flex";
-
-            row.style.alignItems =
-                "center";
-
-            row.style.gap =
-                "4px";
-
-            row.style.marginBottom =
-                "4px";
+            row.className =
+                "chat-row";
 
 
-            // ==================================================
-            // CHAT BUTTON
-            // ==================================================
-
-            const chatButton =
+            const button =
                 document.createElement("button");
 
-            chatButton.className =
+            button.className =
                 "chat-item";
-
-            chatButton.style.flex =
-                "1";
 
 
             if (
@@ -1358,14 +1142,14 @@ function renderChatList(
                 currentChatId
             ) {
 
-                chatButton.classList.add(
+                button.classList.add(
                     "active"
                 );
 
             }
 
 
-            chatButton.innerHTML =
+            button.innerHTML =
                 `
                 <span class="chat-item-title">
                     ${escapeHtml(chat.title)}
@@ -1373,7 +1157,7 @@ function renderChatList(
                 `;
 
 
-            chatButton.onclick =
+            button.onclick =
                 () => {
 
                     loadChat(
@@ -1383,82 +1167,53 @@ function renderChatList(
                 };
 
 
-            // ==================================================
-            // PIN BUTTON
-            // ==================================================
+            // PIN
 
-            const pinButton =
+            const pin =
                 document.createElement("button");
 
-            pinButton.style.border =
-                "none";
+            pin.className =
+                "small-action";
 
-            pinButton.style.background =
-                "transparent";
-
-            pinButton.style.color =
-                "#7fb8ff";
-
-            pinButton.style.cursor =
-                "pointer";
-
-            pinButton.style.padding =
-                "7px";
-
-            pinButton.title =
-                chat.pinned
-                    ? "Unpin chat"
-                    : "Pin chat";
-
-
-            pinButton.textContent =
+            pin.textContent =
                 chat.pinned
                     ? "📌"
                     : "📍";
 
+            pin.title =
+                chat.pinned
+                    ? "Unpin"
+                    : "Pin";
 
-            pinButton.onclick =
+
+            pin.onclick =
                 event => {
 
                     event.stopPropagation();
 
-                    togglePinChat(
+                    togglePin(
                         chat.id
                     );
 
                 };
 
 
-            // ==================================================
-            // DELETE BUTTON
-            // ==================================================
+            // DELETE
 
-            const deleteButton =
+            const del =
                 document.createElement("button");
 
-            deleteButton.style.border =
-                "none";
+            del.className =
+                "small-action delete-action";
 
-            deleteButton.style.background =
-                "transparent";
-
-            deleteButton.style.color =
-                "#ff7777";
-
-            deleteButton.style.cursor =
-                "pointer";
-
-            deleteButton.style.padding =
-                "7px";
-
-            deleteButton.title =
-                "Delete chat";
-
-            deleteButton.textContent =
+            del.textContent =
                 "🗑";
 
+            del.title =
+                "Delete";
 
-            deleteButton.onclick =
+
+            del.onclick =
                 event => {
 
                     event.stopPropagation();
@@ -1471,15 +1226,15 @@ function renderChatList(
 
 
             row.appendChild(
-                chatButton
+                button
             );
 
             row.appendChild(
-                pinButton
+                pin
             );
 
             row.appendChild(
-                deleteButton
+                del
             );
 
 
@@ -1493,10 +1248,10 @@ function renderChatList(
 
 
 // ======================================================
-// PIN / UNPIN CHAT
+// PIN
 // ======================================================
 
-function togglePinChat(id) {
+function togglePin(id) {
 
     let chats =
         JSON.parse(
@@ -1514,7 +1269,6 @@ function togglePinChat(id) {
 
 
     if (!chat) {
-
         return;
     }
 
@@ -1531,40 +1285,15 @@ function togglePinChat(id) {
 
     renderSidebar();
 
-
-    if (chat.pinned) {
-
-        showToast(
-            "Chat pinned 📌"
-        );
-
-    } else {
-
-        showToast(
-            "Chat unpinned"
-        );
-
-    }
+    renderHistory();
 }
 
 
 // ======================================================
-// DELETE CHAT
+// DELETE - NO CONFIRMATION
 // ======================================================
 
 function deleteChat(id) {
-
-    const confirmDelete =
-        confirm(
-            "Delete this chat?"
-        );
-
-
-    if (!confirmDelete) {
-
-        return;
-    }
-
 
     let chats =
         JSON.parse(
@@ -1587,10 +1316,6 @@ function deleteChat(id) {
     );
 
 
-    // ==================================================
-    // IF CURRENT CHAT DELETED
-    // ==================================================
-
     if (
         currentChatId === id
     ) {
@@ -1602,10 +1327,7 @@ function deleteChat(id) {
 
     renderSidebar();
 
-
-    showToast(
-        "Chat deleted 🗑"
-    );
+    renderHistory();
 }
 
 
@@ -1631,7 +1353,6 @@ function loadChat(id) {
 
 
     if (!chat) {
-
         return;
     }
 
@@ -1667,6 +1388,10 @@ function loadChat(id) {
     renderSidebar();
 
 
+    historyModal.style.display =
+        "none";
+
+
     if (sidebar) {
 
         sidebar.classList.remove(
@@ -1675,10 +1400,6 @@ function loadChat(id) {
 
     }
 
-
-    showToast(
-        "Chat loaded"
-    );
 }
 
 
@@ -1703,8 +1424,7 @@ function startNewChat() {
         "New Chat";
 
 
-    conversation.innerHTML =
-        `
+    conversation.innerHTML = `
 
         <div class="welcome">
 
@@ -1726,12 +1446,11 @@ function startNewChat() {
 
         </div>
 
-        `;
+    `;
 
 
     messageInput.value =
         "";
-
 
     messageInput.style.height =
         "auto";
@@ -1741,131 +1460,350 @@ function startNewChat() {
 }
 
 
-// ======================================================
-// NEW CHAT BUTTON
-// ======================================================
-
-if (newChatButton) {
-
-    newChatButton.onclick =
-        startNewChat;
-
-}
+newChatButton.addEventListener(
+    "click",
+    startNewChat
+);
 
 
 // ======================================================
 // HISTORY
 // ======================================================
 
-if (historyButton) {
+historyButton.addEventListener(
+    "click",
+    () => {
 
-    historyButton.onclick =
-        () => {
+        renderHistory();
 
-            const chats =
-                JSON.parse(
-                    localStorage.getItem(
-                        "viggoChats"
-                    ) || "[]"
+        historyModal.style.display =
+            "block";
+
+        moreMenu.classList.remove(
+            "show"
+        );
+
+    }
+);
+
+
+// ======================================================
+// RENDER HISTORY
+// ======================================================
+
+function renderHistory() {
+
+    historyList.innerHTML =
+        "";
+
+
+    const chats =
+        JSON.parse(
+            localStorage.getItem(
+                "viggoChats"
+            ) || "[]"
+        );
+
+
+    if (
+        chats.length === 0
+    ) {
+
+        historyList.innerHTML = `
+
+            <div style="
+                text-align:center;
+                padding:40px;
+                color:#66819c;
+            ">
+                No saved chats yet.
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    chats.forEach(
+        chat => {
+
+            const card =
+                document.createElement("div");
+
+            card.className =
+                "history-card";
+
+
+            if (chat.pinned) {
+
+                card.classList.add(
+                    "pinned"
                 );
 
-
-            if (
-                chats.length === 0
-            ) {
-
-                showToast(
-                    "No saved chats"
-                );
-
-                return;
             }
 
 
-            let historyText =
-                "Viggo Chat History\n\n";
+            card.innerHTML = `
+
+                <div class="history-card-title">
+                    ${chat.pinned ? "📌 " : ""}
+                    ${escapeHtml(chat.title)}
+                </div>
+
+                <div class="history-card-time">
+                    ${escapeHtml(chat.time || "")}
+                </div>
+
+            `;
 
 
-            chats.forEach(
-                (chat, index) => {
+            const actions =
+                document.createElement("div");
 
-                    historyText +=
-                        `${index + 1}. ` +
-                        chat.title +
-                        (
-                            chat.pinned
-                                ? " 📌"
-                                : ""
-                        ) +
-                        "\n";
+            actions.className =
+                "history-card-actions";
 
-                }
+
+            // OPEN
+
+            const open =
+                document.createElement("button");
+
+            open.textContent =
+                "Open";
+
+            open.onclick =
+                () => {
+
+                    loadChat(
+                        chat.id
+                    );
+
+                };
+
+
+            // PIN
+
+            const pin =
+                document.createElement("button");
+
+            pin.textContent =
+                chat.pinned
+                    ? "📌 Unpin"
+                    : "📍 Pin";
+
+
+            pin.onclick =
+                () => {
+
+                    togglePin(
+                        chat.id
+                    );
+
+                };
+
+
+            // DELETE
+
+            const del =
+                document.createElement("button");
+
+            del.className =
+                "history-delete";
+
+            del.textContent =
+                "🗑 Delete";
+
+
+            del.onclick =
+                () => {
+
+                    deleteChat(
+                        chat.id
+                    );
+
+                };
+
+
+            actions.appendChild(
+                open
+            );
+
+            actions.appendChild(
+                pin
+            );
+
+            actions.appendChild(
+                del
             );
 
 
-            alert(
-                historyText
+            card.appendChild(
+                actions
             );
 
-        };
+
+            historyList.appendChild(
+                card
+            );
+
+        }
+    );
 }
+
+
+// ======================================================
+// CLOSE HISTORY
+// ======================================================
+
+closeHistory.addEventListener(
+    "click",
+    () => {
+
+        historyModal.style.display =
+            "none";
+
+    }
+);
+
+
+historyModal.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target ===
+            historyModal
+        ) {
+
+            historyModal.style.display =
+                "none";
+
+        }
+
+    }
+);
 
 
 // ======================================================
 // CLEAR HISTORY
 // ======================================================
 
-if (clearHistoryButton) {
+clearHistoryButton.addEventListener(
+    "click",
+    () => {
 
-    clearHistoryButton.onclick =
-        () => {
-
-            const confirmClear =
-                confirm(
-                    "Delete ALL saved chats?"
-                );
+        localStorage.removeItem(
+            "viggoChats"
+        );
 
 
-            if (!confirmClear) {
+        startNewChat();
 
-                return;
+
+        renderSidebar();
+
+        renderHistory();
+
+
+        moreMenu.classList.remove(
+            "show"
+        );
+
+    }
+);
+
+
+// ======================================================
+// SHARE COMPLETE CHAT
+// ======================================================
+
+shareChatButton.addEventListener(
+    "click",
+    async () => {
+
+        moreMenu.classList.remove(
+            "show"
+        );
+
+
+        if (
+            chatMessages.length === 0
+        ) {
+
+            return;
+        }
+
+
+        let text =
+            "Viggo AI Chat\n\n";
+
+
+        chatMessages.forEach(
+            item => {
+
+                text +=
+                    (
+                        item.role === "user"
+                            ? "You"
+                            : "Viggo"
+                    ) +
+                    ":\n" +
+                    item.content +
+                    "\n\n";
+
             }
+        );
 
 
-            localStorage.removeItem(
-                "viggoChats"
-            );
+        if (
+            navigator.share
+        ) {
 
+            try {
 
-            startNewChat();
+                await navigator.share({
 
+                    title:
+                        "Viggo AI Chat",
 
-            renderSidebar();
+                    text
 
+                });
 
-            showToast(
-                "All chat history cleared"
-            );
+            } catch {}
 
-        };
-}
+        } else {
+
+            try {
+
+                await navigator
+                    .clipboard
+                    .writeText(text);
+
+            } catch {}
+
+        }
+
+    }
+);
 
 
 // ======================================================
-// MOBILE MENU
+// MOBILE
 // ======================================================
 
-if (mobileMenu) {
+mobileMenu.addEventListener(
+    "click",
+    () => {
 
-    mobileMenu.onclick =
-        () => {
+        sidebar.classList.toggle(
+            "open"
+        );
 
-            sidebar.classList.toggle(
-                "open"
-            );
-
-        };
-}
+    }
+);
 
 
 // ======================================================
@@ -1883,33 +1821,28 @@ async function checkServer() {
             );
 
 
-        if (response.ok) {
+        console.log(
+            response.ok
+                ? "Viggo server connected."
+                : "Viggo server error."
+        );
 
-            console.log(
-                "✓ Viggo server connected"
-            );
-
-        } else {
-
-            console.log(
-                "✕ Viggo server error"
-            );
-
-        }
-
-    } catch (error) {
+    } catch {
 
         console.log(
-            "✕ Viggo server is not connected"
+            "Viggo server unavailable."
         );
 
     }
+
 }
 
 
 // ======================================================
-// START
+// INITIAL
 // ======================================================
+
+updateVoiceButtons();
 
 renderSidebar();
 
