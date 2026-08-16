@@ -1,425 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <meta
-        name="theme-color"
-        content="#05070d"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Viggo AI</title>
-
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <!-- ======================================
-         SIDEBAR
-    ======================================= -->
+<aside class="sidebar" id="sidebar">
 
-    <aside
-        class="sidebar"
-        id="sidebar"
-    >
-
-        <!-- LOGO -->
-
-        <div class="logo">
-
-            <div class="logo-icon">
-                V
-            </div>
-
-            <div class="logo-text">
-
-                <strong>Viggo</strong>
-
-                <small>AI Friend</small>
-
-            </div>
-
+    <div class="logo">
+        <div class="logo-icon">V</div>
+        <div class="logo-text">
+            <strong>Viggo</strong>
+            <small>AI Friend</small>
         </div>
+    </div>
 
+    <button class="new-chat" id="newChatBtn">
+        ＋ New Chat
+    </button>
 
-        <!-- NEW CHAT -->
+    <div class="history" id="historyList"></div>
 
-        <button
-            class="new-chat"
-            id="newChatBtn"
-            type="button"
-        >
+    <div class="sidebar-more">
 
-            <span>＋</span>
-
-            <span>New Chat</span>
-
+        <button class="more-button" id="moreBtn">
+            ⋮ More
         </button>
 
+        <div class="more-menu" id="moreMenu">
 
-        <!-- CHAT HISTORY -->
+            <button id="saveBtn">💾 Save</button>
 
-        <div
-            class="history"
-            id="historyList"
-        ></div>
-
-
-        <!-- ==================================
-             MORE MENU
-        =================================== -->
-
-        <div class="sidebar-more">
-
-            <button
-                class="more-button"
-                id="moreBtn"
-                type="button"
-            >
-
-                <span>⋮</span>
-
-                <span>More</span>
-
+            <button id="selectChatsBtn">
+                ☑ Select Chats
             </button>
 
+            <button
+                id="deleteSelectedBtn"
+                class="danger-button"
+                style="display:none;"
+            >
+                🗑 Delete Selected
+            </button>
 
-            <div
-                class="more-menu"
-                id="moreMenu"
+            <button
+                id="clearHistoryBtn"
+                class="danger-button"
+            >
+                🗑 Clear History
+            </button>
+
+            <div class="menu-divider"></div>
+
+            <div class="language-title">
+                🌐 Select Language
+            </div>
+
+            <button data-language="en">🇬🇧 English</button>
+            <button data-language="ta">🇮🇳 தமிழ்</button>
+            <button data-language="hi">🇮🇳 हिन्दी</button>
+            <button data-language="ml">🇮🇳 മലയാളം</button>
+            <button data-language="te">🇮🇳 తెలుగు</button>
+            <button data-language="kn">🇮🇳 ಕನ್ನಡ</button>
+
+        </div>
+    </div>
+
+</aside>
+
+
+<main class="main">
+
+    <header class="header">
+
+        <button
+            class="mobile-menu"
+            id="mobileMenuBtn"
+        >
+            ☰
+        </button>
+
+        <div
+            class="chat-title"
+            id="chatTitle"
+        >
+            New Chat
+        </div>
+
+        <button
+            class="share-btn"
+            id="shareBtn"
+        >
+            ↗ Share
+        </button>
+
+    </header>
+
+
+    <section
+        class="messages"
+        id="messages"
+    ></section>
+
+
+    <footer class="input-area">
+
+        <div class="input-box">
+
+            <input
+                type="text"
+                id="messageInput"
+                placeholder="Message Viggo..."
+                autocomplete="off"
             >
 
-                <!-- SAVE -->
-
-                <button
-                    id="saveBtn"
-                    type="button"
-                >
-
-                    <span>💾</span>
-
-                    <span>Save</span>
-
-                </button>
-
-
-                <!-- SELECT CHATS -->
-
-                <button
-                    id="selectChatsBtn"
-                    type="button"
-                >
-
-                    <span>☑</span>
-
-                    <span>Select Chats</span>
-
-                </button>
-
-
-                <!-- DELETE SELECTED -->
-
-                <button
-                    id="deleteSelectedBtn"
-                    type="button"
-                    class="danger-button"
-                    style="display: none;"
-                >
-
-                    <span>🗑</span>
-
-                    <span>Delete Selected</span>
-
-                </button>
-
-
-                <!-- CLEAR HISTORY -->
-
-                <button
-                    id="clearHistoryBtn"
-                    type="button"
-                    class="danger-button"
-                >
-
-                    <span>🗑</span>
-
-                    <span>Clear History</span>
-
-                </button>
-
-
-                <div class="menu-divider"></div>
-
-
-                <!-- ==================================
-                     LANGUAGE
-                =================================== -->
-
-                <div class="language-title">
-
-                    🌐 Select Language
-
-                </div>
-
-
-                <!-- ENGLISH -->
-
-                <button
-                    type="button"
-                    data-language="en"
-                >
-
-                    <span>🇬🇧</span>
-
-                    <span>English</span>
-
-                </button>
-
-
-                <!-- TAMIL -->
-
-                <button
-                    type="button"
-                    data-language="ta"
-                >
-
-                    <span>🇮🇳</span>
-
-                    <span>தமிழ்</span>
-
-                </button>
-
-
-                <!-- HINDI -->
-
-                <button
-                    type="button"
-                    data-language="hi"
-                >
-
-                    <span>🇮🇳</span>
-
-                    <span>हिन्दी</span>
-
-                </button>
-
-
-                <!-- MALAYALAM -->
-
-                <button
-                    type="button"
-                    data-language="ml"
-                >
-
-                    <span>🇮🇳</span>
-
-                    <span>മലയാളം</span>
-
-                </button>
-
-
-                <!-- TELUGU -->
-
-                <button
-                    type="button"
-                    data-language="te"
-                >
-
-                    <span>🇮🇳</span>
-
-                    <span>తెలుగు</span>
-
-                </button>
-
-
-                <!-- KANNADA -->
-
-                <button
-                    type="button"
-                    data-language="kn"
-                >
-
-                    <span>🇮🇳</span>
-
-                    <span>ಕನ್ನಡ</span>
-
-                </button>
-
-            </div>
+            <button
+                id="voiceBtn"
+                class="input-icon"
+                title="Voice"
+            >
+                🎤
+            </button>
+
+            <button
+                id="sendBtn"
+                class="send-btn"
+                title="Send"
+            >
+                ➤
+            </button>
 
         </div>
 
-    </aside>
+        <div class="input-hint">
+            Viggo AI can make mistakes. Check important information.
+        </div>
 
+    </footer>
 
+</main>
 
-    <!-- ======================================
-         MAIN
-    ======================================= -->
 
-    <main class="main">
+<div id="viggoToast" class="toast"></div>
 
-
-        <!-- HEADER -->
-
-        <header class="header">
-
-
-            <!-- MOBILE MENU -->
-
-            <button
-                class="mobile-menu"
-                id="mobileMenuBtn"
-                type="button"
-                aria-label="Open menu"
-            >
-
-                ☰
-
-            </button>
-
-
-            <!-- CHAT TITLE -->
-
-            <div
-                class="chat-title"
-                id="chatTitle"
-            >
-
-                New Chat
-
-            </div>
-
-
-            <!-- SHARE -->
-
-            <button
-                class="share-btn"
-                id="shareBtn"
-                type="button"
-            >
-
-                ↗ Share
-
-            </button>
-
-        </header>
-
-
-
-        <!-- ==================================
-             MESSAGES
-        =================================== -->
-
-        <section
-            class="messages"
-            id="messages"
-            aria-live="polite"
-        >
-
-        </section>
-
-
-
-        <!-- ==================================
-             INPUT AREA
-        =================================== -->
-
-        <footer class="input-area">
-
-
-            <div class="input-box">
-
-
-                <!-- MESSAGE INPUT -->
-
-                <input
-                    type="text"
-                    id="messageInput"
-                    placeholder="Message Viggo..."
-                    autocomplete="off"
-                    aria-label="Message Viggo"
-                >
-
-
-                <!-- VOICE -->
-
-                <button
-                    class="input-icon"
-                    id="voiceBtn"
-                    type="button"
-                    title="Voice input"
-                    aria-label="Voice input"
-                >
-
-                    🎤
-
-                </button>
-
-
-                <!-- SEND -->
-
-                <button
-                    class="send-btn"
-                    id="sendBtn"
-                    type="button"
-                    title="Send message"
-                    aria-label="Send message"
-                >
-
-                    ➤
-
-                </button>
-
-
-            </div>
-
-
-            <!-- WARNING -->
-
-            <div class="input-hint">
-
-                Viggo AI can make mistakes.
-                Check important information.
-
-            </div>
-
-
-        </footer>
-
-    </main>
-
-
-
-    <!-- ======================================
-         TOAST
-    ======================================= -->
-
-    <div
-        id="viggoToast"
-        class="toast"
-        role="status"
-        aria-live="polite"
-    ></div>
-
-
-
-    <!-- ======================================
-         SCRIPT
-    ======================================= -->
-
-    <script src="script.js"></script>
+<script src="script.js"></script>
 
 </body>
-
-</html>
+</html
