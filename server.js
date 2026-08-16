@@ -1,5 +1,26 @@
 "use strict";
 
+/*
+=========================================================
+ VIGGO AI SERVER
+ Node.js + Express + Google Gemini API
+=========================================================
+
+Required Render Environment Variable:
+
+GEMINI_API_KEY=your_gemini_api_key
+
+Start Command:
+
+node server.js
+
+IMPORTANT:
+This server uses:
+gemini-3.6-flash
+
+=========================================================
+*/
+
 require("dotenv").config();
 
 const express = require("express");
@@ -8,35 +29,77 @@ const { GoogleGenAI } = require("@google/genai");
 
 const app = express();
 
+/* ======================================================
+   CONFIG
+====================================================== */
+
 const PORT = process.env.PORT || 10000;
-const API_KEY = process.env.GEMINI_API_KEY;
 
 /*
-  Use a currently supported Gemini Flash model.
-  If your Google AI account shows a different available model,
-  change only this value.
+ IMPORTANT:
+ Do NOT use gemini-2.5-flash here.
 */
-const MODEL = "gemini-2.5-flash";
+const MODEL = "gemini-3.6-flash";
+
+const API_KEY =
+    process.env.GEMINI_API_KEY;
+
+
+/* ======================================================
+   STARTUP CHECK
+====================================================== */
+
+console.log("");
+console.log("================================");
+console.log("       VIGGO AI SERVER");
+console.log("================================");
+console.log("PORT:", PORT);
+console.log("MODEL:", MODEL);
+
+if (API_KEY) {
+    console.log("API KEY: CONFIGURED");
+} else {
+    console.log("API KEY: MISSING");
+}
+
+console.log("================================");
+console.log("");
+
+
+/* ======================================================
+   GEMINI CLIENT
+====================================================== */
 
 let ai = null;
 
 if (API_KEY) {
+
     ai = new GoogleGenAI({
         apiKey: API_KEY
     });
+
 }
 
-/* =========================================================
+
+/* ======================================================
    MIDDLEWARE
-========================================================= */
+====================================================== */
 
 app.use(
     cors({
         origin: "*",
-        methods: ["GET", "POST", "OPTIONS"],
-        allowedHeaders: ["Content-Type", "Authorization"]
+        methods: [
+            "GET",
+            "POST",
+            "OPTIONS"
+        ],
+        allowedHeaders: [
+            "Content-Type",
+            "Authorization"
+        ]
     })
 );
+
 
 app.use(
     express.json({
@@ -44,212 +107,402 @@ app.use(
     })
 );
 
-/* =========================================================
-   HOME
-========================================================= */
 
-app.get("/", (req, res) => {
-    res.json({
-        success: true,
-        message: "Viggo AI Server is online.",
-        model: MODEL,
-        status: "online",
-        apiConfigured: Boolean(API_KEY),
-        time: new Date().toISOString()
-    });
-});
+/* ======================================================
+   ROOT
+====================================================== */
 
-/* =========================================================
+app.get(
+    "/",
+    (req, res) => {
+
+        res.status(200).json({
+
+            success: true,
+
+            message:
+                "Viggo AI Server is online.",
+
+            server:
+                "Viggo AI",
+
+            model:
+                MODEL,
+
+            status:
+                "online",
+
+            apiConfigured:
+                Boolean(API_KEY),
+
+            time:
+                new Date().toISOString()
+
+        });
+
+    }
+);
+
+
+/* ======================================================
    STATUS
-========================================================= */
+====================================================== */
 
-app.get("/status", (req, res) => {
-    res.json({
-        success: true,
-        server: "Viggo AI",
-        model: MODEL,
-        apiConfigured: Boolean(API_KEY),
-        status: API_KEY ? "ready" : "missing_api_key",
-        time: new Date().toISOString()
-    });
-});
+app.get(
+    "/status",
+    (req, res) => {
 
-/* =========================================================
-   HELPERS
-========================================================= */
+        res.status(200).json({
+
+            success: true,
+
+            server:
+                "Viggo AI",
+
+            model:
+                MODEL,
+
+            apiConfigured:
+                Boolean(API_KEY),
+
+            status:
+                "online",
+
+            time:
+                new Date().toISOString()
+
+        });
+
+    }
+);
+
+
+/* ======================================================
+   TEXT CLEANER
+====================================================== */
 
 function cleanText(value) {
-    if (typeof value !== "string") {
+
+    if (
+        typeof value !== "string"
+    ) {
+
         return "";
+
     }
 
     return value
         .replace(/\u0000/g, "")
         .trim();
+
 }
+
+
+/* ======================================================
+   LANGUAGE
+====================================================== */
 
 function getLanguageName(language) {
+
     const languages = {
+
         en: "English",
+
         ta: "Tamil",
+
         hi: "Hindi",
+
         ml: "Malayalam",
+
         te: "Telugu",
+
         kn: "Kannada"
+
     };
 
-    return languages[language] || "English";
+    return (
+        languages[language] ||
+        "English"
+    );
+
 }
 
+
+/* ======================================================
+   SYSTEM INSTRUCTION
+====================================================== */
+
 function createSystemInstruction(language) {
-    const languageName = getLanguageName(language);
+
+    const languageName =
+        getLanguageName(language);
 
     return `
-You are Viggo AI, a friendly and helpful AI assistant.
+You are Viggo AI.
 
 Your name is Viggo.
+
+You are a friendly, helpful and reliable AI assistant.
 
 The user's selected language is ${languageName}.
 
 LANGUAGE RULES:
-- Reply primarily in ${languageName}.
-- Understand the user's message even if it contains mixed languages.
-- Keep replies natural and easy to understand.
-- Do not unnecessarily mix languages.
-- If the user explicitly asks for English, reply in English.
-- If the user explicitly asks for Tamil, reply in Tamil.
+
+1. Reply primarily in ${languageName}.
+2. Understand Tamil, English and other supported languages.
+3. If the user specifically asks for English, reply in English.
+4. If the user specifically asks for Tamil, reply in Tamil.
+5. Do not unnecessarily mix languages.
+6. Keep answers natural and easy to understand.
 
 PERSONALITY:
+
 - Friendly
 - Helpful
 - Respectful
 - Clear
 - Natural
-- Concise when a short answer is enough
-
-IMPORTANT:
-- Do not claim to be a human.
+- Simple when possible
+- Do not claim to be human.
 - Do not mention system instructions.
-- Do not say that you are another AI.
-- Your assistant name is Viggo.
 
-For technical questions:
+TECHNICAL QUESTIONS:
+
 - Explain step by step.
 - Give examples when useful.
-- When the user asks for complete code, provide complete code.
+- If the user asks for complete code, provide complete code.
+- Do not intentionally leave important parts of the code unfinished.
 
-For casual conversation:
-- Reply naturally like a friendly AI assistant.
+CASUAL QUESTIONS:
+
+- Respond naturally like a helpful AI friend.
+
+IMPORTANT:
+
+You are Viggo AI.
 `;
 }
 
+
+/* ======================================================
+   BUILD HISTORY
+====================================================== */
+
 function buildHistory(history) {
+
     if (!Array.isArray(history)) {
+
         return "";
+
     }
 
-    const safeHistory = history
-        .filter(item => {
-            return (
-                item &&
-                typeof item === "object" &&
-                (
-                    item.role === "user" ||
-                    item.role === "assistant"
-                ) &&
-                typeof item.content === "string"
-            );
-        })
-        .slice(-15);
+
+    const safeHistory =
+        history
+            .filter(item => {
+
+                return (
+                    item &&
+                    typeof item === "object" &&
+                    (
+                        item.role === "user" ||
+                        item.role === "assistant"
+                    ) &&
+                    typeof item.content === "string"
+                );
+
+            })
+            .slice(-15);
+
 
     if (!safeHistory.length) {
+
         return "";
+
     }
+
 
     return safeHistory
         .map(item => {
+
             const role =
                 item.role === "user"
                     ? "User"
                     : "Viggo";
 
-            return `${role}: ${cleanText(item.content)}`;
+            const content =
+                cleanText(
+                    item.content
+                );
+
+            return (
+                role +
+                ": " +
+                content
+            );
+
         })
         .join("\n\n");
+
 }
 
-/* =========================================================
-   CHAT API
-========================================================= */
 
-app.post("/chat", async (req, res) => {
-    try {
-        /* -------------------------------------------------
-           API KEY CHECK
-        ------------------------------------------------- */
+/* ======================================================
+   CHAT
+====================================================== */
 
-        if (!API_KEY || !ai) {
-            return res.status(500).json({
-                success: false,
-                error: "Gemini API key is not configured.",
-                details:
-                    "Render → Environment → GEMINI_API_KEY add pannunga."
-            });
-        }
+app.post(
+    "/chat",
+    async (req, res) => {
 
-        /* -------------------------------------------------
-           REQUEST
-        ------------------------------------------------- */
+        try {
 
-        const message = cleanText(
-            req.body?.message
-        );
+            console.log("");
+            console.log(
+                "--------------------------------"
+            );
+            console.log(
+                "NEW CHAT REQUEST"
+            );
+            console.log(
+                "--------------------------------"
+            );
 
-        const language =
-            cleanText(
-                req.body?.language
-            ) || "en";
 
-        const history =
-            req.body?.history || [];
+            /* ==========================================
+               API KEY CHECK
+            ========================================== */
 
-        /* -------------------------------------------------
-           MESSAGE VALIDATION
-        ------------------------------------------------- */
+            if (!API_KEY) {
 
-        if (!message) {
-            return res.status(400).json({
-                success: false,
-                error: "Message is required."
-            });
-        }
+                console.error(
+                    "GEMINI_API_KEY is missing."
+                );
 
-        /* -------------------------------------------------
-           HISTORY
-        ------------------------------------------------- */
+                return res.status(500).json({
 
-        const previousMessages =
-            buildHistory(history);
+                    success: false,
 
-        /* -------------------------------------------------
-           PROMPT
-        ------------------------------------------------- */
+                    error:
+                        "Gemini API key is not configured.",
 
-        let prompt =
-            createSystemInstruction(
+                    details:
+                        "Add GEMINI_API_KEY in Render Environment Variables."
+
+                });
+
+            }
+
+
+            if (!ai) {
+
+                return res.status(500).json({
+
+                    success: false,
+
+                    error:
+                        "Gemini client is not initialized."
+
+                });
+
+            }
+
+
+            /* ==========================================
+               REQUEST
+            ========================================== */
+
+            const message =
+                cleanText(
+                    req.body?.message
+                );
+
+
+            const language =
+                cleanText(
+                    req.body?.language
+                ) || "en";
+
+
+            const history =
+                req.body?.history;
+
+
+            console.log(
+                "Language:",
                 language
             );
 
-        if (previousMessages) {
-            prompt += `
+
+            console.log(
+                "Message:",
+                message.slice(0, 150)
+            );
+
+
+            /* ==========================================
+               VALIDATE
+            ========================================== */
+
+            if (!message) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    error:
+                        "Message is required."
+
+                });
+
+            }
+
+
+            /* ==========================================
+               HISTORY
+            ========================================== */
+
+            const previousMessages =
+                buildHistory(
+                    history
+                );
+
+
+            /* ==========================================
+               SYSTEM
+            ========================================== */
+
+            const systemInstruction =
+                createSystemInstruction(
+                    language
+                );
+
+
+            /* ==========================================
+               PROMPT
+            ========================================== */
+
+            let prompt = "";
+
+
+            prompt +=
+                systemInstruction;
+
+
+            if (previousMessages) {
+
+                prompt += `
 
 CONVERSATION HISTORY:
 
 ${previousMessages}
-`;
-        }
 
-        prompt += `
+`;
+
+            }
+
+
+            prompt += `
 
 CURRENT USER MESSAGE:
 
@@ -258,224 +511,429 @@ ${message}
 Respond to the user now.
 `;
 
-        console.log(
-            "→ Gemini request:",
-            message.substring(0, 100)
-        );
 
-        /* -------------------------------------------------
-           GEMINI REQUEST
-        ------------------------------------------------- */
+            /* ==========================================
+               GEMINI REQUEST
+            ========================================== */
 
-        const response =
-            await ai.models.generateContent({
-                model: MODEL,
-                contents: prompt
-            });
-
-        /* -------------------------------------------------
-           RESPONSE TEXT
-        ------------------------------------------------- */
-
-        let reply = "";
-
-        if (
-            response &&
-            typeof response.text === "string"
-        ) {
-            reply = response.text;
-        }
-
-        /*
-          Fallback for SDK response formats.
-        */
-
-        if (
-            !reply &&
-            response?.candidates?.length
-        ) {
-            const candidate =
-                response.candidates[0];
-
-            const parts =
-                candidate?.content?.parts;
-
-            if (Array.isArray(parts)) {
-                reply = parts
-                    .map(part => part?.text || "")
-                    .join("");
-            }
-        }
-
-        reply = cleanText(reply);
-
-        /* -------------------------------------------------
-           EMPTY RESPONSE
-        ------------------------------------------------- */
-
-        if (!reply) {
-            console.error(
-                "Gemini returned empty response."
+            console.log(
+                "Sending request to Gemini..."
             );
 
-            return res.status(502).json({
-                success: false,
-                error:
-                    "Viggo AI returned an empty response."
+
+            const response =
+                await ai.models.generateContent({
+
+                    model:
+                        MODEL,
+
+                    contents:
+                        prompt
+
+                });
+
+
+            /* ==========================================
+               RESPONSE TEXT
+            ========================================== */
+
+            let reply = "";
+
+
+            if (
+                response &&
+                typeof response.text ===
+                    "string"
+            ) {
+
+                reply =
+                    response.text;
+
+            }
+
+
+            /* ==========================================
+               FALLBACK RESPONSE EXTRACTION
+            ========================================== */
+
+            if (
+                !reply &&
+                response?.candidates
+            ) {
+
+                const candidates =
+                    response.candidates;
+
+
+                if (
+                    Array.isArray(
+                        candidates
+                    ) &&
+                    candidates.length
+                ) {
+
+                    const candidate =
+                        candidates[0];
+
+
+                    const parts =
+                        candidate
+                            ?.content
+                            ?.parts;
+
+
+                    if (
+                        Array.isArray(parts)
+                    ) {
+
+                        reply =
+                            parts
+                                .map(
+                                    part =>
+                                        part?.text ||
+                                        ""
+                                )
+                                .join("");
+
+                    }
+
+                }
+
+            }
+
+
+            reply =
+                cleanText(
+                    reply
+                );
+
+
+            /* ==========================================
+               EMPTY RESPONSE
+            ========================================== */
+
+            if (!reply) {
+
+                console.error(
+                    "Gemini returned empty response."
+                );
+
+
+                console.error(
+                    JSON.stringify(
+                        response,
+                        null,
+                        2
+                    )
+                );
+
+
+                return res.status(502).json({
+
+                    success: false,
+
+                    error:
+                        "Viggo AI returned an empty response.",
+
+                    details:
+                        "The Gemini model did not return text."
+
+                });
+
+            }
+
+
+            /* ==========================================
+               SUCCESS
+            ========================================== */
+
+            console.log(
+                "Gemini response received."
+            );
+
+
+            console.log(
+                "Reply:",
+                reply.slice(0, 150)
+            );
+
+
+            console.log(
+                "--------------------------------"
+            );
+
+
+            return res.status(200).json({
+
+                success:
+                    true,
+
+                reply:
+                    reply,
+
+                model:
+                    MODEL
+
             });
+
         }
 
-        /* -------------------------------------------------
-           SUCCESS
-        ------------------------------------------------- */
 
-        console.log(
-            "✓ Gemini response received."
-        );
+        /* ==============================================
+           ERROR
+        ============================================== */
 
-        return res.json({
-            success: true,
-            reply: reply,
-            model: MODEL
-        });
-    }
+        catch (error) {
 
-    /* =====================================================
-       ERROR
-    ===================================================== */
+            console.error("");
+            console.error(
+                "================================"
+            );
+            console.error(
+                "GEMINI ERROR"
+            );
+            console.error(
+                "================================"
+            );
 
-    catch (error) {
-        console.error(
-            "❌ Gemini error:"
-        );
 
-        console.error(error);
+            console.error(
+                error
+            );
 
-        const errorMessage =
-            error?.message ||
-            String(error);
 
-        const lower =
-            errorMessage.toLowerCase();
+            const errorMessage =
+                error?.message ||
+                String(error);
 
-        /* -------------------------------------------------
-           RATE LIMIT / HIGH DEMAND
-        ------------------------------------------------- */
 
-        if (
-            lower.includes("429") ||
-            lower.includes("resource exhausted") ||
-            lower.includes("quota") ||
-            lower.includes("rate limit") ||
-            lower.includes("high demand")
-        ) {
-            return res.status(429).json({
-                success: false,
-                error:
-                    "Viggo AI is temporarily busy.",
-                details:
-                    "Gemini is currently experiencing high demand. Please try again after a few seconds."
-            });
-        }
+            const lowerError =
+                errorMessage.toLowerCase();
 
-        /* -------------------------------------------------
-           API KEY
-        ------------------------------------------------- */
 
-        if (
-            lower.includes("api key") ||
-            lower.includes("unauthorized") ||
-            lower.includes("authentication")
-        ) {
+            /* ==========================================
+               404 MODEL ERROR
+            ========================================== */
+
+            if (
+                lowerError.includes(
+                    "404"
+                ) ||
+                lowerError.includes(
+                    "not found"
+                ) ||
+                lowerError.includes(
+                    "not_found"
+                )
+            ) {
+
+                return res.status(502).json({
+
+                    success: false,
+
+                    error:
+                        "Gemini model is unavailable.",
+
+                    details:
+                        `Model "${MODEL}" could not be used. Check the Gemini API model availability.`
+
+                });
+
+            }
+
+
+            /* ==========================================
+               API KEY
+            ========================================== */
+
+            if (
+                lowerError.includes(
+                    "api key"
+                ) ||
+                lowerError.includes(
+                    "invalid api"
+                ) ||
+                lowerError.includes(
+                    "unauthenticated"
+                )
+            ) {
+
+                return res.status(500).json({
+
+                    success: false,
+
+                    error:
+                        "Gemini API key error.",
+
+                    details:
+                        "Check GEMINI_API_KEY in Render Environment Variables."
+
+                });
+
+            }
+
+
+            /* ==========================================
+               429 RATE LIMIT
+            ========================================== */
+
+            if (
+                lowerError.includes(
+                    "429"
+                ) ||
+                lowerError.includes(
+                    "resource exhausted"
+                ) ||
+                lowerError.includes(
+                    "rate limit"
+                ) ||
+                lowerError.includes(
+                    "too many requests"
+                )
+            ) {
+
+                return res.status(429).json({
+
+                    success: false,
+
+                    error:
+                        "Viggo AI is temporarily busy.",
+
+                    details:
+                        "Gemini is experiencing high demand. Please try again after a few seconds."
+
+                });
+
+            }
+
+
+            /* ==========================================
+               GENERAL ERROR
+            ========================================== */
+
             return res.status(500).json({
-                success: false,
-                error:
-                    "Gemini API key error.",
-                details:
-                    "Check GEMINI_API_KEY in Render Environment Variables."
-            });
-        }
 
-        /* -------------------------------------------------
-           MODEL
-        ------------------------------------------------- */
-
-        if (
-            lower.includes("model") ||
-            lower.includes("not found")
-        ) {
-            return res.status(502).json({
                 success: false,
+
                 error:
-                    "Gemini model error.",
+                    "Viggo AI could not generate a response.",
+
                 details:
                     errorMessage
+
             });
+
         }
 
-        /* -------------------------------------------------
-           GENERAL ERROR
-        ------------------------------------------------- */
+    }
+);
+
+
+/* ======================================================
+   404
+====================================================== */
+
+app.use(
+    (req, res) => {
+
+        res.status(404).json({
+
+            success: false,
+
+            error:
+                "Endpoint not found.",
+
+            path:
+                req.path
+
+        });
+
+    }
+);
+
+
+/* ======================================================
+   GLOBAL ERROR
+====================================================== */
+
+app.use(
+    (
+        error,
+        req,
+        res,
+        next
+    ) => {
+
+        console.error(
+            "Unhandled server error:",
+            error
+        );
+
+
+        if (
+            res.headersSent
+        ) {
+
+            return next(error);
+
+        }
+
 
         return res.status(500).json({
+
             success: false,
+
             error:
-                "Viggo AI could not generate a response.",
-            details:
-                errorMessage
+                "Internal server error."
+
         });
+
     }
-});
+);
 
-/* =========================================================
-   404
-========================================================= */
 
-app.use((req, res) => {
-    res.status(404).json({
-        success: false,
-        error: "Endpoint not found.",
-        path: req.path
-    });
-});
+/* ======================================================
+   START
+====================================================== */
 
-/* =========================================================
-   GLOBAL ERROR HANDLER
-========================================================= */
+app.listen(
+    PORT,
+    () => {
 
-app.use((error, req, res, next) => {
-    console.error(
-        "Unhandled server error:",
-        error
-    );
+        console.log("");
+        console.log(
+            "================================"
+        );
+        console.log(
+            "     VIGGO AI SERVER ONLINE"
+        );
+        console.log(
+            "================================"
+        );
+        console.log(
+            "PORT:",
+            PORT
+        );
+        console.log(
+            "MODEL:",
+            MODEL
+        );
+        console.log(
+            "API KEY:",
+            API_KEY
+                ? "CONFIGURED"
+                : "MISSING"
+        );
+        console.log(
+            "CHAT ENDPOINT: /chat"
+        );
+        console.log(
+            "STATUS ENDPOINT: /status"
+        );
+        console.log(
+            "================================"
+        );
+        console.log("");
 
-    if (res.headersSent) {
-        return next(error);
     }
-
-    res.status(500).json({
-        success: false,
-        error: "Internal server error."
-    });
-});
-
-/* =========================================================
-   START SERVER
-========================================================= */
-
-app.listen(PORT, () => {
-    console.log("");
-    console.log("================================");
-    console.log("       VIGGO AI SERVER ONLINE");
-    console.log("================================");
-    console.log("PORT:", PORT);
-    console.log("MODEL:", MODEL);
-    console.log(
-        "API KEY:",
-        API_KEY
-            ? "CONFIGURED"
-            : "MISSING"
-    );
-    console.log("================================");
-    console.log("");
-});
+);
