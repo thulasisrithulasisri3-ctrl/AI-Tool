@@ -1,4 +1,4 @@
-```javascript
+
 "use strict";
 
 const express = require("express");
@@ -591,4 +591,4 @@ app.listen(
 
     }
 );
-```
+
