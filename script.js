@@ -1,48 +1,29 @@
 "use strict";
 
 /* =========================================
-   API
+   VIGGO AI - FRONTEND
 ========================================= */
 
 const API_BASE = "https://ai-tool-1-fgmc.onrender.com";
-
 const CHAT_API = API_BASE + "/chat";
 
-const SHARE_API = API_BASE + "/api/share";
-
-
-/* =========================================
-   STORAGE
-========================================= */
-
 const STORAGE_KEY = "viggo_chats";
-
 const SETTINGS_KEY = "viggo_settings";
 
-
-/* =========================================
-   STATE
-========================================= */
-
 let currentChatId = null;
-
 let messages = [];
-
 let currentLanguage = "en";
 
 let isSending = false;
-
 let recognition = null;
-
 let isListening = false;
 
 let selectMode = false;
-
 let selectedChats = new Set();
 
 
 /* =========================================
-   DOM
+   DOM HELPER
 ========================================= */
 
 function $(id) {
@@ -120,7 +101,7 @@ function getChats() {
 
     } catch (error) {
 
-        console.error("Chat storage error:", error);
+        console.error("Storage error:", error);
 
         return [];
 
@@ -176,13 +157,15 @@ function createChat() {
 
 function initializeChat() {
 
-    const chats = getChats();
+    let chats = getChats();
 
     if (!chats.length) {
 
         const chat = createChat();
 
-        saveChats([chat]);
+        chats = [chat];
+
+        saveChats(chats);
 
         currentChatId = chat.id;
 
@@ -229,10 +212,6 @@ function newChat() {
 
     messages = [];
 
-    selectMode = false;
-
-    selectedChats.clear();
-
     renderMessages();
 
     updateTitle();
@@ -240,6 +219,8 @@ function newChat() {
     renderHistory();
 
     closeMore();
+
+    showToast("New chat created");
 
 }
 
@@ -249,14 +230,6 @@ function newChat() {
 ========================================= */
 
 function openChat(id) {
-
-    if (selectMode) {
-
-        toggleChatSelection(id);
-
-        return;
-
-    }
 
     const chats = getChats();
 
@@ -275,6 +248,8 @@ function openChat(id) {
     updateTitle();
 
     renderHistory();
+
+    closeMobileSidebar();
 
 }
 
@@ -323,7 +298,7 @@ function updateChat() {
 
 
 /* =========================================
-   TITLE
+   UPDATE TITLE
 ========================================= */
 
 function updateTitle() {
@@ -366,23 +341,15 @@ function renderHistory() {
         chat => !chat.pinned
     );
 
-    addHistory(
-        list,
-        "Pinned",
-        pinned
-    );
+    addHistory(list, "Pinned", pinned);
 
-    addHistory(
-        list,
-        "Recent",
-        recent
-    );
+    addHistory(list, "Recent", recent);
 
 }
 
 
 /* =========================================
-   ADD HISTORY
+   HISTORY ITEM
 ========================================= */
 
 function addHistory(list, title, chats) {
@@ -405,8 +372,7 @@ function addHistory(list, title, chats) {
         const row =
             document.createElement("div");
 
-        row.className =
-            "history-item";
+        row.className = "history-item";
 
 
         if (chat.id === currentChatId) {
@@ -416,34 +382,45 @@ function addHistory(list, title, chats) {
         }
 
 
-        if (selectedChats.has(chat.id)) {
+        if (selectMode) {
 
-            row.classList.add("selected");
+            row.classList.add("select-mode");
 
         }
 
 
-        /* Selection */
+        /* =====================================
+           SELECT CHECKBOX
+        ===================================== */
 
         if (selectMode) {
 
             const checkbox =
-                document.createElement("span");
+                document.createElement("input");
+
+            checkbox.type = "checkbox";
 
             checkbox.className =
-                "history-select";
+                "chat-checkbox";
 
-            checkbox.textContent =
-                selectedChats.has(chat.id)
-                    ? "✓"
-                    : "○";
+            checkbox.checked =
+                selectedChats.has(chat.id);
+
+            checkbox.onclick = event => {
+
+                event.stopPropagation();
+
+                toggleChatSelection(
+                    chat.id,
+                    checkbox.checked
+                );
+
+            };
 
             row.appendChild(checkbox);
 
         }
 
-
-        /* Title */
 
         const titleEl =
             document.createElement("div");
@@ -454,10 +431,6 @@ function addHistory(list, title, chats) {
         titleEl.textContent =
             chat.title || "New Chat";
 
-        row.appendChild(titleEl);
-
-
-        /* Actions */
 
         const actions =
             document.createElement("div");
@@ -466,65 +439,98 @@ function addHistory(list, title, chats) {
             "history-actions";
 
 
-        /* Pin */
+        /* =====================================
+           PIN BUTTON
+        ===================================== */
 
         const pin =
             document.createElement("button");
 
-        pin.type = "button";
-
         pin.className =
             "history-action";
-
-        pin.textContent =
-            chat.pinned ? "📌" : "📍";
 
         pin.title =
             chat.pinned
                 ? "Unpin"
                 : "Pin";
 
+        pin.textContent =
+            chat.pinned
+                ? "📌"
+                : "📍";
 
-        pin.addEventListener(
-            "click",
-            event => {
+
+        pin.onclick = event => {
+
+            event.stopPropagation();
+
+            togglePin(chat.id);
+
+        };
+
+
+        /* =====================================
+           DELETE BUTTON
+        ===================================== */
+
+        if (!selectMode) {
+
+            const del =
+                document.createElement("button");
+
+            del.className =
+                "history-action delete";
+
+            del.title =
+                "Delete Chat";
+
+            del.textContent =
+                "🗑";
+
+
+            del.onclick = event => {
 
                 event.stopPropagation();
 
-                togglePin(chat.id);
+                deleteChat(chat.id);
 
-            }
-        );
+            };
+
+
+            actions.appendChild(del);
+
+        }
 
 
         actions.appendChild(pin);
 
 
+        row.appendChild(titleEl);
+
         row.appendChild(actions);
 
 
-        /* Row click */
+        row.onclick = () => {
 
-        row.addEventListener(
-            "click",
-            () => {
+            if (selectMode) {
 
-                if (selectMode) {
+                const newValue =
+                    !selectedChats.has(chat.id);
 
-                    toggleChatSelection(
-                        chat.id
-                    );
+                toggleChatSelection(
+                    chat.id,
+                    newValue
+                );
 
-                } else {
+                renderHistory();
 
-                    openChat(
-                        chat.id
-                    );
-
-                }
+                return;
 
             }
-        );
+
+            openChat(chat.id);
+
+        };
 
 
         list.appendChild(row);
@@ -535,30 +541,22 @@ function addHistory(list, title, chats) {
 
 
 /* =========================================
-   PIN
+   SELECT CHAT
 ========================================= */
 
-function togglePin(id) {
+function toggleChatSelection(id, checked) {
 
-    const chats = getChats();
+    if (checked) {
 
-    const chat = chats.find(
-        item => item.id === id
-    );
+        selectedChats.add(id);
 
-    if (!chat) return;
+    } else {
 
-    chat.pinned = !chat.pinned;
+        selectedChats.delete(id);
 
-    saveChats(chats);
+    }
 
-    renderHistory();
-
-    showToast(
-        chat.pinned
-            ? "📌 Chat pinned"
-            : "Chat unpinned"
-    );
+    updateDeleteSelectedButton();
 
 }
 
@@ -573,34 +571,14 @@ function toggleSelectMode() {
 
     selectedChats.clear();
 
-    renderHistory();
+    const button = $("selectChatsBtn");
 
-    updateDeleteSelectedButton();
+    if (button) {
 
-    closeMore();
-
-    showToast(
-        selectMode
-            ? "Select chats to delete"
-            : "Selection cancelled"
-    );
-
-}
-
-
-/* =========================================
-   SELECT CHAT
-========================================= */
-
-function toggleChatSelection(id) {
-
-    if (selectedChats.has(id)) {
-
-        selectedChats.delete(id);
-
-    } else {
-
-        selectedChats.add(id);
+        button.textContent =
+            selectMode
+                ? "✓ Done Selecting"
+                : "☑ Select Chats";
 
     }
 
@@ -642,16 +620,14 @@ function updateDeleteSelectedButton() {
 
 
 /* =========================================
-   DELETE SELECTED
+   DELETE SELECTED CHATS
 ========================================= */
 
 function deleteSelectedChats() {
 
     if (!selectedChats.size) {
 
-        showToast(
-            "No chats selected"
-        );
+        showToast("Select chats first");
 
         return;
 
@@ -675,16 +651,15 @@ function deleteSelectedChats() {
 
 
     chats = chats.filter(
-        chat =>
-            !selectedChats.has(chat.id)
+        chat => !selectedChats.has(chat.id)
     );
 
 
     if (!chats.length) {
 
-        chats.push(
-            createChat()
-        );
+        const newChat = createChat();
+
+        chats.push(newChat);
 
     }
 
@@ -693,10 +668,7 @@ function deleteSelectedChats() {
 
 
     if (
-        !chats.some(
-            chat =>
-                chat.id === currentChatId
-        )
+        selectedChats.has(currentChatId)
     ) {
 
         chats.sort(
@@ -722,6 +694,18 @@ function deleteSelectedChats() {
 
     selectMode = false;
 
+
+    const button =
+        $("selectChatsBtn");
+
+    if (button) {
+
+        button.textContent =
+            "☑ Select Chats";
+
+    }
+
+
     renderHistory();
 
     updateDeleteSelectedButton();
@@ -730,8 +714,98 @@ function deleteSelectedChats() {
 
 
     showToast(
-        `🗑 ${count} chat${count > 1 ? "s" : ""} deleted`
+        `${count} chat${count > 1 ? "s" : ""} deleted`
     );
+
+}
+
+
+/* =========================================
+   PIN
+========================================= */
+
+function togglePin(id) {
+
+    const chats = getChats();
+
+    const chat = chats.find(
+        item => item.id === id
+    );
+
+    if (!chat) return;
+
+    chat.pinned = !chat.pinned;
+
+    chat.updatedAt = Date.now();
+
+    saveChats(chats);
+
+    renderHistory();
+
+    showToast(
+        chat.pinned
+            ? "Chat pinned"
+            : "Chat unpinned"
+    );
+
+}
+
+
+/* =========================================
+   DELETE SINGLE CHAT
+========================================= */
+
+function deleteChat(id) {
+
+    const confirmed =
+        confirm("Delete this chat?");
+
+    if (!confirmed) return;
+
+
+    let chats = getChats();
+
+    chats = chats.filter(
+        chat => chat.id !== id
+    );
+
+
+    if (!chats.length) {
+
+        chats.push(
+            createChat()
+        );
+
+    }
+
+
+    saveChats(chats);
+
+
+    if (currentChatId === id) {
+
+        chats.sort(
+            (a, b) =>
+                (b.updatedAt || 0) -
+                (a.updatedAt || 0)
+        );
+
+        currentChatId =
+            chats[0].id;
+
+        messages =
+            chats[0].messages || [];
+
+        renderMessages();
+
+        updateTitle();
+
+    }
+
+
+    renderHistory();
+
+    showToast("Chat deleted");
 
 }
 
@@ -744,9 +818,7 @@ function saveCurrentChat() {
 
     updateChat();
 
-    showToast(
-        "✓ Chat saved"
-    );
+    showToast("✓ Chat saved");
 
     closeMore();
 
@@ -767,17 +839,22 @@ function clearHistory() {
     if (!confirmed) return;
 
 
-    const chat = createChat();
+    const chat =
+        createChat();
+
 
     saveChats([chat]);
 
-    currentChatId = chat.id;
+
+    currentChatId =
+        chat.id;
 
     messages = [];
 
+    selectMode = false;
+
     selectedChats.clear();
 
-    selectMode = false;
 
     renderMessages();
 
@@ -789,9 +866,8 @@ function clearHistory() {
 
     closeMore();
 
-    showToast(
-        "History cleared"
-    );
+
+    showToast("History cleared");
 
 }
 
@@ -878,8 +954,7 @@ function addMessage(role, text) {
         "message-bubble";
 
 
-    bubble.textContent =
-        text;
+    bubble.textContent = text;
 
 
     wrapper.appendChild(bubble);
@@ -894,44 +969,38 @@ function addMessage(role, text) {
             "message-actions";
 
 
-        /* COPY */
-
         const copy =
             document.createElement("button");
-
-        copy.type = "button";
 
         copy.className =
             "message-action";
 
-        copy.textContent = "📋";
+        copy.title =
+            "Copy";
 
-        copy.title = "Copy";
-
-        copy.addEventListener(
-            "click",
-            () => copyText(text)
-        );
+        copy.textContent =
+            "📋";
 
 
-        /* VOICE */
+        copy.onclick = () =>
+            copyText(text);
+
 
         const voice =
             document.createElement("button");
 
-        voice.type = "button";
-
         voice.className =
             "message-action";
 
-        voice.textContent = "🔊";
+        voice.title =
+            "Read aloud";
 
-        voice.title = "Read aloud";
+        voice.textContent =
+            "🔊";
 
-        voice.addEventListener(
-            "click",
-            () => speakText(text)
-        );
+
+        voice.onclick = () =>
+            speakText(text);
 
 
         actions.appendChild(copy);
@@ -960,6 +1029,10 @@ async function sendMessage() {
     const input =
         $("messageInput");
 
+    const sendButton =
+        $("sendBtn");
+
+
     if (!input) return;
 
 
@@ -971,10 +1044,6 @@ async function sendMessage() {
 
 
     isSending = true;
-
-
-    const sendButton =
-        $("sendBtn");
 
 
     if (sendButton) {
@@ -1046,8 +1115,9 @@ async function sendMessage() {
             role: "assistant",
 
             content:
-                "Sorry friend, " +
-                error.message,
+                "⚠️ " +
+                (error.message ||
+                    "Unable to connect to Viggo AI."),
 
             timestamp: Date.now()
 
@@ -1070,11 +1140,14 @@ async function sendMessage() {
 
     }
 
+
+    input.focus();
+
 }
 
 
 /* =========================================
-   ASK VIGGO
+   API CALL
 ========================================= */
 
 async function askViggo(text) {
@@ -1084,53 +1157,51 @@ async function askViggo(text) {
 
     try {
 
-        response =
-            await fetch(
-                CHAT_API,
-                {
+        response = await fetch(
+            CHAT_API,
+            {
 
-                    method: "POST",
+                method: "POST",
 
-                    headers: {
+                headers: {
 
-                        "Content-Type":
-                            "application/json",
+                    "Content-Type":
+                        "application/json",
 
-                        "Accept":
-                            "application/json"
+                    "Accept":
+                        "application/json"
 
-                    },
+                },
 
-                    body:
-                        JSON.stringify({
+                body:
+                    JSON.stringify({
 
-                            message: text,
+                        message: text,
 
-                            language:
-                                currentLanguage,
+                        language:
+                            currentLanguage,
 
-                            history:
-                                messages
-                                    .slice(-15)
-                                    .map(
-                                        item => ({
-                                            role:
-                                                item.role,
+                        history:
+                            messages
+                                .slice(-15)
+                                .map(item => ({
+                                    role:
+                                        item.role,
 
-                                            content:
-                                                item.content
-                                        })
-                                    )
+                                    content:
+                                        item.content
+                                }))
 
-                        })
+                    })
 
-                }
-            );
+            }
+        );
+
 
     } catch (error) {
 
         throw new Error(
-            "I couldn't connect to Viggo AI right now."
+            "Render server-க்கு connect ஆகவில்லை."
         );
 
     }
@@ -1145,12 +1216,13 @@ async function askViggo(text) {
 
     try {
 
-        data = JSON.parse(raw);
+        data =
+            JSON.parse(raw);
 
     } catch (error) {
 
         throw new Error(
-            "Server returned an invalid response."
+            "Server invalid response கொடுத்தது."
         );
 
     }
@@ -1178,19 +1250,10 @@ async function askViggo(text) {
     }
 
 
-    if (
-        typeof data.reply !== "string" ||
-        !data.reply.trim()
-    ) {
-
-        throw new Error(
-            "Viggo returned an empty response."
-        );
-
-    }
-
-
-    return data.reply;
+    return (
+        data.reply ||
+        "Sorry, I couldn't generate a response."
+    );
 
 }
 
@@ -1201,16 +1264,22 @@ async function askViggo(text) {
 
 function showTyping() {
 
-    const area = $("messages");
+    const area =
+        $("messages");
 
     if (!area) return;
+
+
+    removeTyping();
 
 
     const div =
         document.createElement("div");
 
 
-    div.id = "viggoTyping";
+    div.id =
+        "viggoTyping";
+
 
     div.className =
         "message assistant-message";
@@ -1258,33 +1327,25 @@ async function copyText(text) {
             text
         );
 
-    } catch {
+    } catch (error) {
 
         const textarea =
             document.createElement("textarea");
 
-
         textarea.value = text;
-
 
         textarea.style.position =
             "fixed";
 
         textarea.style.opacity = "0";
 
-
         document.body.appendChild(
             textarea
         );
 
-
-        textarea.focus();
-
         textarea.select();
 
-
         document.execCommand("copy");
-
 
         textarea.remove();
 
@@ -1297,7 +1358,7 @@ async function copyText(text) {
 
 
 /* =========================================
-   SPEAK
+   VOICE OUTPUT
 ========================================= */
 
 function speakText(text) {
@@ -1342,7 +1403,14 @@ function speakText(text) {
         "en-IN";
 
 
-    speechSynthesis.speak(speech);
+    speech.rate = 1;
+
+    speech.pitch = 1;
+
+
+    speechSynthesis.speak(
+        speech
+    );
 
 }
 
@@ -1358,7 +1426,13 @@ function setupVoice() {
         window.webkitSpeechRecognition;
 
 
-    if (!SpeechRecognition) return;
+    if (!SpeechRecognition) {
+
+        recognition = null;
+
+        return;
+
+    }
 
 
     recognition =
@@ -1378,6 +1452,8 @@ function setupVoice() {
             ?.classList
             .add("active");
 
+        showToast("Listening...");
+
     };
 
 
@@ -1396,12 +1472,19 @@ function setupVoice() {
 
             input.value = text;
 
+            input.focus();
+
         }
 
     };
 
 
     recognition.onerror = event => {
+
+        console.error(
+            "Voice error:",
+            event.error
+        );
 
         showToast(
             "Voice error: " +
@@ -1423,10 +1506,6 @@ function setupVoice() {
 
 }
 
-
-/* =========================================
-   TOGGLE VOICE
-========================================= */
 
 function toggleVoice() {
 
@@ -1486,7 +1565,7 @@ function toggleVoice() {
 
 
 /* =========================================
-   SHORT SHARE
+   SHORT SHARE LINK
 ========================================= */
 
 async function shareChat() {
@@ -1512,204 +1591,77 @@ async function shareChat() {
     }
 
 
-    if (
-        !chat.messages ||
-        !chat.messages.length
-    ) {
+    /*
+       NOTE:
+       This creates a shorter Base64 URL
+       than the previous double-encoded version.
+    */
 
-        showToast(
-            "Start chatting before sharing"
+    const json =
+        JSON.stringify({
+
+            title:
+                chat.title,
+
+            messages:
+                chat.messages
+
+        });
+
+
+    const encoded =
+        btoa(
+            encodeURIComponent(json)
         );
 
-        return;
 
-    }
-
-
-    showToast(
-        "Creating share link..."
-    );
+    const link =
+        window.location.origin +
+        window.location.pathname +
+        "?c=" +
+        encoded;
 
 
     try {
-
-        /*
-         * Send chat to Render.
-         * server.js should create a short ID.
-         */
-
-        const response =
-            await fetch(
-                SHARE_API,
-                {
-
-                    method: "POST",
-
-                    headers: {
-
-                        "Content-Type":
-                            "application/json",
-
-                        "Accept":
-                            "application/json"
-
-                    },
-
-                    body:
-                        JSON.stringify({
-
-                            chat: chat
-
-                        })
-
-                }
-            );
-
-
-        const raw =
-            await response.text();
-
-
-        let data;
-
-
-        try {
-
-            data =
-                JSON.parse(raw);
-
-        } catch {
-
-            throw new Error(
-                "Share server returned invalid data."
-            );
-
-        }
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                data.error ||
-                data.details ||
-                "Unable to create share link."
-            );
-
-        }
-
-
-        if (
-            !data.success ||
-            !data.id
-        ) {
-
-            throw new Error(
-                data.error ||
-                "Short share ID was not created."
-            );
-
-        }
-
-
-        const shortLink =
-            API_BASE +
-            "/s/" +
-            encodeURIComponent(
-                data.id
-            );
-
 
         if (
             navigator.share
         ) {
 
-            try {
+            await navigator.share({
 
-                await navigator.share({
+                title:
+                    chat.title ||
+                    "Viggo AI Chat",
 
-                    title:
-                        chat.title ||
-                        "Viggo AI Chat",
+                text:
+                    "Viggo AI Chat",
 
-                    text:
-                        "Viggo AI Chat",
+                url:
+                    link
 
-                    url:
-                        shortLink
+            });
 
-                });
+        } else {
 
-                return;
+            await copyText(link);
 
-            } catch (error) {
-
-                if (
-                    error.name ===
-                    "AbortError"
-                ) {
-
-                    return;
-
-                }
-
-            }
+            showToast(
+                "Short share link copied"
+            );
 
         }
 
-
-        await copyText(shortLink);
-
-
-        showToast(
-            "🔗 Short share link copied"
-        );
-
-
     } catch (error) {
 
-        console.error(
-            "Share error:",
-            error
-        );
+        if (
+            error.name !==
+            "AbortError"
+        ) {
 
-
-        /*
-         * Fallback:
-         * If short-link endpoint is not ready,
-         * keep the old full-chat share working.
-         */
-
-        try {
-
-            const encoded =
-                btoa(
-                    encodeURIComponent(
-                        JSON.stringify(chat)
-                    )
-                );
-
-
-            const fallbackLink =
-                window.location.origin +
-                window.location.pathname +
-                "?chat=" +
-                encoded;
-
-
-            await copyText(
-                fallbackLink
-            );
-
-
-            showToast(
-                "Share server unavailable. Full link copied."
-            );
-
-
-        } catch {
-
-            showToast(
-                "Unable to create share link."
+            console.error(
+                "Share error:",
+                error
             );
 
         }
@@ -1732,6 +1684,7 @@ function loadSharedChat() {
 
 
     const encoded =
+        params.get("c") ||
         params.get("chat");
 
 
@@ -1740,12 +1693,14 @@ function loadSharedChat() {
 
     try {
 
-        const chat =
-            JSON.parse(
-                decodeURIComponent(
-                    atob(encoded)
-                )
+        const json =
+            decodeURIComponent(
+                atob(encoded)
             );
+
+
+        const chat =
+            JSON.parse(json);
 
 
         if (
@@ -1791,11 +1746,12 @@ function loadSharedChat() {
             "Shared chat opened"
         );
 
-
     } catch (error) {
 
-        console.error(error);
-
+        console.error(
+            "Shared chat error:",
+            error
+        );
 
         showToast(
             "Invalid share link"
@@ -1812,7 +1768,8 @@ function loadSharedChat() {
 
 function toggleMore() {
 
-    const menu = $("moreMenu");
+    const menu =
+        $("moreMenu");
 
     if (!menu) return;
 
@@ -1823,38 +1780,12 @@ function toggleMore() {
 
 function closeMore() {
 
-    $("moreMenu")
-        ?.classList
-        .remove("show");
+    const menu =
+        $("moreMenu");
 
-}
+    if (!menu) return;
 
-
-/* =========================================
-   LANGUAGE MENU
-========================================= */
-
-function toggleLanguageMenu() {
-
-    const submenu =
-        $("languageSubmenu");
-
-    if (!submenu) return;
-
-    submenu.classList.toggle("show");
-
-}
-
-
-/* =========================================
-   CLOSE LANGUAGE
-========================================= */
-
-function closeLanguageMenu() {
-
-    $("languageSubmenu")
-        ?.classList
-        .remove("show");
+    menu.classList.remove("show");
 
 }
 
@@ -1865,9 +1796,12 @@ function closeLanguageMenu() {
 
 function setLanguage(language) {
 
-    currentLanguage = language;
+    currentLanguage =
+        language;
+
 
     saveSettings();
+
 
     const names = {
 
@@ -1891,8 +1825,6 @@ function setLanguage(language) {
         (names[language] || language)
     );
 
-
-    closeLanguageMenu();
 
     closeMore();
 
@@ -1919,43 +1851,38 @@ function showToast(message) {
             "viggoToast";
 
 
-        Object.assign(
-            toast.style,
-            {
+        toast.style.position =
+            "fixed";
 
-                position: "fixed",
+        toast.style.bottom =
+            "25px";
 
-                bottom: "25px",
+        toast.style.left =
+            "50%";
 
-                left: "50%",
+        toast.style.transform =
+            "translateX(-50%)";
 
-                transform:
-                    "translateX(-50%)",
+        toast.style.background =
+            "#222";
 
-                background: "#222",
+        toast.style.color =
+            "#fff";
 
-                color: "#fff",
+        toast.style.padding =
+            "11px 17px";
 
-                padding:
-                    "11px 17px",
+        toast.style.borderRadius =
+            "10px";
 
-                borderRadius:
-                    "10px",
+        toast.style.zIndex =
+            "99999";
 
-                zIndex: "99999",
+        toast.style.fontSize =
+            "14px";
 
-                fontSize: "14px",
-
-                maxWidth: "90%",
-
-                textAlign: "center",
-
-                boxShadow:
-                    "0 4px 15px rgba(0,0,0,.2)"
-
-            }
-        );
-
+        toast.style.boxShadow =
+            "0 5px 20px rgba(0,0,0,.25)";
 
         document.body.appendChild(
             toast
@@ -1978,15 +1905,12 @@ function showToast(message) {
 
 
     toast.timer =
-        setTimeout(
-            () => {
+        setTimeout(() => {
 
-                toast.style.display =
-                    "none";
+            toast.style.display =
+                "none";
 
-            },
-            2500
-        );
+        }, 2500);
 
 }
 
@@ -2003,10 +1927,27 @@ function scrollBottom() {
 
     if (area) {
 
-        area.scrollTop =
-            area.scrollHeight;
+        requestAnimationFrame(() => {
+
+            area.scrollTop =
+                area.scrollHeight;
+
+        });
 
     }
+
+}
+
+
+/* =========================================
+   MOBILE SIDEBAR
+========================================= */
+
+function closeMobileSidebar() {
+
+    $("sidebar")
+        ?.classList
+        .remove("open");
 
 }
 
@@ -2120,7 +2061,7 @@ function setupEvents() {
         );
 
 
-    /* MESSAGE INPUT */
+    /* ENTER TO SEND */
 
     $("messageInput")
         ?.addEventListener(
@@ -2142,48 +2083,29 @@ function setupEvents() {
         );
 
 
-    /* LANGUAGE BUTTON */
-
-    $("languageBtn")
-        ?.addEventListener(
-            "click",
-            event => {
-
-                event.stopPropagation();
-
-                toggleLanguageMenu();
-
-            }
-        );
-
-
-    /* LANGUAGE OPTIONS */
+    /* LANGUAGE */
 
     document
         .querySelectorAll(
             "[data-language]"
         )
-        .forEach(
-            button => {
+        .forEach(button => {
 
-                button.addEventListener(
-                    "click",
-                    event => {
+            button.addEventListener(
+                "click",
+                () => {
 
-                        event.stopPropagation();
+                    setLanguage(
+                        button.dataset.language
+                    );
 
-                        setLanguage(
-                            button.dataset.language
-                        );
+                }
+            );
 
-                    }
-                );
-
-            }
-        );
+        });
 
 
-    /* OUTSIDE CLICK */
+    /* CLOSE MORE */
 
     document.addEventListener(
         "click",
@@ -2197,7 +2119,21 @@ function setupEvents() {
 
                 closeMore();
 
-                closeLanguageMenu();
+            }
+
+        }
+    );
+
+
+    /* ESC */
+
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            if (event.key === "Escape") {
+
+                closeMore();
 
             }
 
@@ -2205,7 +2141,7 @@ function setupEvents() {
     );
 
 
-    /* LOAD SHARED CHAT */
+    /* SHARED CHAT */
 
     loadSharedChat();
 
