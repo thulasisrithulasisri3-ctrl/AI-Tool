@@ -1,122 +1,158 @@
 "use strict";
 
-/* =========================================================
-   VIGGO AI - FULL SCRIPT
-========================================================= */
 
-/* =========================================================
-   API
-========================================================= */
+/* =========================================
+   CONFIG
+========================================= */
 
-const API_BASE = "https://ai-tool-1-fgmc.onrender.com";
-const CHAT_API = API_BASE + "/chat";
+const API_BASE =
+    "https://ai-tool-1-fgmc.onrender.com";
 
-/* =========================================================
+const CHAT_API =
+    API_BASE + "/chat";
+
+
+/* =========================================
    STORAGE
-========================================================= */
+========================================= */
 
-const STORAGE_KEY = "viggo_chats";
-const SETTINGS_KEY = "viggo_settings";
+const STORAGE_KEY =
+    "viggo_chats";
 
-/* =========================================================
-   STATE
-========================================================= */
+const SETTINGS_KEY =
+    "viggo_settings";
+
 
 let currentChatId = null;
+
 let messages = [];
+
 let currentLanguage = "en";
 
 let isSending = false;
 
 let recognition = null;
+
 let isListening = false;
 
 let selectedChats = new Set();
-let selectionMode = false;
+
+let selectMode = false;
 
 let selectedVoice = "female";
 
-/* =========================================================
-   DOM HELPER
-========================================================= */
+
+/* =========================================
+   DOM
+========================================= */
 
 function $(id) {
     return document.getElementById(id);
 }
 
-/* =========================================================
+
+/* =========================================
    START
-========================================================= */
+========================================= */
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
 
-    loadSettings();
+        loadSettings();
 
-    initializeChat();
+        initializeChat();
 
-    setupEvents();
+        setupEvents();
 
-    setupVoice();
+        setupVoice();
 
-    loadSharedChat();
+        updateVoiceButtons();
 
-    updateVoiceButton();
+    }
+);
 
-});
 
-/* =========================================================
+/* =========================================
    SETTINGS
-========================================================= */
+========================================= */
 
 function loadSettings() {
 
     try {
 
-        const data = JSON.parse(
-            localStorage.getItem(SETTINGS_KEY) || "{}"
-        );
+        const data =
+            JSON.parse(
+                localStorage.getItem(
+                    SETTINGS_KEY
+                ) || "{}"
+            );
+
 
         if (data.language) {
-            currentLanguage = data.language;
+
+            currentLanguage =
+                data.language;
+
         }
 
+
         if (data.voice) {
-            selectedVoice = data.voice;
+
+            selectedVoice =
+                data.voice;
+
         }
 
     } catch (error) {
 
-        console.error("Settings error:", error);
+        console.error(error);
 
     }
 
 }
 
+
 function saveSettings() {
 
     localStorage.setItem(
+
         SETTINGS_KEY,
+
         JSON.stringify({
-            language: currentLanguage,
-            voice: selectedVoice
+
+            language:
+                currentLanguage,
+
+            voice:
+                selectedVoice
+
         })
+
     );
 
 }
 
-/* =========================================================
-   STORAGE
-========================================================= */
+
+/* =========================================
+   CHAT STORAGE
+========================================= */
 
 function getChats() {
 
     try {
 
-        const data = JSON.parse(
-            localStorage.getItem(STORAGE_KEY) || "[]"
-        );
+        const data =
+            JSON.parse(
+                localStorage.getItem(
+                    STORAGE_KEY
+                ) || "[]"
+            );
 
-        return Array.isArray(data) ? data : [];
+
+        return Array.isArray(data)
+            ? data
+            : [];
 
     } catch {
 
@@ -126,18 +162,23 @@ function getChats() {
 
 }
 
+
 function saveChats(chats) {
 
     localStorage.setItem(
+
         STORAGE_KEY,
+
         JSON.stringify(chats)
+
     );
 
 }
 
-/* =========================================================
+
+/* =========================================
    CREATE CHAT
-========================================================= */
+========================================= */
 
 function createChat() {
 
@@ -151,47 +192,68 @@ function createChat() {
                 .toString(36)
                 .slice(2, 8),
 
-        title: "New Chat",
+        title:
+            "New Chat",
 
         messages: [],
 
-        pinned: false,
+        pinned:
+            false,
 
-        createdAt: Date.now(),
+        createdAt:
+            Date.now(),
 
-        updatedAt: Date.now()
+        updatedAt:
+            Date.now()
 
     };
 
 }
 
-/* =========================================================
-   INITIALIZE CHAT
-========================================================= */
+
+/* =========================================
+   INITIALIZE
+========================================= */
 
 function initializeChat() {
 
-    let chats = getChats();
+    const chats =
+        getChats();
+
 
     if (!chats.length) {
 
-        const chat = createChat();
+        const chat =
+            createChat();
 
-        chats = [chat];
 
-        saveChats(chats);
+        saveChats([chat]);
+
+
+        currentChatId =
+            chat.id;
+
+
+        messages = [];
+
+    } else {
+
+        chats.sort(
+            (a, b) =>
+                (b.updatedAt || 0) -
+                (a.updatedAt || 0)
+        );
+
+
+        currentChatId =
+            chats[0].id;
+
+
+        messages =
+            chats[0].messages || [];
 
     }
 
-    chats.sort(
-        (a, b) =>
-            (b.updatedAt || 0) -
-            (a.updatedAt || 0)
-    );
-
-    currentChatId = chats[0].id;
-
-    messages = chats[0].messages || [];
 
     renderMessages();
 
@@ -201,29 +263,40 @@ function initializeChat() {
 
 }
 
-/* =========================================================
+
+/* =========================================
    NEW CHAT
-========================================================= */
+========================================= */
 
 function newChat() {
 
-    selectionMode = false;
+    const chat =
+        createChat();
 
-    selectedChats.clear();
 
-    updateSelectionUI();
+    const chats =
+        getChats();
 
-    const chat = createChat();
-
-    const chats = getChats();
 
     chats.unshift(chat);
 
+
     saveChats(chats);
 
-    currentChatId = chat.id;
+
+    currentChatId =
+        chat.id;
+
 
     messages = [];
+
+
+    selectedChats.clear();
+
+    selectMode = false;
+
+
+    updateSelectButton();
 
     renderMessages();
 
@@ -233,27 +306,36 @@ function newChat() {
 
     closeMore();
 
-    showToast("New chat created");
-
 }
 
-/* =========================================================
+
+/* =========================================
    OPEN CHAT
-========================================================= */
+========================================= */
 
 function openChat(id) {
 
-    const chats = getChats();
+    const chats =
+        getChats();
 
-    const chat = chats.find(
-        item => item.id === id
-    );
+
+    const chat =
+        chats.find(
+            item =>
+                item.id === id
+        );
+
 
     if (!chat) return;
 
-    currentChatId = chat.id;
 
-    messages = chat.messages || [];
+    currentChatId =
+        chat.id;
+
+
+    messages =
+        chat.messages || [];
+
 
     renderMessages();
 
@@ -263,27 +345,41 @@ function openChat(id) {
 
 }
 
-/* =========================================================
-   UPDATE CURRENT CHAT
-========================================================= */
+
+/* =========================================
+   UPDATE CHAT
+========================================= */
 
 function updateChat() {
 
-    const chats = getChats();
+    const chats =
+        getChats();
 
-    const chat = chats.find(
-        item => item.id === currentChatId
-    );
+
+    const chat =
+        chats.find(
+            item =>
+                item.id === currentChatId
+        );
+
 
     if (!chat) return;
 
-    chat.messages = messages;
 
-    chat.updatedAt = Date.now();
+    chat.messages =
+        messages;
 
-    const firstUser = messages.find(
-        item => item.role === "user"
-    );
+
+    chat.updatedAt =
+        Date.now();
+
+
+    const firstUser =
+        messages.find(
+            item =>
+                item.role === "user"
+        );
+
 
     if (
         firstUser &&
@@ -298,7 +394,9 @@ function updateChat() {
 
     }
 
+
     saveChats(chats);
+
 
     updateTitle();
 
@@ -306,54 +404,78 @@ function updateChat() {
 
 }
 
-/* =========================================================
-   UPDATE TITLE
-========================================================= */
+
+/* =========================================
+   TITLE
+========================================= */
 
 function updateTitle() {
 
-    const element = $("chatTitle");
+    const element =
+        $("chatTitle");
+
 
     if (!element) return;
 
-    const chats = getChats();
 
-    const chat = chats.find(
-        item => item.id === currentChatId
-    );
+    const chats =
+        getChats();
+
+
+    const chat =
+        chats.find(
+            item =>
+                item.id === currentChatId
+        );
+
 
     element.textContent =
-        chat?.title || "New Chat";
+        chat?.title ||
+        "New Chat";
 
 }
 
-/* =========================================================
+
+/* =========================================
    HISTORY
-========================================================= */
+========================================= */
 
 function renderHistory() {
 
-    const list = $("historyList");
+    const list =
+        $("historyList");
+
 
     if (!list) return;
 
-    const chats = getChats();
+
+    const chats =
+        getChats();
+
 
     list.innerHTML = "";
 
-    const pinned = chats.filter(
-        chat => chat.pinned
-    );
 
-    const recent = chats.filter(
-        chat => !chat.pinned
-    );
+    const pinned =
+        chats.filter(
+            chat =>
+                chat.pinned
+        );
+
+
+    const recent =
+        chats.filter(
+            chat =>
+                !chat.pinned
+        );
+
 
     addHistory(
         list,
         "Pinned",
         pinned
     );
+
 
     addHistory(
         list,
@@ -363,183 +485,227 @@ function renderHistory() {
 
 }
 
-/* =========================================================
-   ADD HISTORY
-========================================================= */
 
 function addHistory(
     list,
-    sectionTitle,
+    title,
     chats
 ) {
 
-    if (!chats.length) return;
+    if (!chats.length)
+        return;
+
 
     const heading =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     heading.className =
         "history-section-title";
 
-    heading.textContent =
-        sectionTitle;
 
-    list.appendChild(heading);
+    heading.textContent =
+        title;
+
+
+    list.appendChild(
+        heading
+    );
+
 
     chats.forEach(chat => {
 
         const row =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
+
 
         row.className =
             "history-item";
 
-        if (
-            chat.id === currentChatId
-        ) {
-
-            row.classList.add("active");
-
-        }
 
         if (
-            selectedChats.has(chat.id)
+            chat.id ===
+            currentChatId
         ) {
 
             row.classList.add(
-                "selected"
+                "active"
             );
 
         }
 
-        /* Selection checkbox */
 
-        if (selectionMode) {
+        if (
+            selectMode
+        ) {
 
-            const checkbox =
-                document.createElement("input");
-
-            checkbox.type = "checkbox";
-
-            checkbox.className =
-                "chat-select-checkbox";
-
-            checkbox.checked =
-                selectedChats.has(chat.id);
-
-            checkbox.addEventListener(
-                "click",
-                event => {
-
-                    event.stopPropagation();
-
-                    toggleChatSelection(
-                        chat.id
-                    );
-
-                }
-            );
-
-            row.appendChild(
-                checkbox
+            row.classList.add(
+                "selectable"
             );
 
         }
 
-        /* Title */
 
         const titleEl =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
+
 
         titleEl.className =
             "history-title";
 
-        titleEl.textContent =
-            chat.title || "New Chat";
 
-        /* Actions */
+        titleEl.textContent =
+            chat.title ||
+            "New Chat";
+
 
         const actions =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
+
 
         actions.className =
             "history-actions";
 
-        /* Pin */
 
-        const pin =
-            document.createElement("button");
+        if (selectMode) {
 
-        pin.type = "button";
+            const checkbox =
+                document.createElement(
+                    "input"
+                );
 
-        pin.className =
-            "history-action";
 
-        pin.title =
-            chat.pinned
-                ? "Unpin"
-                : "Pin";
+            checkbox.type =
+                "checkbox";
 
-        pin.textContent =
-            chat.pinned
-                ? "📌"
-                : "📍";
 
-        pin.addEventListener(
-            "click",
-            event => {
+            checkbox.checked =
+                selectedChats.has(
+                    chat.id
+                );
 
-                event.stopPropagation();
 
-                togglePin(chat.id);
+            checkbox.onclick =
+                event => {
 
-            }
+                    event.stopPropagation();
+
+                };
+
+
+            checkbox.onchange =
+                event => {
+
+                    if (
+                        event.target.checked
+                    ) {
+
+                        selectedChats.add(
+                            chat.id
+                        );
+
+                    } else {
+
+                        selectedChats.delete(
+                            chat.id
+                        );
+
+                    }
+
+
+                    updateSelectButton();
+
+                };
+
+
+            actions.appendChild(
+                checkbox
+            );
+
+        } else {
+
+            const pin =
+                document.createElement(
+                    "button"
+                );
+
+
+            pin.className =
+                "history-action";
+
+
+            pin.type =
+                "button";
+
+
+            pin.textContent =
+                chat.pinned
+                    ? "📌"
+                    : "📍";
+
+
+            pin.onclick =
+                event => {
+
+                    event.stopPropagation();
+
+                    togglePin(chat.id);
+
+                };
+
+
+            actions.appendChild(
+                pin
+            );
+
+        }
+
+
+        row.appendChild(
+            titleEl
         );
 
-        /* Delete */
 
-        const del =
-            document.createElement("button");
-
-        del.type = "button";
-
-        del.className =
-            "history-action delete";
-
-        del.title =
-            "Delete chat";
-
-        del.textContent =
-            "🗑";
-
-        del.addEventListener(
-            "click",
-            event => {
-
-                event.stopPropagation();
-
-                deleteChat(chat.id);
-
-            }
+        row.appendChild(
+            actions
         );
 
-        actions.appendChild(pin);
 
-        actions.appendChild(del);
-
-        row.appendChild(titleEl);
-
-        row.appendChild(actions);
-
-        row.addEventListener(
-            "click",
+        row.onclick =
             () => {
 
-                if (selectionMode) {
+                if (selectMode) {
 
-                    toggleChatSelection(
-                        chat.id
-                    );
+                    if (
+                        selectedChats.has(
+                            chat.id
+                        )
+                    ) {
+
+                        selectedChats.delete(
+                            chat.id
+                        );
+
+                    } else {
+
+                        selectedChats.add(
+                            chat.id
+                        );
+
+                    }
+
+
+                    renderHistory();
+
+                    updateSelectButton();
 
                 } else {
 
@@ -549,8 +715,8 @@ function addHistory(
 
                 }
 
-            }
-        );
+            };
+
 
         list.appendChild(row);
 
@@ -558,106 +724,62 @@ function addHistory(
 
 }
 
-/* =========================================================
-   SELECT CHAT
-========================================================= */
 
-function toggleChatSelection(id) {
+/* =========================================
+   SELECT CHAT MODE
+========================================= */
 
-    if (selectedChats.has(id)) {
+function toggleSelectMode() {
 
-        selectedChats.delete(id);
+    selectMode =
+        !selectMode;
 
-    } else {
 
-        selectedChats.add(id);
-
-    }
-
-    renderHistory();
-
-    updateSelectionUI();
-
-}
-
-/* =========================================================
-   SELECT ALL
-========================================================= */
-
-function selectAllChats() {
-
-    const chats = getChats();
-
-    if (
-        selectedChats.size === chats.length
-    ) {
-
-        selectedChats.clear();
-
-    } else {
-
-        chats.forEach(
-            chat => {
-                selectedChats.add(
-                    chat.id
-                );
-            }
-        );
-
-    }
-
-    renderHistory();
-
-    updateSelectionUI();
-
-}
-
-/* =========================================================
-   SELECTION MODE
-========================================================= */
-
-function toggleSelectionMode() {
-
-    selectionMode =
-        !selectionMode;
-
-    if (!selectionMode) {
+    if (!selectMode) {
 
         selectedChats.clear();
 
     }
 
-    updateSelectionUI();
 
     renderHistory();
 
+    updateSelectButton();
+
 }
 
-/* =========================================================
-   SELECTION UI
-========================================================= */
 
-function updateSelectionUI() {
+function updateSelectButton() {
 
-    const selectBtn =
+    const button =
         $("selectChatsBtn");
 
-    const deleteBtn =
+
+    const deleteButton =
         $("deleteSelectedBtn");
 
-    if (selectBtn) {
 
-        selectBtn.textContent =
-            selectionMode
-                ? "☑ Done Selecting"
-                : "☑ Select Chats";
+    if (!button)
+        return;
+
+
+    if (selectMode) {
+
+        button.textContent =
+            "✖ Cancel Selection";
+
+    } else {
+
+        button.textContent =
+            "☑ Select Chats";
 
     }
 
-    if (deleteBtn) {
 
-        deleteBtn.style.display =
-            selectionMode &&
+    if (deleteButton) {
+
+        deleteButton.style.display =
+            selectMode &&
             selectedChats.size > 0
                 ? "block"
                 : "none";
@@ -666,33 +788,44 @@ function updateSelectionUI() {
 
 }
 
-/* =========================================================
+
+/* =========================================
    DELETE SELECTED
-========================================================= */
+========================================= */
 
 function deleteSelectedChats() {
 
-    if (!selectedChats.size) {
+    if (
+        selectedChats.size === 0
+    ) {
 
         showToast(
-            "Select at least one chat"
+            "Select chats first"
         );
 
         return;
 
     }
 
+
     const count =
         selectedChats.size;
 
-    const ok =
-        confirm(
-            `Delete ${count} selected chat${count > 1 ? "s" : ""}?`
-        );
 
-    if (!ok) return;
+    if (
+        !confirm(
+            `Delete ${count} selected chat(s)?`
+        )
+    ) {
 
-    let chats = getChats();
+        return;
+
+    }
+
+
+    let chats =
+        getChats();
+
 
     chats =
         chats.filter(
@@ -702,101 +835,6 @@ function deleteSelectedChats() {
                 )
         );
 
-    if (!chats.length) {
-
-        chats = [
-            createChat()
-        ];
-
-    }
-
-    saveChats(chats);
-
-    if (
-        !chats.some(
-            chat =>
-                chat.id === currentChatId
-        )
-    ) {
-
-        currentChatId =
-            chats[0].id;
-
-        messages =
-            chats[0].messages || [];
-
-        renderMessages();
-
-        updateTitle();
-
-    }
-
-    selectedChats.clear();
-
-    selectionMode = false;
-
-    updateSelectionUI();
-
-    renderHistory();
-
-    showToast(
-        `${count} chat${count > 1 ? "s" : ""} deleted`
-    );
-
-}
-
-/* =========================================================
-   PIN
-========================================================= */
-
-function togglePin(id) {
-
-    const chats = getChats();
-
-    const chat = chats.find(
-        item => item.id === id
-    );
-
-    if (!chat) return;
-
-    chat.pinned =
-        !chat.pinned;
-
-    chat.updatedAt =
-        Date.now();
-
-    saveChats(chats);
-
-    renderHistory();
-
-    showToast(
-        chat.pinned
-            ? "Chat pinned"
-            : "Chat unpinned"
-    );
-
-}
-
-/* =========================================================
-   DELETE CHAT
-========================================================= */
-
-function deleteChat(id) {
-
-    const ok =
-        confirm(
-            "Delete this chat?"
-        );
-
-    if (!ok) return;
-
-    let chats = getChats();
-
-    chats =
-        chats.filter(
-            chat =>
-                chat.id !== id
-        );
 
     if (!chats.length) {
 
@@ -806,14 +844,21 @@ function deleteChat(id) {
 
     }
 
+
     saveChats(chats);
 
+
     if (
-        currentChatId === id
+        !chats.some(
+            chat =>
+                chat.id ===
+                currentChatId
+        )
     ) {
 
         currentChatId =
             chats[0].id;
+
 
         messages =
             chats[0].messages || [];
@@ -824,60 +869,90 @@ function deleteChat(id) {
 
     }
 
+
+    selectedChats.clear();
+
+    selectMode = false;
+
+
     renderHistory();
 
+    updateSelectButton();
+
+
     showToast(
-        "Chat deleted"
+        `${count} chat(s) deleted`
     );
 
 }
 
-/* =========================================================
-   SAVE
-========================================================= */
 
-function saveCurrentChat() {
+/* =========================================
+   PIN
+========================================= */
 
-    updateChat();
+function togglePin(id) {
 
-    saveChats(
-        getChats()
-    );
+    const chats =
+        getChats();
 
-    closeMore();
 
-    showToast(
-        "✓ Chat saved"
-    );
+    const chat =
+        chats.find(
+            item =>
+                item.id === id
+        );
+
+
+    if (!chat) return;
+
+
+    chat.pinned =
+        !chat.pinned;
+
+
+    saveChats(chats);
+
+    renderHistory();
 
 }
 
-/* =========================================================
+
+/* =========================================
    CLEAR HISTORY
-========================================================= */
+========================================= */
 
 function clearHistory() {
 
-    const ok =
-        confirm(
+    if (
+        !confirm(
             "Delete all chat history?"
-        );
+        )
+    ) {
 
-    if (!ok) return;
+        return;
+
+    }
+
 
     const chat =
         createChat();
 
+
     saveChats([chat]);
+
 
     currentChatId =
         chat.id;
 
+
     messages = [];
+
 
     selectedChats.clear();
 
-    selectionMode = false;
+    selectMode = false;
+
 
     renderMessages();
 
@@ -885,27 +960,53 @@ function clearHistory() {
 
     renderHistory();
 
-    updateSelectionUI();
+    updateSelectButton();
 
-    closeMore();
 
     showToast(
         "History cleared"
     );
 
+
+    closeMore();
+
 }
 
-/* =========================================================
+
+/* =========================================
+   SAVE
+========================================= */
+
+function saveCurrentChat() {
+
+    updateChat();
+
+
+    showToast(
+        "✓ Chat saved"
+    );
+
+
+    closeMore();
+
+}
+
+
+/* =========================================
    RENDER MESSAGES
-========================================================= */
+========================================= */
 
 function renderMessages() {
 
-    const area = $("messages");
+    const area =
+        $("messages");
+
 
     if (!area) return;
 
+
     area.innerHTML = "";
+
 
     if (!messages.length) {
 
@@ -927,9 +1028,11 @@ function renderMessages() {
 
         `;
 
+
         return;
 
     }
+
 
     messages.forEach(
         item => {
@@ -942,121 +1045,125 @@ function renderMessages() {
         }
     );
 
+
     scrollBottom();
 
 }
 
-/* =========================================================
+
+/* =========================================
    ADD MESSAGE
-========================================================= */
+========================================= */
 
 function addMessage(
     role,
     text
 ) {
 
-    const area = $("messages");
+    const area =
+        $("messages");
 
-    if (!area) return;
 
     const wrapper =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     wrapper.className =
         role === "user"
             ? "message user-message"
             : "message assistant-message";
 
+
     const bubble =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     bubble.className =
         "message-bubble";
 
+
     bubble.textContent =
         text;
+
 
     wrapper.appendChild(
         bubble
     );
+
 
     if (
         role === "assistant"
     ) {
 
         const actions =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
+
 
         actions.className =
             "message-actions";
 
-        /* Copy */
 
         const copy =
-            document.createElement("button");
+            document.createElement(
+                "button"
+            );
 
-        copy.type = "button";
 
         copy.className =
             "message-action";
 
-        copy.title = "Copy";
+
+        copy.type =
+            "button";
+
 
         copy.textContent =
             "📋";
 
-        copy.addEventListener(
-            "click",
-            () => copyText(text)
-        );
 
-        /* Voice */
+        copy.onclick =
+            () =>
+                copyText(text);
+
 
         const voice =
-            document.createElement("button");
+            document.createElement(
+                "button"
+            );
 
-        voice.type = "button";
 
         voice.className =
             "message-action";
 
-        voice.title =
-            "Read aloud";
+
+        voice.type =
+            "button";
+
 
         voice.textContent =
             "🔊";
 
-        voice.addEventListener(
-            "click",
-            () => speakText(text)
+
+        voice.onclick =
+            () =>
+                speakText(text);
+
+
+        actions.appendChild(
+            copy
         );
 
-        /* Stop */
 
-        const stop =
-            document.createElement("button");
-
-        stop.type = "button";
-
-        stop.className =
-            "message-action";
-
-        stop.title =
-            "Stop voice";
-
-        stop.textContent =
-            "⏹";
-
-        stop.addEventListener(
-            "click",
-            stopSpeaking
+        actions.appendChild(
+            voice
         );
 
-        actions.appendChild(copy);
-
-        actions.appendChild(voice);
-
-        actions.appendChild(stop);
 
         wrapper.appendChild(
             actions
@@ -1064,52 +1171,72 @@ function addMessage(
 
     }
 
+
     area.appendChild(
         wrapper
     );
 
 }
 
-/* =========================================================
-   SEND MESSAGE
-========================================================= */
+
+/* =========================================
+   SEND
+========================================= */
 
 async function sendMessage() {
 
-    if (isSending) return;
+    if (isSending)
+        return;
+
 
     const input =
         $("messageInput");
 
-    if (!input) return;
+
+    if (!input)
+        return;
+
 
     const text =
         input.value.trim();
 
-    if (!text) return;
 
-    isSending = true;
+    if (!text)
+        return;
 
-    const sendBtn =
+
+    isSending =
+        true;
+
+
+    const sendButton =
         $("sendBtn");
 
-    if (sendBtn) {
 
-        sendBtn.disabled = true;
+    if (sendButton) {
+
+        sendButton.disabled =
+            true;
 
     }
 
+
     messages.push({
 
-        role: "user",
+        role:
+            "user",
 
-        content: text,
+        content:
+            text,
 
-        timestamp: Date.now()
+        timestamp:
+            Date.now()
 
     });
 
+
     input.value = "";
+
 
     renderMessages();
 
@@ -1117,44 +1244,59 @@ async function sendMessage() {
 
     showTyping();
 
+
     try {
 
         const reply =
             await askViggo(text);
 
+
         removeTyping();
+
 
         messages.push({
 
-            role: "assistant",
+            role:
+                "assistant",
 
-            content: reply,
+            content:
+                reply,
 
-            timestamp: Date.now()
+            timestamp:
+                Date.now()
 
         });
+
 
         renderMessages();
 
         updateChat();
+
 
     } catch (error) {
 
         removeTyping();
 
-        console.error(error);
+
+        console.error(
+            error
+        );
+
 
         messages.push({
 
-            role: "assistant",
+            role:
+                "assistant",
 
             content:
                 "⚠️ " +
                 error.message,
 
-            timestamp: Date.now()
+            timestamp:
+                Date.now()
 
         });
+
 
         renderMessages();
 
@@ -1162,23 +1304,31 @@ async function sendMessage() {
 
     }
 
-    isSending = false;
 
-    if (sendBtn) {
+    isSending =
+        false;
 
-        sendBtn.disabled = false;
+
+    if (sendButton) {
+
+        sendButton.disabled =
+            false;
 
     }
 
 }
 
-/* =========================================================
-   GEMINI API
-========================================================= */
 
-async function askViggo(text) {
+/* =========================================
+   API
+========================================= */
+
+async function askViggo(
+    text
+) {
 
     let response;
+
 
     try {
 
@@ -1187,7 +1337,8 @@ async function askViggo(text) {
                 CHAT_API,
                 {
 
-                    method: "POST",
+                    method:
+                        "POST",
 
                     headers: {
 
@@ -1202,7 +1353,8 @@ async function askViggo(text) {
                     body:
                         JSON.stringify({
 
-                            message: text,
+                            message:
+                                text,
 
                             language:
                                 currentLanguage,
@@ -1212,10 +1364,13 @@ async function askViggo(text) {
                                     .slice(-15)
                                     .map(
                                         item => ({
+
                                             role:
                                                 item.role,
+
                                             content:
                                                 item.content
+
                                         })
                                     )
 
@@ -1227,15 +1382,18 @@ async function askViggo(text) {
     } catch {
 
         throw new Error(
-            "Render server-க்கு connect ஆகவில்லை."
+            "Viggo server-க்கு connect ஆகவில்லை."
         );
 
     }
 
+
     const raw =
         await response.text();
 
+
     let data;
+
 
     try {
 
@@ -1250,49 +1408,63 @@ async function askViggo(text) {
 
     }
 
+
     if (!response.ok) {
 
         throw new Error(
+
             data.details ||
             data.error ||
             "Server error"
+
         );
 
     }
 
-    if (!data.success) {
+
+    if (
+        !data.success
+    ) {
 
         throw new Error(
+
             data.details ||
             data.error ||
             "Viggo AI error"
+
         );
 
     }
+
 
     return data.reply;
 
 }
 
-/* =========================================================
+
+/* =========================================
    TYPING
-========================================================= */
+========================================= */
 
 function showTyping() {
 
     const area =
         $("messages");
 
-    if (!area) return;
 
     const div =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     div.id =
         "viggoTyping";
 
+
     div.className =
         "message assistant-message";
+
 
     div.innerHTML = `
 
@@ -1302,28 +1474,30 @@ function showTyping() {
 
     `;
 
+
     area.appendChild(div);
+
 
     scrollBottom();
 
 }
+
 
 function removeTyping() {
 
     const element =
         $("viggoTyping");
 
-    if (element) {
 
+    if (element)
         element.remove();
-
-    }
 
 }
 
-/* =========================================================
+
+/* =========================================
    COPY
-========================================================= */
+========================================= */
 
 async function copyText(text) {
 
@@ -1340,21 +1514,28 @@ async function copyText(text) {
                 "textarea"
             );
 
-        textarea.value = text;
+
+        textarea.value =
+            text;
+
 
         document.body.appendChild(
             textarea
         );
 
+
         textarea.select();
+
 
         document.execCommand(
             "copy"
         );
 
+
         textarea.remove();
 
     }
+
 
     showToast(
         "Copied"
@@ -1362,28 +1543,83 @@ async function copyText(text) {
 
 }
 
-/* =========================================================
-   VOICE OUTPUT
-========================================================= */
 
-function getVoiceList() {
+/* =========================================
+   VOICE SETTINGS
+========================================= */
 
-    if (!window.speechSynthesis) {
+function setVoice(type) {
 
-        return [];
+    selectedVoice =
+        type;
 
-    }
 
-    return speechSynthesis.getVoices();
+    saveSettings();
+
+    updateVoiceButtons();
+
+
+    showToast(
+        type === "male"
+            ? "👨 Male voice selected"
+            : "👩 Female voice selected"
+    );
 
 }
 
-function findVoice() {
+
+function updateVoiceButtons() {
+
+    const male =
+        $("maleVoiceBtn");
+
+
+    const female =
+        $("femaleVoiceBtn");
+
+
+    if (male) {
+
+        male.textContent =
+            selectedVoice === "male"
+                ? "✅ 👨 Male Voice"
+                : "👨 Male Voice";
+
+    }
+
+
+    if (female) {
+
+        female.textContent =
+            selectedVoice === "female"
+                ? "✅ 👩 Female Voice"
+                : "👩 Female Voice";
+
+    }
+
+}
+
+
+/* =========================================
+   FIND VOICE
+========================================= */
+
+function findBestVoice() {
+
+    if (
+        !window.speechSynthesis
+    ) {
+
+        return null;
+
+    }
+
 
     const voices =
-        getVoiceList();
+        speechSynthesis.getVoices();
 
-    const languageMap = {
+
+    const langMap = {
 
         en: ["en-IN", "en-US", "en-GB"],
 
@@ -1399,15 +1635,16 @@ function findVoice() {
 
     };
 
-    const preferred =
-        languageMap[
-            currentLanguage
-        ] || ["en-IN"];
 
-    let candidates =
+    const preferredLanguages =
+        langMap[currentLanguage] ||
+        ["en-IN"];
+
+
+    const matching =
         voices.filter(
             voice =>
-                preferred.some(
+                preferredLanguages.some(
                     lang =>
                         voice.lang
                             .toLowerCase()
@@ -1419,66 +1656,94 @@ function findVoice() {
                 )
         );
 
-    if (!candidates.length) {
 
-        candidates = voices;
+    if (!matching.length) {
 
-    }
-
-    if (!candidates.length) {
-
-        return null;
+        return voices[0] || null;
 
     }
 
-    if (
-        selectedVoice === "male"
-    ) {
 
-        const male =
-            candidates.find(
-                voice =>
-                    /male|man|david|mark|daniel|ravi|alex/i
-                        .test(
-                            voice.name
-                        )
-            );
+    const femaleWords = [
+        "female",
+        "woman",
+        "girl",
+        "samantha",
+        "zira",
+        "susan",
+        "karen",
+        "google uk english female"
+    ];
 
-        return male || candidates[0];
 
-    }
+    const maleWords = [
+        "male",
+        "man",
+        "boy",
+        "david",
+        "mark",
+        "alex",
+        "ravi",
+        "daniel"
+    ];
 
-    const female =
-        candidates.find(
-            voice =>
-                /female|woman|zira|samantha|karen|heera|veena/i
-                    .test(
-                        voice.name
-                    )
+
+    const words =
+        selectedVoice === "female"
+            ? femaleWords
+            : maleWords;
+
+
+    const selected =
+        matching.find(
+            voice => {
+
+                const name =
+                    voice.name.toLowerCase();
+
+                return words.some(
+                    word =>
+                        name.includes(word)
+                );
+
+            }
         );
 
-    return female || candidates[0];
+
+    return selected ||
+        matching[0] ||
+        null;
 
 }
 
+
+/* =========================================
+   VOICE OUTPUT
+========================================= */
+
 function speakText(text) {
 
-    if (!window.speechSynthesis) {
+    if (
+        !window.speechSynthesis
+    ) {
 
         showToast(
-            "Voice not supported"
+            "Voice not supported in this browser"
         );
 
         return;
 
     }
 
+
     speechSynthesis.cancel();
+
 
     const speech =
         new SpeechSynthesisUtterance(
             text
         );
+
 
     const languageMap = {
 
@@ -1496,42 +1761,67 @@ function speakText(text) {
 
     };
 
+
     speech.lang =
         languageMap[
             currentLanguage
         ] || "en-IN";
 
+
     const voice =
-        findVoice();
+        findBestVoice();
+
 
     if (voice) {
 
-        speech.voice = voice;
+        speech.voice =
+            voice;
 
     }
 
-    speech.rate = 1;
+
+    speech.rate =
+        1;
+
 
     speech.pitch =
         selectedVoice === "female"
             ? 1.05
             : 0.85;
 
-    speech.volume = 1;
+
+    speech.volume =
+        1;
+
 
     speechSynthesis.speak(
         speech
     );
 
-    showToast(
-        selectedVoice === "female"
-            ? "Female voice"
-            : "Male voice"
-    );
+}
+
+
+/* Load voices when browser creates them */
+
+if (
+    window.speechSynthesis
+) {
+
+    speechSynthesis.onvoiceschanged =
+        () => {
+
+            findBestVoice();
+
+        };
 
 }
 
-function stopSpeaking() {
+
+/* =========================================
+   STOP VOICE
+========================================= */
+
+function stopVoice() {
 
     if (
         window.speechSynthesis
@@ -1540,43 +1830,17 @@ function stopSpeaking() {
         speechSynthesis.cancel();
 
         showToast(
-            "Voice stopped"
+            "⏹ Voice stopped"
         );
 
     }
 
 }
 
-/* =========================================================
-   VOICE SETTINGS MENU
-========================================================= */
 
-function setVoice(type) {
-
-    if (
-        type !== "male" &&
-        type !== "female"
-    ) {
-
-        return;
-
-    }
-
-    selectedVoice = type;
-
-    saveSettings();
-
-    showToast(
-        type === "male"
-            ? "Male voice selected"
-            : "Female voice selected"
-    );
-
-}
-
-/* =========================================================
+/* =========================================
    VOICE INPUT
-========================================================= */
+========================================= */
 
 function setupVoice() {
 
@@ -1584,41 +1848,48 @@ function setupVoice() {
         window.SpeechRecognition ||
         window.webkitSpeechRecognition;
 
+
     if (!SpeechRecognition) {
 
         return;
 
     }
 
+
     recognition =
         new SpeechRecognition();
 
-    recognition.continuous = false;
 
-    recognition.interimResults = false;
+    recognition.continuous =
+        false;
 
-    recognition.maxAlternatives = 1;
 
-    recognition.onstart = () => {
+    recognition.interimResults =
+        false;
 
-        isListening = true;
 
-        const btn =
-            $("voiceBtn");
+    recognition.maxAlternatives =
+        1;
 
-        if (btn) {
 
-            btn.classList.add(
-                "active"
+    recognition.onstart =
+        () => {
+
+            isListening =
+                true;
+
+
+            $("voiceBtn")
+                ?.classList
+                .add("active");
+
+
+            showToast(
+                "🎤 Listening..."
             );
 
-        }
+        };
 
-        showToast(
-            "Listening..."
-        );
-
-    };
 
     recognition.onresult =
         event => {
@@ -1628,12 +1899,15 @@ function setupVoice() {
                     .results[0][0]
                     .transcript;
 
+
             const input =
                 $("messageInput");
 
+
             if (input) {
 
-                input.value = text;
+                input.value =
+                    text;
 
                 input.focus();
 
@@ -1641,51 +1915,65 @@ function setupVoice() {
 
         };
 
+
     recognition.onerror =
         event => {
 
             console.error(
-                "Voice input:",
+                "Voice error:",
                 event.error
             );
 
-            showToast(
-                "Voice error: " +
-                event.error
-            );
+
+            if (
+                event.error ===
+                "not-allowed"
+            ) {
+
+                showToast(
+                    "Microphone permission denied"
+                );
+
+            } else {
+
+                showToast(
+                    "Voice error: " +
+                    event.error
+                );
+
+            }
 
         };
 
-    recognition.onend = () => {
 
-        isListening = false;
+    recognition.onend =
+        () => {
 
-        const btn =
-            $("voiceBtn");
+            isListening =
+                false;
 
-        if (btn) {
 
-            btn.classList.remove(
-                "active"
-            );
+            $("voiceBtn")
+                ?.classList
+                .remove("active");
 
-        }
-
-    };
+        };
 
 }
+
 
 function toggleVoice() {
 
     if (!recognition) {
 
         showToast(
-            "Voice input is not supported in this browser."
+            "Voice input is not supported. Use Chrome."
         );
 
         return;
 
     }
+
 
     if (isListening) {
 
@@ -1694,6 +1982,7 @@ function toggleVoice() {
         return;
 
     }
+
 
     const languageMap = {
 
@@ -1711,10 +2000,12 @@ function toggleVoice() {
 
     };
 
+
     recognition.lang =
         languageMap[
             currentLanguage
         ] || "en-IN";
+
 
     try {
 
@@ -1728,93 +2019,23 @@ function toggleVoice() {
 
 }
 
-/* =========================================================
-   UPDATE VOICE BUTTON
-========================================================= */
 
-function updateVoiceButton() {
-
-    const btn =
-        $("voiceBtn");
-
-    if (!btn) return;
-
-    btn.title =
-        isListening
-            ? "Stop listening"
-            : "Voice input";
-
-}
-
-/* =========================================================
-   LANGUAGE
-========================================================= */
-
-function setLanguage(language) {
-
-    const validLanguages = [
-        "en",
-        "ta",
-        "hi",
-        "ml",
-        "te",
-        "kn"
-    ];
-
-    if (
-        !validLanguages.includes(
-            language
-        )
-    ) {
-
-        return;
-
-    }
-
-    currentLanguage =
-        language;
-
-    saveSettings();
-
-    const languageNames = {
-
-        en: "English",
-
-        ta: "தமிழ்",
-
-        hi: "हिन्दी",
-
-        ml: "മലയാളം",
-
-        te: "తెలుగు",
-
-        kn: "ಕನ್ನಡ"
-
-    };
-
-    showToast(
-        "Language: " +
-        languageNames[language]
-    );
-
-    closeMore();
-
-}
-
-/* =========================================================
-   SHARE CHAT
-========================================================= */
+/* =========================================
+   SHARE
+========================================= */
 
 async function shareChat() {
 
     const chats =
         getChats();
 
+
     const chat =
         chats.find(
             item =>
                 item.id === currentChatId
         );
+
 
     if (!chat) {
 
@@ -1826,51 +2047,42 @@ async function shareChat() {
 
     }
 
+
     /*
-       NOTE:
-       Browser-only share links containing the entire
-       conversation will still be long.
-       This version creates the shortest possible
-       encoded client-side link without changing
-       your backend.
+       Short link version:
+
+       Instead of putting the entire chat
+       inside the URL, create a compact ID.
+       
+       This stores the shared chat locally
+       and uses a short URL parameter.
     */
 
-    const shareData = {
+    const shareId =
+        "s" +
+        Date.now().toString(36) +
+        Math.random()
+            .toString(36)
+            .slice(2, 6);
 
-        t: chat.title || "Viggo Chat",
 
-        m: chat.messages || []
+    const sharedKey =
+        "viggo_shared_" +
+        shareId;
 
-    };
 
-    let encoded;
+    localStorage.setItem(
+        sharedKey,
+        JSON.stringify(chat)
+    );
 
-    try {
-
-        encoded =
-            btoa(
-                encodeURIComponent(
-                    JSON.stringify(
-                        shareData
-                    )
-                )
-            );
-
-    } catch {
-
-        showToast(
-            "Could not create share link"
-        );
-
-        return;
-
-    }
 
     const link =
         window.location.origin +
         window.location.pathname +
-        "?c=" +
-        encoded;
+        "?share=" +
+        shareId;
+
 
     try {
 
@@ -1894,10 +2106,13 @@ async function shareChat() {
 
         } else {
 
-            await copyText(link);
+            await copyText(
+                link
+            );
+
 
             showToast(
-                "Short share link copied"
+                "🔗 Short share link copied"
             );
 
         }
@@ -1917,9 +2132,10 @@ async function shareChat() {
 
 }
 
-/* =========================================================
+
+/* =========================================
    LOAD SHARED CHAT
-========================================================= */
+========================================= */
 
 function loadSharedChat() {
 
@@ -1928,47 +2144,40 @@ function loadSharedChat() {
             window.location.search
         );
 
-    const encoded =
-        params.get("c") ||
-        params.get("chat");
 
-    if (!encoded) return;
+    const shareId =
+        params.get("share");
+
+
+    if (!shareId)
+        return;
+
+
+    const key =
+        "viggo_shared_" +
+        shareId;
+
+
+    const saved =
+        localStorage.getItem(key);
+
+
+    if (!saved) {
+
+        showToast(
+            "Shared chat is unavailable on this browser"
+        );
+
+        return;
+
+    }
+
 
     try {
 
-        const decoded =
-            decodeURIComponent(
-                atob(encoded)
-            );
+        const chat =
+            JSON.parse(saved);
 
-        const data =
-            JSON.parse(decoded);
-
-        let chat;
-
-        if (
-            data &&
-            Array.isArray(
-                data.m
-            )
-        ) {
-
-            chat = {
-
-                title:
-                    data.t ||
-                    "Shared Chat",
-
-                messages:
-                    data.m
-
-            };
-
-        } else {
-
-            chat = data;
-
-        }
 
         if (
             !chat ||
@@ -1983,33 +2192,29 @@ function loadSharedChat() {
 
         }
 
+
         messages =
             chat.messages;
+
 
         currentChatId =
             "shared_" +
             Date.now();
 
+
         renderMessages();
 
-        const title =
-            $("chatTitle");
 
-        if (title) {
+        $("chatTitle").textContent =
+            chat.title ||
+            "Shared Chat";
 
-            title.textContent =
-                chat.title ||
-                "Shared Chat";
-
-        }
 
         showToast(
-            "Shared chat opened"
+            "🔗 Shared chat opened"
         );
 
-    } catch (error) {
-
-        console.error(error);
+    } catch {
 
         showToast(
             "Invalid share link"
@@ -2019,92 +2224,100 @@ function loadSharedChat() {
 
 }
 
-/* =========================================================
+
+/* =========================================
    MORE MENU
-========================================================= */
+========================================= */
 
 function toggleMore() {
 
-    const menu =
-        $("moreMenu");
-
-    if (!menu) return;
-
-    menu.classList.toggle(
-        "show"
-    );
+    $("moreMenu")
+        ?.classList
+        .toggle("show");
 
 }
+
 
 function closeMore() {
 
-    const menu =
-        $("moreMenu");
-
-    if (!menu) return;
-
-    menu.classList.remove(
-        "show"
-    );
+    $("moreMenu")
+        ?.classList
+        .remove("show");
 
 }
 
-/* =========================================================
-   MOBILE SIDEBAR
-========================================================= */
 
-function toggleMobileSidebar() {
+/* =========================================
+   LANGUAGE
+========================================= */
 
-    const sidebar =
-        $("sidebar");
+function setLanguage(
+    language
+) {
 
-    if (!sidebar) return;
+    currentLanguage =
+        language;
 
-    sidebar.classList.toggle(
-        "open"
+
+    saveSettings();
+
+
+    const names = {
+
+        en: "English",
+
+        ta: "தமிழ்",
+
+        hi: "हिन्दी",
+
+        ml: "മലയാളം",
+
+        te: "తెలుగు",
+
+        kn: "ಕನ್ನಡ"
+
+    };
+
+
+    showToast(
+        "🌐 Language: " +
+        names[language]
     );
+
+
+    closeMore();
 
 }
 
-/* =========================================================
+
+/* =========================================
    TOAST
-========================================================= */
+========================================= */
 
 function showToast(message) {
 
     let toast =
         $("viggoToast");
 
-    if (!toast) {
 
-        toast =
-            document.createElement(
-                "div"
-            );
+    if (!toast)
+        return;
 
-        toast.id =
-            "viggoToast";
-
-        toast.className =
-            "toast";
-
-        document.body.appendChild(
-            toast
-        );
-
-    }
 
     toast.textContent =
         message;
 
+
     toast.style.display =
         "block";
 
+
     clearTimeout(
-        toast._timer
+        toast.timer
     );
 
-    toast._timer =
+
+    toast.timer =
         setTimeout(
             () => {
 
@@ -2117,35 +2330,32 @@ function showToast(message) {
 
 }
 
-/* =========================================================
+
+/* =========================================
    SCROLL
-========================================================= */
+========================================= */
 
 function scrollBottom() {
 
     const area =
         $("messages");
 
-    if (!area) return;
 
-    requestAnimationFrame(
-        () => {
+    if (area) {
 
-            area.scrollTop =
-                area.scrollHeight;
+        area.scrollTop =
+            area.scrollHeight;
 
-        }
-    );
+    }
 
 }
 
-/* =========================================================
+
+/* =========================================
    EVENTS
-========================================================= */
+========================================= */
 
 function setupEvents() {
-
-    /* New Chat */
 
     $("newChatBtn")
         ?.addEventListener(
@@ -2153,7 +2363,6 @@ function setupEvents() {
             newChat
         );
 
-    /* Send */
 
     $("sendBtn")
         ?.addEventListener(
@@ -2161,7 +2370,6 @@ function setupEvents() {
             sendMessage
         );
 
-    /* Share */
 
     $("shareBtn")
         ?.addEventListener(
@@ -2169,7 +2377,6 @@ function setupEvents() {
             shareChat
         );
 
-    /* Voice Input */
 
     $("voiceBtn")
         ?.addEventListener(
@@ -2177,7 +2384,6 @@ function setupEvents() {
             toggleVoice
         );
 
-    /* More */
 
     $("moreBtn")
         ?.addEventListener(
@@ -2191,79 +2397,70 @@ function setupEvents() {
             }
         );
 
-    /* Save */
 
     $("saveBtn")
         ?.addEventListener(
             "click",
-            event => {
-
-                event.preventDefault();
-
-                event.stopPropagation();
-
-                saveCurrentChat();
-
-            }
+            saveCurrentChat
         );
 
-    /* Select */
 
     $("selectChatsBtn")
         ?.addEventListener(
             "click",
-            event => {
-
-                event.preventDefault();
-
-                event.stopPropagation();
-
-                toggleSelectionMode();
-
-            }
+            toggleSelectMode
         );
 
-    /* Delete Selected */
 
     $("deleteSelectedBtn")
         ?.addEventListener(
             "click",
-            event => {
-
-                event.preventDefault();
-
-                event.stopPropagation();
-
-                deleteSelectedChats();
-
-            }
+            deleteSelectedChats
         );
 
-    /* Clear */
 
     $("clearHistoryBtn")
         ?.addEventListener(
             "click",
-            event => {
-
-                event.preventDefault();
-
-                event.stopPropagation();
-
-                clearHistory();
-
-            }
+            clearHistory
         );
 
-    /* Mobile */
+
+    $("maleVoiceBtn")
+        ?.addEventListener(
+            "click",
+            () =>
+                setVoice("male")
+        );
+
+
+    $("femaleVoiceBtn")
+        ?.addEventListener(
+            "click",
+            () =>
+                setVoice("female")
+        );
+
+
+    $("stopVoiceBtn")
+        ?.addEventListener(
+            "click",
+            stopVoice
+        );
+
 
     $("mobileMenuBtn")
         ?.addEventListener(
             "click",
-            toggleMobileSidebar
+            () => {
+
+                $("sidebar")
+                    ?.classList
+                    .toggle("open");
+
+            }
         );
 
-    /* Enter */
 
     $("messageInput")
         ?.addEventListener(
@@ -2284,7 +2481,6 @@ function setupEvents() {
             }
         );
 
-    /* Language */
 
     document
         .querySelectorAll(
@@ -2295,11 +2491,7 @@ function setupEvents() {
 
                 button.addEventListener(
                     "click",
-                    event => {
-
-                        event.preventDefault();
-
-                        event.stopPropagation();
+                    () => {
 
                         setLanguage(
                             button.dataset.language
@@ -2311,7 +2503,6 @@ function setupEvents() {
             }
         );
 
-    /* Close More */
 
     document.addEventListener(
         "click",
@@ -2330,36 +2521,7 @@ function setupEvents() {
         }
     );
 
-    /* Voice list refresh */
 
-    if (
-        window.speechSynthesis
-    ) {
-
-        speechSynthesis.onvoiceschanged =
-            () => {
-
-                getVoiceList();
-
-            };
-
-    }
+    loadSharedChat();
 
 }
-
-/* =========================================================
-   GLOBAL VOICE FUNCTIONS
-   Useful if you add buttons later
-========================================================= */
-
-window.setVoice = setVoice;
-window.stopSpeaking = stopSpeaking;
-window.speakText = speakText;
-window.toggleVoice = toggleVoice;
-window.setLanguage = setLanguage;
-window.newChat = newChat;
-window.saveCurrentChat = saveCurrentChat;
-window.deleteSelectedChats =
-    deleteSelectedChats;
-window.toggleSelectionMode =
-    toggleSelectionMode;
