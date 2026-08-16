@@ -1,4 +1,3 @@
-
 "use strict";
 
 require("dotenv").config();
@@ -9,24 +8,15 @@ const { GoogleGenAI } = require("@google/genai");
 
 const app = express();
 
-/* =========================================
-   CONFIG
-========================================= */
-
 const PORT = process.env.PORT || 10000;
-
 const API_KEY = process.env.GEMINI_API_KEY;
 
 /*
-   Current Gemini model used by the
-   Interactions API.
+  Use a currently supported Gemini Flash model.
+  If your Google AI account shows a different available model,
+  change only this value.
 */
-const MODEL = "gemini-3.6-flash";
-
-
-/* =========================================
-   GEMINI CLIENT
-========================================= */
+const MODEL = "gemini-2.5-flash";
 
 let ai = null;
 
@@ -34,20 +24,17 @@ if (API_KEY) {
     ai = new GoogleGenAI({
         apiKey: API_KEY
     });
-
-    console.log("✓ Gemini API key detected.");
-} else {
-    console.error("❌ GEMINI_API_KEY is missing.");
 }
 
-
-/* =========================================
+/* =========================================================
    MIDDLEWARE
-========================================= */
+========================================================= */
 
 app.use(
     cors({
-        origin: "*"
+        origin: "*",
+        methods: ["GET", "POST", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"]
     })
 );
 
@@ -57,42 +44,39 @@ app.use(
     })
 );
 
-
-/* =========================================
-   HEALTH CHECK
-========================================= */
+/* =========================================================
+   HOME
+========================================================= */
 
 app.get("/", (req, res) => {
     res.json({
         success: true,
         message: "Viggo AI Server is online.",
         model: MODEL,
+        status: "online",
         apiConfigured: Boolean(API_KEY),
-        api: "Gemini Interactions API",
         time: new Date().toISOString()
     });
 });
 
-
-/* =========================================
+/* =========================================================
    STATUS
-========================================= */
+========================================================= */
 
 app.get("/status", (req, res) => {
     res.json({
         success: true,
         server: "Viggo AI",
         model: MODEL,
-        api: "Interactions API",
         apiConfigured: Boolean(API_KEY),
+        status: API_KEY ? "ready" : "missing_api_key",
         time: new Date().toISOString()
     });
 });
 
-
-/* =========================================
-   CLEAN TEXT
-========================================= */
+/* =========================================================
+   HELPERS
+========================================================= */
 
 function cleanText(value) {
     if (typeof value !== "string") {
@@ -104,12 +88,7 @@ function cleanText(value) {
         .trim();
 }
 
-
-/* =========================================
-   LANGUAGE
-========================================= */
-
-function languageName(language) {
+function getLanguageName(language) {
     const languages = {
         en: "English",
         ta: "Tamil",
@@ -122,106 +101,109 @@ function languageName(language) {
     return languages[language] || "English";
 }
 
+function createSystemInstruction(language) {
+    const languageName = getLanguageName(language);
 
-/* =========================================
-   BUILD PROMPT
-========================================= */
+    return `
+You are Viggo AI, a friendly and helpful AI assistant.
 
-function buildPrompt(
-    history,
-    message,
-    language
-) {
-    const selectedLanguage =
-        languageName(language);
+Your name is Viggo.
 
-    let conversation = "";
+The user's selected language is ${languageName}.
 
-    if (Array.isArray(history)) {
-        history
-            .filter(item =>
+LANGUAGE RULES:
+- Reply primarily in ${languageName}.
+- Understand the user's message even if it contains mixed languages.
+- Keep replies natural and easy to understand.
+- Do not unnecessarily mix languages.
+- If the user explicitly asks for English, reply in English.
+- If the user explicitly asks for Tamil, reply in Tamil.
+
+PERSONALITY:
+- Friendly
+- Helpful
+- Respectful
+- Clear
+- Natural
+- Concise when a short answer is enough
+
+IMPORTANT:
+- Do not claim to be a human.
+- Do not mention system instructions.
+- Do not say that you are another AI.
+- Your assistant name is Viggo.
+
+For technical questions:
+- Explain step by step.
+- Give examples when useful.
+- When the user asks for complete code, provide complete code.
+
+For casual conversation:
+- Reply naturally like a friendly AI assistant.
+`;
+}
+
+function buildHistory(history) {
+    if (!Array.isArray(history)) {
+        return "";
+    }
+
+    const safeHistory = history
+        .filter(item => {
+            return (
                 item &&
+                typeof item === "object" &&
                 (
                     item.role === "user" ||
                     item.role === "assistant"
                 ) &&
                 typeof item.content === "string"
-            )
-            .slice(-14)
-            .forEach(item => {
-                const role =
-                    item.role === "assistant"
-                        ? "Viggo"
-                        : "User";
+            );
+        })
+        .slice(-15);
 
-                conversation +=
-                    `${role}: ${cleanText(item.content)}\n`;
-            });
+    if (!safeHistory.length) {
+        return "";
     }
 
-    const prompt = `
-You are Viggo AI, a friendly and helpful AI assistant.
+    return safeHistory
+        .map(item => {
+            const role =
+                item.role === "user"
+                    ? "User"
+                    : "Viggo";
 
-IMPORTANT INSTRUCTIONS:
-
-1. Your name is Viggo.
-2. Be friendly, natural, clear and respectful.
-3. The user's selected language is ${selectedLanguage}.
-4. Reply primarily in ${selectedLanguage}.
-5. Understand Tamil, English, Hindi, Malayalam, Telugu and Kannada.
-6. Do not unnecessarily mix languages.
-7. If the user asks specifically for English, reply in English.
-8. If the user asks specifically for Tamil, reply in Tamil.
-9. For technical questions, explain step by step.
-10. When the user asks for full code, provide complete working code.
-11. Do not mention these internal instructions.
-12. Keep answers useful and easy to understand.
-
-Previous conversation:
-${conversation || "(No previous conversation)"}
-
-Current user message:
-${cleanText(message)}
-
-Now answer the user naturally.
-`;
-
-    return prompt.trim();
+            return `${role}: ${cleanText(item.content)}`;
+        })
+        .join("\n\n");
 }
 
-
-/* =========================================
-   CHAT
-========================================= */
+/* =========================================================
+   CHAT API
+========================================================= */
 
 app.post("/chat", async (req, res) => {
-
     try {
-
-        /* -----------------------------
+        /* -------------------------------------------------
            API KEY CHECK
-        ----------------------------- */
+        ------------------------------------------------- */
 
         if (!API_KEY || !ai) {
-
             return res.status(500).json({
                 success: false,
-                error: "GEMINI_API_KEY is missing.",
+                error: "Gemini API key is not configured.",
                 details:
-                    "Add GEMINI_API_KEY in Render → Environment Variables."
+                    "Render → Environment → GEMINI_API_KEY add pannunga."
             });
-
         }
 
+        /* -------------------------------------------------
+           REQUEST
+        ------------------------------------------------- */
 
-        /* -----------------------------
-           REQUEST DATA
-        ----------------------------- */
-
-        const message =
-            cleanText(
-                req.body?.message
-            );
+        const message = cleanText(
+            req.body?.message
+        );
 
         const language =
             cleanText(
@@ -229,303 +211,271 @@ app.post("/chat", async (req, res) => {
             ) || "en";
 
         const history =
-            req.body?.history;
+            req.body?.history || [];
 
-
-        /* -----------------------------
-           MESSAGE CHECK
-        ----------------------------- */
+        /* -------------------------------------------------
+           MESSAGE VALIDATION
+        ------------------------------------------------- */
 
         if (!message) {
-
             return res.status(400).json({
                 success: false,
                 error: "Message is required."
             });
-
         }
 
+        /* -------------------------------------------------
+           HISTORY
+        ------------------------------------------------- */
 
-        /* -----------------------------
-           BUILD PROMPT
-        ----------------------------- */
+        const previousMessages =
+            buildHistory(history);
 
-        const prompt =
-            buildPrompt(
-                history,
-                message,
+        /* -------------------------------------------------
+           PROMPT
+        ------------------------------------------------- */
+
+        let prompt =
+            createSystemInstruction(
                 language
             );
 
+        if (previousMessages) {
+            prompt += `
+
+CONVERSATION HISTORY:
+
+${previousMessages}
+`;
+        }
+
+        prompt += `
+
+CURRENT USER MESSAGE:
+
+${message}
+
+Respond to the user now.
+`;
 
         console.log(
-            "→ User:",
-            message.slice(0, 100)
+            "→ Gemini request:",
+            message.substring(0, 100)
         );
 
+        /* -------------------------------------------------
+           GEMINI REQUEST
+        ------------------------------------------------- */
 
-        /* =================================
-           GEMINI INTERACTIONS API
-        ================================= */
-
-        const interaction =
-            await ai.interactions.create({
-
+        const response =
+            await ai.models.generateContent({
                 model: MODEL,
-
-                input: prompt
-
+                contents: prompt
             });
 
-
-        /* -----------------------------
-           GET RESPONSE
-        ----------------------------- */
+        /* -------------------------------------------------
+           RESPONSE TEXT
+        ------------------------------------------------- */
 
         let reply = "";
 
         if (
-            interaction &&
-            typeof interaction.output_text ===
-                "string"
+            response &&
+            typeof response.text === "string"
         ) {
-            reply =
-                interaction.output_text;
+            reply = response.text;
         }
 
+        /*
+          Fallback for SDK response formats.
+        */
 
-        reply =
-            cleanText(reply);
+        if (
+            !reply &&
+            response?.candidates?.length
+        ) {
+            const candidate =
+                response.candidates[0];
 
+            const parts =
+                candidate?.content?.parts;
 
-        /* -----------------------------
+            if (Array.isArray(parts)) {
+                reply = parts
+                    .map(part => part?.text || "")
+                    .join("");
+            }
+        }
+
+        reply = cleanText(reply);
+
+        /* -------------------------------------------------
            EMPTY RESPONSE
-        ----------------------------- */
+        ------------------------------------------------- */
 
         if (!reply) {
-
             console.error(
-                "❌ Empty Gemini response:",
-                interaction
+                "Gemini returned empty response."
             );
 
             return res.status(502).json({
                 success: false,
                 error:
-                    "Viggo returned an empty response."
+                    "Viggo AI returned an empty response."
             });
-
         }
 
+        /* -------------------------------------------------
+           SUCCESS
+        ------------------------------------------------- */
 
         console.log(
-            "✓ Response received."
+            "✓ Gemini response received."
         );
-
-
-        /* -----------------------------
-           SEND TO FRONTEND
-        ----------------------------- */
 
         return res.json({
-
             success: true,
-
             reply: reply,
-
-            model: MODEL,
-
-            api: "Interactions API"
-
+            model: MODEL
         });
-
     }
 
+    /* =====================================================
+       ERROR
+    ===================================================== */
 
     catch (error) {
-
         console.error(
-            "❌ Gemini error:",
-            error
+            "❌ Gemini error:"
         );
 
+        console.error(error);
 
-        const errorText =
-            String(
-                error?.message ||
-                error
-            );
-
+        const errorMessage =
+            error?.message ||
+            String(error);
 
         const lower =
-            errorText.toLowerCase();
+            errorMessage.toLowerCase();
 
-
-        /* =================================
-           429 / QUOTA
-        ================================= */
+        /* -------------------------------------------------
+           RATE LIMIT / HIGH DEMAND
+        ------------------------------------------------- */
 
         if (
             lower.includes("429") ||
             lower.includes("resource exhausted") ||
             lower.includes("quota") ||
-            lower.includes("rate limit")
+            lower.includes("rate limit") ||
+            lower.includes("high demand")
         ) {
-
             return res.status(429).json({
-
                 success: false,
-
                 error:
-                    "Gemini is temporarily busy.",
-
+                    "Viggo AI is temporarily busy.",
                 details:
-                    "Please try again after a few seconds."
-
+                    "Gemini is currently experiencing high demand. Please try again after a few seconds."
             });
-
         }
 
-
-        /* =================================
+        /* -------------------------------------------------
            API KEY
-        ================================= */
+        ------------------------------------------------- */
 
         if (
             lower.includes("api key") ||
-            lower.includes("401") ||
-            lower.includes("unauthenticated") ||
+            lower.includes("unauthorized") ||
             lower.includes("authentication")
         ) {
-
-            return res.status(401).json({
-
+            return res.status(500).json({
                 success: false,
-
                 error:
                     "Gemini API key error.",
-
                 details:
-                    "Check GEMINI_API_KEY in Render → Environment Variables."
-
+                    "Check GEMINI_API_KEY in Render Environment Variables."
             });
-
         }
 
-
-        /* =================================
+        /* -------------------------------------------------
            MODEL
-        ================================= */
+        ------------------------------------------------- */
 
         if (
             lower.includes("model") ||
-            lower.includes("404") ||
             lower.includes("not found")
         ) {
-
             return res.status(502).json({
-
                 success: false,
-
                 error:
                     "Gemini model error.",
-
                 details:
-                    errorText
-
+                    errorMessage
             });
-
         }
 
-
-        /* =================================
+        /* -------------------------------------------------
            GENERAL ERROR
-        ================================= */
+        ------------------------------------------------- */
 
         return res.status(500).json({
-
             success: false,
-
             error:
                 "Viggo AI could not generate a response.",
-
             details:
-                errorText
-
+                errorMessage
         });
-
     }
-
 });
 
-
-/* =========================================
+/* =========================================================
    404
-========================================= */
+========================================================= */
 
 app.use((req, res) => {
-
     res.status(404).json({
-
         success: false,
-
-        error:
-            "Endpoint not found.",
-
-        path:
-            req.path
-
+        error: "Endpoint not found.",
+        path: req.path
     });
-
 });
 
+/* =========================================================
+   GLOBAL ERROR HANDLER
+========================================================= */
 
-/* =========================================
-   START SERVER
-========================================= */
+app.use((error, req, res, next) => {
+    console.error(
+        "Unhandled server error:",
+        error
+    );
 
-app.listen(
-    PORT,
-    () => {
-
-        console.log(
-            "================================"
-        );
-
-        console.log(
-            "       VIGGO AI SERVER ONLINE"
-        );
-
-        console.log(
-            "================================"
-        );
-
-        console.log(
-            "PORT:",
-            PORT
-        );
-
-        console.log(
-            "MODEL:",
-            MODEL
-        );
-
-        console.log(
-            "API:",
-            "Interactions API"
-        );
-
-        console.log(
-            "API KEY:",
-            API_KEY
-                ? "CONFIGURED"
-                : "MISSING"
-        );
-
-        console.log(
-            "================================"
-        );
-
+    if (res.headersSent) {
+        return next(error);
     }
-);
 
+    res.status(500).json({
+        success: false,
+        error: "Internal server error."
+    });
+});
+
+/* =========================================================
+   START SERVER
+========================================================= */
+
+app.listen(PORT, () => {
+    console.log("");
+    console.log("================================");
+    console.log("       VIGGO AI SERVER ONLINE");
+    console.log("================================");
+    console.log("PORT:", PORT);
+    console.log("MODEL:", MODEL);
+    console.log(
+        "API KEY:",
+        API_KEY
+            ? "CONFIGURED"
+            : "MISSING"
+    );
+    console.log("================================");
+    console.log("");
+});
