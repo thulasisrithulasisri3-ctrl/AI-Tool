@@ -1,2759 +1,557 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Viggo AI</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-    font-family:Arial,Helvetica,sans-serif;
-}
+  <title>Viggo AI Assistant</title>
 
-body{
-    height:100vh;
-    overflow:hidden;
-    background:#07101a;
-    color:#fff;
-}
-
-button,input{
-    font-family:inherit;
-}
-
-.app{
-    height:100vh;
-    display:flex;
-}
-
-/* SIDEBAR */
-.sidebar{
-    width:270px;
-    min-width:270px;
-    height:100vh;
-    background:#050b12;
-    border-right:1px solid #20364a;
-    padding:18px;
-    display:flex;
-    flex-direction:column;
-}
-
-.logo{
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
-
-.logo-icon{
-    width:43px;
-    height:43px;
-    border-radius:13px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:linear-gradient(135deg,#2999ff,#07569d);
-    font-size:22px;
-    font-weight:bold;
-}
-
-.logo-name{
-    font-size:21px;
-    font-weight:600;
-}
-
-.online{
-    margin-left:53px;
-    margin-top:5px;
-    color:#45df88;
-    font-size:11px;
-}
-
-.online-dot{
-    width:6px;
-    height:6px;
-    display:inline-block;
-    border-radius:50%;
-    background:#45df88;
-}
-
-.new-chat{
-    margin-top:25px;
-    width:100%;
-    padding:12px;
-    border:1px solid #176bad;
-    border-radius:10px;
-    background:#0b4f82;
-    color:#fff;
-    cursor:pointer;
-    text-align:left;
-}
-
-.new-chat:hover{
-    background:#0d629f;
-}
-
-.section-title{
-    margin-top:22px;
-    margin-bottom:7px;
-    color:#6c87a0;
-    font-size:11px;
-}
-
-.chat-list{
-    display:flex;
-    flex-direction:column;
-    gap:4px;
-    overflow:auto;
-}
-
-.chat-item{
-    width:100%;
-    padding:9px;
-    border:0;
-    border-radius:8px;
-    background:transparent;
-    color:#d7e6f5;
-    cursor:pointer;
-    text-align:left;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-}
-
-.chat-item:hover{
-    background:#10283c;
-}
-
-.empty{
-    padding:8px;
-    color:#50677d;
-    font-size:12px;
-}
-
-/* MORE */
-.more-area{
-    margin-top:auto;
-    position:relative;
-}
-
-.more-button{
-    width:100%;
-    padding:11px;
-    border:1px solid #294760;
-    border-radius:10px;
-    background:#0b1724;
-    color:#fff;
-    cursor:pointer;
-    text-align:left;
-}
-
-.more-button:hover{
-    background:#11273a;
-}
-
-.more-menu{
-    display:none;
-    position:absolute;
-    bottom:52px;
-    left:0;
-    right:0;
-    z-index:1000;
-    padding:7px;
-    border:1px solid #294b67;
-    border-radius:12px;
-    background:#091522;
-}
-
-.more-menu.show{
-    display:block;
-}
-
-.more-menu button{
-    width:100%;
-    padding:10px;
-    border:0;
-    border-radius:8px;
-    background:transparent;
-    color:#fff;
-    cursor:pointer;
-    text-align:left;
-}
-
-.more-menu button:hover{
-    background:#12314a;
-}
-
-/* LANGUAGE MENU */
-.language-menu{
-    display:none;
-    position:absolute;
-    left:100%;
-    bottom:0;
-    margin-left:8px;
-    width:180px;
-    padding:7px;
-    border:1px solid #294b67;
-    border-radius:12px;
-    background:#091522;
-    z-index:2000;
-}
-
-.language-menu.show{
-    display:block;
-}
-
-.language-menu button{
-    width:100%;
-    padding:9px;
-    border:0;
-    border-radius:8px;
-    background:transparent;
-    color:#fff;
-    text-align:left;
-    cursor:pointer;
-}
-
-.language-menu button:hover{
-    background:#12314a;
-}
-
-.selected-language{
-    color:#45df88;
-    font-size:10px;
-    margin-left:5px;
-}
-
-/* MAIN */
-.main{
-    min-width:0;
-    flex:1;
-    display:flex;
-    flex-direction:column;
-}
-
-.header{
-    height:60px;
-    padding:0 20px;
-    display:flex;
-    align-items:center;
-    border-bottom:1px solid #1d3449;
-    background:#050b12;
-}
-
-.header-title{
-    font-size:14px;
-}
-
-.share{
-    margin-left:auto;
-    padding:8px 14px;
-    border:1px solid #226da8;
-    border-radius:8px;
-    background:#0b3152;
-    color:#fff;
-    cursor:pointer;
-}
-
-.share:hover{
-    background:#10456f;
-}
-
-/* CHAT */
-.chat-area{
-    flex:1;
-    overflow-y:auto;
-    padding:25px 18px;
-}
-
-.conversation{
-    width:100%;
-    max-width:850px;
-    margin:auto;
-}
-
-.welcome{
-    padding-top:80px;
-    text-align:center;
-}
-
-.welcome-icon{
-    width:70px;
-    height:70px;
-    margin:auto;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border-radius:18px;
-    background:linear-gradient(135deg,#2999ff,#07569d);
-    font-size:34px;
-    font-weight:bold;
-}
-
-.welcome h1{
-    margin-top:15px;
-}
-
-.welcome p{
-    margin-top:7px;
-    color:#718ba5;
-}
-
-/* MESSAGE */
-.message{
-    display:flex;
-    gap:11px;
-    margin-bottom:22px;
-}
-
-.avatar{
-    width:36px;
-    height:36px;
-    min-width:36px;
-    border-radius:10px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:#0b68ad;
-    font-weight:bold;
-}
-
-.user-avatar{
-    background:#293d52;
-}
-
-.message-content{
-    min-width:0;
-    flex:1;
-}
-
-.message-name{
-    margin-bottom:5px;
-    color:#76a4cd;
-    font-size:11px;
-}
-
-.message-text{
-    color:#e7f1fa;
-    font-size:14px;
-    line-height:1.65;
-    white-space:pre-wrap;
-    word-break:break-word;
-}
-
-.message-actions{
-    display:flex;
-    gap:6px;
-    margin-top:8px;
-    flex-wrap:wrap;
-}
-
-.message-actions button{
-    padding:5px 8px;
-    border:1px solid #29465d;
-    border-radius:7px;
-    background:#0b1723;
-    color:#9db7cd;
-    cursor:pointer;
-    font-size:11px;
-}
-
-.message-actions button:hover{
-    background:#14324a;
-}
-
-/* INPUT */
-.input-area{
-    padding:12px 20px 18px;
-    border-top:1px solid #1b3043;
-    background:#060c14;
-}
-
-.input-box{
-    max-width:850px;
-    margin:auto;
-    padding:7px 8px 7px 14px;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    border:1px solid #294052;
-    border-radius:22px;
-    background:#151b24;
-}
-
-.input{
-    flex:1;
-    min-width:0;
-    border:0;
-    outline:0;
-    background:transparent;
-    color:#fff;
-    font-size:14px;
-}
-
-.input::placeholder{
-    color:#65798b;
-}
-
-.mic,
-.send{
-    width:38px;
-    height:38px;
-    border-radius:50%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-}
-
-.mic{
-    border:1px solid #31536f;
-    background:#10283e;
-    color:#fff;
-}
-
-.send{
-    border:0;
-    background:#0873c5;
-    color:#fff;
-}
-
-.send:disabled{
-    opacity:.5;
-}
-
-/* MODAL */
-.modal{
-    display:none;
-    position:fixed;
-    inset:0;
-    z-index:5000;
-    padding:25px;
-    background:rgba(0,0,0,.75);
-}
-
-.modal.show{
-    display:flex;
-}
-
-.modal-box{
-    width:100%;
-    max-width:700px;
-    max-height:85vh;
-    overflow:auto;
-    margin:auto;
-    padding:20px;
-    border:1px solid #294b67;
-    border-radius:15px;
-    background:#091522;
-}
-
-.modal-head{
-    margin-bottom:15px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-}
-
-.close{
-    border:0;
-    background:none;
-    color:#fff;
-    font-size:24px;
-    cursor:pointer;
-}
-
-.history-item{
-    margin-bottom:8px;
-    padding:12px;
-    border:1px solid #223e54;
-    border-radius:10px;
-    background:#0d1d2b;
-}
-
-.history-info{
-    cursor:pointer;
-}
-
-.history-time{
-    margin-top:4px;
-    color:#637d94;
-    font-size:10px;
-}
-
-.history-buttons{
-    margin-top:8px;
-    display:flex;
-    gap:7px;
-}
-
-.history-buttons button{
-    padding:6px 10px;
-    border:1px solid #29465d;
-    border-radius:7px;
-    background:#10202e;
-    color:#fff;
-    cursor:pointer;
-}
-
-.history-buttons .delete{
-    border-color:#63313a;
-    background:#28151a;
-    color:#ff7e89;
-}
-
-@media(max-width:700px){
-
-    .sidebar{
-        width:220px;
-        min-width:220px;
-        padding:12px;
+  <style>
+    * {
+      box-sizing: border-box;
     }
 
-    .logo-name{
-        font-size:18px;
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f7f7f8;
+      color: #222;
     }
 
-    .header{
-        padding:0 10px;
+    .app {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
     }
 
-    .chat-area{
-        padding:18px 10px;
+    /* SIDEBAR */
+
+    #sidebar {
+      width: 270px;
+      background: #202123;
+      color: white;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
     }
 
-    .input-area{
-        padding:10px;
+    .brand {
+      font-size: 22px;
+      font-weight: bold;
+      padding: 10px;
+      margin-bottom: 10px;
     }
 
-    .language-menu{
-        left:0;
-        bottom:52px;
-        margin-left:0;
+    #newChat,
+    #historyButton,
+    #saveButton,
+    #voiceToggle,
+    #clearHistory {
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-size: 14px;
     }
-}
-</style>
+
+    #newChat {
+      background: #343541;
+      color: white;
+      text-align: left;
+      margin-bottom: 12px;
+    }
+
+    .side-title {
+      font-size: 12px;
+      color: #aaa;
+      padding: 8px 10px;
+      text-transform: uppercase;
+    }
+
+    .chat-list {
+      overflow-y: auto;
+    }
+
+    .chat-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: transparent;
+      color: #ddd;
+      border: 0;
+      padding: 10px;
+      border-radius: 7px;
+      cursor: pointer;
+      text-align: left;
+      margin-bottom: 3px;
+    }
+
+    .chat-item:hover,
+    .chat-item.active {
+      background: #343541;
+    }
+
+    .chat-item-title {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .pin-icon {
+      margin-left: 5px;
+    }
+
+    .empty-sidebar {
+      color: #777;
+      font-size: 12px;
+      padding: 10px;
+    }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    #historyButton,
+    #voiceToggle {
+      background: #343541;
+      color: white;
+    }
+
+    #saveButton {
+      background: #10a37f;
+      color: white;
+    }
+
+    #clearHistory {
+      background: #8b2020;
+      color: white;
+    }
+
+    #mobileMenu {
+      display: none;
+    }
+
+    /* MAIN */
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .topbar {
+      height: 60px;
+      background: white;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      gap: 12px;
+    }
+
+    #currentTitle {
+      font-size: 17px;
+      font-weight: bold;
+    }
+
+    #chatArea {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    #conversation {
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .welcome {
+      min-height: 65vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .welcome-box {
+      max-width: 500px;
+    }
+
+    .welcome-icon {
+      font-size: 50px;
+    }
+
+    .welcome-box h1 {
+      margin: 10px 0;
+    }
+
+    .welcome-box p {
+      color: #777;
+    }
+
+    .message {
+      display: flex;
+      gap: 12px;
+      padding: 18px 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .message.user {
+      background: #fff;
+    }
+
+    .message.ai {
+      background: #f7f7f8;
+    }
+
+    .message-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #10a37f;
+      color: white;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    .message.user .message-avatar {
+      background: #555;
+    }
+
+    .message-name {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .message-text {
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+
+    /* INPUT */
+
+    .input-area {
+      background: white;
+      border-top: 1px solid #ddd;
+      padding: 12px;
+    }
+
+    .input-box {
+      max-width: 900px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      padding: 7px;
+      background: white;
+    }
+
+    #message {
+      flex: 1;
+      border: 0;
+      outline: none;
+      resize: none;
+      font-size: 15px;
+      min-height: 38px;
+      padding: 9px;
+    }
+
+    #mic,
+    #send {
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      min-width: 45px;
+      height: 40px;
+    }
+
+    #mic {
+      background: #eee;
+      font-size: 18px;
+    }
+
+    #mic.listening {
+      background: #ffdddd;
+    }
+
+    #send {
+      background: #10a37f;
+      color: white;
+      font-weight: bold;
+    }
+
+    #send:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    /* HISTORY MODAL */
+
+    #historyModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.55);
+      z-index: 1000;
+      padding: 30px;
+    }
+
+    .history-window {
+      background: white;
+      max-width: 800px;
+      max-height: 85vh;
+      overflow-y: auto;
+      margin: auto;
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    #closeHistory {
+      border: 0;
+      background: #eee;
+      border-radius: 7px;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    .history-card {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 13px;
+      margin-bottom: 10px;
+    }
+
+    .history-card.pinned {
+      border-left: 4px solid #10a37f;
+    }
+
+    .history-card-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .history-card-time {
+      color: #888;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    .history-card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .history-card-actions button {
+      border: 0;
+      border-radius: 7px;
+      padding: 8px 10px;
+      cursor: pointer;
+    }
+
+    .pin-button {
+      background: #eee;
+    }
+
+    .delete-button {
+      background: #ffdede;
+      color: #a00;
+    }
+
+    /* MOBILE */
+
+    @media (max-width: 700px) {
+
+      #sidebar {
+        position: fixed;
+        left: -280px;
+        top: 0;
+        bottom: 0;
+        z-index: 900;
+        transition: left .2s;
+      }
+
+      #sidebar.open {
+        left: 0;
+      }
+
+      #mobileMenu {
+        display: block;
+        border: 0;
+        background: #eee;
+        border-radius: 7px;
+        padding: 8px 10px;
+        cursor: pointer;
+      }
+
+      .topbar {
+        padding: 0 10px;
+      }
+
+      #chatArea {
+        padding: 10px;
+      }
+
+      #historyModal {
+        padding: 10px;
+      }
+
+      .history-window {
+        max-height: 95vh;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
 <div class="app">
 
-<!-- SIDEBAR -->
-<aside class="sidebar">
+  <!-- SIDEBAR -->
 
-    <div class="logo">
+  <aside id="sidebar">
 
-        <div class="logo-icon">
-            B
-        </div>
-
-        <div class="logo-name">
-            Viggo
-        </div>
-
+    <div class="brand">
+      Viggo
     </div>
 
-    <div class="online">
-        <span class="online-dot"></span>
-        Online
-    </div>
-
-    <button
-        class="new-chat"
-        id="newChat"
-    >
-        ＋ New Chat
+    <button id="newChat">
+      ＋ New Chat
     </button>
 
-    <div class="section-title">
-        Pinned
+    <div class="side-title">
+      Pinned
     </div>
 
-    <div
-        class="chat-list"
-        id="pinnedList"
-    ></div>
+    <div id="pinnedList" class="chat-list"></div>
 
-    <div class="section-title">
-        Recent
+    <div class="side-title">
+      Recent
     </div>
 
-    <div
-        class="chat-list"
-        id="recentList"
-    ></div>
+    <div id="recentList" class="chat-list"></div>
 
-    <!-- MORE -->
-    <div class="more-area">
+    <div class="sidebar-bottom">
 
-        <button
-            class="more-button"
-            id="moreButton"
-        >
-            ⋮ More
-        </button>
+      <button id="historyButton">
+        🕘 History
+      </button>
 
-        <div
-            class="more-menu"
-            id="moreMenu"
-        >
+      <button id="saveButton">
+        💾 Save
+      </button>
 
-            <button id="saveButton">
-                💾 Save
-            </button>
+      <button id="voiceToggle">
+        🔊 Voice ON
+      </button>
 
-            <button id="historyButton">
-                🕘 History
-            </button>
-
-            <button id="pinButton">
-                📌 Pin Chat
-            </button>
-
-            <button id="languageButton">
-                🌐 Language
-                <span
-                    class="selected-language"
-                    id="selectedLanguage"
-                >
-                    English
-                </span>
-            </button>
-
-            <!-- LANGUAGE -->
-            <div
-                class="language-menu"
-                id="languageMenu"
-            >
-
-                <button
-                    data-lang="en"
-                    data-name="English"
-                    data-speech="en-IN"
-                >
-                    🇬🇧 English
-                </button>
-
-                <button
-                    data-lang="ta"
-                    data-name="தமிழ்"
-                    data-speech="ta-IN"
-                >
-                    🇮🇳 தமிழ்
-                </button>
-
-                <button
-                    data-lang="hi"
-                    data-name="हिन्दी"
-                    data-speech="hi-IN"
-                >
-                    🇮🇳 हिन्दी
-                </button>
-
-                <button
-                    data-lang="ml"
-                    data-name="മലയാളം"
-                    data-speech="ml-IN"
-                >
-                    🇮🇳 മലയാളം
-                </button>
-
-                <button
-                    data-lang="te"
-                    data-name="తెలుగు"
-                    data-speech="te-IN"
-                >
-                    🇮🇳 తెలుగు
-                </button>
-
-                <button
-                    data-lang="kn"
-                    data-name="ಕನ್ನಡ"
-                    data-speech="kn-IN"
-                >
-                    🇮🇳 ಕನ್ನಡ
-                </button>
-
-            </div>
-
-            <button id="voiceButton">
-                🔊 Voice ON
-            </button>
-
-            <button id="clearButton">
-                🗑 Clear History
-            </button>
-
-        </div>
+      <button id="clearHistory">
+        🗑️ Clear History
+      </button>
 
     </div>
 
-</aside>
+  </aside>
 
+  <!-- MAIN -->
 
-<!-- MAIN -->
-<main class="main">
+  <main class="main">
 
-    <header class="header">
+    <header class="topbar">
 
-        <div
-            class="header-title"
-            id="headerTitle"
-        >
-            New Chat
-        </div>
+      <button id="mobileMenu">
+        ☰
+      </button>
 
-        <button
-            class="share"
-            id="shareButton"
-        >
-            ↗ Share
-        </button>
+      <div id="currentTitle">
+        New Chat
+      </div>
 
     </header>
 
+    <section id="chatArea">
 
-    <section
-        class="chat-area"
-        id="chatArea"
-    >
-
-        <div
-            class="conversation"
-            id="conversation"
-        >
-
-            <div
-                class="welcome"
-                id="welcome"
-            >
-
-                <div class="welcome-icon">
-                    B
-                </div>
-
-                <h1>
-                    Viggo
-                </h1>
-
-                <p id="welcomeText">
-                    Your AI friend is ready.
-                </p>
-
-            </div>
-
-        </div>
+      <div id="conversation"></div>
 
     </section>
 
+    <footer class="input-area">
 
-    <!-- INPUT -->
-    <div class="input-area">
+      <div class="input-box">
 
-        <div class="input-box">
+        <textarea
+          id="message"
+          placeholder="Type message..."
+          rows="1"
+        ></textarea>
 
-            <input
-                id="messageInput"
-                class="input"
-                type="text"
-                placeholder="Message Viggo..."
-                autocomplete="off"
-            >
+        <button
+          id="mic"
+          title="Microphone"
+        >
+          🎤
+        </button>
 
-            <button
-                class="mic"
-                id="micButton"
-                title="Voice input"
-            >
-                🎤
-            </button>
+        <button
+          id="send"
+          title="Send"
+        >
+          ➤
+        </button>
 
-            <button
-                class="send"
-                id="sendButton"
-                title="Send"
-            >
-                ➤
-            </button>
+      </div>
 
-        </div>
+    </footer>
 
-    </div>
-
-</main>
+  </main>
 
 </div>
 
+<!-- HISTORY -->
 
-<!-- HISTORY MODAL -->
+<div id="historyModal">
 
-<div
-    class="modal"
-    id="historyModal"
->
+  <div class="history-window">
 
-    <div class="modal-box">
+    <div class="history-header">
 
-        <div class="modal-head">
+      <h2>
+        Chat History
+      </h2>
 
-            <h3>
-                🕘 Chat History
-            </h3>
-
-            <button
-                class="close"
-                id="closeHistory"
-            >
-                ×
-            </button>
-
-        </div>
-
-        <div id="historyList"></div>
+      <button id="closeHistory">
+        ✕
+      </button>
 
     </div>
 
+    <div id="historyList"></div>
+
+  </div>
+
 </div>
 
-
-<script>
-
-/* =====================================================
-   API
-===================================================== */
-
-const API_BASE =
-    "https://ai-tool-1-fgmc.onrender.com";
-
-const CHAT_URL =
-    API_BASE + "/chat";
-
-
-/* =====================================================
-   STATE
-===================================================== */
-
-let chats =
-    JSON.parse(
-        localStorage.getItem("viggoChats") || "[]"
-    );
-
-let currentMessages = [];
-
-let currentChatId = null;
-
-let voiceEnabled = true;
-
-let currentLanguage =
-    localStorage.getItem(
-        "viggoLanguage"
-    ) || "en";
-
-let currentLanguageName =
-    localStorage.getItem(
-        "viggoLanguageName"
-    ) || "English";
-
-let speechLanguage =
-    localStorage.getItem(
-        "viggoSpeechLanguage"
-    ) || "en-IN";
-
-
-/* =====================================================
-   ELEMENTS
-===================================================== */
-
-const input =
-    document.getElementById(
-        "messageInput"
-    );
-
-const sendButton =
-    document.getElementById(
-        "sendButton"
-    );
-
-const micButton =
-    document.getElementById(
-        "micButton"
-    );
-
-const conversation =
-    document.getElementById(
-        "conversation"
-    );
-
-const chatArea =
-    document.getElementById(
-        "chatArea"
-    );
-
-const moreButton =
-    document.getElementById(
-        "moreButton"
-    );
-
-const moreMenu =
-    document.getElementById(
-        "moreMenu"
-    );
-
-const languageButton =
-    document.getElementById(
-        "languageButton"
-    );
-
-const languageMenu =
-    document.getElementById(
-        "languageMenu"
-    );
-
-const selectedLanguage =
-    document.getElementById(
-        "selectedLanguage"
-    );
-
-const saveButton =
-    document.getElementById(
-        "saveButton"
-    );
-
-const recentList =
-    document.getElementById(
-        "recentList"
-    );
-
-const pinnedList =
-    document.getElementById(
-        "pinnedList"
-    );
-
-const historyModal =
-    document.getElementById(
-        "historyModal"
-    );
-
-const historyList =
-    document.getElementById(
-        "historyList"
-    );
-
-
-/* =====================================================
-   LANGUAGE
-===================================================== */
-
-const languageData = {
-
-    en:{
-        placeholder:"Message Viggo...",
-        welcome:"Your AI friend is ready.",
-        thinking:"Thinking...",
-        error:"Sorry friend, I couldn't connect to Viggo AI right now."
-    },
-
-    ta:{
-        placeholder:"Viggo-விடம் கேளுங்கள்...",
-        welcome:"உங்கள் AI நண்பர் தயாராக இருக்கிறார்.",
-        thinking:"யோசிக்கிறேன்...",
-        error:"மன்னிக்கவும் friend, இப்போது Viggo AI-ஐ இணைக்க முடியவில்லை."
-    },
-
-    hi:{
-        placeholder:"Viggo को संदेश भेजें...",
-        welcome:"आपका AI दोस्त तैयार है।",
-        thinking:"सोच रहा हूँ...",
-        error:"माफ़ कीजिए friend, अभी Viggo AI से कनेक्ट नहीं हो सका।"
-    },
-
-    ml:{
-        placeholder:"Viggo-യോട് ചോദിക്കൂ...",
-        welcome:"നിങ്ങളുടെ AI സുഹൃത്ത് തയ്യാറാണ്.",
-        thinking:"ചിന്തിക്കുന്നു...",
-        error:"ക്ഷമിക്കണം friend, ഇപ്പോൾ Viggo AI-യുമായി ബന്ധിപ്പിക്കാൻ കഴിഞ്ഞില്ല."
-    },
-
-    te:{
-        placeholder:"Viggo కి మెసేజ్ చేయండి...",
-        welcome:"మీ AI స్నేహితుడు సిద్ధంగా ఉన్నాడు.",
-        thinking:"ఆలోచిస్తున్నాను...",
-        error:"క్షమించండి friend, ప్రస్తుతం Viggo AIకి కనెక్ట్ కాలేకపోయాను."
-    },
-
-    kn:{
-        placeholder:"Viggo ಗೆ ಸಂದೇಶ ಕಳುಹಿಸಿ...",
-        welcome:"ನಿಮ್ಮ AI ಸ್ನೇಹಿತ ಸಿದ್ಧವಾಗಿದೆ.",
-        thinking:"ಯೋಚಿಸುತ್ತಿದ್ದೇನೆ...",
-        error:"ಕ್ಷಮಿಸಿ friend, ಈಗ Viggo AI ಗೆ ಸಂಪರ್ಕಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ."
-    }
-
-};
-
-
-/* =====================================================
-   APPLY LANGUAGE
-===================================================== */
-
-function applyLanguage(){
-
-    selectedLanguage.textContent =
-        currentLanguageName;
-
-    input.placeholder =
-        languageData[currentLanguage].placeholder;
-
-    const welcomeText =
-        document.getElementById(
-            "welcomeText"
-        );
-
-    if(welcomeText){
-
-        welcomeText.textContent =
-            languageData[currentLanguage].welcome;
-
-    }
-
-    document.documentElement.lang =
-        currentLanguage;
-
-}
-
-
-/* =====================================================
-   SELECT LANGUAGE
-===================================================== */
-
-languageMenu
-    .querySelectorAll("button")
-    .forEach(
-        function(button){
-
-            button.addEventListener(
-                "click",
-                function(event){
-
-                    event.stopPropagation();
-
-                    currentLanguage =
-                        this.dataset.lang;
-
-                    currentLanguageName =
-                        this.dataset.name;
-
-                    speechLanguage =
-                        this.dataset.speech;
-
-
-                    localStorage.setItem(
-                        "viggoLanguage",
-                        currentLanguage
-                    );
-
-                    localStorage.setItem(
-                        "viggoLanguageName",
-                        currentLanguageName
-                    );
-
-                    localStorage.setItem(
-                        "viggoSpeechLanguage",
-                        speechLanguage
-                    );
-
-
-                    applyLanguage();
-
-
-                    languageMenu.classList.remove(
-                        "show"
-                    );
-
-
-                    moreMenu.classList.remove(
-                        "show"
-                    );
-
-
-                    input.focus();
-
-                }
-            );
-
-        }
-    );
-
-
-/* =====================================================
-   LANGUAGE MENU OPEN
-===================================================== */
-
-languageButton.addEventListener(
-    "click",
-    function(event){
-
-        event.stopPropagation();
-
-        languageMenu.classList.toggle(
-            "show"
-        );
-
-    }
-);
-
-
-/* =====================================================
-   MORE MENU
-===================================================== */
-
-moreButton.addEventListener(
-    "click",
-    function(event){
-
-        event.stopPropagation();
-
-        moreMenu.classList.toggle(
-            "show"
-        );
-
-    }
-);
-
-
-moreMenu.addEventListener(
-    "click",
-    function(event){
-
-        event.stopPropagation();
-
-    }
-);
-
-
-document.addEventListener(
-    "click",
-    function(){
-
-        moreMenu.classList.remove(
-            "show"
-        );
-
-        languageMenu.classList.remove(
-            "show"
-        );
-
-    }
-);
-
-
-/* =====================================================
-   STORAGE
-===================================================== */
-
-function saveStorage(){
-
-    localStorage.setItem(
-        "viggoChats",
-        JSON.stringify(chats)
-    );
-
-}
-
-
-/* =====================================================
-   ADD MESSAGE
-===================================================== */
-
-function addMessage(
-    text,
-    sender,
-    saveState=true
-){
-
-    const welcome =
-        document.getElementById(
-            "welcome"
-        );
-
-    if(welcome){
-        welcome.remove();
-    }
-
-
-    const message =
-        document.createElement(
-            "div"
-        );
-
-    message.className =
-        "message";
-
-
-    const avatar =
-        document.createElement(
-            "div"
-        );
-
-    avatar.className =
-        sender === "user"
-            ? "avatar user-avatar"
-            : "avatar";
-
-    avatar.textContent =
-        sender === "user"
-            ? "U"
-            : "B";
-
-
-    const content =
-        document.createElement(
-            "div"
-        );
-
-    content.className =
-        "message-content";
-
-
-    const name =
-        document.createElement(
-            "div"
-        );
-
-    name.className =
-        "message-name";
-
-    name.textContent =
-        sender === "user"
-            ? "You"
-            : "Viggo";
-
-
-    const textElement =
-        document.createElement(
-            "div"
-        );
-
-    textElement.className =
-        "message-text";
-
-    textElement.textContent =
-        String(text);
-
-
-    content.appendChild(name);
-
-    content.appendChild(
-        textElement
-    );
-
-
-    if(
-        sender === "assistant"
-    ){
-
-        const actions =
-            document.createElement(
-                "div"
-            );
-
-        actions.className =
-            "message-actions";
-
-
-        const copy =
-            document.createElement(
-                "button"
-            );
-
-        copy.textContent =
-            "📋 Copy";
-
-
-        copy.onclick =
-            async function(){
-
-                try{
-
-                    await navigator.clipboard.writeText(
-                        String(text)
-                    );
-
-                    this.textContent =
-                        "✓ Copied";
-
-                    setTimeout(
-                        () => {
-                            this.textContent =
-                                "📋 Copy";
-                        },
-                        1200
-                    );
-
-                }catch(error){
-
-                    alert(
-                        "Copy failed"
-                    );
-
-                }
-
-            };
-
-
-        const speaker =
-            document.createElement(
-                "button"
-            );
-
-        speaker.textContent =
-            "🔊 Speaker";
-
-
-        speaker.onclick =
-            function(){
-
-                speak(
-                    String(text)
-                );
-
-            };
-
-
-        const like =
-            document.createElement(
-                "button"
-            );
-
-        like.textContent =
-            "👍 Like";
-
-
-        like.onclick =
-            function(){
-
-                this.textContent =
-                    "❤️ Liked";
-
-            };
-
-
-        actions.appendChild(copy);
-
-        actions.appendChild(speaker);
-
-        actions.appendChild(like);
-
-        content.appendChild(actions);
-
-    }
-
-
-    message.appendChild(avatar);
-
-    message.appendChild(content);
-
-    conversation.appendChild(message);
-
-
-    if(saveState){
-
-        currentMessages.push({
-
-            sender:sender,
-
-            text:String(text)
-
-        });
-
-    }
-
-
-    chatArea.scrollTop =
-        chatArea.scrollHeight;
-
-}
-
-
-/* =====================================================
-   SERVER
-===================================================== */
-
-async function callViggo(
-    userMessage
-){
-
-    const response =
-        await fetch(
-            CHAT_URL,
-            {
-                method:"POST",
-
-                headers:{
-                    "Content-Type":
-                        "application/json",
-
-                    "Accept":
-                        "application/json"
-                },
-
-                body:JSON.stringify({
-
-                    message:userMessage,
-
-                    language:
-                        currentLanguage,
-
-                    languageName:
-                        currentLanguageName,
-
-                    history:
-                        currentMessages.map(
-                            function(message){
-
-                                return {
-
-                                    role:
-                                        message.sender === "user"
-                                            ? "user"
-                                            : "assistant",
-
-                                    content:
-                                        message.text
-
-                                };
-
-                            }
-                        )
-
-                })
-            }
-        );
-
-
-    if(!response.ok){
-
-        throw new Error(
-            "Server error: " +
-            response.status
-        );
-
-    }
-
-
-    const data =
-        await response.json();
-
-
-    const reply =
-        data.reply ??
-        data.response ??
-        data.answer ??
-        data.message ??
-        data.text;
-
-
-    if(
-        typeof reply === "string" &&
-        reply.trim()
-    ){
-
-        return reply.trim();
-
-    }
-
-
-    throw new Error(
-        "Empty response"
-    );
-
-}
-
-
-/* =====================================================
-   SEND
-===================================================== */
-
-async function sendMessage(){
-
-    const text =
-        input.value.trim();
-
-
-    if(!text){
-        return;
-    }
-
-
-    addMessage(
-        text,
-        "user",
-        true
-    );
-
-
-    input.value = "";
-
-    sendButton.disabled =
-        true;
-
-
-    const loading =
-        document.createElement(
-            "div"
-        );
-
-    loading.className =
-        "message";
-
-
-    loading.innerHTML = `
-
-        <div class="avatar">
-            B
-        </div>
-
-        <div class="message-content">
-
-            <div class="message-name">
-                Viggo
-            </div>
-
-            <div class="message-text">
-                ${languageData[currentLanguage].thinking}
-            </div>
-
-        </div>
-
-    `;
-
-
-    conversation.appendChild(
-        loading
-    );
-
-
-    try{
-
-        const reply =
-            await callViggo(
-                text
-            );
-
-
-        loading.remove();
-
-
-        addMessage(
-            reply,
-            "assistant",
-            true
-        );
-
-
-        if(voiceEnabled){
-
-            speak(reply);
-
-        }
-
-    }catch(error){
-
-        console.error(
-            "Viggo:",
-            error
-        );
-
-
-        loading.remove();
-
-
-        addMessage(
-            languageData[currentLanguage].error,
-            "assistant",
-            true
-        );
-
-    }
-
-
-    sendButton.disabled =
-        false;
-
-    input.focus();
-
-}
-
-
-/* =====================================================
-   SEND BUTTON
-===================================================== */
-
-sendButton.addEventListener(
-    "click",
-    sendMessage
-);
-
-
-/* ENTER */
-input.addEventListener(
-    "keydown",
-    function(event){
-
-        if(
-            event.key === "Enter" &&
-            !event.shiftKey
-        ){
-
-            event.preventDefault();
-
-            sendMessage();
-
-        }
-
-    }
-);
-
-
-/* =====================================================
-   SAVE CHAT
-===================================================== */
-
-saveButton.addEventListener(
-    "click",
-    function(event){
-
-        event.preventDefault();
-
-        event.stopPropagation();
-
-
-        if(
-            currentMessages.length === 0
-        ){
-
-            alert(
-                "First send a message."
-            );
-
-            return;
-
-        }
-
-
-        const first =
-            currentMessages.find(
-                m => m.sender === "user"
-            );
-
-
-        const title =
-            first
-                ? first.text.substring(0,45)
-                : "Viggo Chat";
-
-
-        if(currentChatId){
-
-            const existing =
-                chats.find(
-                    c =>
-                        String(c.id) ===
-                        String(currentChatId)
-                );
-
-
-            if(existing){
-
-                existing.title =
-                    title;
-
-                existing.messages =
-                    JSON.parse(
-                        JSON.stringify(
-                            currentMessages
-                        )
-                    );
-
-                existing.language =
-                    currentLanguage;
-
-                existing.time =
-                    new Date().toLocaleString();
-
-                saveStorage();
-
-                renderRecent();
-
-                renderPinned();
-
-                showSaved();
-
-                return;
-
-            }
-
-        }
-
-
-        const chat = {
-
-            id:
-                Date.now().toString(),
-
-            title:title,
-
-            messages:
-                JSON.parse(
-                    JSON.stringify(
-                        currentMessages
-                    )
-                ),
-
-            language:
-                currentLanguage,
-
-            time:
-                new Date().toLocaleString(),
-
-            pinned:false
-
-        };
-
-
-        chats.push(chat);
-
-        currentChatId =
-            chat.id;
-
-
-        saveStorage();
-
-        renderRecent();
-
-        renderPinned();
-
-        showSaved();
-
-    }
-);
-
-
-function showSaved(){
-
-    saveButton.textContent =
-        "✓ Saved";
-
-    setTimeout(
-        function(){
-
-            saveButton.textContent =
-                "💾 Save";
-
-        },
-        1500
-    );
-
-}
-
-
-/* =====================================================
-   NEW CHAT
-===================================================== */
-
-document
-    .getElementById("newChat")
-    .addEventListener(
-        "click",
-        function(){
-
-            currentMessages = [];
-
-            currentChatId = null;
-
-
-            conversation.innerHTML = `
-
-                <div
-                    class="welcome"
-                    id="welcome"
-                >
-
-                    <div class="welcome-icon">
-                        B
-                    </div>
-
-                    <h1>
-                        Viggo
-                    </h1>
-
-                    <p id="welcomeText">
-                        ${
-                            languageData[currentLanguage]
-                            .welcome
-                        }
-                    </p>
-
-                </div>
-
-            `;
-
-
-            document
-                .getElementById(
-                    "headerTitle"
-                )
-                .textContent =
-                    "New Chat";
-
-
-            input.value = "";
-
-            input.focus();
-
-        }
-    );
-
-
-/* =====================================================
-   LOAD CHAT
-===================================================== */
-
-function loadChat(id){
-
-    const chat =
-        chats.find(
-            c =>
-                String(c.id) ===
-                String(id)
-        );
-
-
-    if(!chat){
-        return;
-    }
-
-
-    currentChatId =
-        chat.id;
-
-
-    currentMessages =
-        JSON.parse(
-            JSON.stringify(
-                chat.messages || []
-            )
-        );
-
-
-    if(chat.language){
-
-        currentLanguage =
-            chat.language;
-
-        currentLanguageName =
-            getLanguageName(
-                chat.language
-            );
-
-        applyLanguage();
-
-    }
-
-
-    conversation.innerHTML =
-        "";
-
-
-    currentMessages.forEach(
-        message => {
-
-            addMessage(
-                message.text,
-                message.sender,
-                false
-            );
-
-        }
-    );
-
-
-    document
-        .getElementById(
-            "headerTitle"
-        )
-        .textContent =
-            chat.title ||
-            "Saved Chat";
-
-}
-
-
-/* =====================================================
-   LANGUAGE NAME
-===================================================== */
-
-function getLanguageName(
-    code
-){
-
-    const names = {
-
-        en:"English",
-        ta:"தமிழ்",
-        hi:"हिन्दी",
-        ml:"മലയാളം",
-        te:"తెలుగు",
-        kn:"ಕನ್ನಡ"
-
-    };
-
-    return names[code] || "English";
-
-}
-
-
-/* =====================================================
-   RECENT
-===================================================== */
-
-function renderRecent(){
-
-    recentList.innerHTML = "";
-
-
-    if(chats.length === 0){
-
-        recentList.innerHTML = `
-            <div class="empty">
-                No recent chats
-            </div>
-        `;
-
-        return;
-
-    }
-
-
-    chats
-        .slice()
-        .reverse()
-        .slice(0,10)
-        .forEach(
-            chat => {
-
-                const button =
-                    document.createElement(
-                        "button"
-                    );
-
-                button.className =
-                    "chat-item";
-
-                button.textContent =
-                    "💬 " +
-                    (
-                        chat.title ||
-                        "Viggo Chat"
-                    );
-
-
-                button.onclick =
-                    function(){
-
-                        loadChat(
-                            chat.id
-                        );
-
-                    };
-
-
-                recentList.appendChild(
-                    button
-                );
-
-            }
-        );
-
-}
-
-
-/* =====================================================
-   PINNED
-===================================================== */
-
-function renderPinned(){
-
-    pinnedList.innerHTML = "";
-
-
-    const pinned =
-        chats.filter(
-            c =>
-                c.pinned === true
-        );
-
-
-    if(pinned.length === 0){
-
-        pinnedList.innerHTML = `
-            <div class="empty">
-                No pinned chats
-            </div>
-        `;
-
-        return;
-
-    }
-
-
-    pinned.forEach(
-        chat => {
-
-            const button =
-                document.createElement(
-                    "button"
-                );
-
-            button.className =
-                "chat-item";
-
-            button.textContent =
-                "📌 " +
-                chat.title;
-
-
-            button.onclick =
-                function(){
-
-                    loadChat(
-                        chat.id
-                    );
-
-                };
-
-
-            pinnedList.appendChild(
-                button
-            );
-
-        }
-    );
-
-}
-
-
-/* =====================================================
-   HISTORY
-===================================================== */
-
-function openHistory(){
-
-    historyList.innerHTML = "";
-
-
-    if(chats.length === 0){
-
-        historyList.innerHTML = `
-            <div class="empty">
-                No chat history
-            </div>
-        `;
-
-        return;
-
-    }
-
-
-    chats
-        .slice()
-        .reverse()
-        .forEach(
-            chat => {
-
-                const item =
-                    document.createElement(
-                        "div"
-                    );
-
-                item.className =
-                    "history-item";
-
-
-                const info =
-                    document.createElement(
-                        "div"
-                    );
-
-                info.className =
-                    "history-info";
-
-
-                info.innerHTML = `
-
-                    <strong>
-                        💬 ${
-                            chat.title ||
-                            "Viggo Chat"
-                        }
-                    </strong>
-
-                    <div class="history-time">
-                        ${
-                            chat.time || ""
-                        }
-                    </div>
-
-                `;
-
-
-                info.onclick =
-                    function(){
-
-                        loadChat(
-                            chat.id
-                        );
-
-                        historyModal
-                            .classList
-                            .remove(
-                                "show"
-                            );
-
-                    };
-
-
-                const buttons =
-                    document.createElement(
-                        "div"
-                    );
-
-                buttons.className =
-                    "history-buttons";
-
-
-                const pin =
-                    document.createElement(
-                        "button"
-                    );
-
-                pin.textContent =
-                    chat.pinned
-                        ? "📌 Unpin"
-                        : "📌 Pin";
-
-
-                pin.onclick =
-                    function(){
-
-                        chat.pinned =
-                            !chat.pinned;
-
-                        saveStorage();
-
-                        renderPinned();
-
-                        openHistory();
-
-                    };
-
-
-                const del =
-                    document.createElement(
-                        "button"
-                    );
-
-                del.className =
-                    "delete";
-
-                del.textContent =
-                    "🗑 Delete";
-
-
-                del.onclick =
-                    function(){
-
-                        if(
-                            !confirm(
-                                "Delete this chat?"
-                            )
-                        ){
-                            return;
-                        }
-
-
-                        chats =
-                            chats.filter(
-                                c =>
-                                    String(c.id) !==
-                                    String(chat.id)
-                            );
-
-
-                        if(
-                            String(currentChatId) ===
-                            String(chat.id)
-                        ){
-
-                            currentChatId =
-                                null;
-
-                            currentMessages =
-                                [];
-
-                        }
-
-
-                        saveStorage();
-
-                        renderRecent();
-
-                        renderPinned();
-
-                        openHistory();
-
-                    };
-
-
-                buttons.appendChild(pin);
-
-                buttons.appendChild(del);
-
-                item.appendChild(info);
-
-                item.appendChild(buttons);
-
-                historyList.appendChild(item);
-
-            }
-        );
-
-}
-
-
-/* =====================================================
-   HISTORY BUTTON
-===================================================== */
-
-document
-    .getElementById("historyButton")
-    .addEventListener(
-        "click",
-        function(){
-
-            openHistory();
-
-            historyModal
-                .classList
-                .add("show");
-
-        }
-    );
-
-
-document
-    .getElementById("closeHistory")
-    .addEventListener(
-        "click",
-        function(){
-
-            historyModal
-                .classList
-                .remove(
-                    "show"
-                );
-
-        }
-    );
-
-
-/* =====================================================
-   PIN
-===================================================== */
-
-document
-    .getElementById("pinButton")
-    .addEventListener(
-        "click",
-        function(){
-
-            if(!currentChatId){
-
-                alert(
-                    "Save the chat first."
-                );
-
-                return;
-
-            }
-
-
-            const chat =
-                chats.find(
-                    c =>
-                        String(c.id) ===
-                        String(currentChatId)
-                );
-
-
-            if(chat){
-
-                chat.pinned =
-                    !chat.pinned;
-
-                saveStorage();
-
-                renderPinned();
-
-                this.textContent =
-                    chat.pinned
-                        ? "📌 Unpin Chat"
-                        : "📌 Pin Chat";
-
-            }
-
-        }
-    );
-
-
-/* =====================================================
-   CLEAR HISTORY
-===================================================== */
-
-document
-    .getElementById("clearButton")
-    .addEventListener(
-        "click",
-        function(){
-
-            if(
-                !confirm(
-                    "Delete all saved history?"
-                )
-            ){
-                return;
-            }
-
-
-            chats = [];
-
-            currentChatId = null;
-
-            saveStorage();
-
-            renderRecent();
-
-            renderPinned();
-
-        }
-    );
-
-
-/* =====================================================
-   VOICE ON / OFF
-===================================================== */
-
-document
-    .getElementById("voiceButton")
-    .addEventListener(
-        "click",
-        function(){
-
-            voiceEnabled =
-                !voiceEnabled;
-
-            this.textContent =
-                voiceEnabled
-                    ? "🔊 Voice ON"
-                    : "🔇 Voice OFF";
-
-        }
-    );
-
-
-/* =====================================================
-   SPEECH
-===================================================== */
-
-function speak(text){
-
-    if(
-        !voiceEnabled ||
-        !window.speechSynthesis
-    ){
-        return;
-    }
-
-
-    speechSynthesis.cancel();
-
-
-    const utterance =
-        new SpeechSynthesisUtterance(
-            text
-        );
-
-
-    utterance.lang =
-        speechLanguage;
-
-
-    const voices =
-        speechSynthesis.getVoices();
-
-
-    const matchingVoice =
-        voices.find(
-            voice =>
-                voice.lang
-                    .toLowerCase()
-                    .startsWith(
-                        speechLanguage
-                            .split("-")[0]
-                    )
-        );
-
-
-    if(matchingVoice){
-
-        utterance.voice =
-            matchingVoice;
-
-    }
-
-
-    utterance.rate =
-        1;
-
-    utterance.pitch =
-        1;
-
-
-    speechSynthesis.speak(
-        utterance
-    );
-
-}
-
-
-/* =====================================================
-   MICROPHONE
-===================================================== */
-
-const Recognition =
-    window.SpeechRecognition ||
-    window.webkitSpeechRecognition;
-
-let recognition = null;
-
-
-if(Recognition){
-
-    recognition =
-        new Recognition();
-
-    recognition.lang =
-        speechLanguage;
-
-    recognition.interimResults =
-        false;
-
-    recognition.continuous =
-        false;
-
-
-    recognition.onstart =
-        function(){
-
-            micButton.textContent =
-                "🔴";
-
-        };
-
-
-    recognition.onend =
-        function(){
-
-            micButton.textContent =
-                "🎤";
-
-        };
-
-
-    recognition.onresult =
-        function(event){
-
-            input.value =
-                event.results[0][0]
-                    .transcript;
-
-            input.focus();
-
-        };
-
-}
-
-
-micButton.addEventListener(
-    "click",
-    function(){
-
-        if(!recognition){
-
-            alert(
-                "Voice input is not supported in this browser."
-            );
-
-            return;
-
-        }
-
-
-        recognition.lang =
-            speechLanguage;
-
-
-        try{
-
-            recognition.start();
-
-        }catch(error){
-
-            console.log(error);
-
-        }
-
-    }
-);
-
-
-/* =====================================================
-   SHARE
-===================================================== */
-
-document
-    .getElementById("shareButton")
-    .addEventListener(
-        "click",
-        async function(){
-
-            if(
-                currentMessages.length === 0
-            ){
-
-                alert(
-                    "First send a message."
-                );
-
-                return;
-
-            }
-
-
-            if(!currentChatId){
-
-                saveButton.click();
-
-            }
-
-
-            const chat =
-                chats.find(
-                    c =>
-                        String(c.id) ===
-                        String(currentChatId)
-                );
-
-
-            if(!chat){
-
-                alert(
-                    "Save the chat first."
-                );
-
-                return;
-
-            }
-
-
-            /*
-              IMPORTANT:
-              This is a local/static link.
-              For true public sharing between
-              different devices, chat data must
-              also be stored on the server/database.
-            */
-
-            const encoded =
-                btoa(
-                    unescape(
-                        encodeURIComponent(
-                            JSON.stringify({
-                                title:
-                                    chat.title,
-
-                                language:
-                                    chat.language,
-
-                                messages:
-                                    chat.messages
-                            })
-                        )
-                    )
-                );
-
-
-            const shareUrl =
-                window.location.origin +
-                window.location.pathname +
-                "?shared=" +
-                encodeURIComponent(
-                    encoded
-                );
-
-
-            try{
-
-                if(navigator.share){
-
-                    await navigator.share({
-
-                        title:
-                            "Viggo AI Chat",
-
-                        text:
-                            "My Viggo AI conversation",
-
-                        url:
-                            shareUrl
-
-                    });
-
-                }else{
-
-                    await navigator.clipboard.writeText(
-                        shareUrl
-                    );
-
-                    this.textContent =
-                        "✓ Link Copied";
-
-                    setTimeout(
-                        () => {
-
-                            this.textContent =
-                                "↗ Share";
-
-                        },
-                        1500
-                    );
-
-                }
-
-            }catch(error){
-
-                console.log(
-                    "Share cancelled"
-                );
-
-            }
-
-        }
-    );
-
-
-/* =====================================================
-   LOAD SHARED CHAT
-===================================================== */
-
-function loadSharedChat(){
-
-    const params =
-        new URLSearchParams(
-            window.location.search
-        );
-
-
-    const encoded =
-        params.get("shared");
-
-
-    if(!encoded){
-        return;
-    }
-
-
-    try{
-
-        const json =
-            decodeURIComponent(
-                escape(
-                    atob(encoded)
-                )
-            );
-
-
-        const shared =
-            JSON.parse(json);
-
-
-        currentMessages =
-            shared.messages || [];
-
-
-        conversation.innerHTML =
-            "";
-
-
-        currentMessages.forEach(
-            message => {
-
-                addMessage(
-                    message.text,
-                    message.sender,
-                    false
-                );
-
-            }
-        );
-
-
-        document
-            .getElementById(
-                "headerTitle"
-            )
-            .textContent =
-                shared.title ||
-                "Shared Chat";
-
-
-    }catch(error){
-
-        console.error(
-            "Shared chat error:",
-            error
-        );
-
-    }
-
-}
-
-
-/* =====================================================
-   START
-===================================================== */
-
-applyLanguage();
-
-renderRecent();
-
-renderPinned();
-
-loadSharedChat();
-
-</script>
+<script src="script.js"></script>
 
 </body>
 </html>
+```
