@@ -1,3 +1,4 @@
+```javascript
 "use strict";
 
 /* =========================================================
@@ -5,8 +6,10 @@
    Chat + History + Recent + Pin + Delete + Selection
    Share + More Menu + Language + Voice
    API Reply + Sidebar Close
-   User = RIGHT
-   Viggo = LEFT
+   FIX:
+   - User = RIGHT
+   - Viggo = LEFT
+   - Correct message order
 ========================================================= */
 
 
@@ -15,7 +18,7 @@
 ========================================================= */
 
 const API_BASE =
-    "https://ai-tool-1-fgmc.onrender.com";
+    "https://ai-tool-2-zpul.onrender.com";
 
 const CHAT_API =
     API_BASE + "/chat";
@@ -25,11 +28,8 @@ const CHAT_API =
    STORAGE
 ========================================================= */
 
-const STORAGE_KEY =
-    "viggo_chats";
-
-const SETTINGS_KEY =
-    "viggo_settings";
+const STORAGE_KEY = "viggo_chats";
+const SETTINGS_KEY = "viggo_settings";
 
 
 /* =========================================================
@@ -40,16 +40,14 @@ let currentChatId = null;
 let messages = [];
 let currentLanguage = "en";
 let isSending = false;
-
 let recognition = null;
 let isListening = false;
-
 let selectMode = false;
 let selectedChats = new Set();
 
 
 /* =========================================================
-   DOM HELPER
+   DOM
 ========================================================= */
 
 function $(id) {
@@ -162,19 +160,15 @@ function createChat() {
                 .toString(36)
                 .slice(2, 8),
 
-        title:
-            "New Chat",
+        title: "New Chat",
 
         messages: [],
 
-        pinned:
-            false,
+        pinned: false,
 
-        createdAt:
-            Date.now(),
+        createdAt: Date.now(),
 
-        updatedAt:
-            Date.now()
+        updatedAt: Date.now()
 
     };
 
@@ -334,7 +328,8 @@ function updateChat() {
 
         if (title) {
 
-            chat.title = title.slice(0, 40);
+            chat.title =
+                title.slice(0, 40);
 
         }
 
@@ -350,7 +345,7 @@ function updateChat() {
 
 
 /* =========================================================
-   UPDATE TITLE
+   TITLE
 ========================================================= */
 
 function updateTitle() {
@@ -385,13 +380,11 @@ function renderHistory() {
 
     list.innerHTML = "";
 
-    const pinned = chats.filter(
-        chat => chat.pinned
-    );
+    const pinned =
+        chats.filter(chat => chat.pinned);
 
-    const recent = chats.filter(
-        chat => !chat.pinned
-    );
+    const recent =
+        chats.filter(chat => !chat.pinned);
 
     addHistory(
         list,
@@ -411,7 +404,7 @@ function renderHistory() {
 
 
 /* =========================================================
-   ADD HISTORY
+   HISTORY ITEMS
 ========================================================= */
 
 function addHistory(
@@ -581,7 +574,7 @@ function addHistory(
         }
 
 
-        /* ROW CLICK */
+        /* ROW */
 
         row.addEventListener(
             "click",
@@ -589,7 +582,9 @@ function addHistory(
 
                 if (selectMode) {
 
-                    toggleSelectedChat(chat.id);
+                    toggleSelectedChat(
+                        chat.id
+                    );
 
                 } else {
 
@@ -652,9 +647,10 @@ function deleteChat(id) {
 
     if (!chat) return;
 
-    const confirmed = confirm(
-        `Delete "${chat.title || "New Chat"}"?`
-    );
+    const confirmed =
+        confirm(
+            `Delete "${chat.title || "New Chat"}"?`
+        );
 
     if (!confirmed) return;
 
@@ -689,7 +685,9 @@ function deleteChat(id) {
 
     renderHistory();
 
-    showToast("🗑 Chat deleted");
+    showToast(
+        "🗑 Chat deleted"
+    );
 
 }
 
@@ -749,18 +747,20 @@ function deleteSelectedChats() {
     const count =
         selectedChats.size;
 
-    const confirmed = confirm(
-        `Delete ${count} selected chat${count > 1 ? "s" : ""}?`
-    );
+    const confirmed =
+        confirm(
+            `Delete ${count} selected chat${count > 1 ? "s" : ""}?`
+        );
 
     if (!confirmed) return;
 
     let chats = getChats();
 
-    chats = chats.filter(
-        chat =>
-            !selectedChats.has(chat.id)
-    );
+    chats =
+        chats.filter(
+            chat =>
+                !selectedChats.has(chat.id)
+        );
 
     if (!chats.length) {
 
@@ -813,22 +813,22 @@ function updateSelectionUI() {
     const button =
         $("deleteSelectedBtn");
 
-    if (button) {
+    if (!button) return;
 
-        if (selectMode) {
+    if (selectMode) {
 
-            button.style.display = "flex";
+        button.style.display =
+            "flex";
 
-            button.textContent =
-                selectedChats.size
-                    ? `🗑 Delete Selected (${selectedChats.size})`
-                    : "🗑 Delete Selected";
+        button.textContent =
+            selectedChats.size
+                ? `🗑 Delete Selected (${selectedChats.size})`
+                : "🗑 Delete Selected";
 
-        } else {
+    } else {
 
-            button.style.display = "none";
-
-        }
+        button.style.display =
+            "none";
 
     }
 
@@ -848,14 +848,16 @@ function updateSelectionUI() {
 
 
 /* =========================================================
-   SAVE CURRENT CHAT
+   SAVE
 ========================================================= */
 
 function saveCurrentChat() {
 
     updateChat();
 
-    showToast("✓ Chat saved");
+    showToast(
+        "✓ Chat saved"
+    );
 
     closeMore();
 
@@ -869,7 +871,9 @@ function saveCurrentChat() {
 function clearHistory() {
 
     const confirmed =
-        confirm("Delete all chat history?");
+        confirm(
+            "Delete all chat history?"
+        );
 
     if (!confirmed) return;
 
@@ -895,7 +899,9 @@ function clearHistory() {
 
     closeMore();
 
-    showToast("🗑 History cleared");
+    showToast(
+        "🗑 History cleared"
+    );
 
 }
 
@@ -915,26 +921,23 @@ function renderMessages() {
     if (!messages.length) {
 
         area.innerHTML = `
-
             <div class="welcome">
-
-                <div class="big-logo">
-                    V
-                </div>
-
+                <div class="big-logo">V</div>
                 <h1>Viggo</h1>
-
-                <p>
-                    Your AI friend is ready.
-                </p>
-
+                <p>Your AI friend is ready.</p>
             </div>
-
         `;
 
         return;
 
     }
+
+    /*
+       IMPORTANT:
+       messages array order is preserved.
+       User → right
+       Assistant → left
+    */
 
     messages.forEach(item => {
 
@@ -952,8 +955,6 @@ function renderMessages() {
 
 /* =========================================================
    ADD MESSAGE
-   USER = RIGHT
-   VIGGO = LEFT
 ========================================================= */
 
 function addMessage(
@@ -968,11 +969,10 @@ function addMessage(
     const wrapper =
         document.createElement("div");
 
-
     /*
-       IMPORTANT:
-       User  -> user-message
-       Viggo -> assistant-message
+       FIX:
+       User = user-message
+       Viggo = assistant-message
     */
 
     if (role === "user") {
@@ -995,14 +995,14 @@ function addMessage(
         "message-bubble";
 
     bubble.textContent =
-        text || "";
+        text;
 
-    wrapper.appendChild(bubble);
+    wrapper.appendChild(
+        bubble
+    );
 
 
-    /* =====================================================
-       ASSISTANT ACTIONS
-    ===================================================== */
+    /* ASSISTANT ACTIONS */
 
     if (role === "assistant") {
 
@@ -1030,9 +1030,7 @@ function addMessage(
         copy.addEventListener(
             "click",
             () => {
-
                 copyText(text);
-
             }
         );
 
@@ -1050,14 +1048,13 @@ function addMessage(
         voice.title =
             "Read aloud";
 
-        voice.textContent = "🔊";
+        voice.textContent =
+            "🔊";
 
         voice.addEventListener(
             "click",
             () => {
-
                 speakText(text);
-
             }
         );
 
@@ -1068,7 +1065,6 @@ function addMessage(
         wrapper.appendChild(actions);
 
     }
-
 
     area.appendChild(wrapper);
 
@@ -1099,9 +1095,7 @@ async function sendMessage() {
     isSending = true;
 
     if (sendButton) {
-
         sendButton.disabled = true;
-
     }
 
 
@@ -1134,7 +1128,7 @@ async function sendMessage() {
         removeTyping();
 
 
-        /* VIGGO REPLY */
+        /* VIGGO MESSAGE */
 
         messages.push({
 
@@ -1145,6 +1139,16 @@ async function sendMessage() {
             timestamp: Date.now()
 
         });
+
+        /*
+           IMPORTANT:
+           Push assistant AFTER user.
+           Therefore conversation order stays:
+           User
+           Viggo
+           User
+           Viggo
+        */
 
         renderMessages();
 
@@ -1172,7 +1176,8 @@ async function sendMessage() {
                     "Viggo AI error"
                 ),
 
-            timestamp: Date.now()
+            timestamp:
+                Date.now()
 
         });
 
@@ -1187,9 +1192,7 @@ async function sendMessage() {
         isSending = false;
 
         if (sendButton) {
-
             sendButton.disabled = false;
-
         }
 
         input.focus();
@@ -1200,7 +1203,7 @@ async function sendMessage() {
 
 
 /* =========================================================
-   API CALL
+   API
 ========================================================= */
 
 async function askViggo(text) {
@@ -1229,14 +1232,15 @@ async function askViggo(text) {
                     body:
                         JSON.stringify({
 
-                            message: text,
+                            message:
+                                text,
 
                             language:
                                 currentLanguage,
 
                             /*
-                              Current user message
-                              is removed from history.
+                               Send previous conversation
+                               but not duplicate current user.
                             */
 
                             history:
@@ -1275,7 +1279,8 @@ async function askViggo(text) {
 
     try {
 
-        data = JSON.parse(raw);
+        data =
+            JSON.parse(raw);
 
     }
 
@@ -1335,23 +1340,18 @@ function showTyping() {
     const div =
         document.createElement("div");
 
-    div.id = "viggoTyping";
-
-    /*
-       Typing indicator is also LEFT side.
-    */
+    div.id =
+        "viggoTyping";
 
     div.className =
         "message assistant-message";
 
     div.innerHTML = `
-
         <div class="message-bubble typing-bubble">
             <span>●</span>
             <span>●</span>
             <span>●</span>
         </div>
-
     `;
 
     area.appendChild(div);
@@ -1361,19 +1361,13 @@ function showTyping() {
 }
 
 
-/* =========================================================
-   REMOVE TYPING
-========================================================= */
-
 function removeTyping() {
 
     const element =
         $("viggoTyping");
 
     if (element) {
-
         element.remove();
-
     }
 
 }
@@ -1412,7 +1406,9 @@ async function copyText(text) {
 
         textarea.style.opacity = "0";
 
-        document.body.appendChild(textarea);
+        document.body.appendChild(
+            textarea
+        );
 
         textarea.focus();
 
@@ -1509,7 +1505,9 @@ function setupVoice() {
             ?.classList
             .add("active");
 
-        showToast("🎤 Listening...");
+        showToast(
+            "🎤 Listening..."
+        );
 
     };
 
@@ -1542,7 +1540,8 @@ function setupVoice() {
         );
 
         if (
-            event.error === "not-allowed"
+            event.error ===
+            "not-allowed"
         ) {
 
             showToast(
@@ -1628,7 +1627,7 @@ function toggleVoice() {
 
 
 /* =========================================================
-   SHARE CHAT
+   SHARE
 ========================================================= */
 
 async function shareChat() {
@@ -1641,7 +1640,9 @@ async function shareChat() {
 
     if (!chat) {
 
-        showToast("No chat to share");
+        showToast(
+            "No chat to share"
+        );
 
         return;
 
@@ -1720,7 +1721,8 @@ async function shareChat() {
     catch (error) {
 
         if (
-            error?.name !== "AbortError"
+            error?.name !==
+            "AbortError"
         ) {
 
             console.error(error);
@@ -1756,9 +1758,7 @@ function loadSharedChat() {
                 .replace(/_/g, "/");
 
         while (fixed.length % 4) {
-
             fixed += "=";
-
         }
 
         const json =
@@ -1782,10 +1782,12 @@ function loadSharedChat() {
 
         }
 
-        messages = chat.messages;
+        messages =
+            chat.messages;
 
         currentChatId =
-            "shared_" + Date.now();
+            "shared_" +
+            Date.now();
 
         renderMessages();
 
@@ -1847,23 +1849,29 @@ function closeMore() {
 
 
 /* =========================================================
-   SIDEBAR CLOSE
+   SIDEBAR
 ========================================================= */
 
 function closeSidebar() {
 
-    $("sidebar")
-        ?.classList
-        .remove("open");
+    const sidebar =
+        $("sidebar");
+
+    if (!sidebar) return;
+
+    sidebar.classList.remove("open");
 
 }
 
 
 function toggleSidebar() {
 
-    $("sidebar")
-        ?.classList
-        .toggle("open");
+    const sidebar =
+        $("sidebar");
+
+    if (!sidebar) return;
+
+    sidebar.classList.toggle("open");
 
 }
 
@@ -1883,7 +1891,9 @@ function setLanguage(language) {
         "kn"
     ];
 
-    if (!validLanguages.includes(language)) {
+    if (
+        !validLanguages.includes(language)
+    ) {
 
         return;
 
@@ -1934,11 +1944,14 @@ function showToast(message) {
         toast.className =
             "toast";
 
-        document.body.appendChild(toast);
+        document.body.appendChild(
+            toast
+        );
 
     }
 
-    toast.textContent = message;
+    toast.textContent =
+        message;
 
     toast.classList.add("show");
 
@@ -1948,7 +1961,9 @@ function showToast(message) {
         setTimeout(
             () => {
 
-                toast.classList.remove("show");
+                toast.classList.remove(
+                    "show"
+                );
 
             },
             2500
@@ -1963,7 +1978,8 @@ function showToast(message) {
 
 function scrollBottom() {
 
-    const area = $("messages");
+    const area =
+        $("messages");
 
     if (!area) return;
 
@@ -1982,6 +1998,7 @@ function scrollBottom() {
 ========================================================= */
 
 function setupEvents() {
+
 
     $("newChatBtn")
         ?.addEventListener(
@@ -2065,7 +2082,7 @@ function setupEvents() {
         );
 
 
-    /* SIDEBAR CLOSE BUTTON */
+    /* X CLOSE BUTTON */
 
     $("closeSidebarBtn")
         ?.addEventListener(
@@ -2082,7 +2099,7 @@ function setupEvents() {
         );
 
 
-    /* ENTER TO SEND */
+    /* ENTER */
 
     $("messageInput")
         ?.addEventListener(
@@ -2107,7 +2124,9 @@ function setupEvents() {
     /* LANGUAGE */
 
     document
-        .querySelectorAll("[data-language]")
+        .querySelectorAll(
+            "[data-language]"
+        )
         .forEach(button => {
 
             button.addEventListener(
@@ -2161,3 +2180,4 @@ document.addEventListener(
 
     }
 );
+```
