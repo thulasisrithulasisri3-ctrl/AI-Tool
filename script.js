@@ -641,6 +641,8 @@ function addHistory(
                     "click",
                     event => {
 
+                        event.preventDefault();
+
                         event.stopPropagation();
 
                         togglePin(
@@ -674,6 +676,8 @@ function addHistory(
                     "click",
                     event => {
 
+                        event.preventDefault();
+
                         event.stopPropagation();
 
                         deleteChat(
@@ -702,7 +706,20 @@ function addHistory(
 
             row.addEventListener(
                 "click",
-                () => {
+                event => {
+
+                    if (
+                        event.target.closest(
+                            ".history-action"
+                        ) ||
+                        event.target.closest(
+                            ".chat-checkbox"
+                        )
+                    ) {
+
+                        return;
+
+                    }
 
                     if (selectMode) {
 
@@ -972,36 +989,38 @@ function updateSelectionUI() {
     const button =
         $("deleteSelectedBtn");
 
-    if (!button)
-        return;
+    if (button) {
 
-    if (
-        selectMode &&
-        selectedChats.size > 0
-    ) {
+        if (
+            selectMode &&
+            selectedChats.size > 0
+        ) {
 
-        button.style.display =
-            "flex";
+            button.style.display =
+                "flex";
 
-        button.textContent =
-            `🗑 Delete Selected (${selectedChats.size})`;
+            button.textContent =
+                `🗑 Delete Selected (${selectedChats.size})`;
 
-    } else if (
-        selectMode
-    ) {
+        } else if (
+            selectMode
+        ) {
 
-        button.style.display =
-            "flex";
+            button.style.display =
+                "flex";
 
-        button.textContent =
-            "🗑 Delete Selected";
+            button.textContent =
+                "🗑 Delete Selected";
 
-    } else {
+        } else {
 
-        button.style.display =
-            "none";
+            button.style.display =
+                "none";
+
+        }
 
     }
+
 
     const selectButton =
         $("selectChatsBtn");
@@ -2200,11 +2219,20 @@ function closeMore() {
 
 function closeSidebar() {
 
-    $("sidebar")
-        ?.classList
-        .remove(
-            "open"
-        );
+    const sidebar =
+        $("sidebar");
+
+    if (!sidebar)
+        return;
+
+    sidebar.classList.remove(
+        "open"
+    );
+
+    sidebar.setAttribute(
+        "aria-hidden",
+        "true"
+    );
 
 }
 
@@ -2215,11 +2243,23 @@ function closeSidebar() {
 
 function toggleSidebar() {
 
-    $("sidebar")
-        ?.classList
-        .toggle(
+    const sidebar =
+        $("sidebar");
+
+    if (!sidebar)
+        return;
+
+    const isOpen =
+        sidebar.classList.toggle(
             "open"
         );
+
+    sidebar.setAttribute(
+        "aria-hidden",
+        isOpen
+            ? "false"
+            : "true"
+    );
 
 }
 
@@ -2382,7 +2422,13 @@ function setupEvents() {
     $("newChatBtn")
         ?.addEventListener(
             "click",
-            newChat
+            event => {
+
+                event.preventDefault();
+
+                newChat();
+
+            }
         );
 
 
@@ -2393,7 +2439,13 @@ function setupEvents() {
     $("sendBtn")
         ?.addEventListener(
             "click",
-            sendMessage
+            event => {
+
+                event.preventDefault();
+
+                sendMessage();
+
+            }
         );
 
 
@@ -2404,7 +2456,13 @@ function setupEvents() {
     $("shareBtn")
         ?.addEventListener(
             "click",
-            shareChat
+            event => {
+
+                event.preventDefault();
+
+                shareChat();
+
+            }
         );
 
 
@@ -2415,7 +2473,13 @@ function setupEvents() {
     $("voiceBtn")
         ?.addEventListener(
             "click",
-            toggleVoice
+            event => {
+
+                event.preventDefault();
+
+                toggleVoice();
+
+            }
         );
 
 
@@ -2427,6 +2491,8 @@ function setupEvents() {
         ?.addEventListener(
             "click",
             event => {
+
+                event.preventDefault();
 
                 event.stopPropagation();
 
@@ -2443,7 +2509,13 @@ function setupEvents() {
     $("saveBtn")
         ?.addEventListener(
             "click",
-            saveCurrentChat
+            event => {
+
+                event.preventDefault();
+
+                saveCurrentChat();
+
+            }
         );
 
 
@@ -2454,7 +2526,13 @@ function setupEvents() {
     $("selectChatsBtn")
         ?.addEventListener(
             "click",
-            toggleSelectMode
+            event => {
+
+                event.preventDefault();
+
+                toggleSelectMode();
+
+            }
         );
 
 
@@ -2465,7 +2543,13 @@ function setupEvents() {
     $("deleteSelectedBtn")
         ?.addEventListener(
             "click",
-            deleteSelectedChats
+            event => {
+
+                event.preventDefault();
+
+                deleteSelectedChats();
+
+            }
         );
 
 
@@ -2476,7 +2560,13 @@ function setupEvents() {
     $("clearHistoryBtn")
         ?.addEventListener(
             "click",
-            clearHistory
+            event => {
+
+                event.preventDefault();
+
+                clearHistory();
+
+            }
         );
 
 
@@ -2489,6 +2579,8 @@ function setupEvents() {
             "click",
             event => {
 
+                event.preventDefault();
+
                 event.stopPropagation();
 
                 toggleSidebar();
@@ -2499,7 +2591,7 @@ function setupEvents() {
 
     /* =====================================================
        SIDEBAR CLOSE BUTTON
-       NEW ADDITION
+       FIXED
     ===================================================== */
 
     $("closeSidebarBtn")
@@ -2527,8 +2619,7 @@ function setupEvents() {
             event => {
 
                 if (
-                    event.key ===
-                    "Enter" &&
+                    event.key === "Enter" &&
                     !event.shiftKey
                 ) {
 
@@ -2555,7 +2646,9 @@ function setupEvents() {
 
                 button.addEventListener(
                     "click",
-                    () => {
+                    event => {
+
+                        event.preventDefault();
 
                         setLanguage(
                             button.dataset.language
@@ -2591,12 +2684,74 @@ function setupEvents() {
 
 
     /* =====================================================
+       SIDEBAR BACKDROP CLICK
+       OPTIONAL / SAFE
+    ===================================================== */
+
+    const sidebar =
+        $("sidebar");
+
+    if (sidebar) {
+
+        sidebar.addEventListener(
+            "click",
+            event => {
+
+                /*
+                   Only close when clicking
+                   the sidebar itself/backdrop.
+                */
+
+                if (
+                    event.target ===
+                    sidebar
+                ) {
+
+                    closeSidebar();
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
        LOAD SHARED CHAT
     ===================================================== */
 
     loadSharedChat();
 
 }
+
+
+/* =========================================================
+   EXTRA SIDEBAR SAFETY
+   Handles dynamically created close buttons
+========================================================= */
+
+document.addEventListener(
+    "click",
+    event => {
+
+        const closeButton =
+            event.target.closest(
+                "#closeSidebarBtn"
+            );
+
+        if (!closeButton)
+            return;
+
+        event.preventDefault();
+
+        event.stopPropagation();
+
+        closeSidebar();
+
+    },
+    true
+);
 
 
 /* =========================================================
