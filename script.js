@@ -7,7 +7,7 @@
    API Reply Fix
 ========================================================= */
 
-const API_BASE = "https://ai-tool-1-fgmc.onrender.com";
+const API_BASE = "https://ai-tool-2-zpul.onrender.com";
 const CHAT_API = API_BASE + "/chat";
 
 const STORAGE_KEY = "viggo_chats";
@@ -500,8 +500,6 @@ function addHistory(
             actions.className =
                 "history-actions";
 
-            /* PIN */
-
             const pin =
                 document.createElement("button");
 
@@ -528,8 +526,6 @@ function addHistory(
 
                 }
             );
-
-            /* DELETE */
 
             const del =
                 document.createElement("button");
@@ -995,8 +991,6 @@ function addMessage(
         actions.className =
             "message-actions";
 
-        /* COPY */
-
         const copy =
             document.createElement("button");
 
@@ -1013,8 +1007,6 @@ function addMessage(
             "click",
             () => copyText(text)
         );
-
-        /* VOICE */
 
         const voice =
             document.createElement("button");
@@ -1077,10 +1069,6 @@ async function sendMessage() {
 
     }
 
-    /* -----------------------------------------
-       SAVE USER MESSAGE
-    ----------------------------------------- */
-
     messages.push({
 
         role: "user",
@@ -1100,12 +1088,6 @@ async function sendMessage() {
     showTyping();
 
     try {
-
-        /*
-         * IMPORTANT:
-         * Send previous conversation history
-         * separately from the new message.
-         */
 
         const historyForAPI =
             messages
@@ -1243,8 +1225,7 @@ async function askViggo(
 
                         })
 
-                    }
-
+                }
             );
 
     }
@@ -1304,10 +1285,6 @@ async function askViggo(
         );
 
     }
-
-    /*
-     * Support different backend response names.
-     */
 
     const reply =
         data.reply ??
@@ -2516,16 +2493,12 @@ function scrollBottom() {
 
 function setupEvents() {
 
-    /* NEW CHAT */
-
     $("newChatBtn")
         ?.addEventListener(
             "click",
             newChat
         );
 
-
-    /* SEND */
 
     $("sendBtn")
         ?.addEventListener(
@@ -2534,8 +2507,6 @@ function setupEvents() {
         );
 
 
-    /* SHARE */
-
     $("shareBtn")
         ?.addEventListener(
             "click",
@@ -2543,16 +2514,12 @@ function setupEvents() {
         );
 
 
-    /* VOICE */
-
     $("voiceBtn")
         ?.addEventListener(
             "click",
             toggleVoice
         );
 
-
-    /* MORE */
 
     const moreButton =
         $("moreBtn");
@@ -2575,16 +2542,12 @@ function setupEvents() {
     }
 
 
-    /* SAVE */
-
     $("saveBtn")
         ?.addEventListener(
             "click",
             saveCurrentChat
         );
 
-
-    /* SELECT */
 
     $("selectChatsBtn")
         ?.addEventListener(
@@ -2593,8 +2556,6 @@ function setupEvents() {
         );
 
 
-    /* DELETE SELECTED */
-
     $("deleteSelectedBtn")
         ?.addEventListener(
             "click",
@@ -2602,16 +2563,12 @@ function setupEvents() {
         );
 
 
-    /* CLEAR */
-
     $("clearHistoryBtn")
         ?.addEventListener(
             "click",
             clearHistory
         );
 
-
-    /* MOBILE MENU */
 
     $("mobileMenuBtn")
         ?.addEventListener(
@@ -2625,8 +2582,6 @@ function setupEvents() {
             }
         );
 
-
-    /* MESSAGE INPUT */
 
     $("messageInput")
         ?.addEventListener(
@@ -2648,8 +2603,6 @@ function setupEvents() {
         );
 
 
-    /* LANGUAGE */
-
     document
         .querySelectorAll(
             "[data-language]"
@@ -2670,8 +2623,6 @@ function setupEvents() {
         });
 
 
-    /* VOICE SETTINGS */
-
     $("voiceSettingsButton")
         ?.addEventListener(
             "click",
@@ -2687,8 +2638,6 @@ function setupEvents() {
         );
 
 
-    /* FEMALE */
-
     $("femaleVoiceBtn")
         ?.addEventListener(
             "click",
@@ -2702,8 +2651,6 @@ function setupEvents() {
         );
 
 
-    /* MALE */
-
     $("maleVoiceBtn")
         ?.addEventListener(
             "click",
@@ -2716,8 +2663,6 @@ function setupEvents() {
             }
         );
 
-
-    /* OUTSIDE CLICK */
 
     document.addEventListener(
         "click",
