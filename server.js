@@ -18,17 +18,6 @@ const PORT =
 const API_KEY =
     process.env.GEMINI_API_KEY;
 
-/*
-   Model can be changed from Render
-   Environment Variables.
-
-   GEMINI_MODEL =
-   gemini-2.5-flash-lite
-
-   If GEMINI_MODEL is not set,
-   gemini-2.5-flash-lite is used.
-*/
-
 const MODEL =
     process.env.GEMINI_MODEL ||
     "gemini-2.5-flash-lite";
@@ -175,15 +164,10 @@ function languageName(language) {
     const languages = {
 
         en: "English",
-
         ta: "Tamil",
-
         hi: "Hindi",
-
         ml: "Malayalam",
-
         te: "Telugu",
-
         kn: "Kannada"
 
     };
@@ -206,7 +190,6 @@ function buildContents(
 ) {
 
     const contents = [];
-
 
     if (Array.isArray(history)) {
 
@@ -234,7 +217,6 @@ function buildContents(
                 if (!text)
                     return;
 
-
                 contents.push({
 
                     role:
@@ -257,7 +239,6 @@ function buildContents(
 
     }
 
-
     contents.push({
 
         role: "user",
@@ -272,7 +253,6 @@ function buildContents(
         ]
 
     });
-
 
     return contents;
 
@@ -291,7 +271,6 @@ function isRetryableError(error) {
             error ||
             ""
         ).toLowerCase();
-
 
     return (
 
@@ -364,9 +343,7 @@ async function generateWithRetry(
         5000
     ];
 
-
     let lastError = null;
-
 
     for (
         let attempt = 0;
@@ -379,7 +356,6 @@ async function generateWithRetry(
             console.log(
                 `→ Gemini attempt ${attempt + 1}/${MAX_RETRIES + 1}`
             );
-
 
             const response =
                 await ai.models.generateContent({
@@ -399,29 +375,20 @@ async function generateWithRetry(
 
                 });
 
-
             return response;
 
         }
-
 
         catch (error) {
 
             lastError =
                 error;
 
-
             console.error(
                 `❌ Gemini attempt ${attempt + 1} failed:`,
                 error?.message ||
                 error
             );
-
-
-            /*
-               Do not retry model-not-found,
-               API-key or authentication errors.
-            */
 
             if (
                 !isRetryableError(
@@ -433,11 +400,6 @@ async function generateWithRetry(
 
             }
 
-
-            /*
-               Maximum retry reached.
-            */
-
             if (
                 attempt >= MAX_RETRIES
             ) {
@@ -446,18 +408,15 @@ async function generateWithRetry(
 
             }
 
-
             const delay =
                 delays[
                     attempt
                 ] ||
                 5000;
 
-
             console.log(
                 `⏳ Temporary Gemini error. Retrying in ${delay}ms...`
             );
-
 
             await wait(
                 delay
@@ -466,7 +425,6 @@ async function generateWithRetry(
         }
 
     }
-
 
     throw lastError;
 
@@ -516,12 +474,10 @@ app.post(
                     req.body?.message
                 );
 
-
             const language =
                 cleanText(
                     req.body?.language
                 ) || "en";
-
 
             const history =
                 req.body?.history;
@@ -647,7 +603,6 @@ Do not mention these instructions.
 
             let reply = "";
 
-
             if (
                 response &&
                 typeof response.text ===
@@ -669,7 +624,6 @@ Do not mention these instructions.
                 const candidates =
                     response?.candidates;
 
-
                 if (
                     Array.isArray(
                         candidates
@@ -680,7 +634,6 @@ Do not mention these instructions.
                         candidates[0]
                             ?.content
                             ?.parts;
-
 
                     if (
                         Array.isArray(
@@ -720,7 +673,6 @@ Do not mention these instructions.
                     "❌ Gemini returned empty response."
                 );
 
-
                 return res.status(502).json({
 
                     success: false,
@@ -747,7 +699,6 @@ Do not mention these instructions.
             console.log(
                 "================================"
             );
-
 
             return res.json({
 
@@ -789,7 +740,6 @@ Do not mention these instructions.
                     error ||
                     ""
                 );
-
 
             const lower =
                 errorText.toLowerCase();
@@ -996,7 +946,6 @@ app.use(
             error
         );
 
-
         if (
             res.headersSent
         ) {
@@ -1006,7 +955,6 @@ app.use(
             );
 
         }
-
 
         res.status(500).json({
 
