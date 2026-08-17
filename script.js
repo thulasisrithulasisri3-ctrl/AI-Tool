@@ -13,7 +13,7 @@
 ========================================================= */
 
 const API_BASE =
-    "https://ai-tool-2-zpul.onrender.com";
+    "https://ai-tool-1-fgmc.onrender.com";
 
 const CHAT_API =
     API_BASE + "/chat";
@@ -117,16 +117,11 @@ function loadSettings() {
 function saveSettings() {
 
     localStorage.setItem(
-
         SETTINGS_KEY,
-
         JSON.stringify({
-
             language:
                 currentLanguage
-
         })
-
     );
 
 }
@@ -147,9 +142,7 @@ function getChats() {
                 ) || "[]"
             );
 
-        if (
-            Array.isArray(data)
-        ) {
+        if (Array.isArray(data)) {
 
             return data;
 
@@ -174,11 +167,8 @@ function getChats() {
 function saveChats(chats) {
 
     localStorage.setItem(
-
         STORAGE_KEY,
-
         JSON.stringify(chats)
-
     );
 
 }
@@ -299,6 +289,8 @@ function newChat() {
 
     closeMore();
 
+    closeSidebar();
+
     $("messageInput")?.focus();
 
 }
@@ -345,9 +337,7 @@ function openChat(id) {
 
     renderHistory();
 
-    $("sidebar")
-        ?.classList
-        .remove("open");
+    closeSidebar();
 
 }
 
@@ -536,9 +526,7 @@ function addHistory(
 
             }
 
-            if (
-                selectMode
-            ) {
+            if (selectMode) {
 
                 row.classList.add(
                     "select-mode"
@@ -547,7 +535,7 @@ function addHistory(
             }
 
 
-            /* SELECT CHECKBOX */
+            /* SELECT */
 
             if (selectMode) {
 
@@ -848,7 +836,7 @@ function deleteChat(id) {
 
 
 /* =========================================================
-   SELECT CHATS MODE
+   SELECT MODE
 ========================================================= */
 
 function toggleSelectMode() {
@@ -862,19 +850,11 @@ function toggleSelectMode() {
 
     updateSelectionUI();
 
-    if (selectMode) {
-
-        showToast(
-            "Select chats to delete"
-        );
-
-    }
-
 }
 
 
 /* =========================================================
-   SELECT ONE CHAT
+   SELECT CHAT
 ========================================================= */
 
 function toggleSelectedChat(id) {
@@ -1349,6 +1329,7 @@ async function sendMessage() {
 
     showTyping();
 
+
     try {
 
         const reply =
@@ -1520,11 +1501,9 @@ async function askViggo(
     if (!response.ok) {
 
         throw new Error(
-
             data.details ||
             data.error ||
             "Server error"
-
         );
 
     }
@@ -1534,11 +1513,9 @@ async function askViggo(
     ) {
 
         throw new Error(
-
             data.details ||
             data.error ||
             "Viggo AI error"
-
         );
 
     }
@@ -2218,6 +2195,36 @@ function closeMore() {
 
 
 /* =========================================================
+   SIDEBAR CLOSE
+========================================================= */
+
+function closeSidebar() {
+
+    $("sidebar")
+        ?.classList
+        .remove(
+            "open"
+        );
+
+}
+
+
+/* =========================================================
+   SIDEBAR TOGGLE
+========================================================= */
+
+function toggleSidebar() {
+
+    $("sidebar")
+        ?.classList
+        .toggle(
+            "open"
+        );
+
+}
+
+
+/* =========================================================
    LANGUAGE
 ========================================================= */
 
@@ -2367,7 +2374,10 @@ function scrollBottom() {
 
 function setupEvents() {
 
-    /* NEW CHAT */
+
+    /* =====================================================
+       NEW CHAT
+    ===================================================== */
 
     $("newChatBtn")
         ?.addEventListener(
@@ -2376,7 +2386,9 @@ function setupEvents() {
         );
 
 
-    /* SEND */
+    /* =====================================================
+       SEND
+    ===================================================== */
 
     $("sendBtn")
         ?.addEventListener(
@@ -2385,7 +2397,9 @@ function setupEvents() {
         );
 
 
-    /* SHARE */
+    /* =====================================================
+       SHARE
+    ===================================================== */
 
     $("shareBtn")
         ?.addEventListener(
@@ -2394,7 +2408,9 @@ function setupEvents() {
         );
 
 
-    /* VOICE */
+    /* =====================================================
+       VOICE
+    ===================================================== */
 
     $("voiceBtn")
         ?.addEventListener(
@@ -2403,7 +2419,9 @@ function setupEvents() {
         );
 
 
-    /* MORE */
+    /* =====================================================
+       MORE
+    ===================================================== */
 
     $("moreBtn")
         ?.addEventListener(
@@ -2418,7 +2436,9 @@ function setupEvents() {
         );
 
 
-    /* SAVE */
+    /* =====================================================
+       SAVE
+    ===================================================== */
 
     $("saveBtn")
         ?.addEventListener(
@@ -2427,7 +2447,9 @@ function setupEvents() {
         );
 
 
-    /* SELECT */
+    /* =====================================================
+       SELECT
+    ===================================================== */
 
     $("selectChatsBtn")
         ?.addEventListener(
@@ -2436,7 +2458,9 @@ function setupEvents() {
         );
 
 
-    /* DELETE SELECTED */
+    /* =====================================================
+       DELETE SELECTED
+    ===================================================== */
 
     $("deleteSelectedBtn")
         ?.addEventListener(
@@ -2445,7 +2469,9 @@ function setupEvents() {
         );
 
 
-    /* CLEAR */
+    /* =====================================================
+       CLEAR
+    ===================================================== */
 
     $("clearHistoryBtn")
         ?.addEventListener(
@@ -2461,13 +2487,11 @@ function setupEvents() {
     $("mobileMenuBtn")
         ?.addEventListener(
             "click",
-            () => {
+            event => {
 
-                $("sidebar")
-                    ?.classList
-                    .toggle(
-                        "open"
-                    );
+                event.stopPropagation();
+
+                toggleSidebar();
 
             }
         );
@@ -2475,24 +2499,27 @@ function setupEvents() {
 
     /* =====================================================
        SIDEBAR CLOSE BUTTON
+       NEW ADDITION
     ===================================================== */
 
-    $("sidebarCloseBtn")
+    $("closeSidebarBtn")
         ?.addEventListener(
             "click",
-            () => {
+            event => {
 
-                $("sidebar")
-                    ?.classList
-                    .remove(
-                        "open"
-                    );
+                event.preventDefault();
+
+                event.stopPropagation();
+
+                closeSidebar();
 
             }
         );
 
 
-    /* ENTER */
+    /* =====================================================
+       ENTER TO SEND
+    ===================================================== */
 
     $("messageInput")
         ?.addEventListener(
@@ -2515,7 +2542,9 @@ function setupEvents() {
         );
 
 
-    /* LANGUAGE */
+    /* =====================================================
+       LANGUAGE
+    ===================================================== */
 
     document
         .querySelectorAll(
@@ -2539,7 +2568,9 @@ function setupEvents() {
         );
 
 
-    /* OUTSIDE CLICK */
+    /* =====================================================
+       OUTSIDE CLICK - MORE MENU
+    ===================================================== */
 
     document.addEventListener(
         "click",
@@ -2559,7 +2590,9 @@ function setupEvents() {
     );
 
 
-    /* LOAD SHARED */
+    /* =====================================================
+       LOAD SHARED CHAT
+    ===================================================== */
 
     loadSharedChat();
 
