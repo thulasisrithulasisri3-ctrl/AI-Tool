@@ -21,10 +21,10 @@ const API_KEY =
 
 
 /*
-   Stable model used by this version.
+   Updated model.
 */
 const MODEL =
-    "gemini-2.5-flash";
+    "gemini-3.6-flash";
 
 
 /* ================================
