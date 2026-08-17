@@ -1,2674 +1,1075 @@
-```javascript
 "use strict";
 
-/* =========================================================
-   VIGGO AI - FULL SCRIPT
-   Chat + History + Recent + Pin + Delete + Selection
-   Share + More Menu + Language + Voice
-   API Reply + Sidebar Open/Close
-========================================================= */
+require("dotenv").config();
+
+const express = require("express");
+const cors = require("cors");
+const { GoogleGenAI } = require("@google/genai");
+
+const app = express();
+
+/* ================================
+   CONFIG
+================================ */
+
+const PORT =
+    process.env.PORT || 10000;
+
+const API_KEY =
+    process.env.GEMINI_API_KEY;
+
+/*
+   Model can be changed from Render
+   Environment Variables.
+
+   GEMINI_MODEL =
+   gemini-2.5-flash-lite
+
+   If GEMINI_MODEL is not set,
+   gemini-2.5-flash-lite is used.
+*/
+
+const MODEL =
+    process.env.GEMINI_MODEL ||
+    "gemini-2.5-flash-lite";
 
 
-/* =========================================================
-   API
-========================================================= */
+/* ================================
+   GEMINI CLIENT
+================================ */
 
-const API_BASE =
-    "https://ai-tool-2-zpul.onrender.com";
+let ai = null;
 
-const CHAT_API =
-    API_BASE + "/chat";
+if (API_KEY) {
 
+    ai = new GoogleGenAI({
+        apiKey: API_KEY
+    });
 
-/* =========================================================
-   STORAGE
-========================================================= */
+    console.log(
+        "✓ Gemini API key detected."
+    );
 
-const STORAGE_KEY =
-    "viggo_chats";
+} else {
 
-const SETTINGS_KEY =
-    "viggo_settings";
-
-
-/* =========================================================
-   STATE
-========================================================= */
-
-let currentChatId = null;
-
-let messages = [];
-
-let currentLanguage = "en";
-
-let isSending = false;
-
-let recognition = null;
-
-let isListening = false;
-
-let selectMode = false;
-
-let selectedChats = new Set();
-
-
-/* =========================================================
-   DOM HELPER
-========================================================= */
-
-function $(id) {
-
-    return document.getElementById(id);
+    console.error(
+        "❌ GEMINI_API_KEY is missing."
+    );
 
 }
 
 
-/* =========================================================
-   START
-========================================================= */
+/* ================================
+   MIDDLEWARE
+================================ */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
+app.use(
+    cors({
+        origin: "*",
+        methods: [
+            "GET",
+            "POST",
+            "OPTIONS"
+        ],
+        allowedHeaders: [
+            "Content-Type",
+            "Authorization"
+        ]
+    })
+);
 
-        loadSettings();
+app.use(
+    express.json({
+        limit: "2mb"
+    })
+);
 
-        initializeChat();
 
-        setupEvents();
+/* ================================
+   HEALTH
+================================ */
 
-        setupVoice();
+app.get(
+    "/",
+    (req, res) => {
+
+        res.json({
+
+            success: true,
+
+            message:
+                "Viggo AI Server is online.",
+
+            model:
+                MODEL,
+
+            apiConfigured:
+                Boolean(API_KEY),
+
+            time:
+                new Date().toISOString()
+
+        });
 
     }
 );
 
 
-/* =========================================================
-   SETTINGS
-========================================================= */
+/* ================================
+   STATUS
+================================ */
 
-function loadSettings() {
+app.get(
+    "/status",
+    (req, res) => {
 
-    try {
+        res.json({
 
-        const data =
-            JSON.parse(
-                localStorage.getItem(
-                    SETTINGS_KEY
-                ) || "{}"
-            );
+            success: true,
 
-        if (data.language) {
+            server:
+                "Viggo AI",
 
-            currentLanguage =
-                data.language;
+            model:
+                MODEL,
 
-        }
+            apiConfigured:
+                Boolean(API_KEY),
 
-    } catch (error) {
+            time:
+                new Date().toISOString()
 
-        console.error(
-            "Settings error:",
-            error
-        );
+        });
+
+    }
+);
+
+
+/* ================================
+   CLEAN TEXT
+================================ */
+
+function cleanText(value) {
+
+    if (
+        typeof value !== "string"
+    ) {
+
+        return "";
 
     }
 
-}
-
-
-function saveSettings() {
-
-    localStorage.setItem(
-
-        SETTINGS_KEY,
-
-        JSON.stringify({
-
-            language:
-                currentLanguage
-
-        })
-
-    );
+    return value
+        .replace(/\u0000/g, "")
+        .trim();
 
 }
 
 
-/* =========================================================
-   CHAT STORAGE
-========================================================= */
+/* ================================
+   LANGUAGE
+================================ */
 
-function getChats() {
+function languageName(language) {
 
-    try {
+    const languages = {
 
-        const data =
-            JSON.parse(
-                localStorage.getItem(
-                    STORAGE_KEY
-                ) || "[]"
-            );
+        en: "English",
 
-        if (
-            Array.isArray(data)
-        ) {
+        ta: "Tamil",
 
-            return data;
+        hi: "Hindi",
 
-        }
+        ml: "Malayalam",
 
-        return [];
+        te: "Telugu",
 
-    } catch (error) {
-
-        console.error(
-            "Storage error:",
-            error
-        );
-
-        return [];
-
-    }
-
-}
-
-
-function saveChats(chats) {
-
-    localStorage.setItem(
-
-        STORAGE_KEY,
-
-        JSON.stringify(chats)
-
-    );
-
-}
-
-
-/* =========================================================
-   CREATE CHAT
-========================================================= */
-
-function createChat() {
-
-    return {
-
-        id:
-            "chat_" +
-            Date.now() +
-            "_" +
-            Math.random()
-                .toString(36)
-                .slice(2, 8),
-
-        title:
-            "New Chat",
-
-        messages: [],
-
-        pinned:
-            false,
-
-        createdAt:
-            Date.now(),
-
-        updatedAt:
-            Date.now()
+        kn: "Kannada"
 
     };
 
-}
-
-
-/* =========================================================
-   INITIALIZE CHAT
-========================================================= */
-
-function initializeChat() {
-
-    let chats =
-        getChats();
-
-    if (!chats.length) {
-
-        const chat =
-            createChat();
-
-        chats = [chat];
-
-        saveChats(chats);
-
-    }
-
-    chats.sort(
-        (a, b) =>
-            (b.updatedAt || 0) -
-            (a.updatedAt || 0)
+    return (
+        languages[language] ||
+        "English"
     );
 
-    currentChatId =
-        chats[0].id;
-
-    messages =
-        Array.isArray(
-            chats[0].messages
-        )
-            ? chats[0].messages
-            : [];
-
-    renderMessages();
-
-    updateTitle();
-
-    renderHistory();
-
 }
 
 
-/* =========================================================
-   NEW CHAT
-========================================================= */
-
-function newChat() {
-
-    const chat =
-        createChat();
-
-    const chats =
-        getChats();
-
-    chats.unshift(chat);
-
-    saveChats(chats);
-
-    currentChatId =
-        chat.id;
-
-    messages = [];
-
-    selectMode = false;
-
-    selectedChats.clear();
-
-    renderMessages();
-
-    updateTitle();
-
-    renderHistory();
-
-    updateSelectionUI();
-
-    closeMore();
-
-    closeSidebar();
-
-    $("messageInput")?.focus();
-
-}
-
-
-/* =========================================================
-   OPEN CHAT
-========================================================= */
-
-function openChat(id) {
-
-    if (selectMode) {
-
-        toggleSelectedChat(id);
-
-        return;
-
-    }
-
-    const chats =
-        getChats();
-
-    const chat =
-        chats.find(
-            item =>
-                item.id === id
-        );
-
-    if (!chat) return;
-
-    currentChatId =
-        chat.id;
-
-    messages =
-        Array.isArray(
-            chat.messages
-        )
-            ? chat.messages
-            : [];
-
-    renderMessages();
-
-    updateTitle();
-
-    renderHistory();
-
-    closeSidebar();
-
-}
-
-
-/* =========================================================
-   UPDATE CHAT
-========================================================= */
-
-function updateChat() {
-
-    const chats =
-        getChats();
-
-    const chat =
-        chats.find(
-            item =>
-                item.id === currentChatId
-        );
-
-    if (!chat) return;
-
-    chat.messages =
-        messages;
-
-    chat.updatedAt =
-        Date.now();
-
-    const firstUser =
-        messages.find(
-            item =>
-                item.role === "user"
-        );
-
-    if (
-        firstUser &&
-        chat.title === "New Chat"
-    ) {
-
-        const title =
-            String(
-                firstUser.content || ""
-            )
-                .replace(
-                    /\s+/g,
-                    " "
-                )
-                .trim();
-
-        if (title) {
-
-            chat.title =
-                title.slice(0, 40);
-
-        }
-
-    }
-
-    saveChats(chats);
-
-    updateTitle();
-
-    renderHistory();
-
-}
-
-
-/* =========================================================
-   UPDATE TITLE
-========================================================= */
-
-function updateTitle() {
-
-    const element =
-        $("chatTitle");
-
-    if (!element) return;
-
-    const chats =
-        getChats();
-
-    const chat =
-        chats.find(
-            item =>
-                item.id === currentChatId
-        );
-
-    element.textContent =
-        chat?.title ||
-        "New Chat";
-
-}
-
-
-/* =========================================================
-   HISTORY
-========================================================= */
-
-function renderHistory() {
-
-    const list =
-        $("historyList");
-
-    if (!list) return;
-
-    const chats =
-        getChats();
-
-    list.innerHTML = "";
-
-    const pinned =
-        chats.filter(
-            chat =>
-                chat.pinned
-        );
-
-    const recent =
-        chats.filter(
-            chat =>
-                !chat.pinned
-        );
-
-    addHistory(
-        list,
-        "Pinned",
-        pinned
-    );
-
-    addHistory(
-        list,
-        "Recent",
-        recent
-    );
-
-    updateSelectionUI();
-
-}
-
-
-/* =========================================================
-   ADD HISTORY
-========================================================= */
-
-function addHistory(
-    list,
-    sectionTitle,
-    chats
+/* ================================
+   BUILD CONTENTS
+================================ */
+
+function buildContents(
+    history,
+    message
 ) {
 
-    if (!chats.length)
-        return;
+    const contents = [];
 
-    const heading =
-        document.createElement(
-            "div"
-        );
 
-    heading.className =
-        "history-section-title";
+    if (Array.isArray(history)) {
 
-    heading.textContent =
-        sectionTitle;
+        history
+            .filter(item => {
 
-    list.appendChild(
-        heading
-    );
-
-    chats.forEach(
-        chat => {
-
-            const row =
-                document.createElement(
-                    "div"
+                return (
+                    item &&
+                    (
+                        item.role === "user" ||
+                        item.role === "assistant"
+                    ) &&
+                    typeof item.content === "string"
                 );
 
-            row.className =
-                "history-item";
+            })
+            .slice(-14)
+            .forEach(item => {
 
-            if (
-                chat.id ===
-                currentChatId
-            ) {
-
-                row.classList.add(
-                    "active"
-                );
-
-            }
-
-            if (
-                selectMode
-            ) {
-
-                row.classList.add(
-                    "select-mode"
-                );
-
-            }
-
-
-            /* SELECT CHECKBOX */
-
-            if (selectMode) {
-
-                const checkbox =
-                    document.createElement(
-                        "input"
+                const text =
+                    cleanText(
+                        item.content
                     );
 
-                checkbox.type =
-                    "checkbox";
+                if (!text)
+                    return;
 
-                checkbox.className =
-                    "chat-checkbox";
 
-                checkbox.checked =
-                    selectedChats.has(
-                        chat.id
-                    );
+                contents.push({
 
-                checkbox.addEventListener(
-                    "click",
-                    event => {
+                    role:
+                        item.role === "assistant"
+                            ? "model"
+                            : "user",
 
-                        event.stopPropagation();
+                    parts: [
 
-                    }
-                );
+                        {
+                            text:
+                                text
+                        }
 
-                checkbox.addEventListener(
-                    "change",
-                    () => {
+                    ]
 
-                        toggleSelectedChat(
-                            chat.id
-                        );
+                });
 
-                    }
-                );
+            });
 
-                row.appendChild(
-                    checkbox
-                );
+    }
 
+
+    contents.push({
+
+        role: "user",
+
+        parts: [
+
+            {
+                text:
+                    cleanText(message)
             }
 
-
-            /* TITLE */
-
-            const titleEl =
-                document.createElement(
-                    "div"
-                );
-
-            titleEl.className =
-                "history-title";
-
-            titleEl.textContent =
-                chat.title ||
-                "New Chat";
-
-            row.appendChild(
-                titleEl
-            );
-
-
-            /* ACTIONS */
-
-            if (!selectMode) {
-
-                const actions =
-                    document.createElement(
-                        "div"
-                    );
-
-                actions.className =
-                    "history-actions";
-
-
-                /* PIN */
-
-                const pin =
-                    document.createElement(
-                        "button"
-                    );
-
-                pin.type =
-                    "button";
-
-                pin.className =
-                    "history-action";
-
-                pin.title =
-                    chat.pinned
-                        ? "Unpin chat"
-                        : "Pin chat";
-
-                pin.textContent =
-                    chat.pinned
-                        ? "📌"
-                        : "📍";
-
-                pin.addEventListener(
-                    "click",
-                    event => {
-
-                        event.stopPropagation();
-
-                        togglePin(
-                            chat.id
-                        );
-
-                    }
-                );
-
-
-                /* DELETE */
-
-                const del =
-                    document.createElement(
-                        "button"
-                    );
-
-                del.type =
-                    "button";
-
-                del.className =
-                    "history-action delete";
-
-                del.title =
-                    "Delete chat";
-
-                del.textContent =
-                    "🗑";
-
-                del.addEventListener(
-                    "click",
-                    event => {
-
-                        event.stopPropagation();
-
-                        deleteChat(
-                            chat.id
-                        );
-
-                    }
-                );
-
-                actions.appendChild(
-                    pin
-                );
-
-                actions.appendChild(
-                    del
-                );
-
-                row.appendChild(
-                    actions
-                );
-
-            }
-
-
-            /* ROW CLICK */
-
-            row.addEventListener(
-                "click",
-                () => {
-
-                    if (selectMode) {
-
-                        toggleSelectedChat(
-                            chat.id
-                        );
-
-                    } else {
-
-                        openChat(
-                            chat.id
-                        );
-
-                    }
-
-                }
-            );
-
-            list.appendChild(
-                row
-            );
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   PIN CHAT
-========================================================= */
-
-function togglePin(id) {
-
-    const chats =
-        getChats();
-
-    const chat =
-        chats.find(
-            item =>
-                item.id === id
-        );
-
-    if (!chat) return;
-
-    chat.pinned =
-        !chat.pinned;
-
-    chat.updatedAt =
-        Date.now();
-
-    saveChats(chats);
-
-    renderHistory();
-
-    showToast(
-        chat.pinned
-            ? "📌 Chat pinned"
-            : "Chat unpinned"
-    );
-
-}
-
-
-/* =========================================================
-   DELETE CHAT
-========================================================= */
-
-function deleteChat(id) {
-
-    const chats =
-        getChats();
-
-    const chat =
-        chats.find(
-            item =>
-                item.id === id
-        );
-
-    if (!chat) return;
-
-    const confirmed =
-        confirm(
-            `Delete "${chat.title || "New Chat"}"?`
-        );
-
-    if (!confirmed)
-        return;
-
-    let updated =
-        chats.filter(
-            item =>
-                item.id !== id
-        );
-
-    if (!updated.length) {
-
-        updated = [
-            createChat()
-        ];
-
-    }
-
-    saveChats(updated);
-
-    if (
-        currentChatId === id
-    ) {
-
-        currentChatId =
-            updated[0].id;
-
-        messages =
-            updated[0].messages || [];
-
-        renderMessages();
-
-        updateTitle();
-
-    }
-
-    selectedChats.delete(id);
-
-    renderHistory();
-
-    showToast(
-        "🗑 Chat deleted"
-    );
-
-}
-
-
-/* =========================================================
-   SELECT CHATS MODE
-========================================================= */
-
-function toggleSelectMode() {
-
-    selectMode =
-        !selectMode;
-
-    selectedChats.clear();
-
-    renderHistory();
-
-    updateSelectionUI();
-
-    if (selectMode) {
-
-        showToast(
-            "Select chats to delete"
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   SELECT ONE CHAT
-========================================================= */
-
-function toggleSelectedChat(id) {
-
-    if (
-        selectedChats.has(id)
-    ) {
-
-        selectedChats.delete(id);
-
-    } else {
-
-        selectedChats.add(id);
-
-    }
-
-    renderHistory();
-
-    updateSelectionUI();
-
-}
-
-
-/* =========================================================
-   DELETE SELECTED
-========================================================= */
-
-function deleteSelectedChats() {
-
-    if (
-        !selectedChats.size
-    ) {
-
-        showToast(
-            "Select at least one chat"
-        );
-
-        return;
-
-    }
-
-    const count =
-        selectedChats.size;
-
-    const confirmed =
-        confirm(
-            `Delete ${count} selected chat${count > 1 ? "s" : ""}?`
-        );
-
-    if (!confirmed)
-        return;
-
-    let chats =
-        getChats();
-
-    chats =
-        chats.filter(
-            chat =>
-                !selectedChats.has(
-                    chat.id
-                )
-        );
-
-    if (!chats.length) {
-
-        chats = [
-            createChat()
-        ];
-
-    }
-
-    saveChats(chats);
-
-    if (
-        !chats.some(
-            chat =>
-                chat.id ===
-                currentChatId
-        )
-    ) {
-
-        currentChatId =
-            chats[0].id;
-
-        messages =
-            chats[0].messages || [];
-
-        renderMessages();
-
-        updateTitle();
-
-    }
-
-    selectedChats.clear();
-
-    selectMode = false;
-
-    renderHistory();
-
-    updateSelectionUI();
-
-    showToast(
-        `🗑 ${count} chat${count > 1 ? "s" : ""} deleted`
-    );
-
-}
-
-
-/* =========================================================
-   SELECTION UI
-========================================================= */
-
-function updateSelectionUI() {
-
-    const button =
-        $("deleteSelectedBtn");
-
-    if (!button)
-        return;
-
-    if (
-        selectMode &&
-        selectedChats.size > 0
-    ) {
-
-        button.style.display =
-            "flex";
-
-        button.textContent =
-            `🗑 Delete Selected (${selectedChats.size})`;
-
-    } else if (
-        selectMode
-    ) {
-
-        button.style.display =
-            "flex";
-
-        button.textContent =
-            "🗑 Delete Selected";
-
-    } else {
-
-        button.style.display =
-            "none";
-
-    }
-
-    const selectButton =
-        $("selectChatsBtn");
-
-    if (selectButton) {
-
-        selectButton.textContent =
-            selectMode
-                ? "✕ Cancel Selection"
-                : "☑ Select Chats";
-
-    }
-
-}
-
-
-/* =========================================================
-   SAVE CURRENT CHAT
-========================================================= */
-
-function saveCurrentChat() {
-
-    updateChat();
-
-    showToast(
-        "✓ Chat saved"
-    );
-
-    closeMore();
-
-}
-
-
-/* =========================================================
-   CLEAR HISTORY
-========================================================= */
-
-function clearHistory() {
-
-    const confirmed =
-        confirm(
-            "Delete all chat history?"
-        );
-
-    if (!confirmed)
-        return;
-
-    const chat =
-        createChat();
-
-    saveChats([
-        chat
-    ]);
-
-    currentChatId =
-        chat.id;
-
-    messages = [];
-
-    selectedChats.clear();
-
-    selectMode = false;
-
-    renderMessages();
-
-    updateTitle();
-
-    renderHistory();
-
-    updateSelectionUI();
-
-    closeMore();
-
-    showToast(
-        "🗑 History cleared"
-    );
-
-}
-
-
-/* =========================================================
-   RENDER MESSAGES
-========================================================= */
-
-function renderMessages() {
-
-    const area =
-        $("messages");
-
-    if (!area)
-        return;
-
-    area.innerHTML = "";
-
-    if (!messages.length) {
-
-        area.innerHTML = `
-
-            <div class="welcome">
-
-                <div class="big-logo">
-                    V
-                </div>
-
-                <h1>Viggo</h1>
-
-                <p>
-                    Your AI friend is ready.
-                </p>
-
-            </div>
-
-        `;
-
-        return;
-
-    }
-
-    messages.forEach(
-        item => {
-
-            addMessage(
-                item.role,
-                item.content
-            );
-
-        }
-    );
-
-    scrollBottom();
-
-}
-
-
-/* =========================================================
-   ADD MESSAGE
-========================================================= */
-
-function addMessage(
-    role,
-    text
-) {
-
-    const area =
-        $("messages");
-
-    if (!area)
-        return;
-
-    const wrapper =
-        document.createElement(
-            "div"
-        );
-
-    wrapper.className =
-        role === "user"
-            ? "message user-message"
-            : "message assistant-message";
-
-    const bubble =
-        document.createElement(
-            "div"
-        );
-
-    bubble.className =
-        "message-bubble";
-
-    bubble.textContent =
-        text;
-
-    wrapper.appendChild(
-        bubble
-    );
-
-
-    /* ASSISTANT ACTIONS */
-
-    if (
-        role === "assistant"
-    ) {
-
-        const actions =
-            document.createElement(
-                "div"
-            );
-
-        actions.className =
-            "message-actions";
-
-
-        /* COPY */
-
-        const copy =
-            document.createElement(
-                "button"
-            );
-
-        copy.type =
-            "button";
-
-        copy.className =
-            "message-action";
-
-        copy.title =
-            "Copy";
-
-        copy.textContent =
-            "📋";
-
-        copy.addEventListener(
-            "click",
-            () => {
-
-                copyText(
-                    text
-                );
-
-            }
-        );
-
-
-        /* VOICE */
-
-        const voice =
-            document.createElement(
-                "button"
-            );
-
-        voice.type =
-            "button";
-
-        voice.className =
-            "message-action";
-
-        voice.title =
-            "Read aloud";
-
-        voice.textContent =
-            "🔊";
-
-        voice.addEventListener(
-            "click",
-            () => {
-
-                speakText(
-                    text
-                );
-
-            }
-        );
-
-        actions.appendChild(
-            copy
-        );
-
-        actions.appendChild(
-            voice
-        );
-
-        wrapper.appendChild(
-            actions
-        );
-
-    }
-
-    area.appendChild(
-        wrapper
-    );
-
-}
-
-
-/* =========================================================
-   SEND MESSAGE
-========================================================= */
-
-async function sendMessage() {
-
-    if (isSending)
-        return;
-
-    const input =
-        $("messageInput");
-
-    const sendButton =
-        $("sendBtn");
-
-    if (!input)
-        return;
-
-    const text =
-        input.value.trim();
-
-    if (!text)
-        return;
-
-    isSending =
-        true;
-
-    if (sendButton) {
-
-        sendButton.disabled =
-            true;
-
-    }
-
-    messages.push({
-
-        role:
-            "user",
-
-        content:
-            text,
-
-        timestamp:
-            Date.now()
+        ]
 
     });
 
-    input.value = "";
 
-    renderMessages();
+    return contents;
 
-    updateChat();
-
-    showTyping();
+}
 
 
-    try {
+/* ================================
+   RETRY CHECK
+================================ */
 
-        const reply =
-            await askViggo(
-                text
+function isRetryableError(error) {
+
+    const text =
+        String(
+            error?.message ||
+            error ||
+            ""
+        ).toLowerCase();
+
+
+    return (
+
+        text.includes("429") ||
+
+        text.includes(
+            "resource exhausted"
+        ) ||
+
+        text.includes(
+            "too many requests"
+        ) ||
+
+        text.includes(
+            "rate limit"
+        ) ||
+
+        text.includes(
+            "temporarily unavailable"
+        ) ||
+
+        text.includes(
+            "service unavailable"
+        ) ||
+
+        text.includes(
+            "high demand"
+        ) ||
+
+        text.includes(
+            "503"
+        )
+
+    );
+
+}
+
+
+/* ================================
+   WAIT
+================================ */
+
+function wait(ms) {
+
+    return new Promise(
+        resolve =>
+            setTimeout(
+                resolve,
+                ms
+            )
+    );
+
+}
+
+
+/* ================================
+   GEMINI REQUEST WITH RETRY
+================================ */
+
+async function generateWithRetry(
+    contents,
+    systemInstruction
+) {
+
+    const MAX_RETRIES = 3;
+
+    const delays = [
+        1500,
+        3000,
+        5000
+    ];
+
+
+    let lastError = null;
+
+
+    for (
+        let attempt = 0;
+        attempt <= MAX_RETRIES;
+        attempt++
+    ) {
+
+        try {
+
+            console.log(
+                `→ Gemini attempt ${attempt + 1}/${MAX_RETRIES + 1}`
             );
 
-        removeTyping();
 
-        messages.push({
+            const response =
+                await ai.models.generateContent({
 
-            role:
-                "assistant",
+                    model:
+                        MODEL,
 
-            content:
-                reply,
+                    contents:
+                        contents,
 
-            timestamp:
-                Date.now()
+                    config: {
 
-        });
+                        systemInstruction:
+                            systemInstruction
 
-        renderMessages();
+                    }
 
-        updateChat();
+                });
 
-    }
 
-    catch (error) {
-
-        removeTyping();
-
-        console.error(
-            "Viggo error:",
-            error
-        );
-
-        messages.push({
-
-            role:
-                "assistant",
-
-            content:
-                "⚠️ " +
-                (
-                    error.message ||
-                    "Viggo AI error"
-                ),
-
-            timestamp:
-                Date.now()
-
-        });
-
-        renderMessages();
-
-        updateChat();
-
-    }
-
-    finally {
-
-        isSending =
-            false;
-
-        if (sendButton) {
-
-            sendButton.disabled =
-                false;
+            return response;
 
         }
 
-        input.focus();
 
-    }
+        catch (error) {
 
-}
+            lastError =
+                error;
 
-
-/* =========================================================
-   API CALL
-========================================================= */
-
-async function askViggo(
-    text
-) {
-
-    let response;
-
-    try {
-
-        response =
-            await fetch(
-                CHAT_API,
-                {
-
-                    method:
-                        "POST",
-
-                    headers: {
-
-                        "Content-Type":
-                            "application/json",
-
-                        "Accept":
-                            "application/json"
-
-                    },
-
-                    body:
-                        JSON.stringify({
-
-                            message:
-                                text,
-
-                            language:
-                                currentLanguage,
-
-                            history:
-                                messages
-                                    .slice(-15)
-                                    .map(
-                                        item => ({
-
-                                            role:
-                                                item.role,
-
-                                            content:
-                                                item.content
-
-                                        })
-                                    )
-
-                        })
-
-                }
-            );
-
-    }
-
-    catch (error) {
-
-        throw new Error(
-            "Render server-க்கு connect ஆகவில்லை."
-        );
-
-    }
-
-    const raw =
-        await response.text();
-
-    let data;
-
-    try {
-
-        data =
-            JSON.parse(raw);
-
-    }
-
-    catch {
-
-        throw new Error(
-            "Server invalid response கொடுத்தது."
-        );
-
-    }
-
-    if (!response.ok) {
-
-        throw new Error(
-
-            data.details ||
-            data.error ||
-            "Server error"
-
-        );
-
-    }
-
-    if (
-        !data.success
-    ) {
-
-        throw new Error(
-
-            data.details ||
-            data.error ||
-            "Viggo AI error"
-
-        );
-
-    }
-
-    if (
-        !data.reply
-    ) {
-
-        throw new Error(
-            "Viggo empty response கொடுத்தது."
-        );
-
-    }
-
-    return String(
-        data.reply
-    );
-
-}
-
-
-/* =========================================================
-   TYPING
-========================================================= */
-
-function showTyping() {
-
-    const area =
-        $("messages");
-
-    if (!area)
-        return;
-
-    removeTyping();
-
-    const div =
-        document.createElement(
-            "div"
-        );
-
-    div.id =
-        "viggoTyping";
-
-    div.className =
-        "message assistant-message";
-
-    div.innerHTML = `
-
-        <div class="message-bubble typing-bubble">
-            <span>●</span>
-            <span>●</span>
-            <span>●</span>
-        </div>
-
-    `;
-
-    area.appendChild(
-        div
-    );
-
-    scrollBottom();
-
-}
-
-
-/* =========================================================
-   REMOVE TYPING
-========================================================= */
-
-function removeTyping() {
-
-    const element =
-        $("viggoTyping");
-
-    if (element) {
-
-        element.remove();
-
-    }
-
-}
-
-
-/* =========================================================
-   COPY
-========================================================= */
-
-async function copyText(
-    text
-) {
-
-    try {
-
-        if (
-            navigator.clipboard
-        ) {
-
-            await navigator.clipboard.writeText(
-                text
-            );
-
-        } else {
-
-            throw new Error(
-                "Clipboard unavailable"
-            );
-
-        }
-
-    }
-
-    catch {
-
-        const textarea =
-            document.createElement(
-                "textarea"
-            );
-
-        textarea.value =
-            text;
-
-        textarea.style.position =
-            "fixed";
-
-        textarea.style.opacity =
-            "0";
-
-        document.body.appendChild(
-            textarea
-        );
-
-        textarea.focus();
-
-        textarea.select();
-
-        document.execCommand(
-            "copy"
-        );
-
-        textarea.remove();
-
-    }
-
-    showToast(
-        "✓ Copied"
-    );
-
-}
-
-
-/* =========================================================
-   VOICE OUTPUT
-========================================================= */
-
-function speakText(
-    text
-) {
-
-    if (
-        !window.speechSynthesis
-    ) {
-
-        showToast(
-            "Voice not supported"
-        );
-
-        return;
-
-    }
-
-    speechSynthesis.cancel();
-
-    const languageMap = {
-
-        en:
-            "en-IN",
-
-        ta:
-            "ta-IN",
-
-        hi:
-            "hi-IN",
-
-        ml:
-            "ml-IN",
-
-        te:
-            "te-IN",
-
-        kn:
-            "kn-IN"
-
-    };
-
-    const speech =
-        new SpeechSynthesisUtterance(
-            text
-        );
-
-    speech.lang =
-        languageMap[
-            currentLanguage
-        ] || "en-IN";
-
-    speech.rate =
-        1;
-
-    speech.pitch =
-        1;
-
-    speechSynthesis.speak(
-        speech
-    );
-
-}
-
-
-/* =========================================================
-   VOICE INPUT
-========================================================= */
-
-function setupVoice() {
-
-    const SpeechRecognition =
-        window.SpeechRecognition ||
-        window.webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-
-        recognition =
-            null;
-
-        return;
-
-    }
-
-    recognition =
-        new SpeechRecognition();
-
-    recognition.continuous =
-        false;
-
-    recognition.interimResults =
-        false;
-
-    recognition.maxAlternatives =
-        1;
-
-    recognition.onstart =
-        () => {
-
-            isListening =
-                true;
-
-            $("voiceBtn")
-                ?.classList
-                .add(
-                    "active"
-                );
-
-            showToast(
-                "🎤 Listening..."
-            );
-
-        };
-
-    recognition.onresult =
-        event => {
-
-            const result =
-                event.results?.[0]?.[0];
-
-            if (!result)
-                return;
-
-            const text =
-                result.transcript;
-
-            const input =
-                $("messageInput");
-
-            if (input) {
-
-                input.value =
-                    text;
-
-                input.focus();
-
-            }
-
-        };
-
-    recognition.onerror =
-        event => {
 
             console.error(
-                "Voice error:",
-                event.error
+                `❌ Gemini attempt ${attempt + 1} failed:`,
+                error?.message ||
+                error
             );
 
+
+            /*
+               Do not retry model-not-found,
+               API-key or authentication errors.
+            */
+
             if (
-                event.error ===
-                "not-allowed"
+                !isRetryableError(
+                    error
+                )
             ) {
 
-                showToast(
-                    "Microphone permission denied"
-                );
-
-            } else {
-
-                showToast(
-                    "Voice error: " +
-                    event.error
-                );
+                throw error;
 
             }
 
-        };
 
-    recognition.onend =
-        () => {
+            /*
+               Maximum retry reached.
+            */
 
-            isListening =
-                false;
+            if (
+                attempt >= MAX_RETRIES
+            ) {
 
-            $("voiceBtn")
-                ?.classList
-                .remove(
-                    "active"
+                throw error;
+
+            }
+
+
+            const delay =
+                delays[
+                    attempt
+                ] ||
+                5000;
+
+
+            console.log(
+                `⏳ Temporary Gemini error. Retrying in ${delay}ms...`
+            );
+
+
+            await wait(
+                delay
+            );
+
+        }
+
+    }
+
+
+    throw lastError;
+
+}
+
+
+/* ================================
+   CHAT
+================================ */
+
+app.post(
+    "/chat",
+    async (req, res) => {
+
+        try {
+
+            /* --------------------------------
+               API KEY CHECK
+            -------------------------------- */
+
+            if (
+                !API_KEY ||
+                !ai
+            ) {
+
+                return res.status(500).json({
+
+                    success: false,
+
+                    error:
+                        "GEMINI_API_KEY is missing.",
+
+                    details:
+                        "Add GEMINI_API_KEY in Render → Environment Variables."
+
+                });
+
+            }
+
+
+            /* --------------------------------
+               REQUEST DATA
+            -------------------------------- */
+
+            const message =
+                cleanText(
+                    req.body?.message
                 );
 
-        };
 
-}
-
-
-/* =========================================================
-   TOGGLE VOICE
-========================================================= */
-
-function toggleVoice() {
-
-    if (!recognition) {
-
-        showToast(
-            "Voice input is not supported in this browser."
-        );
-
-        return;
-
-    }
-
-    if (isListening) {
-
-        recognition.stop();
-
-        return;
-
-    }
-
-    const languageMap = {
-
-        en:
-            "en-IN",
-
-        ta:
-            "ta-IN",
-
-        hi:
-            "hi-IN",
-
-        ml:
-            "ml-IN",
-
-        te:
-            "te-IN",
-
-        kn:
-            "kn-IN"
-
-    };
-
-    recognition.lang =
-        languageMap[
-            currentLanguage
-        ] || "en-IN";
-
-    try {
-
-        recognition.start();
-
-    }
-
-    catch (error) {
-
-        console.error(
-            error
-        );
-
-    }
-
-}
+            const language =
+                cleanText(
+                    req.body?.language
+                ) || "en";
 
 
-/* =========================================================
-   SHARE CHAT
-========================================================= */
+            const history =
+                req.body?.history;
 
-async function shareChat() {
 
-    const chats =
-        getChats();
+            /* --------------------------------
+               MESSAGE VALIDATION
+            -------------------------------- */
 
-    const chat =
-        chats.find(
-            item =>
-                item.id ===
-                currentChatId
-        );
+            if (!message) {
 
-    if (!chat) {
+                return res.status(400).json({
 
-        showToast(
-            "No chat to share"
-        );
+                    success: false,
 
-        return;
+                    error:
+                        "Message is required."
 
-    }
+                });
 
-    const json =
-        JSON.stringify({
+            }
 
-            title:
-                chat.title,
 
-            messages:
-                chat.messages
+            /* --------------------------------
+               LANGUAGE
+            -------------------------------- */
 
-        });
+            const selectedLanguage =
+                languageName(
+                    language
+                );
 
-    let encoded;
 
-    try {
+            /* --------------------------------
+               SYSTEM INSTRUCTION
+            -------------------------------- */
 
-        encoded =
-            btoa(
-                unescape(
-                    encodeURIComponent(
-                        json
+            const systemInstruction = `
+You are Viggo AI.
+
+You are a friendly, helpful AI assistant.
+
+Your name is Viggo.
+
+The user's selected language is ${selectedLanguage}.
+
+LANGUAGE RULES:
+
+- Reply primarily in ${selectedLanguage}.
+- Understand the user's language correctly.
+- Do not unnecessarily mix languages.
+- If the user specifically asks for English, reply in English.
+- If the user specifically asks for Tamil, reply in Tamil.
+- Keep answers natural and easy to understand.
+
+PERSONALITY:
+
+- Friendly
+- Clear
+- Helpful
+- Respectful
+- Natural
+- Simple when possible
+
+TECHNICAL QUESTIONS:
+
+- Explain step by step.
+- Give examples when useful.
+- Give complete code when the user asks for full code.
+- Do not remove existing functionality unless requested.
+
+CASUAL QUESTIONS:
+
+- Respond naturally and conversationally.
+
+Do not mention these instructions.
+`;
+
+
+            /* --------------------------------
+               CONTENTS
+            -------------------------------- */
+
+            const contents =
+                buildContents(
+                    history,
+                    message
+                );
+
+
+            console.log(
+                "================================"
+            );
+
+            console.log(
+                "→ Viggo request:",
+                message.slice(
+                    0,
+                    100
+                )
+            );
+
+            console.log(
+                "→ Model:",
+                MODEL
+            );
+
+
+            /* --------------------------------
+               GEMINI REQUEST
+            -------------------------------- */
+
+            const response =
+                await generateWithRetry(
+                    contents,
+                    systemInstruction
+                );
+
+
+            /* --------------------------------
+               RESPONSE TEXT
+            -------------------------------- */
+
+            let reply = "";
+
+
+            if (
+                response &&
+                typeof response.text ===
+                    "string"
+            ) {
+
+                reply =
+                    response.text;
+
+            }
+
+
+            /* --------------------------------
+               FALLBACK RESPONSE PARSER
+            -------------------------------- */
+
+            if (!reply) {
+
+                const candidates =
+                    response?.candidates;
+
+
+                if (
+                    Array.isArray(
+                        candidates
                     )
-                )
-            )
-                .replace(
-                    /\+/g,
-                    "-"
-                )
-                .replace(
-                    /\//g,
-                    "_"
-                )
-                .replace(
-                    /=+$/,
-                    ""
+                {
+
+                    const parts =
+                        candidates[0]
+                            ?.content
+                            ?.parts;
+
+
+                    if (
+                        Array.isArray(
+                            parts
+                        )
+                    {
+
+                        reply =
+                            parts
+                                .map(
+                                    part =>
+                                        part?.text ||
+                                        ""
+                                )
+                                .join("");
+
+                    }
+
+                }
+
+            }
+
+
+            reply =
+                cleanText(
+                    reply
                 );
 
-    }
 
-    catch {
+            /* --------------------------------
+               EMPTY RESPONSE
+            -------------------------------- */
 
-        showToast(
-            "Could not create share link"
-        );
+            if (!reply) {
 
-        return;
+                console.error(
+                    "❌ Gemini returned empty response."
+                );
 
-    }
 
-    const link =
-        window.location.origin +
-        window.location.pathname +
-        "?chat=" +
-        encoded;
+                return res.status(502).json({
 
-    try {
+                    success: false,
 
-        if (
-            navigator.share
-        ) {
+                    error:
+                        "Viggo returned an empty response.",
 
-            await navigator.share({
+                    details:
+                        "Gemini did not return text."
 
-                title:
-                    chat.title ||
-                    "Viggo AI Chat",
+                });
 
-                text:
-                    "Viggo AI Chat",
+            }
 
-                url:
-                    link
+
+            /* --------------------------------
+               SUCCESS
+            -------------------------------- */
+
+            console.log(
+                "✓ Response received."
+            );
+
+            console.log(
+                "================================"
+            );
+
+
+            return res.json({
+
+                success: true,
+
+                reply:
+                    reply,
+
+                model:
+                    MODEL
 
             });
 
         }
 
-        else {
 
-            await copyText(
-                link
+        catch (error) {
+
+            console.error(
+                "================================"
             );
 
-            showToast(
-                "🔗 Share link copied"
+            console.error(
+                "❌ Gemini final error:"
             );
-
-        }
-
-    }
-
-    catch (error) {
-
-        if (
-            error?.name !==
-            "AbortError"
-        ) {
 
             console.error(
                 error
             );
 
-        }
-
-    }
-
-}
+            console.error(
+                "================================"
+            );
 
 
-/* =========================================================
-   LOAD SHARED CHAT
-========================================================= */
-
-function loadSharedChat() {
-
-    const params =
-        new URLSearchParams(
-            window.location.search
-        );
-
-    const encoded =
-        params.get(
-            "chat"
-        );
-
-    if (!encoded)
-        return;
-
-    try {
-
-        let fixed =
-            encoded
-                .replace(
-                    /-/g,
-                    "+"
-                )
-                .replace(
-                    /_/g,
-                    "/"
+            const errorText =
+                String(
+                    error?.message ||
+                    error ||
+                    ""
                 );
 
-        while (
-            fixed.length % 4
-        ) {
 
-            fixed += "=";
+            const lower =
+                errorText.toLowerCase();
 
-        }
 
-        const json =
-            decodeURIComponent(
-                escape(
-                    atob(
-                        fixed
+            /* ==============================
+               429 / HIGH DEMAND
+            ============================== */
+
+            if (
+                lower.includes("429") ||
+                lower.includes(
+                    "resource exhausted"
+                ) ||
+                lower.includes(
+                    "too many requests"
+                ) ||
+                lower.includes(
+                    "rate limit"
+                ) ||
+                lower.includes(
+                    "high demand"
+                ) ||
+                lower.includes(
+                    "quota"
+                )
+            ) {
+
+                return res.status(429).json({
+
+                    success: false,
+
+                    error:
+                        "Viggo AI is temporarily busy.",
+
+                    details:
+                        "Gemini is currently experiencing high demand. Please try again in a few seconds."
+
+                });
+
+            }
+
+
+            /* ==============================
+               MODEL NOT FOUND
+            ============================== */
+
+            if (
+                lower.includes(
+                    "model"
+                ) &&
+                (
+                    lower.includes("404") ||
+                    lower.includes(
+                        "not found"
+                    ) ||
+                    lower.includes(
+                        "not available"
                     )
                 )
-            );
+            ) {
 
-        const chat =
-            JSON.parse(
-                json
-            );
+                return res.status(502).json({
 
-        if (
-            !chat ||
-            !Array.isArray(
-                chat.messages
-            )
-        ) {
+                    success: false,
 
-            throw new Error(
-                "Invalid shared chat"
-            );
+                    error:
+                        "Gemini model is unavailable.",
 
-        }
+                    details:
+                        "Current model: " +
+                        MODEL +
+                        ". Change GEMINI_MODEL in Render Environment Variables to a model available to your Gemini API account."
 
-        messages =
-            chat.messages;
-
-        currentChatId =
-            "shared_" +
-            Date.now();
-
-        renderMessages();
-
-        const title =
-            $("chatTitle");
-
-        if (title) {
-
-            title.textContent =
-                chat.title ||
-                "Shared Chat";
-
-        }
-
-        showToast(
-            "🔗 Shared chat opened"
-        );
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "Share error:",
-            error
-        );
-
-        showToast(
-            "Invalid share link"
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   MORE MENU
-========================================================= */
-
-function toggleMore() {
-
-    const menu =
-        $("moreMenu");
-
-    if (!menu)
-        return;
-
-    menu.classList.toggle(
-        "show"
-    );
-
-}
-
-
-function closeMore() {
-
-    $("moreMenu")
-        ?.classList
-        .remove(
-            "show"
-        );
-
-}
-
-
-/* =========================================================
-   SIDEBAR OPEN / CLOSE
-========================================================= */
-
-function openSidebar() {
-
-    const sidebar =
-        $("sidebar");
-
-    if (sidebar) {
-
-        sidebar.classList.add(
-            "open"
-        );
-
-    }
-
-}
-
-
-function closeSidebar() {
-
-    const sidebar =
-        $("sidebar");
-
-    if (sidebar) {
-
-        sidebar.classList.remove(
-            "open"
-        );
-
-    }
-
-}
-
-
-function toggleSidebar() {
-
-    const sidebar =
-        $("sidebar");
-
-    if (!sidebar)
-        return;
-
-    sidebar.classList.toggle(
-        "open"
-    );
-
-}
-
-
-/* =========================================================
-   LANGUAGE
-========================================================= */
-
-function setLanguage(
-    language
-) {
-
-    const validLanguages = [
-        "en",
-        "ta",
-        "hi",
-        "ml",
-        "te",
-        "kn"
-    ];
-
-    if (
-        !validLanguages.includes(
-            language
-        )
-    ) {
-
-        return;
-
-    }
-
-    currentLanguage =
-        language;
-
-    saveSettings();
-
-    const names = {
-
-        en:
-            "English",
-
-        ta:
-            "தமிழ்",
-
-        hi:
-            "हिन्दी",
-
-        ml:
-            "മലയാളം",
-
-        te:
-            "తెలుగు",
-
-        kn:
-            "ಕನ್ನಡ"
-
-    };
-
-    showToast(
-        "🌐 Language: " +
-        names[language]
-    );
-
-    closeMore();
-
-}
-
-
-/* =========================================================
-   TOAST
-========================================================= */
-
-function showToast(
-    message
-) {
-
-    let toast =
-        $("viggoToast");
-
-    if (!toast) {
-
-        toast =
-            document.createElement(
-                "div"
-            );
-
-        toast.id =
-            "viggoToast";
-
-        toast.className =
-            "toast";
-
-        document.body.appendChild(
-            toast
-        );
-
-    }
-
-    toast.textContent =
-        message;
-
-    toast.classList.add(
-        "show"
-    );
-
-    clearTimeout(
-        toast.timer
-    );
-
-    toast.timer =
-        setTimeout(
-            () => {
-
-                toast.classList.remove(
-                    "show"
-                );
-
-            },
-            2500
-        );
-
-}
-
-
-/* =========================================================
-   SCROLL
-========================================================= */
-
-function scrollBottom() {
-
-    const area =
-        $("messages");
-
-    if (!area)
-        return;
-
-    requestAnimationFrame(
-        () => {
-
-            area.scrollTop =
-                area.scrollHeight;
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   EVENTS
-========================================================= */
-
-function setupEvents() {
-
-    /* NEW CHAT */
-
-    $("newChatBtn")
-        ?.addEventListener(
-            "click",
-            newChat
-        );
-
-
-    /* SEND */
-
-    $("sendBtn")
-        ?.addEventListener(
-            "click",
-            sendMessage
-        );
-
-
-    /* SHARE */
-
-    $("shareBtn")
-        ?.addEventListener(
-            "click",
-            shareChat
-        );
-
-
-    /* VOICE */
-
-    $("voiceBtn")
-        ?.addEventListener(
-            "click",
-            toggleVoice
-        );
-
-
-    /* MORE */
-
-    $("moreBtn")
-        ?.addEventListener(
-            "click",
-            event => {
-
-                event.stopPropagation();
-
-                toggleMore();
+                });
 
             }
-        );
 
 
-    /* SAVE */
-
-    $("saveBtn")
-        ?.addEventListener(
-            "click",
-            saveCurrentChat
-        );
-
-
-    /* SELECT */
-
-    $("selectChatsBtn")
-        ?.addEventListener(
-            "click",
-            toggleSelectMode
-        );
-
-
-    /* DELETE SELECTED */
-
-    $("deleteSelectedBtn")
-        ?.addEventListener(
-            "click",
-            deleteSelectedChats
-        );
-
-
-    /* CLEAR */
-
-    $("clearHistoryBtn")
-        ?.addEventListener(
-            "click",
-            clearHistory
-        );
-
-
-    /* =====================================================
-       SIDEBAR BUTTON
-    ===================================================== */
-
-    $("mobileMenuBtn")
-        ?.addEventListener(
-            "click",
-            event => {
-
-                event.stopPropagation();
-
-                toggleSidebar();
-
-            }
-        );
-
-
-    /* =====================================================
-       ENTER
-    ===================================================== */
-
-    $("messageInput")
-        ?.addEventListener(
-            "keydown",
-            event => {
-
-                if (
-                    event.key ===
-                    "Enter" &&
-                    !event.shiftKey
-                ) {
-
-                    event.preventDefault();
-
-                    sendMessage();
-
-                }
-
-            }
-        );
-
-
-    /* =====================================================
-       LANGUAGE
-    ===================================================== */
-
-    document
-        .querySelectorAll(
-            "[data-language]"
-        )
-        .forEach(
-            button => {
-
-                button.addEventListener(
-                    "click",
-                    () => {
-
-                        setLanguage(
-                            button.dataset.language
-                        );
-
-                    }
-                );
-
-            }
-        );
-
-
-    /* =====================================================
-       OUTSIDE CLICK - MORE MENU + SIDEBAR
-    ===================================================== */
-
-    document.addEventListener(
-        "click",
-        event => {
-
-            /* MORE MENU */
+            /* ==============================
+               API KEY
+            ============================== */
 
             if (
-                !event.target.closest(
-                    ".sidebar-more"
+                lower.includes(
+                    "api key"
+                ) ||
+                lower.includes(
+                    "401"
+                ) ||
+                lower.includes(
+                    "unauthenticated"
+                ) ||
+                lower.includes(
+                    "authentication"
                 )
             ) {
 
-                closeMore();
+                return res.status(401).json({
+
+                    success: false,
+
+                    error:
+                        "Gemini API key error.",
+
+                    details:
+                        "Check GEMINI_API_KEY in Render → Environment Variables."
+
+                });
 
             }
 
 
-            /* SIDEBAR */
-
-            const sidebar =
-                $("sidebar");
-
-            const mobileButton =
-                $("mobileMenuBtn");
+            /* ==============================
+               PERMISSION
+            ============================== */
 
             if (
-                sidebar &&
-                sidebar.classList.contains(
-                    "open"
-                ) &&
-                !sidebar.contains(
-                    event.target
-                ) &&
-                !mobileButton?.contains(
-                    event.target
+                lower.includes(
+                    "permission denied"
+                ) ||
+                lower.includes(
+                    "403"
+                ) ||
+                lower.includes(
+                    "permission"
                 )
             ) {
 
-                closeSidebar();
+                return res.status(403).json({
+
+                    success: false,
+
+                    error:
+                        "Gemini API permission error.",
+
+                    details:
+                        errorText
+
+                });
 
             }
 
-        }
-    );
 
+            /* ==============================
+               GENERAL ERROR
+            ============================== */
 
-    /* =====================================================
-       ESC KEY - CLOSE SIDEBAR
-    ===================================================== */
+            return res.status(500).json({
 
-    document.addEventListener(
-        "keydown",
-        event => {
+                success: false,
 
-            if (
-                event.key ===
-                "Escape"
-            ) {
+                error:
+                    "Viggo AI could not generate a response.",
 
-                closeSidebar();
+                details:
+                    errorText
 
-                closeMore();
-
-            }
+            });
 
         }
-    );
-
-
-    /* =====================================================
-       LOAD SHARED CHAT
-    ===================================================== */
-
-    loadSharedChat();
-
-}
-
-
-/* =========================================================
-   PREVENT ACCIDENTAL FORM SUBMIT
-========================================================= */
-
-document.addEventListener(
-    "submit",
-    event => {
-
-        event.preventDefault();
 
     }
 );
-```
+
+
+/* ================================
+   404
+================================ */
+
+app.use(
+    (req, res) => {
+
+        res.status(404).json({
+
+            success: false,
+
+            error:
+                "Endpoint not found.",
+
+            path:
+                req.path
+
+        });
+
+    }
+);
+
+
+/* ================================
+   GLOBAL ERROR
+================================ */
+
+app.use(
+    (
+        error,
+        req,
+        res,
+        next
+    ) => {
+
+        console.error(
+            "Unhandled server error:",
+            error
+        );
+
+
+        if (
+            res.headersSent
+        ) {
+
+            return next(
+                error
+            );
+
+        }
+
+
+        res.status(500).json({
+
+            success: false,
+
+            error:
+                "Internal server error."
+
+        });
+
+    }
+);
+
+
+/* ================================
+   START SERVER
+================================ */
+
+app.listen(
+    PORT,
+    () => {
+
+        console.log("");
+
+        console.log(
+            "================================"
+        );
+
+        console.log(
+            "       VIGGO AI SERVER ONLINE"
+        );
+
+        console.log(
+            "================================"
+        );
+
+        console.log(
+            "PORT:",
+            PORT
+        );
+
+        console.log(
+            "MODEL:",
+            MODEL
+        );
+
+        console.log(
+            "API KEY:",
+            API_KEY
+                ? "CONFIGURED"
+                : "MISSING"
+        );
+
+        console.log(
+            "RETRY:",
+            "ENABLED"
+        );
+
+        console.log(
+            "================================"
+        );
+
+        console.log("");
+
+    }
+);
