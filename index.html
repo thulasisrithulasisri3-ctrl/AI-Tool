@@ -1,426 +1,551 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
 
-  <title>Viggo AI</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-  <link rel="stylesheet" href="style.css">
+    <meta
+        name="theme-color"
+        content="#05070c"
+    >
+
+    <title>Viggo AI</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 </head>
 
 <body>
 
 <div class="app">
 
-  <!-- ================= SIDEBAR ================= -->
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
 
-  <aside class="sidebar" id="sidebar">
-
-    <div class="sidebar-top">
-
-      <div class="brand">
-        <div class="brand-logo">V</div>
-        <div>
-          <div class="brand-name">Viggo AI</div>
-          <div class="brand-status">AI Assistant</div>
-        </div>
-      </div>
-
-      <button
-        class="new-chat-btn"
-        id="newChatButton"
-        type="button"
-      >
-        <span>＋</span>
-        New Chat
-      </button>
-
-    </div>
-
-
-    <!-- RECENT -->
-
-    <div class="recent-title">
-      Recent
-    </div>
-
-    <div
-      class="history-container"
-      id="historyContainer"
-    ></div>
-
-
-    <!-- SIDEBAR MORE -->
-
-    <div class="sidebar-bottom">
-
-      <button
-        class="more-button"
-        id="moreButton"
-        type="button"
-      >
-        <span>⋮</span>
-        More
-      </button>
-
-      <div
-        class="more-menu"
-        id="moreMenu"
-      >
-
-        <button id="languageButton" type="button">
-          🌐 Language
-        </button>
-
-        <button id="voiceSettingsButton" type="button">
-          🎤 Voice
-        </button>
-
-        <button id="clearHistoryButton" type="button">
-          🗑️ Clear History
-        </button>
-
-      </div>
-
-    </div>
-
-  </aside>
-
-
-  <!-- ================= MAIN ================= -->
-
-  <main class="main">
-
-
-    <!-- HEADER -->
-
-    <header class="header">
-
-      <div class="header-left">
-
-        <button
-          class="mobile-menu"
-          id="mobileMenuButton"
-          type="button"
-        >
-          ☰
-        </button>
-
-        <div>
-          <h1>Viggo AI</h1>
-          <span>How can I help you?</span>
-        </div>
-
-      </div>
-
-
-      <div class="header-right">
-
-        <a
-          href="https://ai-tool-2-zpul.onrender.com"
-          target="_blank"
-          class="server-link"
-        >
-          🔗 Server
-        </a>
-
-      </div>
-
-    </header>
-
-
-    <!-- ================= CHAT ================= -->
-
-    <section
-      class="message-container"
-      id="messageContainer"
+    <aside
+        class="sidebar"
+        id="sidebar"
     >
 
-      <div class="welcome">
+        <!-- BRAND -->
 
-        <div class="welcome-logo">
-          V
+        <div class="brand">
+
+            <div class="brand-logo">
+                V
+            </div>
+
+            <div>
+                <div class="brand-name">
+                    Viggo AI
+                </div>
+
+                <div class="brand-status">
+                    AI Assistant
+                </div>
+            </div>
+
         </div>
 
-        <h2>
-          Hi! I'm Viggo AI 👋
-        </h2>
 
-        <p>
-          Ask me anything. I'm here to help.
-        </p>
-
-      </div>
-
-    </section>
-
-
-    <!-- ================= INPUT ================= -->
-
-    <div class="input-wrapper">
-
-      <div class="input-box">
-
-
-        <!-- PLUS -->
+        <!-- NEW CHAT -->
 
         <button
-          class="input-button"
-          id="plusButton"
-          type="button"
-          title="Add"
+            id="newChatButton"
+            class="new-chat-btn"
+            type="button"
         >
-          ＋
+            <span>＋</span>
+            New Chat
         </button>
 
 
-        <!-- PLUS MENU -->
+        <!-- RECENT -->
+
+        <div class="recent-title">
+            Recent
+        </div>
+
+
+        <!-- HISTORY -->
 
         <div
-          class="plus-menu"
-          id="plusMenu"
+            id="historyContainer"
+            class="history-container"
         >
+            <!-- JavaScript creates chats here -->
+        </div>
 
-          <button
-            id="photoButton"
-            type="button"
-          >
-            📷
-            <span>Photos</span>
-          </button>
 
-          <button
-            id="videoButton"
-            type="button"
-          >
-            🎥
-            <span>Videos</span>
-          </button>
+        <!-- SELECT / DELETE -->
 
-          <button
-            id="fileButton"
-            type="button"
-          >
-            📎
-            <span>Files</span>
-          </button>
+        <div class="select-controls">
+
+            <button
+                id="selectChatsButton"
+                class="select-button"
+                type="button"
+            >
+                ☑ Select Chats
+            </button>
+
+            <button
+                id="deleteSelectedButton"
+                class="delete-selected-button"
+                type="button"
+                disabled
+            >
+                🗑 Delete Selected
+            </button>
 
         </div>
 
 
-        <!-- HIDDEN FILE INPUTS -->
+        <!-- DELETED CHATS -->
 
-        <input
-          type="file"
-          id="photoInput"
-          accept="image/*"
-          hidden
+        <div class="deleted-section">
+
+            <button
+                id="deletedChatsButton"
+                class="deleted-chats-button"
+                type="button"
+            >
+                🗑 Deleted Chats
+            </button>
+
+            <div
+                id="deletedChatsContainer"
+                class="deleted-chats-container"
+            >
+                <!-- Deleted chats appear here -->
+            </div>
+
+        </div>
+
+
+        <!-- MORE -->
+
+        <div class="sidebar-bottom">
+
+            <button
+                id="moreButton"
+                class="more-button"
+                type="button"
+            >
+                ⋮
+                More
+            </button>
+
+
+            <div
+                id="moreMenu"
+                class="more-menu"
+            >
+
+                <button
+                    id="languageButton"
+                    type="button"
+                >
+                    🌐 Language
+                </button>
+
+                <button
+                    id="voiceButton"
+                    type="button"
+                >
+                    🔊 Voice
+                </button>
+
+                <button
+                    id="clearAllButton"
+                    type="button"
+                >
+                    🗑 Clear All Chats
+                </button>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main class="main">
+
+
+        <!-- HEADER -->
+
+        <header class="header">
+
+            <div class="header-left">
+
+                <button
+                    id="mobileMenuButton"
+                    class="mobile-menu"
+                    type="button"
+                    aria-label="Open menu"
+                >
+                    ☰
+                </button>
+
+
+                <div>
+
+                    <h1>
+                        Viggo AI
+                    </h1>
+
+                    <span>
+                        Your intelligent AI assistant
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- TOP RIGHT SERVER LINK -->
+
+            <div class="header-right">
+
+                <a
+                    id="serverLink"
+                    class="server-link"
+                    href="https://ai-tool-2-zpul.onrender.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    🔗 Viggo Server
+                </a>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             MESSAGE AREA
+        ================================================== -->
+
+        <section
+            id="messageContainer"
+            class="message-container"
         >
 
-        <input
-          type="file"
-          id="videoInput"
-          accept="video/*"
-          hidden
-        >
+            <!-- WELCOME -->
 
-        <input
-          type="file"
-          id="fileInput"
-          hidden
-        >
+            <div
+                id="welcomeScreen"
+                class="welcome"
+            >
 
+                <div class="welcome-logo">
+                    V
+                </div>
 
-        <!-- MESSAGE -->
+                <h2>
+                    How can I help you?
+                </h2>
 
-        <textarea
-          id="messageInput"
-          class="message-input"
-          placeholder="Message Viggo AI..."
-          rows="1"
-        ></textarea>
+                <p>
+                    Ask Viggo AI anything.
+                </p>
+
+            </div>
 
 
-        <!-- VOICE -->
+            <!-- MESSAGES CREATED BY JS -->
 
-        <button
-          class="input-button"
-          id="voiceButton"
-          type="button"
-          title="Voice"
-        >
-          🎤
-        </button>
+        </section>
 
 
-        <!-- SEND -->
+        <!-- =================================================
+             INPUT AREA
+        ================================================== -->
 
-        <button
-          class="send-button"
-          id="sendButton"
-          type="button"
-          title="Send"
-        >
-          ➤
-        </button>
+        <section class="input-wrapper">
 
-      </div>
-
-    </div>
+            <div class="input-box">
 
 
-  </main>
+                <!-- PLUS -->
+
+                <button
+                    id="plusButton"
+                    class="input-button"
+                    type="button"
+                    aria-label="More options"
+                >
+                    ＋
+                </button>
+
+
+                <!-- PLUS MENU -->
+
+                <div
+                    id="plusMenu"
+                    class="plus-menu"
+                >
+
+                    <button
+                        id="photoButton"
+                        type="button"
+                    >
+                        📷
+                        <span>
+                            Photo
+                        </span>
+                    </button>
+
+                    <button
+                        id="videoButton"
+                        type="button"
+                    >
+                        🎥
+                        <span>
+                            Video
+                        </span>
+                    </button>
+
+                    <button
+                        id="fileButton"
+                        type="button"
+                    >
+                        📎
+                        <span>
+                            File
+                        </span>
+                    </button>
+
+                </div>
+
+
+                <!-- HIDDEN FILE INPUT -->
+
+                <input
+                    id="photoInput"
+                    type="file"
+                    accept="image/*"
+                    hidden
+                >
+
+                <input
+                    id="videoInput"
+                    type="file"
+                    accept="video/*"
+                    hidden
+                >
+
+                <input
+                    id="fileInput"
+                    type="file"
+                    hidden
+                >
+
+
+                <!-- MESSAGE INPUT -->
+
+                <textarea
+                    id="messageInput"
+                    class="message-input"
+                    rows="1"
+                    placeholder="Message Viggo AI..."
+                    autocomplete="off"
+                ></textarea>
+
+
+                <!-- VOICE -->
+
+                <button
+                    id="voiceInputButton"
+                    class="input-button"
+                    type="button"
+                    aria-label="Voice input"
+                    title="Voice input"
+                >
+                    🎤
+                </button>
+
+
+                <!-- SEND -->
+
+                <button
+                    id="sendButton"
+                    class="send-button"
+                    type="button"
+                    aria-label="Send message"
+                    title="Send"
+                >
+                    ➤
+                </button>
+
+            </div>
+
+        </section>
+
+    </main>
 
 </div>
 
 
-<!-- ================= LANGUAGE MODAL ================= -->
+<!-- =====================================================
+     LANGUAGE MODAL
+====================================================== -->
 
 <div
-  class="modal"
-  id="languageModal"
+    id="languageModal"
+    class="modal"
 >
 
-  <div class="modal-box">
+    <div class="modal-box">
 
-    <div class="modal-header">
-      <h3>🌐 Language</h3>
+        <div class="modal-header">
 
-      <button
-        id="closeLanguage"
-        type="button"
-      >
-        ×
-      </button>
+            <h3>
+                Select Language
+            </h3>
+
+            <button
+                id="closeLanguageModal"
+                type="button"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <label for="languageSelect">
+            Language
+        </label>
+
+        <select
+            id="languageSelect"
+        >
+
+            <option value="en">
+                English
+            </option>
+
+            <option value="ta">
+                தமிழ்
+            </option>
+
+            <option value="hi">
+                हिन्दी
+            </option>
+
+            <option value="ml">
+                മലയാളം
+            </option>
+
+            <option value="te">
+                తెలుగు
+            </option>
+
+            <option value="kn">
+                ಕನ್ನಡ
+            </option>
+
+        </select>
+
+
+        <button
+            id="saveLanguageButton"
+            class="save-button"
+            type="button"
+        >
+            Save Language
+        </button>
+
     </div>
-
-
-    <select id="languageSelect">
-
-      <option value="en">
-        English
-      </option>
-
-      <option value="ta">
-        தமிழ்
-      </option>
-
-      <option value="hi">
-        हिन्दी
-      </option>
-
-      <option value="ml">
-        മലയാളം
-      </option>
-
-      <option value="te">
-        తెలుగు
-      </option>
-
-      <option value="kn">
-        ಕನ್ನಡ
-      </option>
-
-      <option value="bn">
-        বাংলা
-      </option>
-
-      <option value="mr">
-        मराठी
-      </option>
-
-      <option value="gu">
-        ગુજરાતી
-      </option>
-
-      <option value="pa">
-        ਪੰਜਾਬੀ
-      </option>
-
-      <option value="ur">
-        اردو
-      </option>
-
-      <option value="es">
-        Español
-      </option>
-
-      <option value="fr">
-        Français
-      </option>
-
-      <option value="de">
-        Deutsch
-      </option>
-
-      <option value="ja">
-        日本語
-      </option>
-
-      <option value="ko">
-        한국어
-      </option>
-
-    </select>
-
-  </div>
 
 </div>
 
 
-<!-- ================= VOICE MODAL ================= -->
+<!-- =====================================================
+     CONFIRM MODAL
+====================================================== -->
 
 <div
-  class="modal"
-  id="voiceModal"
+    id="confirmModal"
+    class="modal"
 >
 
-  <div class="modal-box">
+    <div class="modal-box">
 
-    <div class="modal-header">
+        <div class="modal-header">
 
-      <h3>🎤 Voice</h3>
+            <h3 id="confirmTitle">
+                Confirm
+            </h3>
 
-      <button
-        id="closeVoice"
-        type="button"
-      >
-        ×
-      </button>
+            <button
+                id="closeConfirmModal"
+                type="button"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <p
+            id="confirmMessage"
+            style="
+                color:#aeb9c9;
+                line-height:1.6;
+                margin-bottom:18px;
+            "
+        >
+            Are you sure?
+        </p>
+
+
+        <div
+            style="
+                display:flex;
+                gap:8px;
+            "
+        >
+
+            <button
+                id="cancelConfirmButton"
+                class="select-button"
+                type="button"
+            >
+                Cancel
+            </button>
+
+            <button
+                id="confirmActionButton"
+                class="delete-selected-button"
+                type="button"
+            >
+                Confirm
+            </button>
+
+        </div>
 
     </div>
 
-
-    <label>
-      Voice
-    </label>
-
-    <select id="voiceSelect">
-
-      <option value="female">
-        Female
-      </option>
-
-      <option value="male">
-        Male
-      </option>
-
-    </select>
-
-
-    <button
-      class="save-button"
-      id="saveVoice"
-      type="button"
-    >
-      Save
-    </button>
-
-  </div>
-
 </div>
 
+
+<!-- =====================================================
+     MAIN SCRIPT
+====================================================== -->
 
 <script src="script.js"></script>
 
