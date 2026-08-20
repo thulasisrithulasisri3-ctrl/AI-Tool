@@ -15,7 +15,8 @@
 
 body{
     height:100vh;
-    background:#f5f7fb;
+    background:#050b16;
+    color:#fff;
     overflow:hidden;
 }
 
@@ -28,8 +29,8 @@ body{
 
 .sidebar{
     width:280px;
-    background:#fff;
-    border-right:1px solid #ddd;
+    background:#07101f;
+    border-right:1px solid #12345c;
     display:flex;
     flex-direction:column;
     transition:.3s;
@@ -40,17 +41,19 @@ body{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    border-bottom:1px solid #eee;
+    border-bottom:1px solid #12345c;
 }
 
 .logo{
     font-size:22px;
     font-weight:bold;
+    color:#1683ff;
 }
 
 .close-sidebar{
     border:0;
     background:none;
+    color:#fff;
     font-size:22px;
     cursor:pointer;
 }
@@ -58,19 +61,30 @@ body{
 .new-chat{
     margin:15px;
     padding:12px;
-    border:0;
+    border:1px solid #1677ff;
     border-radius:10px;
     cursor:pointer;
     font-size:15px;
-    background:#eee;
+    background:#0b1d38;
+    color:#fff;
+}
+
+.new-chat:hover{
+    background:#0d47a1;
 }
 
 .search-box{
     margin:0 15px 10px;
     padding:10px;
-    border:1px solid #ddd;
+    border:1px solid #12345c;
     border-radius:9px;
     outline:none;
+    background:#050b16;
+    color:#fff;
+}
+
+.search-box::placeholder{
+    color:#789;
 }
 
 .history{
@@ -81,7 +95,7 @@ body{
 
 .history-title{
     font-size:13px;
-    color:#777;
+    color:#7f9abb;
     padding:8px;
 }
 
@@ -95,7 +109,7 @@ body{
 }
 
 .history-item:hover{
-    background:#f1f1f1;
+    background:#0c1e35;
 }
 
 .chat-name{
@@ -111,12 +125,13 @@ body{
     height:30px;
     border:0;
     background:transparent;
+    color:#fff;
     cursor:pointer;
     border-radius:6px;
 }
 
 .history-btn:hover{
-    background:#ddd;
+    background:#12345c;
 }
 
 /* ================= MAIN ================= */
@@ -133,14 +148,15 @@ body{
     display:flex;
     align-items:center;
     padding:0 15px;
-    border-bottom:1px solid #ddd;
-    background:#fff;
+    border-bottom:1px solid #12345c;
+    background:#07101f;
     position:relative;
 }
 
 .menu-btn{
     border:0;
     background:none;
+    color:#fff;
     font-size:24px;
     cursor:pointer;
     margin-right:12px;
@@ -150,11 +166,13 @@ body{
     flex:1;
     font-size:20px;
     font-weight:bold;
+    color:#1683ff;
 }
 
 .hint-btn{
     border:0;
     background:none;
+    color:#fff;
     font-size:20px;
     cursor:pointer;
     margin-right:8px;
@@ -163,6 +181,7 @@ body{
 .more-btn{
     border:0;
     background:none;
+    color:#fff;
     font-size:25px;
     cursor:pointer;
 }
@@ -174,10 +193,10 @@ body{
     right:15px;
     top:55px;
     width:245px;
-    background:white;
-    border:1px solid #ddd;
+    background:#07101f;
+    border:1px solid #1677ff;
     border-radius:12px;
-    box-shadow:0 5px 25px rgba(0,0,0,.15);
+    box-shadow:0 5px 25px rgba(0,0,0,.5);
     display:none;
     z-index:1000;
     overflow:hidden;
@@ -197,7 +216,7 @@ body{
 }
 
 .more-item:hover{
-    background:#f2f2f2;
+    background:#0d47a1;
 }
 
 .more-item span:first-child{
@@ -223,6 +242,12 @@ body{
 
 .welcome h1{
     font-size:30px;
+    color:#1683ff;
+}
+
+.welcome p{
+    color:#789;
+    margin-top:8px;
 }
 
 .message{
@@ -231,62 +256,72 @@ body{
     padding:13px 15px;
     border-radius:14px;
     line-height:1.5;
+    word-wrap:break-word;
 }
 
 .user{
     margin-left:auto;
-    background:#e9eefc;
+    background:#0d47a1;
+    color:#fff;
 }
 
 .ai{
     margin-right:auto;
-    background:white;
-    border:1px solid #ddd;
+    background:#0a1424;
+    border:1px solid #12345c;
+    color:#fff;
 }
 
 .message-actions{
     display:flex;
     gap:7px;
     margin-top:7px;
+    flex-wrap:wrap;
 }
 
 .message-actions button{
-    border:0;
-    background:#eee;
+    border:1px solid #12345c;
+    background:#07101f;
+    color:#fff;
     padding:6px 9px;
     border-radius:7px;
     cursor:pointer;
 }
 
 .message-actions button:hover{
-    background:#ddd;
+    background:#0d47a1;
 }
 
 /* ================= INPUT ================= */
 
 .input-area{
     padding:12px 15px;
-    border-top:1px solid #ddd;
-    background:white;
+    border-top:1px solid #12345c;
+    background:#07101f;
 }
 
 .input-box{
     display:flex;
     align-items:center;
     gap:8px;
-    border:1px solid #ccc;
+    border:1px solid #12345c;
     border-radius:15px;
     padding:7px;
+    background:#050b16;
+}
+
+.plus-wrapper{
+    position:relative;
+    display:flex;
+    align-items:center;
 }
 
 .plus-btn,
-.photo-btn,
-.video-btn,
-.file-btn,
 .voice-btn,
 .send-btn{
     border:0;
     background:transparent;
+    color:#fff;
     cursor:pointer;
     font-size:19px;
     width:38px;
@@ -295,12 +330,46 @@ body{
 }
 
 .plus-btn:hover,
-.photo-btn:hover,
-.video-btn:hover,
-.file-btn:hover,
 .voice-btn:hover,
 .send-btn:hover{
-    background:#eee;
+    background:#0d47a1;
+}
+
+/* ================= PLUS MENU ================= */
+
+.plus-menu{
+    position:absolute;
+    left:0;
+    bottom:48px;
+    width:170px;
+    background:#07101f;
+    border:1px solid #1677ff;
+    border-radius:12px;
+    padding:7px;
+    display:none;
+    flex-direction:column;
+    gap:4px;
+    box-shadow:0 8px 25px rgba(0,0,0,.5);
+    z-index:3000;
+}
+
+.plus-menu.show{
+    display:flex;
+}
+
+.plus-menu button{
+    border:0;
+    background:transparent;
+    color:#fff;
+    text-align:left;
+    padding:11px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:14px;
+}
+
+.plus-menu button:hover{
+    background:#0d47a1;
 }
 
 .message-input{
@@ -311,6 +380,12 @@ body{
     min-height:38px;
     max-height:120px;
     padding:9px;
+    background:transparent;
+    color:#fff;
+}
+
+.message-input::placeholder{
+    color:#789;
 }
 
 /* ================= MODAL ================= */
@@ -318,7 +393,7 @@ body{
 .modal{
     position:fixed;
     inset:0;
-    background:rgba(0,0,0,.45);
+    background:rgba(0,0,0,.65);
     display:none;
     align-items:center;
     justify-content:center;
@@ -333,7 +408,8 @@ body{
     width:min(420px,90%);
     max-height:80vh;
     overflow-y:auto;
-    background:white;
+    background:#07101f;
+    border:1px solid #1677ff;
     border-radius:15px;
     padding:20px;
 }
@@ -348,25 +424,26 @@ body{
 .modal-close{
     border:0;
     background:none;
+    color:#fff;
     font-size:22px;
     cursor:pointer;
 }
 
 .option{
     padding:13px;
-    border:1px solid #ddd;
+    border:1px solid #12345c;
     border-radius:9px;
     margin:8px 0;
     cursor:pointer;
 }
 
 .option:hover{
-    background:#f2f2f2;
+    background:#0d47a1;
 }
 
 .saved-item{
     padding:10px;
-    border-bottom:1px solid #eee;
+    border-bottom:1px solid #12345c;
 }
 
 /* ================= MOBILE ================= */
@@ -409,17 +486,13 @@ body{
 <aside class="sidebar" id="sidebar">
 
     <div class="sidebar-header">
-
-        <div class="logo">
-            Viggo AI
-        </div>
+        <div class="logo">Viggo AI</div>
 
         <button
             class="close-sidebar"
             onclick="closeSidebar()">
             ✕
         </button>
-
     </div>
 
     <button
@@ -477,8 +550,7 @@ body{
             ⋮
         </button>
 
-
-        <!-- ================= MORE MENU ================= -->
+        <!-- MORE MENU -->
 
         <div
             class="more-menu"
@@ -487,73 +559,57 @@ body{
             <div
                 class="more-item"
                 onclick="openVoiceSettings()">
-
                 <span>🎤</span>
                 <span>Voice</span>
-
             </div>
 
             <div
                 class="more-item"
                 onclick="openVoiceGender()">
-
                 <span>👩</span>
                 <span>Voice / Female - Male</span>
-
             </div>
 
             <div
                 class="more-item"
                 onclick="openLanguages()">
-
                 <span>🌐</span>
                 <span>Language</span>
-
             </div>
 
             <div
                 class="more-item"
                 onclick="clearCurrentChat()">
-
                 <span>🗑️</span>
                 <span>Clear Chat</span>
-
             </div>
 
             <div
                 class="more-item"
                 onclick="showHistory()">
-
                 <span>📜</span>
                 <span>Show History</span>
-
             </div>
 
             <div
                 class="more-item"
                 onclick="showSavedChats()">
-
                 <span>💾</span>
                 <span>Saved Chats</span>
-
             </div>
 
             <div
                 class="more-item"
                 onclick="selectChats()">
-
                 <span>☑️</span>
                 <span>Select Chats</span>
-
             </div>
 
             <div
                 class="more-item"
                 onclick="deleteSelectedChats()">
-
                 <span>🗑️</span>
                 <span>Delete Selected</span>
-
             </div>
 
         </div>
@@ -561,7 +617,7 @@ body{
     </div>
 
 
-    <!-- ================= CHAT AREA ================= -->
+    <!-- ================= CHAT ================= -->
 
     <section
         class="chat-area"
@@ -594,46 +650,36 @@ body{
 
             <!-- PLUS -->
 
-            <button
-                class="plus-btn"
-                onclick="togglePlus()">
+            <div class="plus-wrapper">
 
-                ＋
+                <button
+                    class="plus-btn"
+                    onclick="togglePlus(event)">
+                    ＋
+                </button>
 
-            </button>
+                <div
+                    class="plus-menu"
+                    id="plusMenu">
 
+                    <button
+                        onclick="photoInput.click(); closePlusMenu();">
+                        📷 Photo
+                    </button>
 
-            <!-- PHOTO -->
+                    <button
+                        onclick="videoInput.click(); closePlusMenu();">
+                        🎥 Video
+                    </button>
 
-            <button
-                class="photo-btn"
-                onclick="document.getElementById('photoInput').click()">
+                    <button
+                        onclick="fileInput.click(); closePlusMenu();">
+                        📎 File
+                    </button>
 
-                📷
+                </div>
 
-            </button>
-
-
-            <!-- VIDEO -->
-
-            <button
-                class="video-btn"
-                onclick="document.getElementById('videoInput').click()">
-
-                🎥
-
-            </button>
-
-
-            <!-- FILE -->
-
-            <button
-                class="file-btn"
-                onclick="document.getElementById('fileInput').click()">
-
-                📎
-
-            </button>
+            </div>
 
 
             <!-- MESSAGE -->
@@ -642,8 +688,8 @@ body{
                 id="messageInput"
                 class="message-input"
                 placeholder="Message Viggo AI..."
-                onkeydown="handleEnter(event)">
-            </textarea>
+                onkeydown="handleEnter(event)"
+            ></textarea>
 
 
             <!-- VOICE -->
@@ -651,9 +697,7 @@ body{
             <button
                 class="voice-btn"
                 onclick="startVoice()">
-
                 🎤
-
             </button>
 
 
@@ -662,9 +706,7 @@ body{
             <button
                 class="send-btn"
                 onclick="sendMessage()">
-
                 ➤
-
             </button>
 
         </div>
@@ -676,24 +718,27 @@ body{
 </div>
 
 
-<!-- ================= FILE INPUTS ================= -->
+<!-- FILE INPUTS -->
 
 <input
     type="file"
     id="photoInput"
     accept="image/*"
-    hidden>
+    hidden
+>
 
 <input
     type="file"
     id="videoInput"
     accept="video/*"
-    hidden>
+    hidden
+>
 
 <input
     type="file"
     id="fileInput"
-    hidden>
+    hidden
+>
 
 
 <!-- ================= MODAL ================= -->
@@ -713,9 +758,7 @@ body{
             <button
                 class="modal-close"
                 onclick="closeModal()">
-
                 ✕
-
             </button>
 
         </div>
@@ -729,17 +772,7 @@ body{
 
 <script>
 
-/* =====================================================
-   VIGGO AI SERVER
-===================================================== */
-
-const API_URL =
-    "https://ai-tool-2-zpul.onrender.com";
-
-
-/* =====================================================
-   DATA
-===================================================== */
+/* ================= DATA ================= */
 
 let chats =
     JSON.parse(
@@ -748,13 +781,10 @@ let chats =
 
 let currentChatId = null;
 
-let selectedChats =
-    new Set();
+let selectedChats = new Set();
 
 
-/* =====================================================
-   SIDEBAR
-===================================================== */
+/* ================= SIDEBAR ================= */
 
 function openSidebar(){
 
@@ -774,9 +804,7 @@ function closeSidebar(){
 }
 
 
-/* =====================================================
-   MORE
-===================================================== */
+/* ================= MORE ================= */
 
 function toggleMore(){
 
@@ -787,26 +815,64 @@ function toggleMore(){
 }
 
 
+/* ================= PLUS ================= */
+
+function togglePlus(event){
+
+    event.stopPropagation();
+
+    document
+        .getElementById("plusMenu")
+        .classList.toggle("show");
+
+}
+
+
+function closePlusMenu(){
+
+    document
+        .getElementById("plusMenu")
+        .classList.remove("show");
+
+}
+
+
+/* ================= OUTSIDE CLICK ================= */
+
 document.addEventListener(
     "click",
-    function(event){
+    function(e){
 
-        const menu =
-            document.getElementById(
-                "moreMenu"
-            );
+        const more =
+            document.getElementById("moreMenu");
 
-        const button =
-            document.querySelector(
-                ".more-btn"
-            );
+        const moreButton =
+            document.querySelector(".more-btn");
 
         if(
-            !menu.contains(event.target) &&
-            !button.contains(event.target)
+            more &&
+            !more.contains(e.target) &&
+            !moreButton.contains(e.target)
         ){
 
-            menu.classList.remove("show");
+            more.classList.remove("show");
+
+        }
+
+
+        const plus =
+            document.getElementById("plusMenu");
+
+        const plusButton =
+            document.querySelector(".plus-btn");
+
+        if(
+            plus &&
+            !plus.contains(e.target) &&
+            !plusButton.contains(e.target)
+        ){
+
+            plus.classList.remove("show");
 
         }
 
@@ -814,9 +880,7 @@ document.addEventListener(
 );
 
 
-/* =====================================================
-   NEW CHAT
-===================================================== */
+/* ================= NEW CHAT ================= */
 
 function newChat(){
 
@@ -853,9 +917,7 @@ function newChat(){
 }
 
 
-/* =====================================================
-   SEND MESSAGE + REAL AI CONNECTION
-===================================================== */
+/* ================= SEND ================= */
 
 async function sendMessage(){
 
@@ -867,17 +929,13 @@ async function sendMessage(){
     const text =
         input.value.trim();
 
-    if(!text){
-        return;
-    }
+    if(!text) return;
 
 
     document
         .getElementById("welcome")
         ?.remove();
 
-
-    /* CREATE CHAT */
 
     if(!currentChatId){
 
@@ -904,8 +962,6 @@ async function sendMessage(){
         );
 
 
-    /* USER MESSAGE */
-
     chat.messages.push({
 
         sender:"user",
@@ -917,7 +973,8 @@ async function sendMessage(){
 
     addMessage(
         "user",
-        text
+        text,
+        true
     );
 
 
@@ -928,52 +985,13 @@ async function sendMessage(){
     renderHistory();
 
 
-    /* LOADING */
-
-    const loading =
-        document.createElement("div");
-
-    loading.className =
-        "message ai";
-
-    loading.innerHTML =
-        "⏳ Viggo AI is thinking...";
-
-
-    document
-        .getElementById("chatArea")
-        .appendChild(loading);
-
-
-    document
-        .getElementById("chatArea")
-        .scrollTop =
-        document.getElementById(
-            "chatArea"
-        ).scrollHeight;
-
-
-    /* LANGUAGE */
-
-    const language =
-        localStorage.getItem(
-            "viggoLanguage"
-        ) || "en";
-
-
-    /* API REQUEST */
+    /* AI RESPONSE */
 
     try{
 
-        console.log(
-            "Sending request to:",
-            API_URL + "/chat"
-        );
-
-
         const response =
             await fetch(
-                API_URL + "/chat",
+                "https://ai-tool-2-zpul.onrender.com/chat",
                 {
                     method:"POST",
 
@@ -986,10 +1004,10 @@ async function sendMessage(){
 
                         message:text,
 
-                        language:language
+                        language:
+                            getLanguageCode()
 
                     })
-
                 }
             );
 
@@ -998,29 +1016,19 @@ async function sendMessage(){
             await response.json();
 
 
-        loading.remove();
-
-
-        /* ERROR FROM SERVER */
-
-        if(
-            !response.ok ||
-            !data.success
-        ){
+        if(!response.ok){
 
             throw new Error(
                 data.error ||
-                "AI response failed"
+                "Server error"
             );
 
         }
 
 
-        /* AI RESPONSE */
-
         const reply =
             data.reply ||
-            "Sorry, I didn't receive a response.";
+            "Sorry, I couldn't get a response.";
 
 
         chat.messages.push({
@@ -1034,62 +1042,98 @@ async function sendMessage(){
 
         addMessage(
             "ai",
-            reply
+            reply,
+            false
         );
 
 
         saveChats();
-
-
-        console.log(
-            "Viggo AI response received."
-        );
 
     }
 
     catch(error){
 
         console.error(
-            "VIGGO AI ERROR:",
+            "Viggo AI Error:",
             error
         );
 
 
-        loading.innerHTML = `
+        const errorText =
+            "Sorry friend, I couldn't connect to Viggo AI right now.";
 
-            <div>
-                ❌ Sorry friend, I couldn't
-                connect to Viggo AI right now.
-            </div>
 
-            <div
-                style="
-                    font-size:12px;
-                    margin-top:8px;
-                    color:#777;
-                ">
+        chat.messages.push({
 
-                ${escapeHTML(
-                    error.message ||
-                    "Connection error"
-                )}
+            sender:"ai",
 
-            </div>
+            text:errorText
 
-        `;
+        });
+
+
+        addMessage(
+            "ai",
+            errorText,
+            false
+        );
+
+
+        saveChats();
 
     }
 
 }
 
 
-/* =====================================================
-   ADD MESSAGE
-===================================================== */
+/* ================= LANGUAGE ================= */
+
+function getLanguageCode(){
+
+    const language =
+        localStorage.getItem(
+            "viggoLanguage"
+        ) || "English";
+
+
+    const codes = {
+
+        "English":"en",
+
+        "தமிழ்":"ta",
+
+        "हिन्दी":"hi",
+
+        "తెలుగు":"te",
+
+        "ಕನ್ನಡ":"kn",
+
+        "മലയാളം":"ml",
+
+        "বাংলা":"bn",
+
+        "मराठी":"mr",
+
+        "ગુજરાતી":"gu",
+
+        "ਪੰਜਾਬੀ":"pa",
+
+        "اردو":"ur"
+
+    };
+
+
+    return codes[language] || "en";
+
+}
+
+
+/* ================= MESSAGE ================= */
 
 function addMessage(
     type,
-    text
+    text,
+    isUser
 ){
 
     const area =
@@ -1099,85 +1143,65 @@ function addMessage(
 
 
     const message =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
+
 
     message.className =
         "message " + type;
 
 
     const content =
-        document.createElement(
-            "div"
-        );
-
-    content.textContent =
-        text;
+        document.createElement("div");
 
 
-    message.appendChild(
-        content
-    );
+    content.textContent = text;
 
 
-    /* ACTIONS */
+    message.appendChild(content);
+
 
     const actions =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
+
 
     actions.className =
         "message-actions";
 
 
     const save =
-        document.createElement(
-            "button"
-        );
+        document.createElement("button");
+
 
     save.innerHTML =
         "💾 Save";
 
+
     save.onclick =
-        function(){
-
-            saveMessage(text);
-
-        };
+        () => saveMessage(text);
 
 
     const link =
-        document.createElement(
-            "button"
-        );
+        document.createElement("button");
+
 
     link.innerHTML =
         "🔗 Link";
 
+
     link.onclick =
-        function(){
-
-            copyMessage(text);
-
-        };
+        () => copyMessage(text);
 
 
     const like =
-        document.createElement(
-            "button"
-        );
+        document.createElement("button");
+
 
     like.innerHTML =
         "👍 Like";
 
+
     like.onclick =
-        function(){
-
-            likeMessage(like);
-
-        };
+        () => likeMessage(like);
 
 
     actions.appendChild(save);
@@ -1187,14 +1211,10 @@ function addMessage(
     actions.appendChild(like);
 
 
-    message.appendChild(
-        actions
-    );
+    message.appendChild(actions);
 
 
-    area.appendChild(
-        message
-    );
+    area.appendChild(message);
 
 
     area.scrollTop =
@@ -1203,9 +1223,7 @@ function addMessage(
 }
 
 
-/* =====================================================
-   SAVE MESSAGE
-===================================================== */
+/* ================= SAVE MESSAGE ================= */
 
 function saveMessage(text){
 
@@ -1217,9 +1235,7 @@ function saveMessage(text){
         ) || [];
 
 
-    if(
-        !saved.includes(text)
-    ){
+    if(!saved.includes(text)){
 
         saved.push(text);
 
@@ -1237,38 +1253,24 @@ function saveMessage(text){
 }
 
 
-/* =====================================================
-   COPY
-===================================================== */
+/* ================= LINK ================= */
 
-async function copyMessage(text){
+function copyMessage(text){
 
-    try{
+    navigator.clipboard
+        .writeText(text)
+        .then(() => {
 
-        await navigator.clipboard.writeText(
-            text
-        );
+            alert(
+                "Message copied"
+            );
 
-        alert(
-            "Message copied"
-        );
-
-    }
-
-    catch{
-
-        alert(
-            "Copy failed"
-        );
-
-    }
+        });
 
 }
 
 
-/* =====================================================
-   LIKE
-===================================================== */
+/* ================= LIKE ================= */
 
 function likeMessage(button){
 
@@ -1278,9 +1280,7 @@ function likeMessage(button){
 }
 
 
-/* =====================================================
-   STORAGE
-===================================================== */
+/* ================= STORAGE ================= */
 
 function saveChats(){
 
@@ -1292,9 +1292,7 @@ function saveChats(){
 }
 
 
-/* =====================================================
-   HISTORY
-===================================================== */
+/* ================= HISTORY ================= */
 
 function renderHistory(){
 
@@ -1303,148 +1301,115 @@ function renderHistory(){
             "historyList"
         );
 
+
     list.innerHTML = "";
 
 
-    chats.forEach(
-        function(chat){
+    chats.forEach(chat => {
 
-            const item =
-                document.createElement(
-                    "div"
-                );
-
-            item.className =
-                "history-item";
+        const item =
+            document.createElement("div");
 
 
-            const checkbox =
-                document.createElement(
-                    "input"
-                );
-
-            checkbox.type =
-                "checkbox";
-
-            checkbox.style.display =
-                "none";
-
-            checkbox.className =
-                "select-checkbox";
-
-            checkbox.dataset.id =
-                chat.id;
+        item.className =
+            "history-item";
 
 
-            const name =
-                document.createElement(
-                    "div"
-                );
-
-            name.className =
-                "chat-name";
-
-            name.textContent =
-                chat.title;
-
-            name.onclick =
-                function(){
-
-                    loadChat(
-                        chat.id
-                    );
-
-                };
+        const checkbox =
+            document.createElement("input");
 
 
-            /* PIN */
+        checkbox.type =
+            "checkbox";
 
-            const pin =
-                document.createElement(
-                    "button"
-                );
 
-            pin.className =
-                "history-btn";
+        checkbox.style.display =
+            "none";
 
-            pin.innerHTML =
-                chat.pinned
+
+        checkbox.className =
+            "select-checkbox";
+
+
+        checkbox.dataset.id =
+            chat.id;
+
+
+        const name =
+            document.createElement("div");
+
+
+        name.className =
+            "chat-name";
+
+
+        name.textContent =
+            chat.title;
+
+
+        name.onclick =
+            () => loadChat(chat.id);
+
+
+        const pin =
+            document.createElement("button");
+
+
+        pin.className =
+            "history-btn";
+
+
+        pin.innerHTML =
+            chat.pinned
                 ? "📌"
                 : "📍";
 
-            pin.title =
-                "Pin";
 
-            pin.onclick =
-                function(event){
-
-                    event.stopPropagation();
-
-                    togglePin(
-                        chat.id
-                    );
-
-                };
+        pin.title =
+            "Pin";
 
 
-            /* DELETE */
-
-            const del =
-                document.createElement(
-                    "button"
-                );
-
-            del.className =
-                "history-btn";
-
-            del.innerHTML =
-                "🗑️";
-
-            del.title =
-                "Delete";
-
-            del.onclick =
-                function(event){
-
-                    event.stopPropagation();
-
-                    deleteChat(
-                        chat.id
-                    );
-
-                };
+        pin.onclick =
+            () => togglePin(chat.id);
 
 
-            item.appendChild(
-                checkbox
-            );
-
-            item.appendChild(
-                name
-            );
-
-            item.appendChild(
-                pin
-            );
-
-            item.appendChild(
-                del
-            );
+        const del =
+            document.createElement("button");
 
 
-            list.appendChild(
-                item
-            );
+        del.className =
+            "history-btn";
 
-        }
-    );
+
+        del.innerHTML =
+            "🗑️";
+
+
+        del.title =
+            "Delete";
+
+
+        del.onclick =
+            () => deleteChat(chat.id);
+
+
+        item.appendChild(checkbox);
+
+        item.appendChild(name);
+
+        item.appendChild(pin);
+
+        item.appendChild(del);
+
+
+        list.appendChild(item);
+
+    });
 
 }
 
 
-/* =====================================================
-   LOAD CHAT
-===================================================== */
+/* ================= LOAD CHAT ================= */
 
 function loadChat(id){
 
@@ -1453,9 +1418,8 @@ function loadChat(id){
             c => c.id === id
         );
 
-    if(!chat){
-        return;
-    }
+
+    if(!chat) return;
 
 
     currentChatId = id;
@@ -1466,15 +1430,17 @@ function loadChat(id){
             "chatArea"
         );
 
+
     area.innerHTML = "";
 
 
     chat.messages.forEach(
-        function(message){
+        message => {
 
             addMessage(
                 message.sender,
-                message.text
+                message.text,
+                message.sender === "user"
             );
 
         }
@@ -1486,9 +1452,7 @@ function loadChat(id){
 }
 
 
-/* =====================================================
-   PIN
-===================================================== */
+/* ================= PIN ================= */
 
 function togglePin(id){
 
@@ -1497,9 +1461,8 @@ function togglePin(id){
             c => c.id === id
         );
 
-    if(!chat){
-        return;
-    }
+
+    if(!chat) return;
 
 
     chat.pinned =
@@ -1513,9 +1476,7 @@ function togglePin(id){
 }
 
 
-/* =====================================================
-   DELETE CHAT
-===================================================== */
+/* ================= DELETE CHAT ================= */
 
 function deleteChat(id){
 
@@ -1523,11 +1484,7 @@ function deleteChat(id){
         !confirm(
             "Delete this chat?"
         )
-    ){
-
-        return;
-
-    }
+    ) return;
 
 
     chats =
@@ -1536,12 +1493,9 @@ function deleteChat(id){
         );
 
 
-    if(
-        currentChatId === id
-    ){
+    if(currentChatId === id){
 
-        currentChatId =
-            null;
+        currentChatId = null;
 
         newChat();
 
@@ -1555,30 +1509,27 @@ function deleteChat(id){
 }
 
 
-/* =====================================================
-   SEARCH
-===================================================== */
+/* ================= SEARCH ================= */
 
 function searchChats(){
 
     const value =
         document
-        .getElementById(
-            "searchChat"
-        )
-        .value
-        .toLowerCase();
+            .getElementById(
+                "searchChat"
+            )
+            .value
+            .toLowerCase();
 
 
     document
         .querySelectorAll(
             ".history-item"
         )
-        .forEach(
-            function(item){
+        .forEach(item => {
 
-                const name =
-                    item
+            const name =
+                item
                     .querySelector(
                         ".chat-name"
                     )
@@ -1586,20 +1537,17 @@ function searchChats(){
                     .toLowerCase();
 
 
-                item.style.display =
-                    name.includes(value)
+            item.style.display =
+                name.includes(value)
                     ? "flex"
                     : "none";
 
-            }
-        );
+        });
 
 }
 
 
-/* =====================================================
-   SELECT CHATS
-===================================================== */
+/* ================= SELECT CHATS ================= */
 
 function selectChats(){
 
@@ -1607,54 +1555,44 @@ function selectChats(){
         .querySelectorAll(
             ".select-checkbox"
         )
-        .forEach(
-            function(cb){
+        .forEach(cb => {
 
-                cb.style.display =
-                    cb.style.display === "none"
+            cb.style.display =
+                cb.style.display === "none"
                     ? "block"
                     : "none";
 
 
-                cb.onchange =
-                    function(){
+            cb.onchange =
+                function(){
 
-                        if(this.checked){
+                    if(this.checked){
 
-                            selectedChats.add(
-                                this.dataset.id
-                            );
+                        selectedChats.add(
+                            this.dataset.id
+                        );
 
-                        }
+                    }else{
 
-                        else{
+                        selectedChats.delete(
+                            this.dataset.id
+                        );
 
-                            selectedChats.delete(
-                                this.dataset.id
-                            );
+                    }
 
-                        }
+                };
 
-                    };
-
-            }
-        );
+        });
 
 
     document
-        .getElementById(
-            "moreMenu"
-        )
-        .classList.remove(
-            "show"
-        );
+        .getElementById("moreMenu")
+        .classList.remove("show");
 
 }
 
 
-/* =====================================================
-   DELETE SELECTED
-===================================================== */
+/* ================= DELETE SELECTED ================= */
 
 function deleteSelectedChats(){
 
@@ -1675,19 +1613,13 @@ function deleteSelectedChats(){
         !confirm(
             "Delete selected chats?"
         )
-    ){
-
-        return;
-
-    }
+    ) return;
 
 
     chats =
         chats.filter(
             c =>
-                !selectedChats.has(
-                    c.id
-                )
+                !selectedChats.has(c.id)
         );
 
 
@@ -1700,9 +1632,7 @@ function deleteSelectedChats(){
 }
 
 
-/* =====================================================
-   CLEAR CHAT
-===================================================== */
+/* ================= CLEAR CHAT ================= */
 
 function clearCurrentChat(){
 
@@ -1751,9 +1681,7 @@ function clearCurrentChat(){
 }
 
 
-/* =====================================================
-   SHOW HISTORY
-===================================================== */
+/* ================= SHOW HISTORY ================= */
 
 function showHistory(){
 
@@ -1763,16 +1691,12 @@ function showHistory(){
         .getElementById(
             "moreMenu"
         )
-        .classList.remove(
-            "show"
-        );
+        .classList.remove("show");
 
 }
 
 
-/* =====================================================
-   SAVED CHATS
-===================================================== */
+/* ================= SAVED ================= */
 
 function showSavedChats(){
 
@@ -1790,32 +1714,21 @@ function showSavedChats(){
 
         saved.length
 
-        ?
-
-        saved.map(
-            function(x){
-
-                return `
-                    <div class="saved-item">
+            ? saved.map(
+                x =>
+                    `<div class="saved-item">
                         ${escapeHTML(x)}
-                    </div>
-                `;
+                     </div>`
+              ).join("")
 
-            }
-        ).join("")
-
-        :
-
-        "<p>No saved messages.</p>"
+            : "<p>No saved messages.</p>"
 
     );
 
 }
 
 
-/* =====================================================
-   LANGUAGE
-===================================================== */
+/* ================= LANGUAGE ================= */
 
 function openLanguages(){
 
@@ -1848,19 +1761,12 @@ function openLanguages(){
         "🌐 Select Language",
 
         languages.map(
-            function(lang){
-
-                return `
-                    <div
-                        class="option"
-                        onclick="selectLanguage('${lang}')">
-
-                        ${lang}
-
-                    </div>
-                `;
-
-            }
+            lang =>
+            `<div
+                class="option"
+                onclick="selectLanguage('${lang}')">
+                ${lang}
+            </div>`
         ).join("")
 
     );
@@ -1870,26 +1776,9 @@ function openLanguages(){
 
 function selectLanguage(language){
 
-    const codes = {
-
-        "English":"en",
-        "தமிழ்":"ta",
-        "हिन्दी":"hi",
-        "తెలుగు":"te",
-        "ಕನ್ನಡ":"kn",
-        "മലയാളം":"ml",
-        "বাংলা":"bn",
-        "मराठी":"mr",
-        "ગુજરાતી":"gu",
-        "ਪੰਜਾਬੀ":"pa",
-        "اردو":"ur"
-
-    };
-
-
     localStorage.setItem(
         "viggoLanguage",
-        codes[language] || "en"
+        language
     );
 
 
@@ -1904,9 +1793,7 @@ function selectLanguage(language){
 }
 
 
-/* =====================================================
-   VOICE
-===================================================== */
+/* ================= VOICE ================= */
 
 function openVoiceSettings(){
 
@@ -1916,4 +1803,240 @@ function openVoiceSettings(){
 
         `
         <div
-            class="option
+            class="option"
+            onclick="selectVoice('On')">
+            🎤 Voice On
+        </div>
+
+        <div
+            class="option"
+            onclick="selectVoice('Off')">
+            🔇 Voice Off
+        </div>
+        `
+
+    );
+
+}
+
+
+function selectVoice(value){
+
+    localStorage.setItem(
+        "viggoVoice",
+        value
+    );
+
+
+    alert(
+        "Voice: " + value
+    );
+
+
+    closeModal();
+
+}
+
+
+/* ================= GENDER ================= */
+
+function openVoiceGender(){
+
+    openModal(
+
+        "👩 Voice",
+
+        `
+        <div
+            class="option"
+            onclick="selectGender('Female')">
+            👩 Female
+        </div>
+
+        <div
+            class="option"
+            onclick="selectGender('Male')">
+            👨 Male
+        </div>
+        `
+
+    );
+
+}
+
+
+function selectGender(value){
+
+    localStorage.setItem(
+        "viggoVoiceGender",
+        value
+    );
+
+
+    alert(
+        "Voice selected: " +
+        value
+    );
+
+
+    closeModal();
+
+}
+
+
+/* ================= HINT ================= */
+
+function showHint(){
+
+    alert(
+        "You can type a message or use the voice button."
+    );
+
+}
+
+
+/* ================= VOICE INPUT ================= */
+
+function startVoice(){
+
+    if(
+        !(
+            "webkitSpeechRecognition"
+            in window
+        )
+    ){
+
+        alert(
+            "Voice recognition is not supported."
+        );
+
+        return;
+
+    }
+
+
+    const recognition =
+        new webkitSpeechRecognition();
+
+
+    recognition.lang =
+        "en-IN";
+
+
+    recognition.start();
+
+
+    recognition.onresult =
+        function(event){
+
+            document
+                .getElementById(
+                    "messageInput"
+                )
+                .value =
+                event.results[0][0]
+                    .transcript;
+
+        };
+
+}
+
+
+/* ================= ENTER ================= */
+
+function handleEnter(event){
+
+    if(
+        event.key === "Enter" &&
+        !event.shiftKey
+    ){
+
+        event.preventDefault();
+
+        sendMessage();
+
+    }
+
+}
+
+
+/* ================= MODAL ================= */
+
+function openModal(
+    title,
+    content
+){
+
+    document
+        .getElementById(
+            "modalTitle"
+        )
+        .textContent =
+        title;
+
+
+    document
+        .getElementById(
+            "modalContent"
+        )
+        .innerHTML =
+        content;
+
+
+    document
+        .getElementById(
+            "modal"
+        )
+        .classList.add("show");
+
+}
+
+
+function closeModal(){
+
+    document
+        .getElementById(
+            "modal"
+        )
+        .classList.remove("show");
+
+}
+
+
+/* ================= ESCAPE ================= */
+
+function escapeHTML(text){
+
+    return text
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
+
+}
+
+
+/* ================= INITIAL ================= */
+
+renderHistory();
+
+</script>
+
+</body>
+</html>
