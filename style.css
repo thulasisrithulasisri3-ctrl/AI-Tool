@@ -5,16 +5,16 @@
 }
 
 :root {
-    --black: #05070c;
-    --black2: #080c14;
-    --panel: #0d121c;
-    --panel2: #111927;
-    --blue: #1687ff;
-    --blue-dark: #0756d9;
-    --white: #ffffff;
-    --text: #e9eef7;
-    --muted: #8b97aa;
-    --border: rgba(255,255,255,0.09);
+    --bg: #05070c;
+    --bg2: #080d15;
+    --panel: #0d141f;
+    --panel2: #111b29;
+    --blue: #168cff;
+    --blue2: #1254ff;
+    --text: #edf4ff;
+    --muted: #8996a9;
+    --border: rgba(255,255,255,.09);
+    --danger: #ff6577;
 }
 
 html,
@@ -25,9 +25,19 @@ body {
 
 body {
     font-family: Arial, Helvetica, sans-serif;
-    background: var(--black);
+    background: var(--bg);
     color: var(--text);
     overflow: hidden;
+}
+
+button,
+textarea,
+select {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
 }
 
 /* ================= APP ================= */
@@ -36,110 +46,107 @@ body {
     width: 100%;
     height: 100vh;
     display: flex;
-    background: var(--black);
+    background: var(--bg);
 }
 
 /* ================= SIDEBAR ================= */
 
 .sidebar {
-    width: 280px;
+    width: 285px;
     height: 100vh;
     flex-shrink: 0;
 
     display: flex;
     flex-direction: column;
 
-    background: var(--black2);
-    border-right: 1px solid var(--border);
-
     padding: 18px;
+
+    background: #070b12;
+    border-right: 1px solid var(--border);
 }
 
-.sidebar-top {
-    width: 100%;
-}
+/* ================= BRAND ================= */
 
 .brand {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 11px;
     margin-bottom: 20px;
 }
 
 .brand-logo,
 .welcome-logo {
-    width: 44px;
-    height: 44px;
-
     display: flex;
     align-items: center;
     justify-content: center;
 
-    flex-shrink: 0;
-
-    border-radius: 13px;
-
     background: linear-gradient(
         135deg,
-        #008cff,
-        #164fff
+        #168cff,
+        #174cff
     );
 
     color: white;
-    font-size: 22px;
-    font-weight: bold;
+    font-weight: 800;
+
+    border-radius: 13px;
+
+    box-shadow:
+        0 8px 30px rgba(22,140,255,.22);
+}
+
+.brand-logo {
+    width: 43px;
+    height: 43px;
+    font-size: 21px;
 }
 
 .brand-name {
-    color: white;
     font-size: 17px;
     font-weight: 700;
 }
 
 .brand-status {
-    margin-top: 4px;
     color: var(--muted);
-    font-size: 12px;
+    font-size: 11px;
+    margin-top: 4px;
 }
 
 /* ================= NEW CHAT ================= */
 
 .new-chat-btn {
     width: 100%;
-    height: 46px;
+    height: 45px;
 
     border: 0;
-    border-radius: 11px;
+    border-radius: 10px;
 
     background: linear-gradient(
         135deg,
         var(--blue),
-        var(--blue-dark)
+        var(--blue2)
     );
 
     color: white;
-    font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
 
-    cursor: pointer;
-
-    transition: 0.2s ease;
+    transition: .2s;
 }
 
 .new-chat-btn:hover {
+    filter: brightness(1.12);
     transform: translateY(-1px);
-    filter: brightness(1.1);
 }
 
 .new-chat-btn span {
-    margin-right: 7px;
     font-size: 18px;
+    margin-right: 6px;
 }
 
 /* ================= RECENT ================= */
 
 .recent-title {
-    margin: 25px 5px 10px;
+    margin: 23px 5px 9px;
 
     color: var(--muted);
 
@@ -152,24 +159,25 @@ body {
 
 .history-container {
     flex: 1;
-    width: 100%;
 
     overflow-y: auto;
     overflow-x: hidden;
 
-    padding-right: 3px;
+    min-height: 50px;
 }
 
-.history-container::-webkit-scrollbar {
+.history-container::-webkit-scrollbar,
+.deleted-chats-container::-webkit-scrollbar {
     width: 5px;
 }
 
-.history-container::-webkit-scrollbar-thumb {
-    background: #202b3c;
-    border-radius: 10px;
+.history-container::-webkit-scrollbar-thumb,
+.deleted-chats-container::-webkit-scrollbar-thumb {
+    background: #263449;
+    border-radius: 20px;
 }
 
-/* ================= HISTORY ITEM ================= */
+/* ================= HISTORY ================= */
 
 .history-item {
     width: 100%;
@@ -178,19 +186,19 @@ body {
     display: flex;
     align-items: center;
 
-    gap: 5px;
+    gap: 6px;
 
-    padding: 7px 8px;
+    padding: 6px 7px;
 
     margin-bottom: 4px;
 
     border-radius: 9px;
 
-    color: #cdd6e4;
+    color: #ccd6e5;
+
+    transition: .18s;
 
     cursor: pointer;
-
-    transition: background 0.2s ease;
 }
 
 .history-item:hover {
@@ -204,21 +212,51 @@ body {
 
 .history-text {
     flex: 1;
-
     min-width: 0;
 
     overflow: hidden;
-
     white-space: nowrap;
-
     text-overflow: ellipsis;
 
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .history-more {
-    width: 30px;
-    height: 30px;
+    width: 29px;
+    height: 29px;
+
+    flex-shrink: 0;
+
+    border: 0;
+    border-radius: 7px;
+
+    background: transparent;
+    color: #8491a5;
+
+    font-size: 18px;
+}
+
+.history-more:hover {
+    background: #1b2738;
+    color: white;
+}
+
+.chat-checkbox {
+    width: 17px;
+    height: 17px;
+
+    flex-shrink: 0;
+
+    accent-color: var(--blue);
+
+    cursor: pointer;
+}
+
+/* ================= PIN ================= */
+
+.pin-button {
+    width: 29px;
+    height: 29px;
 
     flex-shrink: 0;
 
@@ -227,50 +265,184 @@ body {
 
     background: transparent;
 
-    color: #8895a9;
+    color: #77859a;
 
     cursor: pointer;
 }
 
-.history-more:hover {
-    background: #1c2838;
-    color: white;
+.pin-button:hover {
+    background: #1b2738;
+    color: #63aaff;
 }
 
-/* ================= SIDEBAR BOTTOM ================= */
+.pin-button.pinned {
+    color: #168cff;
+}
+
+/* ================= SELECT ================= */
+
+.select-controls {
+    display: flex;
+    flex-direction: column;
+
+    gap: 6px;
+
+    margin-top: 8px;
+}
+
+.select-button,
+.delete-selected-button,
+.deleted-chats-button {
+    width: 100%;
+    height: 39px;
+
+    border: 0;
+    border-radius: 9px;
+
+    transition: .18s;
+}
+
+.select-button {
+    background: #101925;
+    color: #d9e3f0;
+}
+
+.select-button:hover {
+    background: #182536;
+}
+
+.delete-selected-button {
+    background: #261218;
+    color: #ff8998;
+}
+
+.delete-selected-button:hover:not(:disabled) {
+    background: #421b25;
+}
+
+.delete-selected-button:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+}
+
+/* ================= DELETED ================= */
+
+.deleted-section {
+    margin-top: 8px;
+}
+
+.deleted-chats-button {
+    background: #101722;
+    color: #c8d3e1;
+
+    text-align: left;
+
+    padding: 0 11px;
+}
+
+.deleted-chats-button:hover {
+    background: #182334;
+}
+
+.deleted-chats-container {
+    display: none;
+
+    max-height: 170px;
+
+    overflow-y: auto;
+
+    margin-top: 5px;
+
+    padding: 5px;
+
+    background: #0c121b;
+
+    border: 1px solid var(--border);
+    border-radius: 9px;
+}
+
+.deleted-chats-container.show {
+    display: block;
+}
+
+.deleted-chat-item {
+    display: flex;
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 6px;
+
+    margin-bottom: 3px;
+
+    border-radius: 7px;
+
+    background: #101722;
+}
+
+.deleted-chat-title {
+    flex: 1;
+
+    min-width: 0;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    color: #aeb9c8;
+    font-size: 12px;
+}
+
+.restore-button,
+.forever-delete-button {
+    width: 28px;
+    height: 28px;
+
+    border: 0;
+    border-radius: 6px;
+
+    background: transparent;
+}
+
+.restore-button {
+    color: #55b5ff;
+}
+
+.forever-delete-button {
+    color: #ff6577;
+}
+
+.restore-button:hover,
+.forever-delete-button:hover {
+    background: #1c2939;
+}
+
+/* ================= MORE ================= */
 
 .sidebar-bottom {
     position: relative;
-    margin-top: 10px;
+    margin-top: 9px;
 }
 
 .more-button {
     width: 100%;
-    height: 43px;
+    height: 41px;
 
     border: 0;
-    border-radius: 10px;
+    border-radius: 9px;
 
-    background: #0e1521;
+    background: #101722;
 
-    color: #dbe4f1;
+    color: #dbe4f0;
 
     text-align: left;
 
-    padding: 0 13px;
-
-    cursor: pointer;
+    padding: 0 12px;
 }
 
 .more-button:hover {
-    background: #162033;
+    background: #182334;
 }
-
-.more-button span {
-    margin-right: 8px;
-}
-
-/* ================= MORE MENU ================= */
 
 .more-menu {
     display: none;
@@ -278,20 +450,20 @@ body {
     position: absolute;
 
     left: 0;
-    bottom: 51px;
+    bottom: 48px;
 
     width: 100%;
 
-    padding: 7px;
+    padding: 6px;
 
-    background: #111927;
+    background: #111a28;
 
     border: 1px solid var(--border);
 
-    border-radius: 12px;
+    border-radius: 11px;
 
     box-shadow:
-        0 15px 45px rgba(0,0,0,0.55);
+        0 20px 55px rgba(0,0,0,.6);
 
     z-index: 100;
 }
@@ -302,24 +474,22 @@ body {
 
 .more-menu button {
     width: 100%;
-    height: 40px;
+    height: 39px;
 
     border: 0;
-    border-radius: 8px;
+    border-radius: 7px;
 
     background: transparent;
 
-    color: #e8eef7;
+    color: #e4ebf5;
 
     text-align: left;
 
-    padding: 0 11px;
-
-    cursor: pointer;
+    padding: 0 10px;
 }
 
 .more-menu button:hover {
-    background: #1b2637;
+    background: #1b2738;
 }
 
 /* ================= MAIN ================= */
@@ -335,28 +505,26 @@ body {
 
     background:
         radial-gradient(
-            circle at top right,
-            rgba(0,100,255,0.08),
-            transparent 30%
+            circle at 90% 0%,
+            rgba(20,100,255,.08),
+            transparent 28%
         ),
-        var(--black);
+        var(--bg);
 }
 
 /* ================= HEADER ================= */
 
 .header {
-    width: 100%;
-    height: 70px;
-
+    height: 69px;
     flex-shrink: 0;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
 
-    padding: 0 25px;
+    padding: 0 24px;
 
-    background: rgba(5,7,12,0.95);
+    background: rgba(5,7,12,.94);
 
     border-bottom: 1px solid var(--border);
 }
@@ -364,13 +532,12 @@ body {
 .header-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 11px;
 }
 
 .header h1 {
-    color: white;
     font-size: 18px;
-    line-height: 1.2;
+    color: white;
 }
 
 .header span {
@@ -380,7 +547,7 @@ body {
 
     color: var(--muted);
 
-    font-size: 12px;
+    font-size: 11px;
 }
 
 .header-right {
@@ -388,72 +555,63 @@ body {
     align-items: center;
 }
 
-/* ================= SERVER LINK ================= */
-
 .server-link {
     display: inline-flex;
     align-items: center;
 
-    padding: 9px 13px;
+    padding: 8px 12px;
 
-    border: 1px solid rgba(22,135,255,0.3);
+    border: 1px solid rgba(22,140,255,.28);
+    border-radius: 8px;
 
-    border-radius: 9px;
+    background: rgba(22,140,255,.07);
 
-    background: rgba(22,135,255,0.08);
-
-    color: #7fbdff;
+    color: #7ebcff;
 
     text-decoration: none;
 
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .server-link:hover {
-    background: rgba(22,135,255,0.16);
+    background: rgba(22,140,255,.15);
     color: white;
 }
-
-/* ================= MOBILE MENU ================= */
 
 .mobile-menu {
     display: none;
 
-    width: 38px;
-    height: 38px;
+    width: 37px;
+    height: 37px;
 
     border: 0;
-    border-radius: 9px;
+    border-radius: 8px;
 
     background: transparent;
 
     color: white;
 
-    font-size: 21px;
-
-    cursor: pointer;
+    font-size: 20px;
 }
 
-/* ================= MESSAGE AREA ================= */
+/* ================= MESSAGES ================= */
 
 .message-container {
     flex: 1;
 
-    width: 100%;
-
     overflow-y: auto;
 
-    padding: 30px 25px;
+    padding: 28px 24px;
 
     scroll-behavior: smooth;
 }
 
 .message-container::-webkit-scrollbar {
-    width: 7px;
+    width: 6px;
 }
 
 .message-container::-webkit-scrollbar-thumb {
-    background: #1c2738;
+    background: #1e2a3b;
     border-radius: 20px;
 }
 
@@ -473,26 +631,26 @@ body {
 }
 
 .welcome-logo {
-    width: 70px;
-    height: 70px;
+    width: 68px;
+    height: 68px;
 
-    margin-bottom: 18px;
+    margin-bottom: 17px;
 
-    font-size: 32px;
+    font-size: 31px;
 }
 
 .welcome h2 {
-    margin-bottom: 8px;
-
     color: white;
 
     font-size: 24px;
+
+    margin-bottom: 8px;
 }
 
 .welcome p {
     color: var(--muted);
 
-    font-size: 14px;
+    font-size: 13px;
 }
 
 /* ================= MESSAGE ROW ================= */
@@ -513,29 +671,27 @@ body {
     justify-content: flex-start;
 }
 
-/* ================= MESSAGE ================= */
-
 .message {
-    max-width: min(760px, 82%);
+    max-width: min(780px, 82%);
 
     padding: 12px 15px;
 
     border-radius: 15px;
 
-    line-height: 1.55;
-
     font-size: 14px;
+
+    line-height: 1.55;
 
     white-space: pre-wrap;
 
-    word-break: break-word;
+    overflow-wrap: anywhere;
 }
 
 .user-message {
     background: linear-gradient(
         135deg,
-        #087cff,
-        #1749e8
+        #087fff,
+        #164ee8
     );
 
     color: white;
@@ -546,7 +702,7 @@ body {
 .ai-message {
     background: #101722;
 
-    color: #e6ebf4;
+    color: #e6edf7;
 
     border: 1px solid var(--border);
 
@@ -557,7 +713,6 @@ body {
 
 .message-actions {
     display: flex;
-
     align-items: center;
 
     gap: 4px;
@@ -566,7 +721,7 @@ body {
 }
 
 .message-actions button {
-    width: 30px;
+    width: 31px;
     height: 28px;
 
     border: 0;
@@ -574,24 +729,26 @@ body {
 
     background: transparent;
 
-    color: #8491a5;
+    color: #8290a4;
 
-    cursor: pointer;
-
-    transition: 0.15s;
+    transition: .15s;
 }
 
 .message-actions button:hover {
-    background: #1d2838;
+    background: #1b2738;
     color: white;
 }
 
-/* ================= INPUT AREA ================= */
+.message-actions button.liked {
+    color: #168cff;
+}
+
+/* ================= INPUT ================= */
 
 .input-wrapper {
     width: 100%;
 
-    padding: 12px 25px 22px;
+    padding: 10px 24px 20px;
 }
 
 .input-box {
@@ -601,26 +758,24 @@ body {
 
     min-height: 58px;
 
-    margin: 0 auto;
+    margin: auto;
 
     display: flex;
     align-items: center;
 
-    gap: 6px;
+    gap: 5px;
 
-    padding: 7px 8px;
+    padding: 7px;
 
-    background: #0d141f;
+    background: #0c131e;
 
-    border: 1px solid rgba(255,255,255,0.11);
+    border: 1px solid rgba(255,255,255,.1);
 
-    border-radius: 17px;
+    border-radius: 16px;
 
     box-shadow:
-        0 12px 40px rgba(0,0,0,0.3);
+        0 14px 45px rgba(0,0,0,.32);
 }
-
-/* ================= INPUT BUTTON ================= */
 
 .input-button {
     width: 42px;
@@ -629,28 +784,23 @@ body {
     flex-shrink: 0;
 
     border: 0;
-    border-radius: 10px;
+    border-radius: 9px;
 
     background: transparent;
 
-    color: #aab6c8;
+    color: #9eabbd;
 
-    font-size: 21px;
-
-    cursor: pointer;
+    font-size: 20px;
 }
 
 .input-button:hover {
-    background: #182333;
+    background: #182435;
     color: white;
 }
-
-/* ================= TEXTAREA ================= */
 
 .message-input {
     flex: 1;
 
-    width: 100%;
     min-width: 0;
 
     min-height: 42px;
@@ -665,7 +815,7 @@ body {
 
     color: white;
 
-    padding: 11px 5px;
+    padding: 11px 4px;
 
     line-height: 20px;
 
@@ -673,10 +823,8 @@ body {
 }
 
 .message-input::placeholder {
-    color: #6f7d91;
+    color: #6e7c90;
 }
-
-/* ================= SEND ================= */
 
 .send-button {
     width: 43px;
@@ -685,7 +833,7 @@ body {
     flex-shrink: 0;
 
     border: 0;
-    border-radius: 11px;
+    border-radius: 10px;
 
     background: linear-gradient(
         135deg,
@@ -695,20 +843,18 @@ body {
 
     color: white;
 
-    font-size: 19px;
+    font-size: 18px;
 
-    cursor: pointer;
-
-    transition: 0.2s;
+    transition: .18s;
 }
 
 .send-button:hover {
+    filter: brightness(1.12);
     transform: scale(1.04);
-    filter: brightness(1.1);
 }
 
 .send-button:active {
-    transform: scale(0.96);
+    transform: scale(.96);
 }
 
 /* ================= PLUS MENU ================= */
@@ -723,16 +869,16 @@ body {
 
     width: 185px;
 
-    padding: 7px;
+    padding: 6px;
 
-    background: #111927;
+    background: #111a28;
 
     border: 1px solid var(--border);
 
-    border-radius: 12px;
+    border-radius: 11px;
 
     box-shadow:
-        0 15px 45px rgba(0,0,0,0.55);
+        0 18px 50px rgba(0,0,0,.6);
 
     z-index: 100;
 }
@@ -743,31 +889,27 @@ body {
 
 .plus-menu button {
     width: 100%;
-    height: 42px;
+    height: 41px;
 
     display: flex;
     align-items: center;
 
     gap: 10px;
 
-    padding: 0 11px;
-
     border: 0;
-    border-radius: 8px;
+    border-radius: 7px;
 
     background: transparent;
 
     color: white;
 
-    cursor: pointer;
+    padding: 0 10px;
+
+    text-align: left;
 }
 
 .plus-menu button:hover {
-    background: #1b2637;
-}
-
-.plus-menu button span {
-    font-size: 13px;
+    background: #1b2738;
 }
 
 /* ================= MODAL ================= */
@@ -784,9 +926,9 @@ body {
     align-items: center;
     justify-content: center;
 
-    background: rgba(0,0,0,0.7);
-
     padding: 20px;
+
+    background: rgba(0,0,0,.72);
 }
 
 .modal.show {
@@ -794,7 +936,7 @@ body {
 }
 
 .modal-box {
-    width: min(400px, 100%);
+    width: min(410px, 100%);
 
     padding: 20px;
 
@@ -802,10 +944,10 @@ body {
 
     border: 1px solid var(--border);
 
-    border-radius: 16px;
+    border-radius: 15px;
 
     box-shadow:
-        0 20px 70px rgba(0,0,0,0.6);
+        0 25px 80px rgba(0,0,0,.65);
 }
 
 .modal-header {
@@ -813,75 +955,67 @@ body {
     align-items: center;
     justify-content: space-between;
 
-    margin-bottom: 18px;
+    margin-bottom: 17px;
 }
 
 .modal-header h3 {
-    color: white;
     font-size: 18px;
+    color: white;
 }
 
 .modal-header button {
-    width: 32px;
-    height: 32px;
+    width: 31px;
+    height: 31px;
 
     border: 0;
-    border-radius: 8px;
+    border-radius: 7px;
 
     background: transparent;
 
     color: white;
 
-    font-size: 24px;
-
-    cursor: pointer;
+    font-size: 22px;
 }
 
 .modal-header button:hover {
-    background: #1b2637;
+    background: #1b2738;
 }
-
-/* ================= SELECT ================= */
 
 .modal-box label {
     display: block;
 
+    margin-bottom: 6px;
+
     color: var(--muted);
 
-    font-size: 13px;
-
-    margin-bottom: 5px;
+    font-size: 12px;
 }
 
 .modal-box select {
     width: 100%;
-    height: 44px;
+    height: 43px;
+
+    outline: none;
 
     border: 1px solid var(--border);
 
-    border-radius: 9px;
-
-    outline: none;
+    border-radius: 8px;
 
     background: #080d15;
 
     color: white;
 
     padding: 0 10px;
-
-    cursor: pointer;
 }
-
-/* ================= SAVE ================= */
 
 .save-button {
     width: 100%;
-    height: 44px;
+    height: 43px;
 
-    margin-top: 17px;
+    margin-top: 15px;
 
     border: 0;
-    border-radius: 9px;
+    border-radius: 8px;
 
     background: linear-gradient(
         135deg,
@@ -891,9 +1025,7 @@ body {
 
     color: white;
 
-    font-weight: 600;
-
-    cursor: pointer;
+    font-weight: 700;
 }
 
 .save-button:hover {
@@ -904,22 +1036,18 @@ body {
 
 @media (max-width: 750px) {
 
-    body {
-        overflow: hidden;
-    }
-
     .sidebar {
         position: fixed;
 
+        left: -295px;
         top: 0;
-        left: -290px;
 
         z-index: 300;
 
-        transition: left 0.25s ease;
+        transition: left .25s ease;
 
         box-shadow:
-            10px 0 40px rgba(0,0,0,0.45);
+            12px 0 45px rgba(0,0,0,.5);
     }
 
     .sidebar.open {
@@ -935,8 +1063,7 @@ body {
 
     .header {
         height: 62px;
-
-        padding: 0 14px;
+        padding: 0 13px;
     }
 
     .header h1 {
@@ -948,28 +1075,27 @@ body {
     }
 
     .message-container {
-        padding: 18px 13px;
+        padding: 18px 12px;
     }
 
     .message {
-        max-width: 90%;
-
-        font-size: 14px;
+        max-width: 91%;
+        font-size: 13px;
     }
 
     .input-wrapper {
-        padding: 8px 10px 14px;
+        padding: 8px 9px 14px;
     }
 
     .input-box {
         min-height: 55px;
-
-        border-radius: 15px;
+        border-radius: 14px;
     }
 
     .input-button {
         width: 38px;
         height: 38px;
+        font-size: 18px;
     }
 
     .send-button {
@@ -977,13 +1103,13 @@ body {
         height: 40px;
     }
 
-    .welcome h2 {
-        font-size: 20px;
-    }
-
     .welcome-logo {
         width: 60px;
         height: 60px;
+    }
+
+    .welcome h2 {
+        font-size: 20px;
     }
 }
 
@@ -994,8 +1120,7 @@ body {
     .input-button {
         width: 35px;
         height: 35px;
-
-        font-size: 18px;
+        font-size: 17px;
     }
 
     .send-button {
