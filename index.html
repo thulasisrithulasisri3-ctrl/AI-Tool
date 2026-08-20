@@ -1,454 +1,319 @@
 ```html
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Viggo AI</title>
-
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<div id="app">
-
-    <!-- ==================================================
-         SIDEBAR
-    =================================================== -->
-
-    <aside id="sidebar" class="sidebar">
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar" id="sidebar">
 
         <div class="sidebar-header">
-
             <div class="brand">
-
-                <div class="brand-logo">
-                    V
-                </div>
-
-                <span>Viggo</span>
-
+                <div class="logo">V</div>
+                <span>Viggo AI</span>
             </div>
 
+            <!-- CLOSE BUTTON -->
             <button
-                id="closeSidebarBtn"
-                class="icon-btn"
                 type="button"
-                title="Close"
-                aria-label="Close sidebar"
-            >
-                ×
+                class="icon-btn sidebar-close"
+                id="closeSidebarBtn"
+                aria-label="Close sidebar">
+                ✕
             </button>
-
         </div>
 
-
-        <!-- NEW CHAT -->
-
         <button
-            id="newChatBtn"
-            class="new-chat-btn"
             type="button"
-        >
-            <span class="new-chat-plus">+</span>
-            <span>New Chat</span>
+            class="new-chat-btn"
+            id="newChatBtn">
+            ＋ New Chat
         </button>
 
-
-        <!-- HISTORY -->
-
-        <div
-            id="historyList"
-            class="history-list"
-        ></div>
-
-
-        <!-- SIDEBAR BOTTOM -->
+        <div class="history-list" id="historyList"></div>
 
         <div class="sidebar-bottom">
-
             <button
-                id="selectChatsBtn"
-                class="sidebar-btn"
                 type="button"
-            >
+                class="sidebar-btn"
+                id="selectChatsBtn">
                 ☑ Select Chats
             </button>
 
             <button
-                id="deleteSelectedBtn"
-                class="sidebar-btn delete-selected"
                 type="button"
-                style="display:none;"
-            >
+                class="sidebar-btn delete-selected"
+                id="deleteSelectedBtn"
+                style="display:none;">
                 🗑 Delete Selected
             </button>
 
+            <button
+                type="button"
+                class="sidebar-btn"
+                id="clearHistoryBtn">
+                🗑 Clear History
+            </button>
         </div>
 
     </aside>
 
 
-
-    <!-- ==================================================
-         MAIN
-    =================================================== -->
-
+    <!-- ================= MAIN ================= -->
     <main class="main">
 
-
-        <!-- TOP BAR -->
-
+        <!-- HEADER -->
         <header class="topbar">
 
             <button
-                id="mobileMenuBtn"
-                class="icon-btn"
                 type="button"
-                title="Menu"
-                aria-label="Open sidebar"
-            >
+                class="icon-btn mobile-menu-btn"
+                id="mobileMenuBtn"
+                aria-label="Open sidebar">
                 ☰
             </button>
 
-
-            <div class="top-title">
-
-                <span id="chatTitle">
-                    New Chat
-                </span>
-
+            <div class="chat-title" id="chatTitle">
+                New Chat
             </div>
-
 
             <div class="top-actions">
 
-                <!-- SHARE -->
-
                 <button
-                    id="shareBtn"
-                    class="icon-btn"
                     type="button"
-                    title="Share"
-                    aria-label="Share"
-                >
+                    class="icon-btn"
+                    id="shareBtn"
+                    title="Share">
                     ↗
                 </button>
 
-
-                <!-- MORE -->
-
-                <div class="sidebar-more">
-
-                    <button
-                        id="moreBtn"
-                        class="icon-btn"
-                        type="button"
-                        title="More"
-                        aria-label="More"
-                    >
-                        ⋮
-                    </button>
-
-
-                    <div
-                        id="moreMenu"
-                        class="more-menu"
-                    >
-
-                        <button
-                            id="saveBtn"
-                            class="menu-item"
-                            type="button"
-                        >
-                            💾 Save Chat
-                        </button>
-
-
-                        <button
-                            id="clearHistoryBtn"
-                            class="menu-item"
-                            type="button"
-                        >
-                            🗑 Clear History
-                        </button>
-
-
-                        <div class="language-title">
-                            Language
-                        </div>
-
-
-                        <button
-                            class="menu-item"
-                            type="button"
-                            data-language="en"
-                        >
-                            English
-                        </button>
-
-
-                        <button
-                            class="menu-item"
-                            type="button"
-                            data-language="ta"
-                        >
-                            தமிழ்
-                        </button>
-
-
-                        <button
-                            class="menu-item"
-                            type="button"
-                            data-language="hi"
-                        >
-                            हिन्दी
-                        </button>
-
-
-                        <button
-                            class="menu-item"
-                            type="button"
-                            data-language="ml"
-                        >
-                            മലയാളം
-                        </button>
-
-
-                        <button
-                            class="menu-item"
-                            type="button"
-                            data-language="te"
-                        >
-                            తెలుగు
-                        </button>
-
-
-                        <button
-                            class="menu-item"
-                            type="button"
-                            data-language="kn"
-                        >
-                            ಕನ್ನಡ
-                        </button>
-
-                    </div>
-
-                </div>
+                <button
+                    type="button"
+                    class="icon-btn"
+                    id="moreBtn"
+                    title="More">
+                    ⋮
+                </button>
 
             </div>
 
         </header>
 
 
-
-        <!-- ==================================================
-             CHAT MESSAGES
-        =================================================== -->
-
+        <!-- ================= MESSAGES ================= -->
         <section
-            id="messages"
             class="messages"
-        ></section>
+            id="messages">
 
+            <div class="welcome">
 
+                <div class="big-logo">V</div>
 
-        <!-- ==================================================
-             CHAT INPUT
-        =================================================== -->
+                <h1>Viggo</h1>
 
-        <footer class="input-container">
-
-            <div class="chat-input-area">
-
-
-                <!-- LEFT -->
-
-                <div class="input-left">
-
-
-                    <!-- PLUS -->
-
-                    <button
-                        id="attachBtn"
-                        class="input-icon-btn"
-                        type="button"
-                        title="Attach"
-                        aria-label="Attach"
-                    >
-                        +
-                    </button>
-
-
-                    <!-- ATTACHMENT MENU -->
-
-                    <div
-                        id="attachmentMenu"
-                        class="attachment-menu"
-                    >
-
-                        <!-- PHOTO -->
-
-                        <button
-                            id="photoBtn"
-                            class="attachment-option"
-                            type="button"
-                        >
-
-                            <span class="attachment-icon">
-                                📷
-                            </span>
-
-                            <span>
-                                Photo
-                            </span>
-
-                        </button>
-
-
-                        <!-- VIDEO -->
-
-                        <button
-                            id="videoBtn"
-                            class="attachment-option"
-                            type="button"
-                        >
-
-                            <span class="attachment-icon">
-                                🎥
-                            </span>
-
-                            <span>
-                                Video
-                            </span>
-
-                        </button>
-
-
-                        <!-- FILE -->
-
-                        <button
-                            id="fileBtn"
-                            class="attachment-option"
-                            type="button"
-                        >
-
-                            <span class="attachment-icon">
-                                📎
-                            </span>
-
-                            <span>
-                                File
-                            </span>
-
-                        </button>
-
-                    </div>
-
-
-                    <!-- HIDDEN INPUTS -->
-
-                    <input
-                        id="photoInput"
-                        type="file"
-                        accept="image/*"
-                        hidden
-                    >
-
-
-                    <input
-                        id="videoInput"
-                        type="file"
-                        accept="video/*"
-                        hidden
-                    >
-
-
-                    <input
-                        id="fileInput"
-                        type="file"
-                        hidden
-                    >
-
-
-                    <!-- MESSAGE -->
-
-                    <textarea
-                        id="messageInput"
-                        class="message-input"
-                        rows="1"
-                        placeholder="Message Viggo..."
-                        autocomplete="off"
-                    ></textarea>
-
-                </div>
-
-
-
-                <!-- RIGHT -->
-
-                <div class="input-right">
-
-
-                    <!-- VOICE -->
-
-                    <button
-                        id="voiceBtn"
-                        class="input-icon-btn"
-                        type="button"
-                        title="Voice"
-                        aria-label="Voice input"
-                    >
-                        🎤
-                    </button>
-
-
-                    <!-- SEND -->
-
-                    <button
-                        id="sendBtn"
-                        class="send-btn"
-                        type="button"
-                        title="Send"
-                        aria-label="Send"
-                    >
-                        ➤
-                    </button>
-
-                </div>
+                <p>
+                    Your AI friend is ready.
+                </p>
 
             </div>
 
+        </section>
+
+
+        <!-- ================= INPUT AREA ================= -->
+        <div class="input-area">
+
+            <div class="input-box">
+
+                <!-- PLUS BUTTON -->
+                <button
+                    type="button"
+                    class="input-icon"
+                    id="plusBtn"
+                    title="Attach">
+
+                    ＋
+
+                </button>
+
+                <!-- ATTACHMENT MENU -->
+                <div
+                    class="attachment-menu"
+                    id="attachmentMenu">
+
+                    <button
+                        type="button"
+                        class="attachment-item"
+                        id="photoBtn">
+
+                        📷
+                        <span>Photo</span>
+
+                    </button>
+
+                    <button
+                        type="button"
+                        class="attachment-item"
+                        id="videoBtn">
+
+                        🎥
+                        <span>Video</span>
+
+                    </button>
+
+                    <button
+                        type="button"
+                        class="attachment-item"
+                        id="fileBtn">
+
+                        📎
+                        <span>File</span>
+
+                    </button>
+
+                </div>
+
+
+                <!-- HIDDEN FILE INPUTS -->
+                <input
+                    type="file"
+                    id="photoInput"
+                    accept="image/*"
+                    hidden>
+
+                <input
+                    type="file"
+                    id="videoInput"
+                    accept="video/*"
+                    hidden>
+
+                <input
+                    type="file"
+                    id="fileInput"
+                    accept="*/*"
+                    hidden>
+
+
+                <!-- TEXT -->
+                <textarea
+                    id="messageInput"
+                    placeholder="Message Viggo..."
+                    rows="1"></textarea>
+
+
+                <!-- VOICE -->
+                <button
+                    type="button"
+                    class="input-icon"
+                    id="voiceBtn"
+                    title="Voice">
+
+                    🎙️
+
+                </button>
+
+
+                <!-- SEND -->
+                <button
+                    type="button"
+                    class="send-btn"
+                    id="sendBtn"
+                    title="Send">
+
+                    ➤
+
+                </button>
+
+            </div>
+
+            <div
+                class="attachment-status"
+                id="attachmentStatus">
+            </div>
 
             <div class="input-note">
                 Viggo AI can make mistakes. Check important information.
             </div>
 
-        </footer>
+        </div>
 
     </main>
 
-</div>
+
+    <!-- ================= MORE MENU ================= -->
+    <div
+        class="more-menu"
+        id="moreMenu">
+
+        <button
+            type="button"
+            id="saveBtn">
+            💾 Save Chat
+        </button>
+
+        <button
+            type="button"
+            data-language="en">
+            🇬🇧 English
+        </button>
+
+        <button
+            type="button"
+            data-language="ta">
+            தமிழ்
+        </button>
+
+        <button
+            type="button"
+            data-language="hi">
+            हिन्दी
+        </button>
+
+        <button
+            type="button"
+            data-language="ml">
+            മലയാളം
+        </button>
+
+        <button
+            type="button"
+            data-language="te">
+            తెలుగు
+        </button>
+
+        <button
+            type="button"
+            data-language="kn">
+            ಕನ್ನಡ
+        </button>
+
+    </div>
 
 
+    <!-- ================= TOAST ================= -->
+    <div
+        class="toast"
+        id="viggoToast">
+    </div>
 
-<!-- ==================================================
-     ATTACHMENT JAVASCRIPT
-=================================================== -->
 
-<script>
+    <!-- ================= SCRIPT ================= -->
+    <script src="script.js"></script>
 
-"use strict";
+    <script>
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
+        /* =========================================
+           PLUS / ATTACHMENT MENU
+        ========================================= */
 
-        const attachBtn =
-            document.getElementById("attachBtn");
+        const plusBtn =
+            document.getElementById("plusBtn");
 
         const attachmentMenu =
             document.getElementById("attachmentMenu");
@@ -471,16 +336,15 @@ document.addEventListener(
         const fileInput =
             document.getElementById("fileInput");
 
+        const attachmentStatus =
+            document.getElementById(
+                "attachmentStatus"
+            );
 
-        /* ==========================================
-           PLUS
-        ========================================== */
 
-        attachBtn?.addEventListener(
+        plusBtn?.addEventListener(
             "click",
-            function (event) {
-
-                event.preventDefault();
+            function(event) {
 
                 event.stopPropagation();
 
@@ -492,140 +356,109 @@ document.addEventListener(
         );
 
 
-        /* ==========================================
-           PHOTO
-        ========================================== */
-
         photoBtn?.addEventListener(
             "click",
-            function (event) {
-
-                event.preventDefault();
-
-                event.stopPropagation();
+            function() {
 
                 photoInput?.click();
 
+                attachmentMenu?.classList.remove(
+                    "show"
+                );
+
             }
         );
 
-
-        /* ==========================================
-           VIDEO
-        ========================================== */
 
         videoBtn?.addEventListener(
             "click",
-            function (event) {
-
-                event.preventDefault();
-
-                event.stopPropagation();
+            function() {
 
                 videoInput?.click();
 
+                attachmentMenu?.classList.remove(
+                    "show"
+                );
+
             }
         );
 
-
-        /* ==========================================
-           FILE
-        ========================================== */
 
         fileBtn?.addEventListener(
             "click",
-            function (event) {
-
-                event.preventDefault();
-
-                event.stopPropagation();
+            function() {
 
                 fileInput?.click();
+
+                attachmentMenu?.classList.remove(
+                    "show"
+                );
 
             }
         );
 
 
-        /* ==========================================
-           FILE SELECT
-        ========================================== */
-
-        function handleFile(
-            input,
-            type
+        function showAttachment(
+            input
         ) {
 
-            if (!input)
+            const file =
+                input?.files?.[0];
+
+            if (!file)
                 return;
 
-            input.addEventListener(
-                "change",
-                function () {
-
-                    const file =
-                        input.files &&
-                        input.files[0];
-
-                    if (!file)
-                        return;
-
-
-                    const messageInput =
-                        document.getElementById(
-                            "messageInput"
-                        );
-
-
-                    if (messageInput) {
-
-                        messageInput.value =
-                            "📎 " +
-                            type +
-                            ": " +
-                            file.name;
-
-                        messageInput.focus();
-
-                    }
-
-
-                    attachmentMenu?.classList.remove(
-                        "show"
-                    );
-
-                }
-            );
+            attachmentStatus.textContent =
+                "📎 " + file.name;
 
         }
 
 
-        handleFile(
-            photoInput,
-            "Photo"
-        );
+        photoInput?.addEventListener(
+            "change",
+            function() {
 
-        handleFile(
-            videoInput,
-            "Video"
-        );
+                showAttachment(
+                    photoInput
+                );
 
-        handleFile(
-            fileInput,
-            "File"
+            }
         );
 
 
-        /* ==========================================
-           OUTSIDE CLICK
-        ========================================== */
+        videoInput?.addEventListener(
+            "change",
+            function() {
+
+                showAttachment(
+                    videoInput
+                );
+
+            }
+        );
+
+
+        fileInput?.addEventListener(
+            "change",
+            function() {
+
+                showAttachment(
+                    fileInput
+                );
+
+            }
+        );
+
+
+        /* CLOSE ATTACHMENT MENU */
 
         document.addEventListener(
             "click",
-            function (event) {
+            function(event) {
 
                 if (
                     !event.target.closest(
-                        ".input-left"
+                        ".input-box"
                     )
                 ) {
 
@@ -638,21 +471,83 @@ document.addEventListener(
             }
         );
 
-    }
-);
 
-</script>
+        /* =========================================
+           ENTER KEY
+           Enter = Send
+           Shift + Enter = New line
+        ========================================= */
+
+        const messageInput =
+            document.getElementById(
+                "messageInput"
+            );
 
 
+        messageInput?.addEventListener(
+            "keydown",
+            function(event) {
 
-<!-- ==================================================
-     MAIN SCRIPT
-=================================================== -->
+                if (
+                    event.key === "Enter" &&
+                    !event.shiftKey &&
+                    !event.isComposing
+                ) {
 
-<script src="script.js"></script>
+                    event.preventDefault();
 
+                    if (
+                        typeof sendMessage ===
+                        "function"
+                    ) {
+
+                        sendMessage();
+
+                    }
+
+                }
+
+            }
+        );
+
+
+        /* =========================================
+           SIDEBAR CLOSE
+        ========================================= */
+
+        document
+            .getElementById("closeSidebarBtn")
+            ?.addEventListener(
+                "click",
+                function(event) {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+                    if (
+                        typeof closeSidebar ===
+                        "function"
+                    ) {
+
+                        closeSidebar();
+
+                    } else {
+
+                        document
+                            .getElementById(
+                                "sidebar"
+                            )
+                            ?.classList
+                            .remove("open");
+
+                    }
+
+                }
+            );
+
+    </script>
 
 </body>
-
 </html>
 ```
