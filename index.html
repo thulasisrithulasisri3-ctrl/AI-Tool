@@ -1,591 +1,415 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viggo AI</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Viggo AI</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <div class="app">
 
-    <!-- ================= SIDEBAR ================= -->
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
 
-    <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="brand">
+        <div class="brand-logo">V</div>
+        <span>Viggo AI</span>
+      </div>
 
-        <div class="sidebar-header">
+      <button class="mobile-close" onclick="toggleSidebar()">×</button>
+    </div>
 
-            <div class="brand">
-                <div class="brand-logo">V</div>
-                <span>Viggo AI</span>
-            </div>
+    <button class="new-chat" onclick="createNewChat()">
+      <span class="new-icon">＋</span>
+      <span>New Chat</span>
+    </button>
 
-            <button class="mobile-close"
-                    onclick="toggleSidebar()">
-                ×
-            </button>
+    <div class="search-box">
+      <span>⌕</span>
+      <input
+        id="searchInput"
+        type="text"
+        placeholder="Search chats..."
+        oninput="searchChats()"
+      >
+    </div>
 
-        </div>
+    <div class="section-label">RECENT</div>
 
+    <div class="recent-list" id="recentList"></div>
 
-        <!-- NEW CHAT -->
+    <!-- MORE -->
+    <div class="sidebar-bottom">
 
-        <button class="new-chat"
-                onclick="createNewChat()">
+      <button class="more-sidebar" onclick="toggleMoreMenu()">
+        <span class="more-dots">⋮</span>
+        <span>More</span>
+      </button>
 
-            <span class="new-icon">＋</span>
-            <span>New Chat</span>
+      <div class="sidebar-more-menu" id="sidebarMoreMenu">
 
+        <button onclick="openLanguage()">
+          <span>🌐</span>
+          <span>Language</span>
         </button>
 
-
-        <!-- SEARCH -->
-
-        <div class="search-box">
-
-            <span>⌕</span>
-
-            <input
-                id="searchInput"
-                type="text"
-                placeholder="Search chats..."
-                oninput="searchChats()"
-            >
-
-        </div>
-
-
-        <!-- RECENT -->
-
-        <div class="section-label">
-            RECENT
-        </div>
-
-        <div class="recent-list"
-             id="recentList">
-        </div>
-
-
-        <!-- SIDEBAR BOTTOM -->
-
-        <div class="sidebar-bottom">
-
-            <!-- MORE -->
-
-            <button class="more-sidebar"
-                    onclick="toggleMoreMenu()">
-
-                <span class="more-dots">⋮</span>
-                <span>More</span>
-
-            </button>
-
-
-            <!-- MORE MENU -->
-
-            <div class="sidebar-more-menu"
-                 id="sidebarMoreMenu">
-
-                <button onclick="openLanguage()">
-
-                    <span>🌐</span>
-                    <span>Language</span>
-
-                </button>
-
-                <button onclick="openVoice()">
-
-                    <span>🎤</span>
-                    <span>Voice</span>
-
-                </button>
-
-                <button onclick="openDelete()">
-
-                    <span>🗑️</span>
-                    <span>Delete Options</span>
-
-                </button>
-
-            </div>
-
-        </div>
-
-    </aside>
-
-
-    <!-- ================= MAIN ================= -->
-
-    <main class="main">
-
-
-        <!-- TOPBAR -->
-
-        <header class="topbar">
-
-            <button class="menu-button"
-                    onclick="toggleSidebar()">
-                ☰
-            </button>
-
-            <div class="page-title">
-                Viggo AI
-            </div>
-
-        </header>
-
-
-        <!-- ================= CHAT ================= -->
-
-        <section class="chat-area"
-                 id="chatArea">
-
-            <div class="welcome"
-                 id="welcome">
-
-                <div class="welcome-logo">
-                    V
-                </div>
-
-                <h1>
-                    Welcome to Viggo AI
-                </h1>
-
-                <p>
-                    Ask me anything. I'm here to help.
-                </p>
-
-            </div>
-
-        </section>
-
-
-        <!-- ================= INPUT ================= -->
-
-        <div class="input-section">
-
-            <div class="input-wrapper">
-
-
-                <!-- PLUS MENU -->
-
-                <div class="plus-menu"
-                     id="plusMenu">
-
-                    <button onclick="selectPhoto()">
-
-                        <span>📷</span>
-                        <span>Photos</span>
-
-                    </button>
-
-                    <button onclick="selectVideo()">
-
-                        <span>🎥</span>
-                        <span>Videos</span>
-
-                    </button>
-
-                    <button onclick="selectFile()">
-
-                        <span>📎</span>
-                        <span>Files</span>
-
-                    </button>
-
-                </div>
-
-
-                <!-- TEXT -->
-
-                <textarea
-                    id="chatInput"
-                    class="chat-input"
-                    placeholder="Message Viggo AI..."
-                    rows="1"
-                ></textarea>
-
-
-                <!-- PLUS -->
-
-                <button class="plus-button"
-                        onclick="togglePlusMenu()"
-                        title="Attach">
-
-                    ＋
-
-                </button>
-
-
-                <!-- RIGHT -->
-
-                <div class="input-actions">
-
-                    <button class="voice-button"
-                            onclick="openVoice()"
-                            title="Voice">
-
-                        🎤
-
-                    </button>
-
-                    <button class="send-button"
-                            onclick="sendMessage()"
-                            title="Send">
-
-                        ➤
-
-                    </button>
-
-                </div>
-
-
-                <!-- FILE INPUTS -->
-
-                <input
-                    type="file"
-                    id="photoInput"
-                    accept="image/*"
-                    hidden
-                >
-
-                <input
-                    type="file"
-                    id="videoInput"
-                    accept="video/*"
-                    hidden
-                >
-
-                <input
-                    type="file"
-                    id="fileInput"
-                    hidden
-                >
-
-            </div>
-
-        </div>
-
-    </main>
-
-</div>
-
-
-<!-- ================= LANGUAGE ================= -->
-
-<div class="overlay"
-     id="languageOverlay">
-
-    <div class="modal">
-
-        <div class="modal-header">
-
-            <h2>🌐 Language</h2>
-
-            <button onclick="closeModals()">
-                ×
-            </button>
-
-        </div>
-
-
-        <div class="language-grid">
-
-            <button onclick="selectLanguage('English')">
-                English
-            </button>
-
-            <button onclick="selectLanguage('தமிழ்')">
-                தமிழ்
-            </button>
-
-            <button onclick="selectLanguage('हिन्दी')">
-                हिन्दी
-            </button>
-
-            <button onclick="selectLanguage('తెలుగు')">
-                తెలుగు
-            </button>
-
-            <button onclick="selectLanguage('ಕನ್ನಡ')">
-                ಕನ್ನಡ
-            </button>
-
-            <button onclick="selectLanguage('മലയാളം')">
-                മലയാളം
-            </button>
-
-            <button onclick="selectLanguage('বাংলা')">
-                বাংলা
-            </button>
-
-            <button onclick="selectLanguage('मराठी')">
-                मराठी
-            </button>
-
-            <button onclick="selectLanguage('ગુજરાતી')">
-                ગુજરાતી
-            </button>
-
-            <button onclick="selectLanguage('ਪੰਜਾਬੀ')">
-                ਪੰਜਾਬੀ
-            </button>
-
-            <button onclick="selectLanguage('اردو')">
-                اردو
-            </button>
-
-            <button onclick="selectLanguage('Español')">
-                Español
-            </button>
-
-            <button onclick="selectLanguage('Français')">
-                Français
-            </button>
-
-            <button onclick="selectLanguage('Deutsch')">
-                Deutsch
-            </button>
-
-            <button onclick="selectLanguage('Italiano')">
-                Italiano
-            </button>
-
-            <button onclick="selectLanguage('Português')">
-                Português
-            </button>
-
-            <button onclick="selectLanguage('日本語')">
-                日本語
-            </button>
-
-            <button onclick="selectLanguage('한국어')">
-                한국어
-            </button>
-
-            <button onclick="selectLanguage('中文')">
-                中文
-            </button>
-
-            <button onclick="selectLanguage('العربية')">
-                العربية
-            </button>
-
-        </div>
-
-
-        <div class="selected-info"
-             id="selectedLanguage">
-
-            Selected: English
-
-        </div>
+        <button onclick="openVoice()">
+          <span>🎤</span>
+          <span>Voice</span>
+        </button>
+
+        <button onclick="openDelete()">
+          <span>🗑️</span>
+          <span>Delete Options</span>
+        </button>
+
+      </div>
 
     </div>
 
-</div>
+  </aside>
 
 
-<!-- ================= VOICE ================= -->
+  <!-- MAIN -->
+  <main class="main">
 
-<div class="overlay"
-     id="voiceOverlay">
+    <!-- TOP BAR -->
+    <header class="topbar">
 
-    <div class="modal small-modal">
+      <div class="topbar-left">
 
-        <div class="modal-header">
+        <button class="menu-button" onclick="toggleSidebar()">
+          ☰
+        </button>
 
-            <h2>🎤 Voice</h2>
-
-            <button onclick="closeModals()">
-                ×
-            </button>
-
+        <div class="page-title">
+          Viggo AI
         </div>
 
+      </div>
 
-        <p class="modal-subtitle">
-            Select voice
+
+      <!-- ONLY NEW ADDITION -->
+      <button
+        class="top-share-button"
+        onclick="createShareLink()"
+        title="Share current chat"
+      >
+        🔗 <span>Share</span>
+      </button>
+
+    </header>
+
+
+    <!-- CHAT -->
+    <section class="chat-area" id="chatArea">
+
+      <div class="welcome" id="welcome">
+
+        <div class="welcome-logo">
+          V
+        </div>
+
+        <h1>Welcome to Viggo AI</h1>
+
+        <p>
+          Ask me anything. I'm here to help.
         </p>
 
+      </div>
 
-        <div class="voice-list">
-
-            <button class="voice-option"
-                    onclick="selectVoice('Male')">
-
-                <span class="voice-avatar">
-                    👨
-                </span>
-
-                <span>
-                    <strong>Male</strong>
-                    <small>Male voice</small>
-                </span>
-
-            </button>
+    </section>
 
 
-            <button class="voice-option"
-                    onclick="selectVoice('Female')">
+    <!-- INPUT -->
+    <div class="input-section">
 
-                <span class="voice-avatar">
-                    👩
-                </span>
+      <div class="input-wrapper">
 
-                <span>
-                    <strong>Female</strong>
-                    <small>Female voice</small>
-                </span>
+        <!-- PLUS MENU -->
+        <div class="plus-menu" id="plusMenu">
 
-            </button>
+          <button onclick="selectPhoto()">
+            <span>📷</span>
+            <span>Photos</span>
+          </button>
+
+          <button onclick="selectVideo()">
+            <span>🎥</span>
+            <span>Videos</span>
+          </button>
+
+          <button onclick="selectFile()">
+            <span>📎</span>
+            <span>Files</span>
+          </button>
 
         </div>
 
 
-        <div class="selected-info"
-             id="selectedVoice">
+        <textarea
+          id="chatInput"
+          class="chat-input"
+          placeholder="Message Viggo AI..."
+          rows="1"
+        ></textarea>
 
-            Selected: Female
+
+        <button
+          class="plus-button"
+          onclick="togglePlusMenu()"
+          title="Attach"
+        >
+          ＋
+        </button>
+
+
+        <div class="input-actions">
+
+          <button
+            class="voice-button"
+            onclick="openVoice()"
+            title="Voice"
+          >
+            🎤
+          </button>
+
+          <button
+            class="send-button"
+            onclick="sendMessage()"
+            title="Send"
+          >
+            ➤
+          </button>
 
         </div>
+
+
+        <input
+          type="file"
+          id="photoInput"
+          accept="image/*"
+          hidden
+        >
+
+        <input
+          type="file"
+          id="videoInput"
+          accept="video/*"
+          hidden
+        >
+
+        <input
+          type="file"
+          id="fileInput"
+          hidden
+        >
+
+      </div>
 
     </div>
+
+  </main>
 
 </div>
 
 
-<!-- ================= DELETE ================= -->
+<!-- LANGUAGE -->
+<div class="overlay" id="languageOverlay">
 
-<div class="overlay"
-     id="deleteOverlay">
+  <div class="modal">
 
-    <div class="modal small-modal">
+    <div class="modal-header">
 
-        <div class="modal-header">
+      <h2>🌐 Language</h2>
 
-            <h2>🗑️ Delete Options</h2>
-
-            <button onclick="closeModals()">
-                ×
-            </button>
-
-        </div>
-
-
-        <button class="delete-option"
-                onclick="clearCurrentChat()">
-
-            💬 Clear Current Chat
-
-        </button>
-
-
-        <button class="delete-option"
-                onclick="clearAllChats()">
-
-            🗑️ Clear All Chats
-
-        </button>
-
-
-        <button class="delete-option"
-                onclick="openSelectDelete()">
-
-            ☑️ Select Chats to Delete
-
-        </button>
+      <button onclick="closeModals()">×</button>
 
     </div>
+
+    <div class="language-grid">
+
+      <button onclick="selectLanguage('English')">English</button>
+      <button onclick="selectLanguage('தமிழ்')">தமிழ்</button>
+      <button onclick="selectLanguage('हिन्दी')">हिन्दी</button>
+      <button onclick="selectLanguage('తెలుగు')">తెలుగు</button>
+      <button onclick="selectLanguage('ಕನ್ನಡ')">ಕನ್ನಡ</button>
+      <button onclick="selectLanguage('മലയാളം')">മലയാളം</button>
+      <button onclick="selectLanguage('বাংলা')">বাংলা</button>
+      <button onclick="selectLanguage('मराठी')">मराठी</button>
+      <button onclick="selectLanguage('ગુજરાતી')">ગુજરાતી</button>
+      <button onclick="selectLanguage('ਪੰਜਾਬੀ')">ਪੰਜਾਬੀ</button>
+      <button onclick="selectLanguage('اردو')">اردو</button>
+      <button onclick="selectLanguage('Español')">Español</button>
+      <button onclick="selectLanguage('Français')">Français</button>
+      <button onclick="selectLanguage('Deutsch')">Deutsch</button>
+      <button onclick="selectLanguage('Italiano')">Italiano</button>
+      <button onclick="selectLanguage('Português')">Português</button>
+      <button onclick="selectLanguage('日本語')">日本語</button>
+      <button onclick="selectLanguage('한국어')">한국어</button>
+      <button onclick="selectLanguage('中文')">中文</button>
+      <button onclick="selectLanguage('العربية')">العربية</button>
+
+    </div>
+
+    <div class="selected-info" id="selectedLanguage">
+      Selected: English
+    </div>
+
+  </div>
 
 </div>
 
 
-<!-- ================= SELECT DELETE ================= -->
+<!-- VOICE -->
+<div class="overlay" id="voiceOverlay">
 
-<div class="overlay"
-     id="selectDeleteOverlay">
+  <div class="modal small-modal">
 
-    <div class="modal select-modal">
+    <div class="modal-header">
 
-        <div class="modal-header">
+      <h2>🎤 Voice</h2>
 
-            <h2>☑️ Select Chats</h2>
-
-            <button onclick="closeModals()">
-                ×
-            </button>
-
-        </div>
-
-
-        <div id="selectChatList"
-             class="select-chat-list">
-        </div>
-
-
-        <div class="select-footer">
-
-            <button class="cancel-button"
-                    onclick="closeModals()">
-
-                Cancel
-
-            </button>
-
-            <button class="delete-selected-button"
-                    onclick="deleteSelectedChats()">
-
-                Delete Selected
-
-            </button>
-
-        </div>
+      <button onclick="closeModals()">×</button>
 
     </div>
+
+    <p class="modal-subtitle">
+      Select voice
+    </p>
+
+    <div class="voice-list">
+
+      <button class="voice-option" onclick="selectVoice('Male')">
+
+        <span class="voice-avatar">👨</span>
+
+        <span>
+          <strong>Male</strong>
+          <small>Male voice</small>
+        </span>
+
+      </button>
+
+      <button class="voice-option" onclick="selectVoice('Female')">
+
+        <span class="voice-avatar">👩</span>
+
+        <span>
+          <strong>Female</strong>
+          <small>Female voice</small>
+        </span>
+
+      </button>
+
+    </div>
+
+    <div class="selected-info" id="selectedVoice">
+      Selected: Female
+    </div>
+
+  </div>
 
 </div>
 
 
-<!-- ================= SHARE ================= -->
+<!-- DELETE -->
+<div class="overlay" id="deleteOverlay">
 
-<div class="overlay"
-     id="shareOverlay">
+  <div class="modal small-modal">
 
-    <div class="modal small-modal">
+    <div class="modal-header">
 
-        <div class="modal-header">
+      <h2>🗑️ Delete Options</h2>
 
-            <h2>🔗 Share Chat</h2>
-
-            <button onclick="closeModals()">
-                ×
-            </button>
-
-        </div>
-
-
-        <p class="share-text">
-            Your chat share link is ready.
-        </p>
-
-
-        <div class="share-link-box">
-
-            <input
-                id="shareLink"
-                readonly
-            >
-
-            <button onclick="copyShareLink()">
-                Copy
-            </button>
-
-        </div>
+      <button onclick="closeModals()">×</button>
 
     </div>
+
+    <button class="delete-option" onclick="clearCurrentChat()">
+      💬 Clear Current Chat
+    </button>
+
+    <button class="delete-option" onclick="clearAllChats()">
+      🗑️ Clear All Chats
+    </button>
+
+    <button class="delete-option" onclick="openSelectDelete()">
+      ☑️ Select Chats to Delete
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- SELECT DELETE -->
+<div class="overlay" id="selectDeleteOverlay">
+
+  <div class="modal select-modal">
+
+    <div class="modal-header">
+
+      <h2>☑️ Select Chats</h2>
+
+      <button onclick="closeModals()">×</button>
+
+    </div>
+
+    <div id="selectChatList" class="select-chat-list"></div>
+
+    <div class="select-footer">
+
+      <button class="cancel-button" onclick="closeModals()">
+        Cancel
+      </button>
+
+      <button
+        class="delete-selected-button"
+        onclick="deleteSelectedChats()"
+      >
+        Delete Selected
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- SHARE -->
+<div class="overlay" id="shareOverlay">
+
+  <div class="modal small-modal">
+
+    <div class="modal-header">
+
+      <h2>🔗 Share Chat</h2>
+
+      <button onclick="closeModals()">×</button>
+
+    </div>
+
+    <p class="share-text">
+      Your chat share link is ready.
+    </p>
+
+    <div class="share-link-box">
+
+      <input id="shareLink" readonly>
+
+      <button onclick="copyShareLink()">
+        Copy
+      </button>
+
+    </div>
+
+  </div>
 
 </div>
 
