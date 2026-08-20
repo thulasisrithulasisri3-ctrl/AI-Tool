@@ -1,34 +1,7 @@
 ```css
 /* =========================================================
-   VIGGO AI — BLUE + BLACK THEME
-   Full style.css
-========================================================= */
-
-:root {
-    --bg: #05070c;
-    --bg-2: #080d16;
-    --panel: #0b111c;
-    --panel-2: #101827;
-
-    --blue: #1683ff;
-    --blue-2: #0066ff;
-    --blue-light: #38a8ff;
-
-    --text: #f4f7ff;
-    --text-2: #aab6c8;
-    --muted: #6f7d91;
-
-    --border: rgba(80, 150, 255, 0.20);
-    --border-blue: rgba(22, 131, 255, 0.55);
-
-    --shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
-
-    --radius: 14px;
-}
-
-
-/* =========================================================
-   RESET
+   VIGGO AI - BLUE + BLACK THEME
+   Sidebar + Chat + Attachments + Voice + Send
 ========================================================= */
 
 * {
@@ -36,6 +9,24 @@
     margin: 0;
     padding: 0;
 }
+
+:root {
+    --bg: #050912;
+    --panel: #0a1220;
+    --panel-2: #0d1728;
+    --border: #1d2d46;
+    --blue: #1683ff;
+    --blue-dark: #0d5dcc;
+    --blue-light: #4da3ff;
+    --text: #f5f8ff;
+    --muted: #8fa3bd;
+    --danger: #ff4d5e;
+    --shadow: 0 12px 35px rgba(0, 0, 0, .45);
+}
+
+/* =========================================================
+   BODY
+========================================================= */
 
 html,
 body {
@@ -46,10 +37,8 @@ body {
 body {
     font-family:
         Inter,
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
+        Arial,
+        Helvetica,
         sans-serif;
 
     background: var(--bg);
@@ -60,55 +49,30 @@ body {
 
 
 /* =========================================================
-   APP
-========================================================= */
-
-#app {
-    width: 100%;
-    height: 100vh;
-
-    display: flex;
-
-    background:
-        radial-gradient(
-            circle at 70% 15%,
-            rgba(0, 102, 255, 0.08),
-            transparent 30%
-        ),
-        var(--bg);
-}
-
-
-/* =========================================================
    SIDEBAR
 ========================================================= */
 
 .sidebar {
-    width: 285px;
+    position: fixed;
+
+    left: 0;
+    top: 0;
+
+    width: 280px;
     height: 100vh;
 
-    flex-shrink: 0;
+    background: var(--panel);
 
-    background:
-        linear-gradient(
-            180deg,
-            #080d16,
-            #05070c
-        );
-
-    border-right: 1px solid var(--border);
+    border-right:
+        1px solid var(--border);
 
     display: flex;
     flex-direction: column;
 
-    padding: 18px 14px;
-
-    position: relative;
-    z-index: 100;
+    z-index: 1000;
 
     transition:
-        transform 0.25s ease,
-        width 0.25s ease;
+        transform .25s ease;
 }
 
 
@@ -117,23 +81,29 @@ body {
 ========================================================= */
 
 .sidebar-header {
+    height: 70px;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
 
-    margin-bottom: 18px;
+    padding: 0 16px;
+
+    border-bottom:
+        1px solid var(--border);
 }
 
 .brand {
     display: flex;
     align-items: center;
+
     gap: 10px;
 
-    font-size: 20px;
+    font-size: 19px;
     font-weight: 700;
 }
 
-.brand-logo {
+.logo {
     width: 38px;
     height: 38px;
 
@@ -147,15 +117,16 @@ body {
         linear-gradient(
             135deg,
             var(--blue),
-            #0047b3
+            #0052c7
         );
 
     color: white;
 
-    font-weight: 900;
+    font-weight: 800;
 
     box-shadow:
-        0 0 20px rgba(22, 131, 255, 0.30);
+        0 5px 18px
+        rgba(22, 131, 255, .3);
 }
 
 
@@ -164,68 +135,56 @@ body {
 ========================================================= */
 
 button {
-    font-family: inherit;
+    font: inherit;
 }
 
-.icon-btn,
-.input-icon-btn {
-    border: 1px solid transparent;
+button:focus-visible {
+    outline:
+        2px solid var(--blue-light);
 
-    background: transparent;
+    outline-offset: 2px;
+}
 
-    color: var(--text-2);
+.icon-btn {
+    width: 40px;
+    height: 40px;
 
-    cursor: pointer;
+    border: 1px solid var(--border);
+
+    border-radius: 10px;
+
+    background: var(--panel-2);
+
+    color: var(--text);
 
     display: flex;
     align-items: center;
     justify-content: center;
 
+    cursor: pointer;
+
     transition:
-        background 0.2s ease,
-        color 0.2s ease,
-        border 0.2s ease,
-        transform 0.15s ease;
+        background .2s ease,
+        border-color .2s ease,
+        color .2s ease,
+        transform .2s ease;
 }
 
-.icon-btn {
-    width: 38px;
-    height: 38px;
-
-    border-radius: 10px;
-
-    font-size: 20px;
-}
-
-.icon-btn:hover,
-.input-icon-btn:hover {
+.icon-btn:hover {
+    background: var(--blue);
+    border-color: var(--blue);
     color: white;
 
-    background:
-        rgba(22, 131, 255, 0.12);
-
-    border-color:
-        var(--border-blue);
+    transform: translateY(-1px);
 }
 
-.icon-btn:active,
-.input-icon-btn:active {
-    transform: scale(0.94);
+.sidebar-close {
+    color: var(--muted);
 }
 
-
-/* =========================================================
-   CLOSE SIDEBAR
-========================================================= */
-
-#closeSidebarBtn {
-    color: var(--text-2);
-
-    font-size: 27px;
-}
-
-#closeSidebarBtn:hover {
-    color: var(--blue-light);
+.sidebar-close:hover {
+    background: var(--blue);
+    color: white;
 }
 
 
@@ -234,51 +193,42 @@ button {
 ========================================================= */
 
 .new-chat-btn {
-    width: 100%;
-    height: 48px;
+    margin: 16px;
 
-    border: 1px solid var(--border-blue);
+    height: 46px;
 
-    border-radius: 13px;
+    border: 1px solid var(--blue);
+
+    border-radius: 12px;
 
     background:
         linear-gradient(
             135deg,
-            rgba(22, 131, 255, 0.18),
-            rgba(0, 70, 160, 0.12)
+            var(--blue),
+            var(--blue-dark)
         );
 
     color: white;
 
+    font-weight: 700;
+
     cursor: pointer;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    box-shadow:
+        0 8px 22px
+        rgba(22, 131, 255, .2);
 
-    gap: 10px;
-
-    font-size: 15px;
-    font-weight: 600;
-
-    transition: 0.2s ease;
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
 }
 
 .new-chat-btn:hover {
-    background:
-        linear-gradient(
-            135deg,
-            rgba(22, 131, 255, 0.30),
-            rgba(0, 70, 160, 0.20)
-        );
+    transform: translateY(-1px);
 
     box-shadow:
-        0 0 22px rgba(22, 131, 255, 0.15);
-}
-
-.new-chat-plus {
-    font-size: 23px;
-    color: var(--blue-light);
+        0 10px 28px
+        rgba(22, 131, 255, .35);
 }
 
 
@@ -291,37 +241,31 @@ button {
 
     overflow-y: auto;
 
-    margin-top: 20px;
-
-    padding-right: 3px;
+    padding: 4px 10px 15px;
 }
 
-.history-list::-webkit-scrollbar,
-.messages::-webkit-scrollbar {
-    width: 6px;
+.history-list::-webkit-scrollbar {
+    width: 5px;
 }
 
-.history-list::-webkit-scrollbar-thumb,
-.messages::-webkit-scrollbar-thumb {
-    background: rgba(70, 130, 200, 0.25);
-    border-radius: 20px;
+.history-list::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
 }
 
 .history-section-title {
     color: var(--muted);
 
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
 
     text-transform: uppercase;
 
-    letter-spacing: 0.8px;
-
-    padding: 12px 10px 7px;
+    padding: 14px 10px 7px;
 }
 
 .history-item {
-    min-height: 45px;
+    min-height: 46px;
 
     display: flex;
     align-items: center;
@@ -336,28 +280,25 @@ button {
 
     cursor: pointer;
 
-    color: var(--text-2);
+    border:
+        1px solid transparent;
 
-    border: 1px solid transparent;
-
-    transition: 0.2s ease;
+    transition:
+        background .2s ease,
+        border-color .2s ease;
 }
 
 .history-item:hover {
-    background:
-        rgba(22, 131, 255, 0.08);
-
-    color: white;
+    background: var(--panel-2);
+    border-color: var(--border);
 }
 
 .history-item.active {
     background:
-        rgba(22, 131, 255, 0.14);
+        rgba(22, 131, 255, .13);
 
     border-color:
-        rgba(22, 131, 255, 0.30);
-
-    color: white;
+        rgba(22, 131, 255, .4);
 }
 
 .history-title {
@@ -380,34 +321,27 @@ button {
 }
 
 .history-action {
-    width: 29px;
-    height: 29px;
+    width: 30px;
+    height: 30px;
 
     border: 0;
 
-    border-radius: 8px;
+    border-radius: 7px;
 
     background: transparent;
 
-    color: var(--text-2);
+    color: var(--muted);
 
     cursor: pointer;
-
-    transition: 0.2s ease;
 }
 
 .history-action:hover {
-    background:
-        rgba(22, 131, 255, 0.15);
-
+    background: var(--blue);
     color: white;
 }
 
 .history-action.delete:hover {
-    background:
-        rgba(255, 60, 80, 0.15);
-
-    color: #ff6b7a;
+    background: var(--danger);
 }
 
 
@@ -418,10 +352,8 @@ button {
 .chat-checkbox {
     accent-color: var(--blue);
 
-    width: 17px;
-    height: 17px;
-
-    cursor: pointer;
+    width: 16px;
+    height: 16px;
 }
 
 
@@ -430,14 +362,10 @@ button {
 ========================================================= */
 
 .sidebar-bottom {
-    border-top: 1px solid var(--border);
+    padding: 10px;
 
-    padding-top: 12px;
-
-    display: flex;
-    flex-direction: column;
-
-    gap: 7px;
+    border-top:
+        1px solid var(--border);
 }
 
 .sidebar-btn {
@@ -445,35 +373,34 @@ button {
 
     min-height: 40px;
 
-    border: 1px solid transparent;
+    margin-bottom: 7px;
 
-    border-radius: 10px;
+    border:
+        1px solid var(--border);
 
-    background: transparent;
+    border-radius: 9px;
 
-    color: var(--text-2);
+    background: var(--panel-2);
+
+    color: var(--muted);
 
     cursor: pointer;
 
-    text-align: left;
-
-    padding: 8px 12px;
-
-    transition: 0.2s ease;
+    transition:
+        .2s ease;
 }
 
 .sidebar-btn:hover {
+    background: var(--blue);
+
     color: white;
 
-    background:
-        rgba(22, 131, 255, 0.10);
-
-    border-color:
-        var(--border);
+    border-color: var(--blue);
 }
 
-.delete-selected {
-    color: #ff7180;
+.sidebar-btn.delete-selected:hover {
+    background: var(--danger);
+    border-color: var(--danger);
 }
 
 
@@ -482,9 +409,9 @@ button {
 ========================================================= */
 
 .main {
-    min-width: 0;
+    margin-left: 280px;
 
-    flex: 1;
+    width: calc(100% - 280px);
 
     height: 100vh;
 
@@ -493,130 +420,54 @@ button {
 
     background:
         radial-gradient(
-            circle at 50% 30%,
-            rgba(0, 102, 255, 0.045),
-            transparent 40%
+            circle at 50% 0%,
+            rgba(22, 131, 255, .07),
+            transparent 35%
         ),
-        #05070c;
+        var(--bg);
 }
 
 
 /* =========================================================
-   TOPBAR
+   TOP BAR
 ========================================================= */
 
 .topbar {
-    height: 64px;
+    height: 70px;
 
     flex-shrink: 0;
 
     display: flex;
     align-items: center;
 
-    padding: 0 18px;
+    padding: 0 20px;
 
     border-bottom:
         1px solid var(--border);
 
     background:
-        rgba(5, 7, 12, 0.88);
+        rgba(5, 9, 18, .88);
 
-    backdrop-filter:
-        blur(15px);
-
-    position: relative;
-
-    z-index: 20;
+    backdrop-filter: blur(12px);
 }
 
-.top-title {
+.chat-title {
     flex: 1;
 
     text-align: center;
 
-    font-size: 15px;
-    font-weight: 600;
-
-    color: var(--text);
+    font-size: 16px;
+    font-weight: 700;
 }
 
 .top-actions {
     display: flex;
-    align-items: center;
-    gap: 5px;
+
+    gap: 8px;
 }
 
-
-/* =========================================================
-   MORE MENU
-========================================================= */
-
-.sidebar-more {
-    position: relative;
-}
-
-.more-menu {
-    position: absolute;
-
-    right: 0;
-    top: 45px;
-
-    width: 190px;
-
-    padding: 7px;
-
-    background:
-        #0c131f;
-
-    border:
-        1px solid var(--border-blue);
-
-    border-radius: 13px;
-
-    box-shadow: var(--shadow);
-
+.mobile-menu-btn {
     display: none;
-
-    z-index: 500;
-}
-
-.more-menu.show {
-    display: block;
-}
-
-.menu-item {
-    width: 100%;
-
-    border: 0;
-
-    background: transparent;
-
-    color: var(--text-2);
-
-    text-align: left;
-
-    padding: 10px;
-
-    border-radius: 8px;
-
-    cursor: pointer;
-
-    font-size: 13px;
-}
-
-.menu-item:hover {
-    color: white;
-
-    background:
-        rgba(22, 131, 255, 0.12);
-}
-
-.language-title {
-    color: var(--muted);
-
-    font-size: 11px;
-
-    padding: 9px 10px 4px;
 }
 
 
@@ -627,8 +478,6 @@ button {
 .messages {
     flex: 1;
 
-    min-height: 0;
-
     overflow-y: auto;
 
     padding:
@@ -638,86 +487,83 @@ button {
     scroll-behavior: smooth;
 }
 
+.messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.messages::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
+}
+
 
 /* =========================================================
    WELCOME
 ========================================================= */
 
 .welcome {
-    height: 100%;
+    min-height: 100%;
 
     display: flex;
-
     flex-direction: column;
 
     align-items: center;
     justify-content: center;
 
     text-align: center;
-
-    color: var(--text-2);
 }
 
 .big-logo {
-    width: 74px;
-    height: 74px;
+    width: 78px;
+    height: 78px;
 
-    border-radius: 23px;
+    border-radius: 24px;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    font-size: 42px;
-    font-weight: 900;
-
-    color: white;
-
     background:
         linear-gradient(
             135deg,
             var(--blue),
-            #003d9c
+            #0048ae
         );
 
+    font-size: 38px;
+    font-weight: 900;
+
     box-shadow:
-        0 0 40px rgba(22, 131, 255, 0.28);
+        0 15px 45px
+        rgba(22, 131, 255, .25);
 
     margin-bottom: 18px;
 }
 
 .welcome h1 {
-    color: white;
+    font-size: 34px;
 
-    font-size: 30px;
-
-    margin-bottom: 7px;
+    margin-bottom: 8px;
 }
 
 .welcome p {
     color: var(--muted);
-
-    font-size: 14px;
 }
 
 
 /* =========================================================
-   MESSAGE
+   MESSAGE ALIGNMENT
+   USER = RIGHT
+   ASSISTANT = LEFT
 ========================================================= */
 
 .message {
-    display: flex;
-
     width: 100%;
 
-    margin-bottom: 22px;
+    display: flex;
+
+    margin-bottom: 18px;
 }
-
-
-/*
-   USER = RIGHT
-   ASSISTANT = LEFT
-*/
 
 .user-message {
     justify-content: flex-end;
@@ -728,30 +574,28 @@ button {
 }
 
 .message-bubble {
-    max-width: min(75%, 700px);
+    max-width: min(720px, 78%);
 
-    padding: 12px 15px;
+    padding: 12px 16px;
 
-    border-radius: 15px;
+    border-radius: 17px;
 
     line-height: 1.55;
 
-    font-size: 14px;
-
     white-space: pre-wrap;
 
-    word-break: break-word;
+    word-wrap: break-word;
 }
 
 
-/* USER BLUE */
+/* USER RIGHT */
 
 .user-message .message-bubble {
     background:
         linear-gradient(
             135deg,
-            #0879f9,
-            #0056cf
+            var(--blue),
+            var(--blue-dark)
         );
 
     color: white;
@@ -759,20 +603,20 @@ button {
     border-bottom-right-radius: 5px;
 
     box-shadow:
-        0 6px 20px rgba(0, 102, 255, 0.15);
+        0 7px 20px
+        rgba(22, 131, 255, .15);
 }
 
 
-/* AI BLACK */
+/* AI LEFT */
 
 .assistant-message .message-bubble {
-    background:
-        #0e1622;
+    background: var(--panel-2);
+
+    color: var(--text);
 
     border:
         1px solid var(--border);
-
-    color: var(--text);
 
     border-bottom-left-radius: 5px;
 }
@@ -787,36 +631,41 @@ button {
 
     gap: 5px;
 
-    margin-top: 6px;
+    margin-top: 5px;
+}
 
-    margin-left: 3px;
+.assistant-message {
+    flex-wrap: wrap;
+}
+
+.assistant-message .message-actions {
+    width: 100%;
+
+    padding-left: 3px;
 }
 
 .message-action {
-    width: 31px;
-    height: 31px;
+    width: 30px;
+    height: 30px;
 
-    border: 1px solid transparent;
-
-    background: transparent;
-
-    color: var(--muted);
+    border:
+        1px solid var(--border);
 
     border-radius: 8px;
 
-    cursor: pointer;
+    background: var(--panel);
 
-    transition: 0.2s ease;
+    color: var(--muted);
+
+    cursor: pointer;
 }
 
 .message-action:hover {
-    color: var(--blue-light);
+    background: var(--blue);
 
-    background:
-        rgba(22, 131, 255, 0.10);
+    color: white;
 
-    border-color:
-        var(--border);
+    border-color: var(--blue);
 }
 
 
@@ -827,26 +676,22 @@ button {
 .typing-bubble {
     display: flex;
 
-    align-items: center;
-
     gap: 5px;
 }
 
 .typing-bubble span {
-    color: var(--blue-light);
-
-    font-size: 12px;
-
     animation:
-        typing 1.2s infinite;
+        typing 1.2s infinite ease-in-out;
+
+    color: var(--blue);
 }
 
 .typing-bubble span:nth-child(2) {
-    animation-delay: 0.15s;
+    animation-delay: .15s;
 }
 
 .typing-bubble span:nth-child(3) {
-    animation-delay: 0.3s;
+    animation-delay: .3s;
 }
 
 @keyframes typing {
@@ -854,7 +699,7 @@ button {
     0%,
     60%,
     100% {
-        opacity: 0.25;
+        opacity: .25;
         transform: translateY(0);
     }
 
@@ -869,105 +714,178 @@ button {
    INPUT AREA
 ========================================================= */
 
-.input-container {
-    width: 100%;
-
-    flex-shrink: 0;
-
+.input-area {
     padding:
-        12px
-        max(18px, calc((100% - 900px) / 2))
-        18px;
+        12px 20px 16px;
 
     background:
         linear-gradient(
-            180deg,
-            transparent,
-            rgba(5, 7, 12, 0.98) 30%
+            to top,
+            var(--bg),
+            rgba(5, 9, 18, .8)
         );
 }
 
+.input-box {
+    position: relative;
 
-/* =========================================================
-   CHAT INPUT
-========================================================= */
+    width: min(900px, 100%);
 
-.chat-input-area {
-    width: 100%;
+    margin: auto;
 
     min-height: 58px;
 
     display: flex;
-
     align-items: flex-end;
+
+    gap: 7px;
 
     padding: 8px;
 
+    background: var(--panel);
+
     border:
-        1px solid var(--border-blue);
+        1px solid var(--border);
 
     border-radius: 17px;
 
-    background:
-        #0b111b;
-
-    box-shadow:
-        0 8px 35px rgba(0, 0, 0, 0.30);
+    box-shadow: var(--shadow);
 }
 
 
 /* =========================================================
-   LEFT INPUT
+   INPUT ICONS
 ========================================================= */
 
-.input-left {
+.input-icon {
+    flex-shrink: 0;
+
+    width: 42px;
+    height: 42px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 12px;
+
+    background: var(--panel-2);
+
+    color: var(--blue-light);
+
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 20px;
+
+    transition:
+        background .2s ease,
+        border-color .2s ease,
+        color .2s ease,
+        transform .2s ease;
+}
+
+.input-icon:hover,
+.input-icon.active {
+    background: var(--blue);
+
+    border-color: var(--blue);
+
+    color: white;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   TEXTAREA
+========================================================= */
+
+#messageInput {
     flex: 1;
 
     min-width: 0;
 
-    display: flex;
+    min-height: 42px;
+    max-height: 150px;
 
-    align-items: flex-end;
+    resize: none;
 
-    position: relative;
+    border: 0;
+
+    outline: none;
+
+    background: transparent;
+
+    color: var(--text);
+
+    padding:
+        10px 6px;
+
+    font-size: 15px;
+
+    line-height: 1.45;
+}
+
+#messageInput::placeholder {
+    color: var(--muted);
 }
 
 
 /* =========================================================
-   PLUS BUTTON
+   SEND BUTTON
 ========================================================= */
 
-#attachBtn {
+.send-btn {
+    flex-shrink: 0;
+
     width: 42px;
     height: 42px;
 
-    flex-shrink: 0;
-
-    margin-right: 5px;
+    border:
+        1px solid var(--blue);
 
     border-radius: 12px;
 
-    font-size: 27px;
-
-    font-weight: 300;
-
-    color: var(--blue-light);
-
     background:
-        rgba(22, 131, 255, 0.07);
+        linear-gradient(
+            135deg,
+            var(--blue),
+            var(--blue-dark)
+        );
 
-    border:
-        1px solid rgba(22, 131, 255, 0.18);
-}
-
-#attachBtn:hover {
     color: white;
 
-    background:
-        rgba(22, 131, 255, 0.18);
+    cursor: pointer;
 
-    border-color:
-        var(--border-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 19px;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        opacity .2s ease;
+}
+
+.send-btn:hover {
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 7px 20px
+        rgba(22, 131, 255, .3);
+}
+
+.send-btn:disabled {
+    opacity: .5;
+
+    cursor: not-allowed;
+
+    transform: none;
 }
 
 
@@ -978,43 +896,62 @@ button {
 .attachment-menu {
     position: absolute;
 
-    left: 0;
+    left: 8px;
 
-    bottom: 53px;
+    bottom: 62px;
 
-    width: 175px;
+    width: 180px;
 
     padding: 7px;
 
-    border-radius: 14px;
-
-    background:
-        #0c131f;
+    background: var(--panel);
 
     border:
-        1px solid var(--border-blue);
+        1px solid var(--border);
+
+    border-radius: 14px;
 
     box-shadow:
-        0 15px 40px rgba(0, 0, 0, 0.55);
+        0 15px 40px
+        rgba(0, 0, 0, .5);
 
     display: none;
 
-    z-index: 1000;
+    z-index: 2000;
 }
 
 .attachment-menu.show {
     display: block;
+
+    animation:
+        attachmentOpen .15s ease;
 }
 
-.attachment-option {
+@keyframes attachmentOpen {
+
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+.attachment-item {
     width: 100%;
+
+    min-height: 42px;
 
     display: flex;
     align-items: center;
 
-    gap: 11px;
+    gap: 12px;
 
-    padding: 10px;
+    padding: 8px 11px;
 
     border: 0;
 
@@ -1022,158 +959,45 @@ button {
 
     background: transparent;
 
-    color: var(--text-2);
+    color: var(--text);
 
     cursor: pointer;
 
     text-align: left;
 }
 
-.attachment-option:hover {
-    background:
-        rgba(22, 131, 255, 0.12);
+.attachment-item:hover {
+    background: var(--blue);
 
     color: white;
 }
 
-.attachment-icon {
-    width: 28px;
-
-    text-align: center;
-
-    font-size: 18px;
+.attachment-item span {
+    font-size: 14px;
 }
 
 
 /* =========================================================
-   TEXTAREA
+   ATTACHMENT STATUS
 ========================================================= */
 
-.message-input {
-    flex: 1;
+.attachment-status {
+    width: min(900px, 100%);
 
-    min-width: 0;
+    margin:
+        6px auto 0;
 
-    min-height: 42px;
-    max-height: 150px;
+    min-height: 20px;
 
-    resize: none;
+    color: var(--blue-light);
 
-    outline: none;
+    font-size: 13px;
 
-    border: 0;
+    overflow: hidden;
 
-    background: transparent;
+    text-overflow: ellipsis;
 
-    color: white;
-
-    padding:
-        11px
-        8px;
-
-    font-family: inherit;
-
-    font-size: 15px;
-
-    line-height: 20px;
-}
-
-.message-input::placeholder {
-    color: #68778c;
-}
-
-
-/* =========================================================
-   RIGHT INPUT
-========================================================= */
-
-.input-right {
-    display: flex;
-
-    align-items: flex-end;
-
-    gap: 5px;
-}
-
-
-/* =========================================================
-   VOICE
-========================================================= */
-
-#voiceBtn {
-    width: 42px;
-    height: 42px;
-
-    border-radius: 12px;
-
-    font-size: 18px;
-}
-
-#voiceBtn.active {
-    color: white;
-
-    background:
-        rgba(22, 131, 255, 0.25);
-
-    border-color:
-        var(--blue);
-
-    box-shadow:
-        0 0 18px rgba(22, 131, 255, 0.25);
-}
-
-
-/* =========================================================
-   SEND
-========================================================= */
-
-.send-btn {
-    width: 43px;
-    height: 43px;
-
-    border: 1px solid var(--blue);
-
-    border-radius: 12px;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--blue),
-            #0054c9
-        );
-
-    color: white;
-
-    cursor: pointer;
-
-    font-size: 19px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    transition: 0.2s ease;
-}
-
-.send-btn:hover {
-    transform: translateY(-1px);
-
-    box-shadow:
-        0 7px 20px rgba(22, 131, 255, 0.28);
-}
-
-.send-btn:active {
-    transform: scale(0.94);
-}
-
-.send-btn:disabled {
-    opacity: 0.45;
-
-    cursor: not-allowed;
-
-    transform: none;
-
-    box-shadow: none;
+    white-space: nowrap;
 }
 
 
@@ -1184,11 +1008,69 @@ button {
 .input-note {
     text-align: center;
 
-    color: #4e5d70;
+    margin-top: 7px;
 
-    font-size: 10px;
+    color: var(--muted);
 
-    padding-top: 8px;
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   MORE MENU
+========================================================= */
+
+.more-menu {
+    position: fixed;
+
+    top: 62px;
+
+    right: 20px;
+
+    width: 190px;
+
+    padding: 7px;
+
+    background: var(--panel);
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 12px;
+
+    box-shadow: var(--shadow);
+
+    z-index: 3000;
+
+    display: none;
+}
+
+.more-menu.show {
+    display: block;
+}
+
+.more-menu button {
+    width: 100%;
+
+    padding: 10px;
+
+    border: 0;
+
+    border-radius: 8px;
+
+    background: transparent;
+
+    color: var(--text);
+
+    text-align: left;
+
+    cursor: pointer;
+}
+
+.more-menu button:hover {
+    background: var(--blue);
+
+    color: white;
 }
 
 
@@ -1200,39 +1082,34 @@ button {
     position: fixed;
 
     left: 50%;
-    bottom: 90px;
+    bottom: 30px;
 
     transform:
         translate(-50%, 20px);
+
+    padding:
+        11px 17px;
+
+    background: var(--panel-2);
+
+    color: var(--text);
+
+    border:
+        1px solid var(--blue);
+
+    border-radius: 10px;
+
+    box-shadow: var(--shadow);
 
     opacity: 0;
 
     pointer-events: none;
 
-    background:
-        #0d1725;
-
-    border:
-        1px solid var(--border-blue);
-
-    color: white;
-
-    padding:
-        10px
-        15px;
-
-    border-radius: 10px;
-
-    font-size: 13px;
-
-    box-shadow:
-        var(--shadow);
-
-    z-index: 9999;
+    z-index: 5000;
 
     transition:
-        opacity 0.2s ease,
-        transform 0.2s ease;
+        opacity .25s ease,
+        transform .25s ease;
 }
 
 .toast.show {
@@ -1247,19 +1124,15 @@ button {
    MOBILE
 ========================================================= */
 
-@media (max-width: 760px) {
+@media (max-width: 800px) {
 
     .sidebar {
-        position: fixed;
-
-        left: 0;
-        top: 0;
-
         transform:
             translateX(-100%);
 
         box-shadow:
-            20px 0 50px rgba(0, 0, 0, 0.55);
+            10px 0 35px
+            rgba(0, 0, 0, .5);
     }
 
     .sidebar.open {
@@ -1268,30 +1141,51 @@ button {
     }
 
     .main {
+        margin-left: 0;
+
         width: 100%;
+    }
+
+    .mobile-menu-btn {
+        display: flex;
+    }
+
+    .topbar {
+        gap: 10px;
+
+        padding: 0 12px;
+    }
+
+    .chat-title {
+        text-align: left;
     }
 
     .messages {
         padding:
-            20px 12px;
-    }
-
-    .input-container {
-        padding:
-            9px 10px 12px;
+            20px 13px;
     }
 
     .message-bubble {
         max-width: 86%;
     }
 
-    .topbar {
+    .input-area {
         padding:
-            0 10px;
+            8px 9px 12px;
     }
 
-    .top-title {
-        font-size: 14px;
+    .input-box {
+        border-radius: 15px;
+    }
+
+    .input-icon,
+    .send-btn {
+        width: 40px;
+        height: 40px;
+    }
+
+    .attachment-menu {
+        left: 7px;
     }
 
 }
@@ -1301,67 +1195,58 @@ button {
    SMALL MOBILE
 ========================================================= */
 
-@media (max-width: 430px) {
+@media (max-width: 480px) {
+
+    .top-actions {
+        gap: 4px;
+    }
+
+    .top-actions .icon-btn {
+        width: 36px;
+        height: 36px;
+    }
 
     .message-bubble {
         max-width: 90%;
 
+        padding:
+            10px 13px;
+
         font-size: 14px;
     }
 
-    .input-note {
-        font-size: 9px;
+    .welcome h1 {
+        font-size: 28px;
     }
 
-    .chat-input-area {
-        border-radius: 14px;
-    }
-
-    #attachBtn,
-    #voiceBtn,
-    .send-btn {
-        width: 39px;
-        height: 39px;
+    .big-logo {
+        width: 65px;
+        height: 65px;
     }
 
 }
 
 
 /* =========================================================
-   SELECTION
+   SELECTION MODE
 ========================================================= */
 
 .history-item.select-mode {
-    border-color:
-        rgba(22, 131, 255, 0.15);
+    cursor: pointer;
 }
 
 .history-item.select-mode:hover {
     background:
-        rgba(22, 131, 255, 0.12);
+        rgba(22, 131, 255, .12);
 }
 
 
 /* =========================================================
-   FOCUS
-========================================================= */
-
-button:focus-visible,
-textarea:focus-visible {
-    outline:
-        2px solid var(--blue);
-
-    outline-offset: 2px;
-}
-
-
-/* =========================================================
-   SELECTION COLOR
+   SMOOTH UI
 ========================================================= */
 
 ::selection {
-    background:
-        rgba(22, 131, 255, 0.45);
+    background: var(--blue);
 
     color: white;
 }
