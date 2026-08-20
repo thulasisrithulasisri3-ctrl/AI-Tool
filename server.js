@@ -13,39 +13,22 @@ const HOST = "0.0.0.0";
 
 const API_KEY = process.env.GEMINI_API_KEY;
 const MODEL =
-    process.env.GEMINI_MODEL ||
-    "gemini-3.5-flash-lite";
+    process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
 
-let ai = null;
-
-if (API_KEY) {
-    ai = new GoogleGenAI({
-        apiKey: API_KEY
-    });
-
-    console.log("✓ Gemini API key detected.");
-} else {
-    console.error("❌ GEMINI_API_KEY is missing.");
-}
+const ai = API_KEY
+    ? new GoogleGenAI({ apiKey: API_KEY })
+    : null;
 
 
 /* =========================
    MIDDLEWARE
 ========================= */
 
-app.use(
-    cors({
-        origin: "*",
-        methods: ["GET", "POST", "OPTIONS"],
-        allowedHeaders: ["Content-Type", "Authorization"]
-    })
-);
+app.use(cors());
 
-app.use(
-    express.json({
-        limit: "5mb"
-    })
-);
+app.use(express.json({
+    limit: "5mb"
+}));
 
 
 /* =========================
@@ -57,7 +40,7 @@ app.get("/", (req, res) => {
     res.json({
         success: true,
         status: "online",
-        message: "Viggo AI Server is running 🤖",
+        message: "Viggo AI Server is running",
         model: MODEL,
         apiConfigured: Boolean(API_KEY)
     });
@@ -73,103 +56,12 @@ app.get("/status", (req, res) => {
 
     res.json({
         success: true,
-        server: "Viggo AI",
         status: "online",
         model: MODEL,
         apiConfigured: Boolean(API_KEY)
     });
 
 });
-
-
-/* =========================
-   CLEAN TEXT
-========================= */
-
-function cleanText(value) {
-
-    if (typeof value !== "string") {
-        return "";
-    }
-
-    return value
-        .replace(/\u0000/g, "")
-        .trim();
-
-}
-
-
-/* =========================
-   LANGUAGE
-========================= */
-
-function getLanguage(language) {
-
-    const languages = {
-
-        en: "English",
-        ta: "Tamil",
-        hi: "Hindi",
-        ml: "Malayalam",
-        te: "Telugu",
-        kn: "Kannada",
-        bn: "Bengali",
-        mr: "Marathi",
-        gu: "Gujarati",
-        pa: "Punjabi",
-        ur: "Urdu",
-        es: "Spanish",
-        fr: "French",
-        de: "German",
-        ja: "Japanese",
-        ko: "Korean",
-        zh: "Chinese",
-        ar: "Arabic"
-
-    };
-
-    return languages[language] || "English";
-
-}
-
-
-/* =========================
-   HISTORY
-========================= */
-
-function buildHistory(history) {
-
-    if (!Array.isArray(history)) {
-        return [];
-    }
-
-    return history
-        .filter(item =>
-            item &&
-            (
-                item.role === "user" ||
-                item.role === "assistant"
-            ) &&
-            typeof item.content === "string"
-        )
-        .slice(-12)
-        .map(item => ({
-
-            role:
-                item.role === "assistant"
-                    ? "model"
-                    : "user",
-
-            parts: [
-                {
-                    text:
-                        cleanText(item.content)
-                }
-            ]
-
-        }));
-
-}
 
 
 /* =========================
@@ -180,66 +72,63 @@ app.post("/chat", async (req, res) => {
 
     try {
 
-        console.log("================================");
-        console.log("→ /chat request received");
-
-        if (!API_KEY || !ai) {
+        if (!ai) {
 
             return res.status(500).json({
-
                 success: false,
-
-                error:
-                    "Gemini API key is not configured.",
-
-                details:
-                    "Add GEMINI_API_KEY in Render Environment Variables."
-
+                error: "GEMINI_API_KEY is missing"
             });
 
         }
 
 
         const message =
-            cleanText(
-                req.body?.message
-            );
+            typeof req.body?.message === "string"
+                ? req.body.message.trim()
+                : "";
+
 
         const language =
-            cleanText(
-                req.body?.language
-            ) || "en";
-
-        const history =
-            req.body?.history;
+            typeof req.body?.language === "string"
+                ? req.body.language
+                : "en";
 
 
         if (!message) {
 
             return res.status(400).json({
-
                 success: false,
-
-                error:
-                    "Message is required."
-
+                error: "Message is required"
             });
 
         }
 
 
+        const languageNames = {
+
+            en: "English",
+            ta: "Tamil",
+            hi: "Hindi",
+            ml: "Malayalam",
+            te: "Telugu",
+            kn: "Kannada",
+            bn: "Bengali",
+            mr: "Marathi",
+            gu: "Gujarati",
+            pa: "Punjabi",
+            ur: "Urdu"
+
+        };
+
+
         const selectedLanguage =
-            getLanguage(language);
+            languageNames[language] ||
+            "English";
 
 
         console.log(
-            "Message:",
-            message.substring(0, 100)
-        );
-
-        console.log(
-            "Language:",
-            selectedLanguage
+            "Viggo request:",
+            message
         );
 
         console.log(
@@ -248,60 +137,27 @@ app.post("/chat", async (req, res) => {
         );
 
 
-        const contents =
-            buildHistory(history);
-
-
-        contents.push({
-
-            role: "user",
-
-            parts: [
-                {
-                    text: message
-                }
-            ]
-
-        });
-
-
-        const systemInstruction = `
+        const prompt = `
 
 You are Viggo AI.
 
-You are a friendly and helpful AI assistant.
-
 Reply primarily in ${selectedLanguage}.
 
-Understand the user's language naturally.
+User message:
 
-If the user asks for Tamil, reply in Tamil.
+${message}
 
-If the user asks for English, reply in English.
-
-Do not unnecessarily mix languages.
-
-For technical questions:
-- Explain clearly.
-- Give step-by-step answers.
-- Provide complete code when requested.
-
-Be friendly, natural and concise.
+Give a helpful, natural answer.
 
 `;
 
 
-        const response =
+        const result =
             await ai.models.generateContent({
 
                 model: MODEL,
 
-                contents: contents,
-
-                config: {
-                    systemInstruction:
-                        systemInstruction
-                }
+                contents: prompt
 
             });
 
@@ -310,12 +166,12 @@ Be friendly, natural and concise.
 
 
         if (
-            response &&
-            typeof response.text === "string"
+            result &&
+            typeof result.text === "string"
         ) {
 
             reply =
-                response.text;
+                result.text.trim();
 
         }
 
@@ -323,8 +179,7 @@ Be friendly, natural and concise.
         if (!reply) {
 
             const parts =
-                response
-                    ?.candidates?.[0]
+                result?.candidates?.[0]
                     ?.content?.parts;
 
 
@@ -333,32 +188,25 @@ Be friendly, natural and concise.
                 reply =
                     parts
                         .map(
-                            part =>
-                                part?.text || ""
+                            p =>
+                                p?.text || ""
                         )
-                        .join("");
+                        .join("")
+                        .trim();
 
             }
 
         }
 
 
-        reply =
-            cleanText(reply);
-
-
         if (!reply) {
-
-            console.error(
-                "❌ Empty Gemini response"
-            );
 
             return res.status(502).json({
 
                 success: false,
 
                 error:
-                    "Gemini returned an empty response."
+                    "Gemini returned empty response"
 
             });
 
@@ -366,10 +214,8 @@ Be friendly, natural and concise.
 
 
         console.log(
-            "✓ Gemini response received"
+            "Viggo reply generated successfully"
         );
-
-        console.log("================================");
 
 
         return res.json({
@@ -388,13 +234,12 @@ Be friendly, natural and concise.
     catch (error) {
 
         console.error(
-            "❌ Gemini error:"
+            "VIGGO CHAT ERROR:",
+            error
         );
 
-        console.error(error);
 
-
-        const errorText =
+        const errorMessage =
             String(
                 error?.message ||
                 error ||
@@ -403,33 +248,8 @@ Be friendly, natural and concise.
 
 
         const lower =
-            errorText.toLowerCase();
+            errorMessage.toLowerCase();
 
-
-        /* MODEL ERROR */
-
-        if (
-            lower.includes("404") ||
-            lower.includes("not found") ||
-            lower.includes("not available")
-        ) {
-
-            return res.status(502).json({
-
-                success: false,
-
-                error:
-                    "Gemini model unavailable.",
-
-                details:
-                    `Model "${MODEL}" is not available for this API account. Check GEMINI_MODEL in Render.`
-
-            });
-
-        }
-
-
-        /* API KEY */
 
         if (
             lower.includes("401") ||
@@ -442,23 +262,41 @@ Be friendly, natural and concise.
                 success: false,
 
                 error:
-                    "Gemini API key error.",
+                    "Gemini API key is invalid",
 
                 details:
-                    "Check GEMINI_API_KEY in Render."
+                    errorMessage
 
             });
 
         }
 
 
-        /* QUOTA */
+        if (
+            lower.includes("404") ||
+            lower.includes("not found") ||
+            lower.includes("not available")
+        ) {
+
+            return res.status(502).json({
+
+                success: false,
+
+                error:
+                    "Gemini model unavailable",
+
+                details:
+                    `Current model: ${MODEL}. Check GEMINI_MODEL in Render.`
+
+            });
+
+        }
+
 
         if (
             lower.includes("429") ||
             lower.includes("quota") ||
-            lower.includes("resource exhausted") ||
-            lower.includes("rate limit")
+            lower.includes("resource exhausted")
         ) {
 
             return res.status(429).json({
@@ -466,10 +304,10 @@ Be friendly, natural and concise.
                 success: false,
 
                 error:
-                    "Gemini temporarily unavailable.",
+                    "Gemini quota/rate limit reached",
 
                 details:
-                    "Gemini API quota or rate limit was reached."
+                    errorMessage
 
             });
 
@@ -481,10 +319,10 @@ Be friendly, natural and concise.
             success: false,
 
             error:
-                "Viggo AI could not generate a response.",
+                "Viggo AI server error",
 
             details:
-                errorText
+                errorMessage
 
         });
 
@@ -503,11 +341,9 @@ app.use((req, res) => {
 
         success: false,
 
-        error:
-            "Endpoint not found.",
+        error: "Endpoint not found",
 
-        path:
-            req.path
+        path: req.path
 
     });
 
@@ -515,7 +351,7 @@ app.use((req, res) => {
 
 
 /* =========================
-   START
+   START SERVER
 ========================= */
 
 app.listen(
@@ -523,21 +359,43 @@ app.listen(
     HOST,
     () => {
 
-        console.log("");
-        console.log("================================");
-        console.log("       VIGGO AI SERVER ONLINE");
-        console.log("================================");
-        console.log("HOST:", HOST);
-        console.log("PORT:", PORT);
-        console.log("MODEL:", MODEL);
+        console.log(
+            "================================"
+        );
+
+        console.log(
+            "       VIGGO AI SERVER ONLINE"
+        );
+
+        console.log(
+            "================================"
+        );
+
+        console.log(
+            "HOST:",
+            HOST
+        );
+
+        console.log(
+            "PORT:",
+            PORT
+        );
+
+        console.log(
+            "MODEL:",
+            MODEL
+        );
+
         console.log(
             "API KEY:",
             API_KEY
                 ? "CONFIGURED"
                 : "MISSING"
         );
-        console.log("================================");
-        console.log("");
+
+        console.log(
+            "================================"
+        );
 
     }
 );
