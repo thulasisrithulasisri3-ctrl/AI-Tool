@@ -8,23 +8,23 @@ const { GoogleGenAI } = require("@google/genai");
 
 const app = express();
 
-/* ================================
+/* =================================================
    CONFIG
-================================ */
+================================================= */
 
-const PORT = process.env.PORT || 10000;
-const HOST = "0.0.0.0";
+const PORT = Number(process.env.PORT) || 10000;
 
-const API_KEY = process.env.GEMINI_API_KEY;
+const API_KEY =
+    process.env.GEMINI_API_KEY;
 
 const MODEL =
     process.env.GEMINI_MODEL ||
-    "gemini-2.5-flash-lite";
+    "gemini-3.5-flash-lite";
 
 
-/* ================================
-   GEMINI
-================================ */
+/* =================================================
+   GEMINI CLIENT
+================================================= */
 
 let ai = null;
 
@@ -43,9 +43,9 @@ if (API_KEY) {
 }
 
 
-/* ================================
+/* =================================================
    MIDDLEWARE
-================================ */
+================================================= */
 
 app.use(
     cors({
@@ -65,55 +65,78 @@ app.use(
 );
 
 
-/* ================================
-   HOME
-================================ */
+/* =================================================
+   HEALTH CHECK
+================================================= */
 
 app.get("/", (req, res) => {
 
-    res.json({
+    res.status(200).json({
+
         success: true,
-        message: "Viggo AI Server is online.",
-        server: "Viggo AI",
-        status: "online",
-        model: MODEL,
-        apiConfigured: Boolean(API_KEY),
-        endpoints: {
-            chat: "/chat",
-            status: "/status"
-        },
-        time: new Date().toISOString()
+
+        message:
+            "Viggo AI Server is online.",
+
+        server:
+            "Viggo AI",
+
+        model:
+            MODEL,
+
+        apiConfigured:
+            Boolean(API_KEY),
+
+        port:
+            PORT,
+
+        time:
+            new Date().toISOString()
+
     });
 
 });
 
 
-/* ================================
+/* =================================================
    STATUS
-================================ */
+================================================= */
 
 app.get("/status", (req, res) => {
 
-    res.json({
+    res.status(200).json({
+
         success: true,
-        server: "Viggo AI",
-        status: "online",
-        model: MODEL,
-        apiConfigured: Boolean(API_KEY),
-        port: PORT,
-        time: new Date().toISOString()
+
+        server:
+            "Viggo AI",
+
+        status:
+            "online",
+
+        model:
+            MODEL,
+
+        apiConfigured:
+            Boolean(API_KEY),
+
+        time:
+            new Date().toISOString()
+
     });
 
 });
 
 
-/* ================================
+/* =================================================
    CLEAN TEXT
-================================ */
+================================================= */
 
 function cleanText(value) {
 
-    if (typeof value !== "string") {
+    if (
+        typeof value !== "string"
+    ) {
         return "";
     }
 
@@ -124,51 +147,74 @@ function cleanText(value) {
 }
 
 
-/* ================================
+/* =================================================
    LANGUAGE
-================================ */
+================================================= */
 
 function languageName(language) {
 
     const languages = {
 
         en: "English",
+
         ta: "Tamil",
+
         hi: "Hindi",
+
         ml: "Malayalam",
+
         te: "Telugu",
+
         kn: "Kannada",
+
         bn: "Bengali",
+
         mr: "Marathi",
+
         gu: "Gujarati",
+
         pa: "Punjabi",
+
         ur: "Urdu",
+
         es: "Spanish",
+
         fr: "French",
+
         de: "German",
-        it: "Italian",
-        pt: "Portuguese",
+
         ja: "Japanese",
+
         ko: "Korean",
+
         zh: "Chinese",
+
         ar: "Arabic"
 
     };
 
-    return languages[language] || "English";
+    return (
+        languages[language] ||
+        "English"
+    );
 
 }
 
 
-/* ================================
-   HISTORY
-================================ */
+/* =================================================
+   BUILD CONTENTS
+================================================= */
 
-function buildContents(history, message) {
+function buildContents(
+    history,
+    message
+) {
 
     const contents = [];
 
-    if (Array.isArray(history)) {
+    if (
+        Array.isArray(history)
+    ) {
 
         history
             .filter(item => {
@@ -188,7 +234,9 @@ function buildContents(history, message) {
             .forEach(item => {
 
                 const text =
-                    cleanText(item.content);
+                    cleanText(
+                        item.content
+                    );
 
                 if (!text) {
                     return;
@@ -197,10 +245,8 @@ function buildContents(history, message) {
                 contents.push({
 
                     role:
-                        (
-                            item.role === "assistant" ||
-                            item.role === "model"
-                        )
+                        item.role === "assistant" ||
+                        item.role === "model"
                             ? "model"
                             : "user",
 
@@ -217,17 +263,25 @@ function buildContents(history, message) {
     }
 
 
-    contents.push({
+    const cleanMessage =
+        cleanText(message);
 
-        role: "user",
 
-        parts: [
-            {
-                text: cleanText(message)
-            }
-        ]
+    if (cleanMessage) {
 
-    });
+        contents.push({
+
+            role: "user",
+
+            parts: [
+                {
+                    text: cleanMessage
+                }
+            ]
+
+        });
+
+    }
 
 
     return contents;
@@ -235,9 +289,9 @@ function buildContents(history, message) {
 }
 
 
-/* ================================
-   RETRY
-================================ */
+/* =================================================
+   RETRY CHECK
+================================================= */
 
 function isRetryableError(error) {
 
@@ -249,45 +303,73 @@ function isRetryableError(error) {
         ).toLowerCase();
 
     return (
+
         text.includes("429") ||
-        text.includes("resource exhausted") ||
-        text.includes("too many requests") ||
-        text.includes("rate limit") ||
-        text.includes("temporarily unavailable") ||
-        text.includes("service unavailable") ||
-        text.includes("503")
+
+        text.includes(
+            "resource exhausted"
+        ) ||
+
+        text.includes(
+            "too many requests"
+        ) ||
+
+        text.includes(
+            "rate limit"
+        ) ||
+
+        text.includes(
+            "temporarily unavailable"
+        ) ||
+
+        text.includes(
+            "service unavailable"
+        ) ||
+
+        text.includes("503") ||
+
+        text.includes("504")
+
     );
 
 }
 
 
+/* =================================================
+   WAIT
+================================================= */
+
 function wait(ms) {
 
-    return new Promise(resolve => {
-        setTimeout(resolve, ms);
-    });
+    return new Promise(
+        resolve =>
+            setTimeout(
+                resolve,
+                ms
+            )
+    );
 
 }
 
 
-/* ================================
+/* =================================================
    GEMINI REQUEST
-================================ */
+================================================= */
 
 async function generateWithRetry(
     contents,
     systemInstruction
 ) {
 
-    const MAX_RETRIES = 3;
+    const MAX_RETRIES = 2;
 
     const delays = [
         1500,
-        3000,
-        5000
+        3000
     ];
 
     let lastError = null;
+
 
     for (
         let attempt = 0;
@@ -298,146 +380,264 @@ async function generateWithRetry(
         try {
 
             console.log(
-                `→ Gemini attempt ${
-                    attempt + 1
-                }/${MAX_RETRIES + 1}`
+                `→ Gemini attempt ${attempt + 1}/${MAX_RETRIES + 1}`
             );
+
+            console.log(
+                "→ Model:",
+                MODEL
+            );
+
 
             const response =
                 await ai.models.generateContent({
 
-                    model: MODEL,
+                    model:
+                        MODEL,
 
-                    contents: contents,
+                    contents:
+                        contents,
 
                     config: {
+
                         systemInstruction:
-                            systemInstruction
+                            systemInstruction,
+
+                        thinkingConfig: {
+
+                            thinkingLevel:
+                                "minimal"
+
+                        }
+
                     }
 
                 });
 
+
             return response;
 
-        } catch (error) {
+        }
 
-            lastError = error;
+
+        catch (error) {
+
+            lastError =
+                error;
 
             console.error(
-                "Gemini error:",
-                error?.message || error
+                `❌ Gemini attempt ${attempt + 1} failed`
             );
 
-            if (!isRetryableError(error)) {
+            console.error(
+                error?.message ||
+                error
+            );
+
+
+            if (
+                !isRetryableError(
+                    error
+                )
+            ) {
+
                 throw error;
+
             }
 
-            if (attempt >= MAX_RETRIES) {
+
+            if (
+                attempt >= MAX_RETRIES
+            ) {
+
                 throw error;
+
             }
+
 
             await wait(
-                delays[attempt] || 5000
+                delays[attempt]
             );
 
         }
 
     }
 
+
     throw lastError;
 
 }
 
 
-/* ================================
-   CHAT
-================================ */
+/* =================================================
+   EXTRACT RESPONSE TEXT
+================================================= */
 
-app.post("/chat", async (req, res) => {
+function extractResponseText(
+    response
+) {
 
-    try {
-
-        console.log("");
-        console.log("================================");
-        console.log("       VIGGO CHAT REQUEST");
-        console.log("================================");
-
-
-        /* API KEY */
-
-        if (!API_KEY || !ai) {
-
-            return res.status(500).json({
-
-                success: false,
-
-                error:
-                    "GEMINI_API_KEY is missing.",
-
-                details:
-                    "Add GEMINI_API_KEY in Render Environment Variables."
-
-            });
-
-        }
+    if (!response) {
+        return "";
+    }
 
 
-        /* REQUEST */
+    if (
+        typeof response.text === "string"
+    ) {
 
-        const message =
-            cleanText(
-                req.body?.message
+        return cleanText(
+            response.text
+        );
+
+    }
+
+
+    const candidates =
+        response.candidates;
+
+
+    if (
+        Array.isArray(candidates) &&
+        candidates.length
+    ) {
+
+        const parts =
+            candidates[0]
+                ?.content
+                ?.parts;
+
+
+        if (
+            Array.isArray(parts)
+        ) {
+
+            return cleanText(
+
+                parts
+                    .map(
+                        part =>
+                            part?.text || ""
+                    )
+                    .join("")
+
             );
 
-        const language =
-            cleanText(
-                req.body?.language
-            ) || "en";
-
-        const history =
-            req.body?.history;
-
-
-        /* VALIDATION */
-
-        if (!message) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                error:
-                    "Message is required."
-
-            });
-
         }
 
-
-        const selectedLanguage =
-            languageName(language);
+    }
 
 
-        /* SYSTEM */
+    return "";
 
-        const systemInstruction = `
+}
+
+
+/* =================================================
+   CHAT
+================================================= */
+
+app.post(
+    "/chat",
+    async (req, res) => {
+
+        try {
+
+            /* -----------------------------------------
+               API KEY
+            ----------------------------------------- */
+
+            if (
+                !API_KEY ||
+                !ai
+            ) {
+
+                return res.status(500).json({
+
+                    success: false,
+
+                    error:
+                        "GEMINI_API_KEY is missing.",
+
+                    details:
+                        "Add GEMINI_API_KEY in Render Environment Variables."
+
+                });
+
+            }
+
+
+            /* -----------------------------------------
+               REQUEST
+            ----------------------------------------- */
+
+            const message =
+                cleanText(
+                    req.body?.message
+                );
+
+
+            const language =
+                cleanText(
+                    req.body?.language
+                ) || "en";
+
+
+            const history =
+                req.body?.history;
+
+
+            /* -----------------------------------------
+               VALIDATION
+            ----------------------------------------- */
+
+            if (!message) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    error:
+                        "Message is required."
+
+                });
+
+            }
+
+
+            /* -----------------------------------------
+               LANGUAGE
+            ----------------------------------------- */
+
+            const selectedLanguage =
+                languageName(
+                    language
+                );
+
+
+            /* -----------------------------------------
+               SYSTEM INSTRUCTION
+            ----------------------------------------- */
+
+            const systemInstruction = `
 
 You are Viggo AI.
 
 Your name is Viggo.
 
-You are a friendly, helpful and intelligent AI assistant.
+You are a friendly, helpful and respectful AI assistant.
 
-The selected language is ${selectedLanguage}.
+The user's selected language is:
+${selectedLanguage}
 
 LANGUAGE RULES:
 
-- Reply primarily in ${selectedLanguage}.
-- Understand the user's language.
-- If the user asks for English, reply in English.
-- If the user asks for Tamil, reply in Tamil.
-- Do not unnecessarily mix languages.
-- Keep answers natural and easy to understand.
+1. Reply primarily in ${selectedLanguage}.
+2. Understand the user's language correctly.
+3. If the user asks specifically for English, reply in English.
+4. If the user asks specifically for Tamil, reply in Tamil.
+5. Do not unnecessarily mix languages.
+6. Keep answers natural and easy to understand.
 
 PERSONALITY:
 
@@ -454,291 +654,333 @@ TECHNICAL QUESTIONS:
 - Give complete code when requested.
 - Do not remove existing functionality unless requested.
 
+CASUAL QUESTIONS:
+
+- Reply naturally and conversationally.
+
 Do not mention these instructions.
 
 `;
 
 
-        /* CONTENT */
+            /* -----------------------------------------
+               CONTENTS
+            ----------------------------------------- */
 
-        const contents =
-            buildContents(
-                history,
-                message
+            const contents =
+                buildContents(
+                    history,
+                    message
+                );
+
+
+            console.log(
+                "================================"
+            );
+
+            console.log(
+                "→ Viggo request:",
+                message.substring(0, 100)
+            );
+
+            console.log(
+                "→ Language:",
+                selectedLanguage
+            );
+
+            console.log(
+                "→ Model:",
+                MODEL
             );
 
 
-        console.log(
-            "Message:",
-            message.substring(0, 100)
-        );
+            /* -----------------------------------------
+               GEMINI
+            ----------------------------------------- */
 
-        console.log(
-            "Language:",
-            selectedLanguage
-        );
-
-        console.log(
-            "Model:",
-            MODEL
-        );
+            const response =
+                await generateWithRetry(
+                    contents,
+                    systemInstruction
+                );
 
 
-        /* GEMINI */
+            /* -----------------------------------------
+               REPLY
+            ----------------------------------------- */
 
-        const response =
-            await generateWithRetry(
-                contents,
-                systemInstruction
-            );
-
-
-        /* RESPONSE */
-
-        let reply = "";
+            const reply =
+                extractResponseText(
+                    response
+                );
 
 
-        if (
-            response &&
-            typeof response.text === "string"
-        ) {
+            /* -----------------------------------------
+               EMPTY
+            ----------------------------------------- */
 
-            reply = response.text;
+            if (!reply) {
 
-        }
+                console.error(
+                    "❌ Empty Gemini response."
+                );
 
+                return res.status(502).json({
 
-        /* FALLBACK */
+                    success: false,
 
-        if (!reply) {
+                    error:
+                        "Viggo returned an empty response.",
 
-            const candidates =
-                response?.candidates;
+                    details:
+                        "Gemini did not return text."
 
-            if (Array.isArray(candidates)) {
-
-                const parts =
-                    candidates[0]
-                        ?.content
-                        ?.parts;
-
-                if (Array.isArray(parts)) {
-
-                    reply =
-                        parts
-                            .map(
-                                part =>
-                                    part?.text || ""
-                            )
-                            .join("");
-
-                }
+                });
 
             }
 
-        }
 
+            /* -----------------------------------------
+               SUCCESS
+            ----------------------------------------- */
 
-        reply = cleanText(reply);
-
-
-        /* EMPTY */
-
-        if (!reply) {
-
-            return res.status(502).json({
-
-                success: false,
-
-                error:
-                    "Viggo returned an empty response.",
-
-                details:
-                    "Gemini did not return text."
-
-            });
-
-        }
-
-
-        /* SUCCESS */
-
-        console.log(
-            "✓ Response received."
-        );
-
-        return res.status(200).json({
-
-            success: true,
-
-            reply: reply,
-
-            model: MODEL,
-
-            language:
-                selectedLanguage
-
-        });
-
-
-    } catch (error) {
-
-        console.error("");
-        console.error("================================");
-        console.error("❌ VIGGO AI ERROR");
-        console.error(error);
-        console.error("================================");
-
-
-        const errorText =
-            String(
-                error?.message ||
-                error ||
-                ""
+            console.log(
+                "✓ Response received."
             );
 
-        const lower =
-            errorText.toLowerCase();
+            console.log(
+                "================================"
+            );
 
 
-        if (
-            lower.includes("429") ||
-            lower.includes("quota") ||
-            lower.includes("rate limit")
-        ) {
+            return res.status(200).json({
 
-            return res.status(429).json({
+                success: true,
 
-                success: false,
+                reply:
+                    reply,
 
-                error:
-                    "Viggo AI is temporarily busy.",
-
-                details:
-                    "Gemini quota or rate limit reached."
+                model:
+                    MODEL
 
             });
 
         }
 
 
-        if (
-            lower.includes("401") ||
-            lower.includes("api key") ||
-            lower.includes("authentication")
-        ) {
+        catch (error) {
 
-            return res.status(401).json({
+            console.error(
+                "================================"
+            );
+
+            console.error(
+                "❌ VIGGO ERROR"
+            );
+
+            console.error(
+                error
+            );
+
+            console.error(
+                "================================"
+            );
+
+
+            const errorText =
+                String(
+                    error?.message ||
+                    error ||
+                    ""
+                );
+
+
+            const lower =
+                errorText.toLowerCase();
+
+
+            /* =========================================
+               MODEL ERROR
+            ========================================= */
+
+            if (
+                lower.includes("404") &&
+                (
+                    lower.includes("model") ||
+                    lower.includes("not found") ||
+                    lower.includes("not available")
+                )
+            ) {
+
+                return res.status(502).json({
+
+                    success: false,
+
+                    error:
+                        "Gemini model is unavailable.",
+
+                    details:
+                        `Current model: ${MODEL}. ` +
+                        "Check GEMINI_MODEL in Render Environment Variables."
+
+                });
+
+            }
+
+
+            /* =========================================
+               API KEY ERROR
+            ========================================= */
+
+            if (
+                lower.includes("401") ||
+                lower.includes("api key") ||
+                lower.includes("unauthenticated") ||
+                lower.includes("authentication")
+            ) {
+
+                return res.status(401).json({
+
+                    success: false,
+
+                    error:
+                        "Gemini API key error.",
+
+                    details:
+                        "Check GEMINI_API_KEY in Render Environment Variables."
+
+                });
+
+            }
+
+
+            /* =========================================
+               PERMISSION
+            ========================================= */
+
+            if (
+                lower.includes("403") ||
+                lower.includes("permission denied") ||
+                lower.includes("permission")
+            ) {
+
+                return res.status(403).json({
+
+                    success: false,
+
+                    error:
+                        "Gemini API permission error.",
+
+                    details:
+                        errorText
+
+                });
+
+            }
+
+
+            /* =========================================
+               RATE LIMIT
+            ========================================= */
+
+            if (
+                lower.includes("429") ||
+                lower.includes("quota") ||
+                lower.includes("rate limit") ||
+                lower.includes("resource exhausted") ||
+                lower.includes("too many requests")
+            ) {
+
+                return res.status(429).json({
+
+                    success: false,
+
+                    error:
+                        "Viggo AI is temporarily busy.",
+
+                    details:
+                        "Gemini is currently busy. Please try again shortly."
+
+                });
+
+            }
+
+
+            /* =========================================
+               GENERAL ERROR
+            ========================================= */
+
+            return res.status(500).json({
 
                 success: false,
 
                 error:
-                    "Gemini API key error.",
+                    "Viggo AI could not generate a response.",
 
                 details:
-                    "Check GEMINI_API_KEY."
+                    errorText || "Unknown server error."
 
             });
 
         }
 
-
-        if (
-            lower.includes("403") ||
-            lower.includes("permission")
-        ) {
-
-            return res.status(403).json({
-
-                success: false,
-
-                error:
-                    "Gemini permission error.",
-
-                details:
-                    errorText
-
-            });
-
-        }
+    }
+);
 
 
-        if (
-            lower.includes("404") ||
-            lower.includes("model") &&
-            lower.includes("not found")
-        ) {
+/* =================================================
+   404
+================================================= */
 
-            return res.status(502).json({
+app.use(
+    (req, res) => {
 
-                success: false,
-
-                error:
-                    "Gemini model is unavailable.",
-
-                details:
-                    errorText
-
-            });
-
-        }
-
-
-        return res.status(500).json({
+        res.status(404).json({
 
             success: false,
 
             error:
-                "Viggo AI could not generate a response.",
+                "Endpoint not found.",
 
-            details:
-                errorText
+            path:
+                req.path
 
         });
 
     }
-
-});
-
-
-/* ================================
-   404
-================================ */
-
-app.use((req, res) => {
-
-    res.status(404).json({
-
-        success: false,
-
-        error:
-            "Endpoint not found.",
-
-        path:
-            req.path
-
-    });
-
-});
+);
 
 
-/* ================================
+/* =================================================
    GLOBAL ERROR
-================================ */
+================================================= */
 
 app.use(
-    (error, req, res, next) => {
+    (
+        error,
+        req,
+        res,
+        next
+    ) => {
 
         console.error(
             "Unhandled server error:",
             error
         );
 
-        if (res.headersSent) {
-            return next(error);
+
+        if (
+            res.headersSent
+        ) {
+
+            return next(
+                error
+            );
+
         }
 
-        res.status(500).json({
+
+        return res.status(500).json({
 
             success: false,
 
@@ -751,23 +993,27 @@ app.use(
 );
 
 
-/* ================================
-   START
-================================ */
+/* =================================================
+   START SERVER
+================================================= */
 
 app.listen(
     PORT,
-    HOST,
+    "0.0.0.0",
     () => {
 
         console.log("");
-        console.log("================================");
-        console.log("       VIGGO AI SERVER ONLINE");
-        console.log("================================");
 
         console.log(
-            "HOST:",
-            HOST
+            "================================"
+        );
+
+        console.log(
+            "       VIGGO AI SERVER ONLINE"
+        );
+
+        console.log(
+            "================================"
         );
 
         console.log(
@@ -788,16 +1034,14 @@ app.listen(
         );
 
         console.log(
-            "CHAT:",
-            "/chat"
+            "HOST:",
+            "0.0.0.0"
         );
 
         console.log(
-            "STATUS:",
-            "/status"
+            "================================"
         );
 
-        console.log("================================");
         console.log("");
 
     }
