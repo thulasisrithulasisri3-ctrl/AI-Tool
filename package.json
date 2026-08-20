@@ -1,13 +1,10 @@
 {
   "name": "viggo-ai",
   "version": "1.0.0",
-  "description": "Viggo AI backend",
+  "description": "Viggo AI Backend",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
-  },
-  "engines": {
-    "node": ">=18"
   },
   "dependencies": {
     "@google/genai": "^1.0.0",
