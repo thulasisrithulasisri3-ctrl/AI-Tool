@@ -12,11 +12,20 @@ const PORT = Number(process.env.PORT) || 10000;
 const HOST = "0.0.0.0";
 
 const API_KEY = process.env.GEMINI_API_KEY;
+
+/*
+  Render Environment Variable:
+  GEMINI_MODEL
+
+  If not set, this model will be used.
+*/
 const MODEL =
-    process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
+    process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
 const ai = API_KEY
-    ? new GoogleGenAI({ apiKey: API_KEY })
+    ? new GoogleGenAI({
+        apiKey: API_KEY
+      })
     : null;
 
 
@@ -24,11 +33,19 @@ const ai = API_KEY
    MIDDLEWARE
 ========================= */
 
-app.use(cors());
+app.use(
+    cors({
+        origin: "*",
+        methods: ["GET", "POST", "OPTIONS"],
+        allowedHeaders: ["Content-Type"]
+    })
+);
 
-app.use(express.json({
-    limit: "5mb"
-}));
+app.use(
+    express.json({
+        limit: "5mb"
+    })
+);
 
 
 /* =========================
@@ -38,11 +55,19 @@ app.use(express.json({
 app.get("/", (req, res) => {
 
     res.json({
+
         success: true,
+
         status: "online",
-        message: "Viggo AI Server is running",
+
+        message:
+            "Viggo AI Server is running",
+
         model: MODEL,
-        apiConfigured: Boolean(API_KEY)
+
+        apiConfigured:
+            Boolean(API_KEY)
+
     });
 
 });
@@ -55,10 +80,16 @@ app.get("/", (req, res) => {
 app.get("/status", (req, res) => {
 
     res.json({
+
         success: true,
+
         status: "online",
+
         model: MODEL,
-        apiConfigured: Boolean(API_KEY)
+
+        apiConfigured:
+            Boolean(API_KEY)
+
     });
 
 });
@@ -70,23 +101,50 @@ app.get("/status", (req, res) => {
 
 app.post("/chat", async (req, res) => {
 
+    console.log(
+        "================================"
+    );
+
+    console.log(
+        "NEW VIGGO CHAT REQUEST"
+    );
+
+    console.log(
+        "================================"
+    );
+
+
     try {
 
-        if (!ai) {
+        /* API KEY CHECK */
+
+        if (!API_KEY || !ai) {
+
+            console.error(
+                "GEMINI_API_KEY is missing"
+            );
 
             return res.status(500).json({
+
                 success: false,
-                error: "GEMINI_API_KEY is missing"
+
+                error:
+                    "GEMINI_API_KEY is missing"
+
             });
 
         }
 
+
+        /* MESSAGE */
 
         const message =
             typeof req.body?.message === "string"
                 ? req.body.message.trim()
                 : "";
 
+
+        /* LANGUAGE */
 
         const language =
             typeof req.body?.language === "string"
@@ -97,25 +155,41 @@ app.post("/chat", async (req, res) => {
         if (!message) {
 
             return res.status(400).json({
+
                 success: false,
-                error: "Message is required"
+
+                error:
+                    "Message is required"
+
             });
 
         }
 
 
+        /* LANGUAGE NAMES */
+
         const languageNames = {
 
             en: "English",
+
             ta: "Tamil",
+
             hi: "Hindi",
-            ml: "Malayalam",
+
             te: "Telugu",
+
             kn: "Kannada",
+
+            ml: "Malayalam",
+
             bn: "Bengali",
+
             mr: "Marathi",
+
             gu: "Gujarati",
+
             pa: "Punjabi",
+
             ur: "Urdu"
 
         };
@@ -127,8 +201,13 @@ app.post("/chat", async (req, res) => {
 
 
         console.log(
-            "Viggo request:",
+            "User message:",
             message
+        );
+
+        console.log(
+            "Language:",
+            selectedLanguage
         );
 
         console.log(
@@ -137,19 +216,31 @@ app.post("/chat", async (req, res) => {
         );
 
 
+        /* PROMPT */
+
         const prompt = `
 
-You are Viggo AI.
+You are Viggo AI, a helpful and friendly AI assistant.
 
-Reply primarily in ${selectedLanguage}.
+Answer the user's question clearly and naturally.
+
+Preferred response language:
+${selectedLanguage}
+
+If the user asks in another language, understand the question and answer primarily in the selected language.
 
 User message:
 
 ${message}
 
-Give a helpful, natural answer.
-
 `;
+
+
+        /* GEMINI REQUEST */
+
+        console.log(
+            "Sending request to Gemini..."
+        );
 
 
         const result =
@@ -161,6 +252,13 @@ Give a helpful, natural answer.
 
             });
 
+
+        console.log(
+            "Gemini response received."
+        );
+
+
+        /* GET RESPONSE */
 
         let reply = "";
 
@@ -176,20 +274,25 @@ Give a helpful, natural answer.
         }
 
 
+        /* FALLBACK */
+
         if (!reply) {
 
             const parts =
-                result?.candidates?.[0]
+                result
+                    ?.candidates?.[0]
                     ?.content?.parts;
 
 
-            if (Array.isArray(parts)) {
+            if (
+                Array.isArray(parts)
+            ) {
 
                 reply =
                     parts
                         .map(
-                            p =>
-                                p?.text || ""
+                            part =>
+                                part?.text || ""
                         )
                         .join("")
                         .trim();
@@ -199,7 +302,13 @@ Give a helpful, natural answer.
         }
 
 
+        /* EMPTY RESPONSE */
+
         if (!reply) {
+
+            console.error(
+                "Gemini returned empty response"
+            );
 
             return res.status(502).json({
 
@@ -214,9 +323,12 @@ Give a helpful, natural answer.
 
 
         console.log(
-            "Viggo reply generated successfully"
+            "Viggo AI reply:",
+            reply.substring(0, 200)
         );
 
+
+        /* SEND TO FRONTEND */
 
         return res.json({
 
@@ -234,8 +346,19 @@ Give a helpful, natural answer.
     catch (error) {
 
         console.error(
-            "VIGGO CHAT ERROR:",
+            "================================"
+        );
+
+        console.error(
+            "VIGGO CHAT ERROR"
+        );
+
+        console.error(
             error
+        );
+
+        console.error(
+            "================================"
         );
 
 
@@ -251,10 +374,14 @@ Give a helpful, natural answer.
             errorMessage.toLowerCase();
 
 
+        /* API KEY ERROR */
+
         if (
             lower.includes("401") ||
+            lower.includes("403") ||
             lower.includes("api key") ||
-            lower.includes("unauthenticated")
+            lower.includes("unauthenticated") ||
+            lower.includes("permission denied")
         ) {
 
             return res.status(401).json({
@@ -262,7 +389,7 @@ Give a helpful, natural answer.
                 success: false,
 
                 error:
-                    "Gemini API key is invalid",
+                    "Gemini API key is invalid or not configured",
 
                 details:
                     errorMessage
@@ -272,10 +399,12 @@ Give a helpful, natural answer.
         }
 
 
+        /* MODEL ERROR */
+
         if (
             lower.includes("404") ||
             lower.includes("not found") ||
-            lower.includes("not available")
+            lower.includes("model")
         ) {
 
             return res.status(502).json({
@@ -283,20 +412,25 @@ Give a helpful, natural answer.
                 success: false,
 
                 error:
-                    "Gemini model unavailable",
+                    "Gemini model is unavailable",
 
                 details:
-                    `Current model: ${MODEL}. Check GEMINI_MODEL in Render.`
+                    "Current model: " +
+                    MODEL +
+                    ". Check GEMINI_MODEL in Render."
 
             });
 
         }
 
 
+        /* QUOTA */
+
         if (
             lower.includes("429") ||
             lower.includes("quota") ||
-            lower.includes("resource exhausted")
+            lower.includes("resource exhausted") ||
+            lower.includes("rate limit")
         ) {
 
             return res.status(429).json({
@@ -304,7 +438,7 @@ Give a helpful, natural answer.
                 success: false,
 
                 error:
-                    "Gemini quota/rate limit reached",
+                    "Gemini quota or rate limit reached",
 
                 details:
                     errorMessage
@@ -313,6 +447,8 @@ Give a helpful, natural answer.
 
         }
 
+
+        /* OTHER ERROR */
 
         return res.status(500).json({
 
@@ -335,23 +471,27 @@ Give a helpful, natural answer.
    404
 ========================= */
 
-app.use((req, res) => {
+app.use(
+    (req, res) => {
 
-    res.status(404).json({
+        res.status(404).json({
 
-        success: false,
+            success: false,
 
-        error: "Endpoint not found",
+            error:
+                "Endpoint not found",
 
-        path: req.path
+            path:
+                req.path
 
-    });
+        });
 
-});
+    }
+);
 
 
 /* =========================
-   START SERVER
+   SERVER START
 ========================= */
 
 app.listen(
@@ -391,6 +531,14 @@ app.listen(
             API_KEY
                 ? "CONFIGURED"
                 : "MISSING"
+        );
+
+        console.log(
+            "CHAT ENDPOINT:"
+        );
+
+        console.log(
+            "POST /chat"
         );
 
         console.log(
