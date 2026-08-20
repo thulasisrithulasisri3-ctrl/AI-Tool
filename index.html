@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Viggo AI</title>
-
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -17,49 +16,55 @@
     <aside class="sidebar" id="sidebar">
 
         <div class="sidebar-header">
+
             <div class="brand">
-                <div class="brand-icon">V</div>
+                <div class="brand-logo">V</div>
                 <span>Viggo AI</span>
             </div>
 
-            <button class="icon-btn close-sidebar"
+            <button class="mobile-close"
                     onclick="toggleSidebar()">
                 ×
             </button>
+
         </div>
 
 
         <!-- NEW CHAT -->
 
-        <button class="new-chat-btn"
+        <button class="new-chat"
                 onclick="createNewChat()">
-            <span>＋</span>
+
+            <span class="new-icon">＋</span>
             <span>New Chat</span>
+
         </button>
 
 
         <!-- SEARCH -->
 
-        <div class="search-area">
+        <div class="search-box">
+
             <span>⌕</span>
 
             <input
+                id="searchInput"
                 type="text"
-                id="historySearch"
                 placeholder="Search chats..."
                 oninput="searchChats()"
             >
+
         </div>
 
 
         <!-- RECENT -->
 
-        <div class="section-title">
+        <div class="section-label">
             RECENT
         </div>
 
-        <div class="history-list"
-             id="historyList">
+        <div class="recent-list"
+             id="recentList">
         </div>
 
 
@@ -67,29 +72,44 @@
 
         <div class="sidebar-bottom">
 
-            <button class="side-option"
-                    onclick="showPinnedChats()">
-                <span>📌</span>
-                <span>Pinned Chats</span>
+            <!-- MORE -->
+
+            <button class="more-sidebar"
+                    onclick="toggleMoreMenu()">
+
+                <span class="more-dots">⋮</span>
+                <span>More</span>
+
             </button>
 
-            <button class="side-option"
-                    onclick="showDeletedChats()">
-                <span>🗑️</span>
-                <span>Deleted Chats</span>
-            </button>
 
-            <button class="side-option"
-                    onclick="openLanguageMenu()">
-                <span>🌐</span>
-                <span>Language</span>
-            </button>
+            <!-- MORE MENU -->
 
-            <button class="side-option"
-                    onclick="openVoiceMenu()">
-                <span>🎤</span>
-                <span>Voice</span>
-            </button>
+            <div class="sidebar-more-menu"
+                 id="sidebarMoreMenu">
+
+                <button onclick="openLanguage()">
+
+                    <span>🌐</span>
+                    <span>Language</span>
+
+                </button>
+
+                <button onclick="openVoice()">
+
+                    <span>🎤</span>
+                    <span>Voice</span>
+
+                </button>
+
+                <button onclick="openDelete()">
+
+                    <span>🗑️</span>
+                    <span>Delete Options</span>
+
+                </button>
+
+            </div>
 
         </div>
 
@@ -100,55 +120,21 @@
 
     <main class="main">
 
-        <!-- TOP BAR -->
+
+        <!-- TOPBAR -->
 
         <header class="topbar">
 
-            <button class="top-icon"
+            <button class="menu-button"
                     onclick="toggleSidebar()">
                 ☰
             </button>
 
-            <div class="top-title">
+            <div class="page-title">
                 Viggo AI
             </div>
 
-            <button class="top-icon"
-                    onclick="shareCurrentChat()"
-                    title="Share">
-                🔗
-            </button>
-
-            <button class="top-icon"
-                    onclick="toggleMoreMenu()"
-                    title="More">
-                ⋮
-            </button>
-
         </header>
-
-
-        <!-- ================= MORE MENU ================= -->
-
-        <div class="more-menu"
-             id="moreMenu">
-
-            <button onclick="openLanguageMenu()">
-                <span>🌐</span>
-                <span>Language</span>
-            </button>
-
-            <button onclick="openVoiceMenu()">
-                <span>🎤</span>
-                <span>Voice</span>
-            </button>
-
-            <button onclick="openDeleteMenu()">
-                <span>🗑️</span>
-                <span>Delete Options</span>
-            </button>
-
-        </div>
 
 
         <!-- ================= CHAT ================= -->
@@ -188,25 +174,31 @@
                 <div class="plus-menu"
                      id="plusMenu">
 
-                    <button onclick="choosePhoto()">
+                    <button onclick="selectPhoto()">
+
                         <span>📷</span>
                         <span>Photos</span>
+
                     </button>
 
-                    <button onclick="chooseVideo()">
+                    <button onclick="selectVideo()">
+
                         <span>🎥</span>
                         <span>Videos</span>
+
                     </button>
 
-                    <button onclick="chooseFile()">
+                    <button onclick="selectFile()">
+
                         <span>📎</span>
                         <span>Files</span>
+
                     </button>
 
                 </div>
 
 
-                <!-- TEXT INPUT -->
+                <!-- TEXT -->
 
                 <textarea
                     id="chatInput"
@@ -218,33 +210,33 @@
 
                 <!-- PLUS -->
 
-                <button
-                    class="plus-button"
-                    onclick="togglePlusMenu()"
-                    title="Attach"
-                >
+                <button class="plus-button"
+                        onclick="togglePlusMenu()"
+                        title="Attach">
+
                     ＋
+
                 </button>
 
 
-                <!-- RIGHT BUTTONS -->
+                <!-- RIGHT -->
 
                 <div class="input-actions">
 
-                    <button
-                        class="voice-button"
-                        onclick="openVoiceMenu()"
-                        title="Voice"
-                    >
+                    <button class="voice-button"
+                            onclick="openVoice()"
+                            title="Voice">
+
                         🎤
+
                     </button>
 
-                    <button
-                        class="send-button"
-                        onclick="sendMessage()"
-                        title="Send"
-                    >
+                    <button class="send-button"
+                            onclick="sendMessage()"
+                            title="Send">
+
                         ➤
+
                     </button>
 
                 </div>
@@ -281,28 +273,25 @@
 </div>
 
 
-<!-- ================= LANGUAGE MODAL ================= -->
+<!-- ================= LANGUAGE ================= -->
 
 <div class="overlay"
-     id="languageOverlay"
-     onclick="closePopups(event)">
+     id="languageOverlay">
 
-    <div class="popup-box"
-         onclick="event.stopPropagation()">
+    <div class="modal">
 
-        <div class="popup-header">
+        <div class="modal-header">
 
             <h2>🌐 Language</h2>
 
-            <button onclick="closeAllPopups()">
+            <button onclick="closeModals()">
                 ×
             </button>
 
         </div>
 
 
-        <div class="language-grid"
-             id="languageGrid">
+        <div class="language-grid">
 
             <button onclick="selectLanguage('English')">
                 English
@@ -386,9 +375,12 @@
 
         </div>
 
-        <div class="selected-language"
+
+        <div class="selected-info"
              id="selectedLanguage">
+
             Selected: English
+
         </div>
 
     </div>
@@ -396,70 +388,68 @@
 </div>
 
 
-<!-- ================= VOICE MODAL ================= -->
+<!-- ================= VOICE ================= -->
 
 <div class="overlay"
-     id="voiceOverlay"
-     onclick="closePopups(event)">
+     id="voiceOverlay">
 
-    <div class="popup-box small-popup"
-         onclick="event.stopPropagation()">
+    <div class="modal small-modal">
 
-        <div class="popup-header">
+        <div class="modal-header">
 
             <h2>🎤 Voice</h2>
 
-            <button onclick="closeAllPopups()">
+            <button onclick="closeModals()">
                 ×
             </button>
 
         </div>
 
 
-        <p class="popup-label">
+        <p class="modal-subtitle">
             Select voice
         </p>
 
 
-        <div class="voice-options">
+        <div class="voice-list">
 
-            <button
-                class="voice-option"
-                onclick="selectVoice('Male')">
+            <button class="voice-option"
+                    onclick="selectVoice('Male')">
 
-                <div class="voice-icon">
+                <span class="voice-avatar">
                     👨
-                </div>
+                </span>
 
-                <div>
+                <span>
                     <strong>Male</strong>
                     <small>Male voice</small>
-                </div>
+                </span>
 
             </button>
 
 
-            <button
-                class="voice-option"
-                onclick="selectVoice('Female')">
+            <button class="voice-option"
+                    onclick="selectVoice('Female')">
 
-                <div class="voice-icon">
+                <span class="voice-avatar">
                     👩
-                </div>
+                </span>
 
-                <div>
+                <span>
                     <strong>Female</strong>
                     <small>Female voice</small>
-                </div>
+                </span>
 
             </button>
 
         </div>
 
 
-        <div class="selected-language"
+        <div class="selected-info"
              id="selectedVoice">
+
             Selected: Female
+
         </div>
 
     </div>
@@ -467,20 +457,18 @@
 </div>
 
 
-<!-- ================= DELETE MODAL ================= -->
+<!-- ================= DELETE ================= -->
 
 <div class="overlay"
-     id="deleteOverlay"
-     onclick="closePopups(event)">
+     id="deleteOverlay">
 
-    <div class="popup-box small-popup"
-         onclick="event.stopPropagation()">
+    <div class="modal small-modal">
 
-        <div class="popup-header">
+        <div class="modal-header">
 
             <h2>🗑️ Delete Options</h2>
 
-            <button onclick="closeAllPopups()">
+            <button onclick="closeModals()">
                 ×
             </button>
 
@@ -490,23 +478,23 @@
         <button class="delete-option"
                 onclick="clearCurrentChat()">
 
-            💬 Clear Chat
+            💬 Clear Current Chat
 
         </button>
 
 
         <button class="delete-option"
-                onclick="clearHistory()">
+                onclick="clearAllChats()">
 
-            🕘 Clear History
+            🗑️ Clear All Chats
 
         </button>
 
 
-        <button class="delete-option danger"
-                onclick="deleteSelectedChat()">
+        <button class="delete-option"
+                onclick="openSelectDelete()">
 
-            ❌ Delete Selected
+            ☑️ Select Chats to Delete
 
         </button>
 
@@ -515,7 +503,92 @@
 </div>
 
 
-<!-- ================= SCRIPT ================= -->
+<!-- ================= SELECT DELETE ================= -->
+
+<div class="overlay"
+     id="selectDeleteOverlay">
+
+    <div class="modal select-modal">
+
+        <div class="modal-header">
+
+            <h2>☑️ Select Chats</h2>
+
+            <button onclick="closeModals()">
+                ×
+            </button>
+
+        </div>
+
+
+        <div id="selectChatList"
+             class="select-chat-list">
+        </div>
+
+
+        <div class="select-footer">
+
+            <button class="cancel-button"
+                    onclick="closeModals()">
+
+                Cancel
+
+            </button>
+
+            <button class="delete-selected-button"
+                    onclick="deleteSelectedChats()">
+
+                Delete Selected
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= SHARE ================= -->
+
+<div class="overlay"
+     id="shareOverlay">
+
+    <div class="modal small-modal">
+
+        <div class="modal-header">
+
+            <h2>🔗 Share Chat</h2>
+
+            <button onclick="closeModals()">
+                ×
+            </button>
+
+        </div>
+
+
+        <p class="share-text">
+            Your chat share link is ready.
+        </p>
+
+
+        <div class="share-link-box">
+
+            <input
+                id="shareLink"
+                readonly
+            >
+
+            <button onclick="copyShareLink()">
+                Copy
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
 
 <script src="script.js"></script>
 
