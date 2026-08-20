@@ -3,446 +3,303 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Viggo AI</title>
 
-
-    <!-- =================================================
-         PWA
-    ================================================== -->
-
-    <link
-        rel="manifest"
-        href="manifest.json"
-    >
-
-    <link
-        rel="icon"
-        type="image/png"
-        sizes="192x192"
-        href="icon-192.png"
-    >
-
-    <link
-        rel="apple-touch-icon"
-        href="icon-192.png"
-    >
-
-    <meta
-        name="theme-color"
-        content="#050b16"
-    >
-
-    <meta
-        name="mobile-web-app-capable"
-        content="yes"
-    >
-
-    <meta
-        name="apple-mobile-web-app-capable"
-        content="yes"
-    >
-
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
-
+    <link rel="stylesheet" href="style.css">
 </head>
-
 
 <body>
 
+<div id="app">
 
-    <!-- =================================================
+    <!-- ==================================================
          SIDEBAR
-    ================================================== -->
+    =================================================== -->
 
-    <aside
-        class="sidebar"
-        id="sidebar"
-    >
+    <aside id="sidebar" class="sidebar">
 
+        <div class="sidebar-header">
 
-        <!-- =================================================
-             SIDEBAR TOP
-        ================================================== -->
+            <div class="brand">
 
-        <div class="sidebar-top">
-
-
-            <!-- LOGO -->
-
-            <div class="logo">
-
-                <div class="logo-icon">
+                <div class="brand-logo">
                     V
                 </div>
 
-                <div class="logo-text">
-
-                    <strong>
-                        Viggo
-                    </strong>
-
-                    <small>
-                        AI Friend
-                    </small>
-
-                </div>
+                <span>Viggo</span>
 
             </div>
 
-
-            <!-- SIDEBAR CLOSE BUTTON -->
-
             <button
-                class="sidebar-close-btn"
-                id="sidebarCloseBtn"
+                id="closeSidebarBtn"
+                class="icon-btn"
                 type="button"
+                title="Close"
                 aria-label="Close sidebar"
-                title="Close sidebar"
             >
-                ✕
+                ×
             </button>
-
 
         </div>
 
 
-        <!-- =================================================
-             NEW CHAT
-        ================================================== -->
+        <!-- NEW CHAT -->
 
         <button
-            class="new-chat"
             id="newChatBtn"
+            class="new-chat-btn"
             type="button"
         >
-            ＋ New Chat
+            <span class="new-chat-plus">+</span>
+            <span>New Chat</span>
         </button>
 
 
-        <!-- =================================================
-             HISTORY
-        ================================================== -->
+        <!-- HISTORY -->
 
         <div
-            class="history"
             id="historyList"
+            class="history-list"
         ></div>
 
 
-        <!-- =================================================
-             MORE
-        ================================================== -->
+        <!-- SIDEBAR BOTTOM -->
 
-        <div class="sidebar-more">
-
+        <div class="sidebar-bottom">
 
             <button
-                class="more-button"
-                id="moreBtn"
+                id="selectChatsBtn"
+                class="sidebar-btn"
                 type="button"
             >
-                ⋮ More
+                ☑ Select Chats
             </button>
 
-
-            <div
-                class="more-menu"
-                id="moreMenu"
+            <button
+                id="deleteSelectedBtn"
+                class="sidebar-btn delete-selected"
+                type="button"
+                style="display:none;"
             >
-
-
-                <!-- SAVE -->
-
-                <button
-                    id="saveBtn"
-                    type="button"
-                >
-                    💾 Save
-                </button>
-
-
-                <!-- SELECT -->
-
-                <button
-                    id="selectChatsBtn"
-                    type="button"
-                >
-                    ☑ Select Chats
-                </button>
-
-
-                <!-- DELETE SELECTED -->
-
-                <button
-                    id="deleteSelectedBtn"
-                    type="button"
-                    class="danger-button"
-                    style="display:none;"
-                >
-                    🗑 Delete Selected
-                </button>
-
-
-                <!-- CLEAR HISTORY -->
-
-                <button
-                    id="clearHistoryBtn"
-                    type="button"
-                    class="danger-button"
-                >
-                    🗑 Clear History
-                </button>
-
-
-                <div class="menu-divider"></div>
-
-
-                <!-- LANGUAGE -->
-
-                <div class="language-title">
-                    🌐 Select Language
-                </div>
-
-
-                <button
-                    type="button"
-                    data-language="en"
-                >
-                    🇬🇧 English
-                </button>
-
-
-                <button
-                    type="button"
-                    data-language="ta"
-                >
-                    🇮🇳 தமிழ்
-                </button>
-
-
-                <button
-                    type="button"
-                    data-language="hi"
-                >
-                    🇮🇳 हिन्दी
-                </button>
-
-
-                <button
-                    type="button"
-                    data-language="ml"
-                >
-                    🇮🇳 മലയാളം
-                </button>
-
-
-                <button
-                    type="button"
-                    data-language="te"
-                >
-                    🇮🇳 తెలుగు
-                </button>
-
-
-                <button
-                    type="button"
-                    data-language="kn"
-                >
-                    🇮🇳 ಕನ್ನಡ
-                </button>
-
-
-                <div class="menu-divider"></div>
-
-
-                <!-- VOICE SETTINGS -->
-
-                <button
-                    id="voiceSettingsButton"
-                    type="button"
-                >
-                    🔊 Voice Settings
-                </button>
-
-
-                <div
-                    id="voiceSettingsPanel"
-                    class="voice-settings-panel"
-                >
-
-                    <div class="voice-setting-title">
-                        Voice
-                    </div>
-
-
-                    <button
-                        id="femaleVoiceBtn"
-                        class="voice-choice"
-                        type="button"
-                    >
-                        👩 Female
-                    </button>
-
-
-                    <button
-                        id="maleVoiceBtn"
-                        class="voice-choice"
-                        type="button"
-                    >
-                        👨 Male
-                    </button>
-
-
-                    <div
-                        id="voiceLanguageStatus"
-                        class="voice-language-status"
-                    ></div>
-
-                </div>
-
-
-            </div>
+                🗑 Delete Selected
+            </button>
 
         </div>
-
 
     </aside>
 
 
-    <!-- =================================================
+
+    <!-- ==================================================
          MAIN
-    ================================================== -->
+    =================================================== -->
 
     <main class="main">
 
 
-        <!-- =================================================
-             HEADER
-        ================================================== -->
+        <!-- TOP BAR -->
 
-        <header class="header">
-
-
-            <!-- MOBILE MENU -->
+        <header class="topbar">
 
             <button
-                class="mobile-menu"
                 id="mobileMenuBtn"
+                class="icon-btn"
                 type="button"
-                aria-label="Open menu"
+                title="Menu"
+                aria-label="Open sidebar"
             >
                 ☰
             </button>
 
 
-            <!-- CHAT TITLE -->
+            <div class="top-title">
 
-            <div
-                class="chat-title"
-                id="chatTitle"
-            >
-                New Chat
+                <span id="chatTitle">
+                    New Chat
+                </span>
+
             </div>
 
 
-            <!-- SHARE -->
+            <div class="top-actions">
 
-            <button
-                class="share-btn"
-                id="shareBtn"
-                type="button"
-            >
-                ↗ Share
-            </button>
+                <!-- SHARE -->
 
+                <button
+                    id="shareBtn"
+                    class="icon-btn"
+                    type="button"
+                    title="Share"
+                    aria-label="Share"
+                >
+                    ↗
+                </button>
+
+
+                <!-- MORE -->
+
+                <div class="sidebar-more">
+
+                    <button
+                        id="moreBtn"
+                        class="icon-btn"
+                        type="button"
+                        title="More"
+                        aria-label="More"
+                    >
+                        ⋮
+                    </button>
+
+
+                    <div
+                        id="moreMenu"
+                        class="more-menu"
+                    >
+
+                        <button
+                            id="saveBtn"
+                            class="menu-item"
+                            type="button"
+                        >
+                            💾 Save Chat
+                        </button>
+
+
+                        <button
+                            id="clearHistoryBtn"
+                            class="menu-item"
+                            type="button"
+                        >
+                            🗑 Clear History
+                        </button>
+
+
+                        <div class="language-title">
+                            Language
+                        </div>
+
+
+                        <button
+                            class="menu-item"
+                            type="button"
+                            data-language="en"
+                        >
+                            English
+                        </button>
+
+
+                        <button
+                            class="menu-item"
+                            type="button"
+                            data-language="ta"
+                        >
+                            தமிழ்
+                        </button>
+
+
+                        <button
+                            class="menu-item"
+                            type="button"
+                            data-language="hi"
+                        >
+                            हिन्दी
+                        </button>
+
+
+                        <button
+                            class="menu-item"
+                            type="button"
+                            data-language="ml"
+                        >
+                            മലയാളം
+                        </button>
+
+
+                        <button
+                            class="menu-item"
+                            type="button"
+                            data-language="te"
+                        >
+                            తెలుగు
+                        </button>
+
+
+                        <button
+                            class="menu-item"
+                            type="button"
+                            data-language="kn"
+                        >
+                            ಕನ್ನಡ
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
 
         </header>
 
 
-        <!-- =================================================
-             MESSAGES
-        ================================================== -->
+
+        <!-- ==================================================
+             CHAT MESSAGES
+        =================================================== -->
 
         <section
-            class="messages"
             id="messages"
+            class="messages"
         ></section>
 
 
-        <!-- =================================================
-             INPUT AREA
-        ================================================== -->
 
-        <footer class="input-area">
+        <!-- ==================================================
+             CHAT INPUT
+        =================================================== -->
+
+        <footer class="input-container">
+
+            <div class="chat-input-area">
 
 
-            <div class="input-box">
+                <!-- LEFT -->
+
+                <div class="input-left">
 
 
-                <!-- PLUS BUTTON -->
-
-                <div class="plus-container">
-
+                    <!-- PLUS -->
 
                     <button
-                        class="input-icon plus-btn"
-                        id="plusBtn"
+                        id="attachBtn"
+                        class="input-icon-btn"
                         type="button"
-                        title="Add"
-                        aria-label="Add"
+                        title="Attach"
+                        aria-label="Attach"
                     >
-                        ＋
+                        +
                     </button>
 
 
-                    <!-- PLUS MENU -->
+                    <!-- ATTACHMENT MENU -->
 
                     <div
-                        class="plus-menu"
-                        id="plusMenu"
+                        id="attachmentMenu"
+                        class="attachment-menu"
                     >
-
-
-                        <!-- CAMERA -->
-
-                        <button
-                            type="button"
-                            id="cameraBtn"
-                            class="plus-menu-item"
-                        >
-
-                            <span class="plus-menu-icon">
-                                📷
-                            </span>
-
-                            <span>
-                                Camera
-                            </span>
-
-                        </button>
-
 
                         <!-- PHOTO -->
 
                         <button
-                            type="button"
                             id="photoBtn"
-                            class="plus-menu-item"
+                            class="attachment-option"
+                            type="button"
                         >
 
-                            <span class="plus-menu-icon">
-                                🖼️
+                            <span class="attachment-icon">
+                                📷
                             </span>
 
                             <span>
@@ -452,16 +309,35 @@
                         </button>
 
 
+                        <!-- VIDEO -->
+
+                        <button
+                            id="videoBtn"
+                            class="attachment-option"
+                            type="button"
+                        >
+
+                            <span class="attachment-icon">
+                                🎥
+                            </span>
+
+                            <span>
+                                Video
+                            </span>
+
+                        </button>
+
+
                         <!-- FILE -->
 
                         <button
-                            type="button"
                             id="fileBtn"
-                            class="plus-menu-item"
+                            class="attachment-option"
+                            type="button"
                         >
 
-                            <span class="plus-menu-icon">
-                                📁
+                            <span class="attachment-icon">
+                                📎
                             </span>
 
                             <span>
@@ -470,569 +346,310 @@
 
                         </button>
 
-
                     </div>
 
+
+                    <!-- HIDDEN INPUTS -->
+
+                    <input
+                        id="photoInput"
+                        type="file"
+                        accept="image/*"
+                        hidden
+                    >
+
+
+                    <input
+                        id="videoInput"
+                        type="file"
+                        accept="video/*"
+                        hidden
+                    >
+
+
+                    <input
+                        id="fileInput"
+                        type="file"
+                        hidden
+                    >
+
+
+                    <!-- MESSAGE -->
+
+                    <textarea
+                        id="messageInput"
+                        class="message-input"
+                        rows="1"
+                        placeholder="Message Viggo..."
+                        autocomplete="off"
+                    ></textarea>
 
                 </div>
 
 
-                <!-- =================================================
-                     HIDDEN FILE INPUTS
-                ================================================== -->
 
-                <input
-                    type="file"
-                    id="photoInput"
-                    accept="image/*"
-                    hidden
-                >
+                <!-- RIGHT -->
 
-                <input
-                    type="file"
-                    id="cameraInput"
-                    accept="image/*"
-                    capture="environment"
-                    hidden
-                >
-
-                <input
-                    type="file"
-                    id="fileInput"
-                    hidden
-                >
+                <div class="input-right">
 
 
-                <!-- =================================================
-                     MESSAGE INPUT
-                ================================================== -->
+                    <!-- VOICE -->
 
-                <input
-                    type="text"
-                    id="messageInput"
-                    placeholder="Message Viggo..."
-                    autocomplete="off"
-                >
-
-
-                <!-- =================================================
-                     VOICE
-                ================================================== -->
-
-                <button
-                    class="input-icon"
-                    id="voiceBtn"
-                    type="button"
-                    title="Voice input"
-                    aria-label="Voice input"
-                >
-                    🎤
-                </button>
+                    <button
+                        id="voiceBtn"
+                        class="input-icon-btn"
+                        type="button"
+                        title="Voice"
+                        aria-label="Voice input"
+                    >
+                        🎤
+                    </button>
 
 
-                <!-- =================================================
-                     SEND
-                ================================================== -->
+                    <!-- SEND -->
 
-                <button
-                    class="send-btn"
-                    id="sendBtn"
-                    type="button"
-                    title="Send"
-                    aria-label="Send"
-                >
-                    ➤
-                </button>
+                    <button
+                        id="sendBtn"
+                        class="send-btn"
+                        type="button"
+                        title="Send"
+                        aria-label="Send"
+                    >
+                        ➤
+                    </button>
 
+                </div>
 
             </div>
 
 
-            <!-- INPUT HINT -->
-
-            <div class="input-hint">
+            <div class="input-note">
                 Viggo AI can make mistakes. Check important information.
             </div>
 
-
         </footer>
-
 
     </main>
 
+</div>
 
-    <!-- =================================================
-         TOAST
-    ================================================== -->
 
-    <div
-        id="viggoToast"
-        class="toast"
-    ></div>
 
+<!-- ==================================================
+     ATTACHMENT JAVASCRIPT
+=================================================== -->
 
-    <!-- =================================================
-         JAVASCRIPT
-    ================================================== -->
+<script>
 
-    <script src="script.js"></script>
+"use strict";
 
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
 
-    <!-- =================================================
-         PLUS BUTTON & FILE SELECTION
-    ================================================== -->
+        const attachBtn =
+            document.getElementById("attachBtn");
 
-    <script>
+        const attachmentMenu =
+            document.getElementById("attachmentMenu");
 
-        document.addEventListener(
-            "DOMContentLoaded",
-            function () {
+        const photoBtn =
+            document.getElementById("photoBtn");
 
+        const videoBtn =
+            document.getElementById("videoBtn");
 
-                const plusBtn =
-                    document.getElementById(
-                        "plusBtn"
-                    );
+        const fileBtn =
+            document.getElementById("fileBtn");
 
+        const photoInput =
+            document.getElementById("photoInput");
 
-                const plusMenu =
-                    document.getElementById(
-                        "plusMenu"
-                    );
+        const videoInput =
+            document.getElementById("videoInput");
 
+        const fileInput =
+            document.getElementById("fileInput");
 
-                const cameraBtn =
-                    document.getElementById(
-                        "cameraBtn"
-                    );
 
+        /* ==========================================
+           PLUS
+        ========================================== */
 
-                const photoBtn =
-                    document.getElementById(
-                        "photoBtn"
-                    );
+        attachBtn?.addEventListener(
+            "click",
+            function (event) {
 
+                event.preventDefault();
 
-                const fileBtn =
-                    document.getElementById(
-                        "fileBtn"
-                    );
+                event.stopPropagation();
 
-
-                const cameraInput =
-                    document.getElementById(
-                        "cameraInput"
-                    );
-
-
-                const photoInput =
-                    document.getElementById(
-                        "photoInput"
-                    );
-
-
-                const fileInput =
-                    document.getElementById(
-                        "fileInput"
-                    );
-
-
-                /* -----------------------------------------
-                   PLUS MENU
-                ----------------------------------------- */
-
-                if (
-                    plusBtn &&
-                    plusMenu
-                ) {
-
-                    plusBtn.addEventListener(
-                        "click",
-                        function (event) {
-
-                            event.stopPropagation();
-
-                            plusMenu.classList.toggle(
-                                "show"
-                            );
-
-                        }
-                    );
-
-                }
-
-
-                /* -----------------------------------------
-                   CAMERA
-                ----------------------------------------- */
-
-                if (
-                    cameraBtn &&
-                    cameraInput
-                ) {
-
-                    cameraBtn.addEventListener(
-                        "click",
-                        function () {
-
-                            cameraInput.click();
-
-                            plusMenu?.classList.remove(
-                                "show"
-                            );
-
-                        }
-                    );
-
-                }
-
-
-                /* -----------------------------------------
-                   PHOTO
-                ----------------------------------------- */
-
-                if (
-                    photoBtn &&
-                    photoInput
-                ) {
-
-                    photoBtn.addEventListener(
-                        "click",
-                        function () {
-
-                            photoInput.click();
-
-                            plusMenu?.classList.remove(
-                                "show"
-                            );
-
-                        }
-                    );
-
-                }
-
-
-                /* -----------------------------------------
-                   FILE
-                ----------------------------------------- */
-
-                if (
-                    fileBtn &&
-                    fileInput
-                ) {
-
-                    fileBtn.addEventListener(
-                        "click",
-                        function () {
-
-                            fileInput.click();
-
-                            plusMenu?.classList.remove(
-                                "show"
-                            );
-
-                        }
-                    );
-
-                }
-
-
-                /* -----------------------------------------
-                   FILE SELECTION
-                ----------------------------------------- */
-
-                if (photoInput) {
-
-                    photoInput.addEventListener(
-                        "change",
-                        function () {
-
-                            if (
-                                this.files &&
-                                this.files.length
-                            ) {
-
-                                showSelectedFile(
-                                    this.files[0]
-                                );
-
-                            }
-
-                        }
-                    );
-
-                }
-
-
-                if (cameraInput) {
-
-                    cameraInput.addEventListener(
-                        "change",
-                        function () {
-
-                            if (
-                                this.files &&
-                                this.files.length
-                            ) {
-
-                                showSelectedFile(
-                                    this.files[0]
-                                );
-
-                            }
-
-                        }
-                    );
-
-                }
-
-
-                if (fileInput) {
-
-                    fileInput.addEventListener(
-                        "change",
-                        function () {
-
-                            if (
-                                this.files &&
-                                this.files.length
-                            ) {
-
-                                showSelectedFile(
-                                    this.files[0]
-                                );
-
-                            }
-
-                        }
-                    );
-
-                }
-
-
-                /* -----------------------------------------
-                   CLOSE PLUS MENU
-                ----------------------------------------- */
-
-                document.addEventListener(
-                    "click",
-                    function (event) {
-
-                        if (
-                            !event.target.closest(
-                                ".plus-container"
-                            )
-                        ) {
-
-                            plusMenu?.classList.remove(
-                                "show"
-                            );
-
-                        }
-
-                    }
+                attachmentMenu?.classList.toggle(
+                    "show"
                 );
-
-
-                /* -----------------------------------------
-                   SELECTED FILE
-                ----------------------------------------- */
-
-                window.showSelectedFile =
-                    function (file) {
-
-                        if (!file)
-                            return;
-
-
-                        const input =
-                            document.getElementById(
-                                "messageInput"
-                            );
-
-
-                        if (!input)
-                            return;
-
-
-                        input.value =
-                            "📎 " +
-                            file.name;
-
-
-                        input.focus();
-
-
-                        const toast =
-                            document.getElementById(
-                                "viggoToast"
-                            );
-
-
-                        if (toast) {
-
-                            toast.textContent =
-                                "📎 " +
-                                file.name +
-                                " selected";
-
-
-                            toast.classList.add(
-                                "show"
-                            );
-
-
-                            clearTimeout(
-                                window.viggoFileToastTimer
-                            );
-
-
-                            window.viggoFileToastTimer =
-                                setTimeout(
-                                    function () {
-
-                                        toast.classList.remove(
-                                            "show"
-                                        );
-
-                                    },
-                                    2500
-                                );
-
-                        }
-
-                    };
-
 
             }
         );
 
-    </script>
 
+        /* ==========================================
+           PHOTO
+        ========================================== */
 
-    <!-- =================================================
-         SIDEBAR CLOSE BUTTON
-    ================================================== -->
+        photoBtn?.addEventListener(
+            "click",
+            function (event) {
 
-    <script>
+                event.preventDefault();
 
-        document.addEventListener(
-            "DOMContentLoaded",
-            function () {
+                event.stopPropagation();
 
-
-                const sidebar =
-                    document.getElementById(
-                        "sidebar"
-                    );
-
-
-                const closeBtn =
-                    document.getElementById(
-                        "sidebarCloseBtn"
-                    );
-
-
-                if (
-                    closeBtn &&
-                    sidebar
-                ) {
-
-                    closeBtn.addEventListener(
-                        "click",
-                        function (event) {
-
-                            event.preventDefault();
-
-                            event.stopPropagation();
-
-                            sidebar.classList.remove(
-                                "open"
-                            );
-
-                        }
-                    );
-
-                }
-
-
-                /* -----------------------------------------
-                   CLOSE SIDEBAR AFTER CHAT OPEN
-                ----------------------------------------- */
-
-                document.addEventListener(
-                    "click",
-                    function (event) {
-
-                        if (
-                            window.innerWidth <= 768 &&
-                            event.target.closest(
-                                ".history-item"
-                            )
-                        ) {
-
-                            sidebar?.classList.remove(
-                                "open"
-                            );
-
-                        }
-
-                    }
-                );
-
+                photoInput?.click();
 
             }
         );
 
-    </script>
+
+        /* ==========================================
+           VIDEO
+        ========================================== */
+
+        videoBtn?.addEventListener(
+            "click",
+            function (event) {
+
+                event.preventDefault();
+
+                event.stopPropagation();
+
+                videoInput?.click();
+
+            }
+        );
 
 
-    <!-- =================================================
-         SERVICE WORKER
-    ================================================== -->
+        /* ==========================================
+           FILE
+        ========================================== */
 
-    <script>
+        fileBtn?.addEventListener(
+            "click",
+            function (event) {
 
-        if (
-            "serviceWorker" in navigator
+                event.preventDefault();
+
+                event.stopPropagation();
+
+                fileInput?.click();
+
+            }
+        );
+
+
+        /* ==========================================
+           FILE SELECT
+        ========================================== */
+
+        function handleFile(
+            input,
+            type
         ) {
 
-            window.addEventListener(
-                "load",
+            if (!input)
+                return;
+
+            input.addEventListener(
+                "change",
                 function () {
 
-                    navigator.serviceWorker
-                        .register(
-                            "service-worker.js"
-                        )
+                    const file =
+                        input.files &&
+                        input.files[0];
 
-                        .then(
-                            function () {
+                    if (!file)
+                        return;
 
-                                console.log(
-                                    "Viggo Service Worker registered successfully."
-                                );
 
-                            }
-                        )
-
-                        .catch(
-                            function (error) {
-
-                                console.log(
-                                    "Viggo Service Worker registration failed:",
-                                    error
-                                );
-
-                            }
+                    const messageInput =
+                        document.getElementById(
+                            "messageInput"
                         );
+
+
+                    if (messageInput) {
+
+                        messageInput.value =
+                            "📎 " +
+                            type +
+                            ": " +
+                            file.name;
+
+                        messageInput.focus();
+
+                    }
+
+
+                    attachmentMenu?.classList.remove(
+                        "show"
+                    );
 
                 }
             );
 
         }
 
-    </script>
+
+        handleFile(
+            photoInput,
+            "Photo"
+        );
+
+        handleFile(
+            videoInput,
+            "Video"
+        );
+
+        handleFile(
+            fileInput,
+            "File"
+        );
+
+
+        /* ==========================================
+           OUTSIDE CLICK
+        ========================================== */
+
+        document.addEventListener(
+            "click",
+            function (event) {
+
+                if (
+                    !event.target.closest(
+                        ".input-left"
+                    )
+                ) {
+
+                    attachmentMenu?.classList.remove(
+                        "show"
+                    );
+
+                }
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+
+
+<!-- ==================================================
+     MAIN SCRIPT
+=================================================== -->
+
+<script src="script.js"></script>
 
 
 </body>
