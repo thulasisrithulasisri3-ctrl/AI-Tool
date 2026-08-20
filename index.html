@@ -1,16 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
 
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
-    >
-
-    <meta
-        name="theme-color"
-        content="#05070c"
     >
 
     <title>Viggo AI</title>
@@ -23,34 +19,49 @@
 
 <body>
 
-<div class="app">
+<!-- =====================================================
+     APP
+===================================================== -->
 
-    <!-- =====================================================
+<div id="app">
+
+
+    <!-- =================================================
          SIDEBAR
-    ====================================================== -->
+    ================================================== -->
 
     <aside
-        class="sidebar"
         id="sidebar"
+        class="sidebar"
     >
 
-        <!-- BRAND -->
+        <!-- SIDEBAR HEADER -->
 
-        <div class="brand">
+        <div class="sidebar-header">
 
-            <div class="brand-logo">
-                V
-            </div>
+            <div class="logo-area">
 
-            <div>
-                <div class="brand-name">
+                <div class="logo">
+                    V
+                </div>
+
+                <span>
                     Viggo AI
-                </div>
+                </span>
 
-                <div class="brand-status">
-                    AI Assistant
-                </div>
             </div>
+
+
+            <!-- SIDEBAR CLOSE -->
+
+            <button
+                id="closeSidebarButton"
+                class="close-sidebar-button"
+                type="button"
+                aria-label="Close Sidebar"
+            >
+                ✕
+            </button>
 
         </div>
 
@@ -59,179 +70,194 @@
 
         <button
             id="newChatButton"
-            class="new-chat-btn"
+            class="new-chat-button"
             type="button"
         >
-            <span>＋</span>
-            New Chat
+            ＋ New Chat
         </button>
 
 
-        <!-- RECENT -->
+        <!-- SEARCH -->
 
-        <div class="recent-title">
-            Recent
+        <div class="history-search">
+
+            <span>🔍</span>
+
+            <input
+                id="historySearchInput"
+                type="text"
+                placeholder="Search chats..."
+                autocomplete="off"
+            >
+
         </div>
 
 
-        <!-- HISTORY -->
+        <!-- CHAT HISTORY TITLE -->
+
+        <div class="section-title">
+
+            <span>
+                Chat History
+            </span>
+
+            <button
+                id="selectChatsButton"
+                type="button"
+                class="select-button"
+            >
+                ☑ Select
+            </button>
+
+        </div>
+
+
+        <!-- CHAT HISTORY -->
 
         <div
             id="historyContainer"
             class="history-container"
         >
-            <!-- JavaScript creates chats here -->
         </div>
 
 
-        <!-- SELECT / DELETE -->
+        <!-- SELECTED DELETE -->
 
-        <div class="select-controls">
-
-            <button
-                id="selectChatsButton"
-                class="select-button"
-                type="button"
-            >
-                ☑ Select Chats
-            </button>
-
-            <button
-                id="deleteSelectedButton"
-                class="delete-selected-button"
-                type="button"
-                disabled
-            >
-                🗑 Delete Selected
-            </button>
-
-        </div>
+        <button
+            id="deleteSelectedButton"
+            class="delete-selected-button"
+            type="button"
+            disabled
+        >
+            🗑 Delete Selected
+        </button>
 
 
         <!-- DELETED CHATS -->
 
-        <div class="deleted-section">
+        <button
+            id="deletedChatsButton"
+            class="deleted-chats-button"
+            type="button"
+        >
+            🗑 Deleted Chats
+        </button>
 
-            <button
-                id="deletedChatsButton"
-                class="deleted-chats-button"
-                type="button"
-            >
-                🗑 Deleted Chats
-            </button>
 
-            <div
-                id="deletedChatsContainer"
-                class="deleted-chats-container"
-            >
-                <!-- Deleted chats appear here -->
-            </div>
-
+        <div
+            id="deletedChatsContainer"
+            class="deleted-chats-container"
+        >
         </div>
 
-
-        <!-- MORE -->
-
-        <div class="sidebar-bottom">
-
-            <button
-                id="moreButton"
-                class="more-button"
-                type="button"
-            >
-                ⋮
-                More
-            </button>
-
-
-            <div
-                id="moreMenu"
-                class="more-menu"
-            >
-
-                <button
-                    id="languageButton"
-                    type="button"
-                >
-                    🌐 Language
-                </button>
-
-                <button
-                    id="voiceButton"
-                    type="button"
-                >
-                    🔊 Voice
-                </button>
-
-                <button
-                    id="clearAllButton"
-                    type="button"
-                >
-                    🗑 Clear All Chats
-                </button>
-
-            </div>
-
-        </div>
 
     </aside>
 
 
-    <!-- =====================================================
-         MAIN
-    ====================================================== -->
+    <!-- =================================================
+         MAIN AREA
+    ================================================== -->
 
-    <main class="main">
+    <main class="main-area">
 
 
-        <!-- HEADER -->
+        <!-- =================================================
+             TOP BAR
+        ================================================== -->
 
-        <header class="header">
+        <header class="topbar">
 
-            <div class="header-left">
+
+            <!-- MOBILE SIDEBAR BUTTON -->
+
+            <button
+                id="mobileMenuButton"
+                class="mobile-menu-button"
+                type="button"
+                aria-label="Open Sidebar"
+            >
+                ☰
+            </button>
+
+
+            <!-- CHAT TITLE -->
+
+            <div
+                id="currentChatTitle"
+                class="current-chat-title"
+            >
+                Viggo AI
+            </div>
+
+
+            <!-- TOP ACTIONS -->
+
+            <div class="top-actions">
+
+
+                <!-- LANGUAGE -->
 
                 <button
-                    id="mobileMenuButton"
-                    class="mobile-menu"
+                    id="languageButton"
+                    class="top-button"
                     type="button"
-                    aria-label="Open menu"
+                    title="Language"
                 >
-                    ☰
+                    🌐
                 </button>
 
 
-                <div>
+                <!-- MORE -->
 
-                    <h1>
-                        Viggo AI
-                    </h1>
-
-                    <span>
-                        Your intelligent AI assistant
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <!-- TOP RIGHT SERVER LINK -->
-
-            <div class="header-right">
-
-                <a
-                    id="serverLink"
-                    class="server-link"
-                    href="https://ai-tool-2-zpul.onrender.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                <button
+                    id="moreButton"
+                    class="top-button"
+                    type="button"
+                    title="More"
                 >
-                    🔗 Viggo Server
-                </a>
+                    ⋮
+                </button>
+
 
             </div>
+
 
         </header>
+
+
+        <!-- =================================================
+             MORE MENU
+        ================================================== -->
+
+        <div
+            id="moreMenu"
+            class="popup-menu more-menu"
+        >
+
+            <button
+                id="voiceToggleButton"
+                type="button"
+            >
+                🔊 Voice ON/OFF
+            </button>
+
+
+            <button
+                id="clearAllButton"
+                type="button"
+            >
+                🗑 Clear All Chats
+            </button>
+
+
+            <button
+                id="aboutButton"
+                type="button"
+            >
+                ℹ About Viggo
+            </button>
+
+        </div>
 
 
         <!-- =================================================
@@ -247,25 +273,22 @@
 
             <div
                 id="welcomeScreen"
-                class="welcome"
+                class="welcome-screen"
             >
 
                 <div class="welcome-logo">
                     V
                 </div>
 
-                <h2>
-                    How can I help you?
-                </h2>
+                <h1>
+                    Hello, I'm Viggo AI
+                </h1>
 
                 <p>
-                    Ask Viggo AI anything.
+                    How can I help you today?
                 </p>
 
             </div>
-
-
-            <!-- MESSAGES CREATED BY JS -->
 
         </section>
 
@@ -274,7 +297,43 @@
              INPUT AREA
         ================================================== -->
 
-        <section class="input-wrapper">
+        <footer class="input-area">
+
+
+            <!-- PLUS MENU -->
+
+            <div
+                id="plusMenu"
+                class="popup-menu plus-menu"
+            >
+
+                <button
+                    id="photoButton"
+                    type="button"
+                >
+                    📷 Photo
+                </button>
+
+
+                <button
+                    id="videoButton"
+                    type="button"
+                >
+                    🎥 Video
+                </button>
+
+
+                <button
+                    id="fileButton"
+                    type="button"
+                >
+                    📎 File
+                </button>
+
+            </div>
+
+
+            <!-- INPUT BOX -->
 
             <div class="input-box">
 
@@ -285,80 +344,16 @@
                     id="plusButton"
                     class="input-button"
                     type="button"
-                    aria-label="More options"
+                    title="Attach"
                 >
                     ＋
                 </button>
 
 
-                <!-- PLUS MENU -->
-
-                <div
-                    id="plusMenu"
-                    class="plus-menu"
-                >
-
-                    <button
-                        id="photoButton"
-                        type="button"
-                    >
-                        📷
-                        <span>
-                            Photo
-                        </span>
-                    </button>
-
-                    <button
-                        id="videoButton"
-                        type="button"
-                    >
-                        🎥
-                        <span>
-                            Video
-                        </span>
-                    </button>
-
-                    <button
-                        id="fileButton"
-                        type="button"
-                    >
-                        📎
-                        <span>
-                            File
-                        </span>
-                    </button>
-
-                </div>
-
-
-                <!-- HIDDEN FILE INPUT -->
-
-                <input
-                    id="photoInput"
-                    type="file"
-                    accept="image/*"
-                    hidden
-                >
-
-                <input
-                    id="videoInput"
-                    type="file"
-                    accept="video/*"
-                    hidden
-                >
-
-                <input
-                    id="fileInput"
-                    type="file"
-                    hidden
-                >
-
-
-                <!-- MESSAGE INPUT -->
+                <!-- TEXTAREA -->
 
                 <textarea
                     id="messageInput"
-                    class="message-input"
                     rows="1"
                     placeholder="Message Viggo AI..."
                     autocomplete="off"
@@ -369,10 +364,9 @@
 
                 <button
                     id="voiceInputButton"
-                    class="input-button"
+                    class="input-button voice-button"
                     type="button"
-                    aria-label="Voice input"
-                    title="Voice input"
+                    title="Voice"
                 >
                     🎤
                 </button>
@@ -384,24 +378,59 @@
                     id="sendButton"
                     class="send-button"
                     type="button"
-                    aria-label="Send message"
                     title="Send"
                 >
                     ➤
                 </button>
 
+
             </div>
 
-        </section>
+
+            <div class="input-hint">
+                Press Enter to send • Shift + Enter for new line
+            </div>
+
+
+        </footer>
+
 
     </main>
+
 
 </div>
 
 
 <!-- =====================================================
+     HIDDEN FILE INPUTS
+===================================================== -->
+
+<input
+    id="photoInput"
+    type="file"
+    accept="image/*"
+    hidden
+>
+
+
+<input
+    id="videoInput"
+    type="file"
+    accept="video/*"
+    hidden
+>
+
+
+<input
+    id="fileInput"
+    type="file"
+    hidden
+>
+
+
+<!-- =====================================================
      LANGUAGE MODAL
-====================================================== -->
+===================================================== -->
 
 <div
     id="languageModal"
@@ -410,25 +439,19 @@
 
     <div class="modal-box">
 
-        <div class="modal-header">
-
-            <h3>
-                Select Language
-            </h3>
-
-            <button
-                id="closeLanguageModal"
-                type="button"
-            >
-                ×
-            </button>
-
-        </div>
+        <button
+            id="closeLanguageModal"
+            class="modal-close"
+            type="button"
+        >
+            ✕
+        </button>
 
 
-        <label for="languageSelect">
-            Language
-        </label>
+        <h2>
+            Select Language
+        </h2>
+
 
         <select
             id="languageSelect"
@@ -463,11 +486,12 @@
 
         <button
             id="saveLanguageButton"
-            class="save-button"
+            class="save-language-button"
             type="button"
         >
-            Save Language
+            Save
         </button>
+
 
     </div>
 
@@ -475,68 +499,43 @@
 
 
 <!-- =====================================================
-     CONFIRM MODAL
-====================================================== -->
+     ABOUT MODAL
+===================================================== -->
 
 <div
-    id="confirmModal"
+    id="aboutModal"
     class="modal"
 >
 
     <div class="modal-box">
 
-        <div class="modal-header">
+        <button
+            id="closeAboutModal"
+            class="modal-close"
+            type="button"
+        >
+            ✕
+        </button>
 
-            <h3 id="confirmTitle">
-                Confirm
-            </h3>
 
-            <button
-                id="closeConfirmModal"
-                type="button"
-            >
-                ×
-            </button>
-
+        <div class="about-logo">
+            V
         </div>
 
 
-        <p
-            id="confirmMessage"
-            style="
-                color:#aeb9c9;
-                line-height:1.6;
-                margin-bottom:18px;
-            "
-        >
-            Are you sure?
+        <h2>
+            Viggo AI
+        </h2>
+
+
+        <p>
+            Your friendly AI assistant.
         </p>
 
 
-        <div
-            style="
-                display:flex;
-                gap:8px;
-            "
-        >
-
-            <button
-                id="cancelConfirmButton"
-                class="select-button"
-                type="button"
-            >
-                Cancel
-            </button>
-
-            <button
-                id="confirmActionButton"
-                class="delete-selected-button"
-                type="button"
-            >
-                Confirm
-            </button>
-
-        </div>
+        <p class="version">
+            Version 1.0
+        </p>
 
     </div>
 
@@ -544,10 +543,11 @@
 
 
 <!-- =====================================================
-     MAIN SCRIPT
-====================================================== -->
+     JAVASCRIPT
+===================================================== -->
 
 <script src="script.js"></script>
 
 </body>
+
 </html>
