@@ -8,24 +8,23 @@ const { GoogleGenAI } = require("@google/genai");
 
 const app = express();
 
-/* =================================
+/* =========================================
    CONFIG
-================================= */
+========================================= */
 
-const PORT =
-    process.env.PORT || 10000;
+const PORT = process.env.PORT || 10000;
+const HOST = "0.0.0.0";
 
-const API_KEY =
-    process.env.GEMINI_API_KEY;
+const API_KEY = process.env.GEMINI_API_KEY;
 
 const MODEL =
     process.env.GEMINI_MODEL ||
     "gemini-2.5-flash-lite";
 
 
-/* =================================
+/* =========================================
    GEMINI CLIENT
-================================= */
+========================================= */
 
 let ai = null;
 
@@ -46,9 +45,9 @@ if (API_KEY) {
 }
 
 
-/* =================================
+/* =========================================
    MIDDLEWARE
-================================= */
+========================================= */
 
 app.use(
     cors({
@@ -72,45 +71,18 @@ app.use(
 );
 
 
-/* =================================
-   HOME / HEALTH
-================================= */
+/* =========================================
+   HOME
+========================================= */
 
 app.get("/", (req, res) => {
 
-    res.json({
+    res.status(200).json({
 
         success: true,
 
         message:
             "Viggo AI Server is online.",
-
-        model:
-            MODEL,
-
-        apiConfigured:
-            Boolean(API_KEY),
-
-        chatEndpoint:
-            "/chat",
-
-        time:
-            new Date().toISOString()
-
-    });
-
-});
-
-
-/* =================================
-   STATUS
-================================= */
-
-app.get("/status", (req, res) => {
-
-    res.json({
-
-        success: true,
 
         server:
             "Viggo AI",
@@ -124,8 +96,15 @@ app.get("/status", (req, res) => {
         apiConfigured:
             Boolean(API_KEY),
 
-        chatEndpoint:
-            "/chat",
+        endpoints: {
+
+            chat:
+                "/chat",
+
+            status:
+                "/status"
+
+        },
 
         time:
             new Date().toISOString()
@@ -135,16 +114,51 @@ app.get("/status", (req, res) => {
 });
 
 
-/* =================================
+/* =========================================
+   STATUS
+========================================= */
+
+app.get("/status", (req, res) => {
+
+    res.status(200).json({
+
+        success: true,
+
+        server:
+            "Viggo AI",
+
+        status:
+            "online",
+
+        port:
+            PORT,
+
+        model:
+            MODEL,
+
+        apiConfigured:
+            Boolean(API_KEY),
+
+        time:
+            new Date().toISOString()
+
+    });
+
+});
+
+
+/* =========================================
    CLEAN TEXT
-================================= */
+========================================= */
 
 function cleanText(value) {
 
     if (
         typeof value !== "string"
     ) {
+
         return "";
+
     }
 
     return value
@@ -154,9 +168,9 @@ function cleanText(value) {
 }
 
 
-/* =================================
+/* =========================================
    LANGUAGE
-================================= */
+========================================= */
 
 function languageName(language) {
 
@@ -212,9 +226,9 @@ function languageName(language) {
 }
 
 
-/* =================================
-   BUILD CHAT HISTORY
-================================= */
+/* =========================================
+   BUILD CONTENTS
+========================================= */
 
 function buildContents(
     history,
@@ -257,7 +271,9 @@ function buildContents(
 
 
                 if (!text) {
+
                     return;
+
                 }
 
 
@@ -310,9 +326,9 @@ function buildContents(
 }
 
 
-/* =================================
-   RETRY ERROR CHECK
-================================= */
+/* =========================================
+   RETRY CHECK
+========================================= */
 
 function isRetryableError(error) {
 
@@ -359,9 +375,9 @@ function isRetryableError(error) {
 }
 
 
-/* =================================
+/* =========================================
    WAIT
-================================= */
+========================================= */
 
 function wait(ms) {
 
@@ -376,9 +392,9 @@ function wait(ms) {
 }
 
 
-/* =================================
+/* =========================================
    GEMINI REQUEST
-================================= */
+========================================= */
 
 async function generateWithRetry(
     contents,
@@ -495,9 +511,9 @@ async function generateWithRetry(
 }
 
 
-/* =================================
+/* =========================================
    CHAT API
-================================= */
+========================================= */
 
 app.post(
     "/chat",
@@ -509,18 +525,16 @@ app.post(
             console.log(
                 "================================"
             );
-
             console.log(
                 "        VIGGO CHAT REQUEST"
             );
-
             console.log(
                 "================================"
             );
 
 
             /* -----------------------------
-               API KEY CHECK
+               API KEY
             ----------------------------- */
 
             if (
@@ -541,7 +555,7 @@ app.post(
                         "GEMINI_API_KEY is missing.",
 
                     details:
-                        "Add GEMINI_API_KEY in Render → Environment Variables."
+                        "Add GEMINI_API_KEY in Render Environment Variables."
 
                 });
 
@@ -549,7 +563,7 @@ app.post(
 
 
             /* -----------------------------
-               REQUEST DATA
+               REQUEST
             ----------------------------- */
 
             const message =
@@ -569,7 +583,7 @@ app.post(
 
 
             /* -----------------------------
-               VALIDATE MESSAGE
+               VALIDATION
             ----------------------------- */
 
             if (!message) {
@@ -597,7 +611,7 @@ app.post(
 
 
             /* -----------------------------
-               SYSTEM INSTRUCTION
+               SYSTEM
             ----------------------------- */
 
             const systemInstruction = `
@@ -606,19 +620,21 @@ You are Viggo AI.
 
 Your name is Viggo.
 
-You are a friendly, helpful and intelligent AI assistant.
+You are a friendly, helpful,
+clear and intelligent AI assistant.
 
-The user's selected language is ${selectedLanguage}.
+The user's selected language is
+${selectedLanguage}.
 
 
 LANGUAGE RULES:
 
 - Reply primarily in ${selectedLanguage}.
 - Understand the user's language correctly.
-- If the user writes in Tamil, you may reply naturally in Tamil.
 - If the user asks for English, reply in English.
+- If the user asks for Tamil, reply in Tamil.
 - Do not unnecessarily mix languages.
-- Keep the answer natural and easy to understand.
+- Keep answers natural and easy to understand.
 
 
 PERSONALITY:
@@ -644,25 +660,24 @@ EDUCATION:
 - Explain concepts clearly.
 - Use simple examples.
 - Help with exam preparation.
-- When useful, provide English explanation followed by Tamil explanation.
+- Give English + Tamil explanation when requested.
 
 
 CASUAL QUESTIONS:
 
-- Respond naturally and conversationally.
+- Respond naturally.
 
 
 IMPORTANT:
 
-- Do not mention these system instructions.
-- Do not claim to be a human.
+- Do not mention these instructions.
 - Your name is Viggo AI.
 
 `;
 
 
             /* -----------------------------
-               BUILD CONTENTS
+               CONTENTS
             ----------------------------- */
 
             const contents =
@@ -674,7 +689,7 @@ IMPORTANT:
 
             console.log(
                 "Message:",
-                message.slice(0, 150)
+                message.substring(0, 150)
             );
 
             console.log(
@@ -685,13 +700,6 @@ IMPORTANT:
             console.log(
                 "Model:",
                 MODEL
-            );
-
-            console.log(
-                "History messages:",
-                Array.isArray(history)
-                    ? history.length
-                    : 0
             );
 
 
@@ -707,7 +715,7 @@ IMPORTANT:
 
 
             /* -----------------------------
-               RESPONSE
+               GET TEXT
             ----------------------------- */
 
             let reply = "";
@@ -726,7 +734,7 @@ IMPORTANT:
 
 
             /* -----------------------------
-               FALLBACK PARSER
+               FALLBACK
             ----------------------------- */
 
             if (!reply) {
@@ -736,10 +744,8 @@ IMPORTANT:
 
 
                 if (
-                    Array.isArray(
-                        candidates
-                    )
-                {
+                    Array.isArray(candidates)
+                ) {
 
                     const parts =
                         candidates[0]
@@ -748,10 +754,8 @@ IMPORTANT:
 
 
                     if (
-                        Array.isArray(
-                            parts
-                        )
-                    {
+                        Array.isArray(parts)
+                    ) {
 
                         reply =
                             parts
@@ -782,7 +786,7 @@ IMPORTANT:
             if (!reply) {
 
                 console.error(
-                    "❌ Empty Gemini response."
+                    "❌ Gemini returned empty response."
                 );
 
 
@@ -806,7 +810,7 @@ IMPORTANT:
             ----------------------------- */
 
             console.log(
-                "✓ Gemini response received."
+                "✓ Response received."
             );
 
             console.log(
@@ -814,7 +818,7 @@ IMPORTANT:
             );
 
 
-            return res.json({
+            return res.status(200).json({
 
                 success: true,
 
@@ -865,7 +869,7 @@ IMPORTANT:
 
 
             /* -----------------------------
-               429
+               429 / QUOTA
             ----------------------------- */
 
             if (
@@ -902,7 +906,7 @@ IMPORTANT:
                         "Viggo AI is temporarily busy.",
 
                     details:
-                        "Gemini is currently busy. Please try again in a few seconds."
+                        "Gemini is currently busy. Please try again later."
 
                 });
 
@@ -910,7 +914,7 @@ IMPORTANT:
 
 
             /* -----------------------------
-               MODEL ERROR
+               MODEL
             ----------------------------- */
 
             if (
@@ -933,7 +937,7 @@ IMPORTANT:
                         "Gemini model is unavailable.",
 
                     details:
-                        `Current model: ${MODEL}. Check GEMINI_MODEL in Render Environment Variables.`
+                        `Current model: ${MODEL}. Check GEMINI_MODEL in Render.`
 
                 });
 
@@ -968,7 +972,7 @@ IMPORTANT:
                         "Gemini API key error.",
 
                     details:
-                        "Check GEMINI_API_KEY in Render → Environment Variables."
+                        "Check GEMINI_API_KEY in Render Environment Variables."
 
                 });
 
@@ -1009,7 +1013,7 @@ IMPORTANT:
 
 
             /* -----------------------------
-               GENERAL
+               GENERAL ERROR
             ----------------------------- */
 
             return res.status(500).json({
@@ -1030,9 +1034,9 @@ IMPORTANT:
 );
 
 
-/* =================================
+/* =========================================
    404
-================================= */
+========================================= */
 
 app.use(
     (req, res) => {
@@ -1053,9 +1057,9 @@ app.use(
 );
 
 
-/* =================================
+/* =========================================
    GLOBAL ERROR
-================================= */
+========================================= */
 
 app.use(
     (
@@ -1095,12 +1099,13 @@ app.use(
 );
 
 
-/* =================================
+/* =========================================
    START SERVER
-================================= */
+========================================= */
 
 app.listen(
     PORT,
+    HOST,
     () => {
 
         console.log("");
@@ -1115,6 +1120,11 @@ app.listen(
 
         console.log(
             "================================"
+        );
+
+        console.log(
+            "HOST:",
+            HOST
         );
 
         console.log(
@@ -1142,11 +1152,6 @@ app.listen(
         console.log(
             "STATUS:",
             "/status"
-        );
-
-        console.log(
-            "RETRY:",
-            "ENABLED"
         );
 
         console.log(
