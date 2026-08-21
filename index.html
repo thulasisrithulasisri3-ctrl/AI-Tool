@@ -15,9 +15,7 @@
     <div class="sidebar-header">
       <h2>Viggo AI</h2>
 
-      <button id="closeSidebar" class="icon-btn" title="Close">
-        ✕
-      </button>
+      <button id="closeSidebar" class="icon-btn">✕</button>
     </div>
 
     <button id="newChat" class="new-chat">
@@ -26,11 +24,7 @@
 
     <div class="search-box">
       🔎
-      <input
-        type="text"
-        id="searchChat"
-        placeholder="Search Chat"
-      >
+      <input id="searchChat" type="text" placeholder="Search Chat">
     </div>
 
     <div class="history-title">
@@ -39,7 +33,7 @@
 
     <div id="chatHistory" class="chat-history"></div>
 
-    <!-- ONLY NEW MORE BUTTON -->
+    <!-- MORE BUTTON AT BOTTOM -->
     <div class="sidebar-more">
 
       <button id="moreBtn" class="more-button">
@@ -50,31 +44,31 @@
       <div id="moreMenu" class="more-menu">
 
         <button id="voiceMenuBtn">
-          🎤 <span>Voice</span>
+          🎤 Voice
         </button>
 
         <button id="languageBtn">
-          🌐 <span>Language</span>
+          🌐 Language
         </button>
 
         <button id="clearChatBtn">
-          🗑 <span>Clear Chat</span>
+          🗑 Clear Chat
         </button>
 
         <button id="showHistoryBtn">
-          🕘 <span>Show History</span>
+          🕘 Show History
         </button>
 
         <button id="savedChatsBtn">
-          💾 <span>Saved Chats</span>
+          💾 Saved Chats
         </button>
 
         <button id="selectChatsBtn">
-          ☑ <span>Select Chats</span>
+          ☑ Select Chats
         </button>
 
         <button id="deleteSelectedBtn">
-          🗑 <span>Delete Selected</span>
+          🗑 Delete Selected
         </button>
 
       </div>
@@ -90,66 +84,36 @@
     <!-- TOP BAR -->
     <header class="topbar">
 
-      <button id="openSidebar" class="menu-btn">
-        ☰
-      </button>
+      <div class="top-left">
 
-      <div class="brand">
-        Viggo AI
-      </div>
-
-      <div class="top-actions">
-
-        <button id="topMoreBtn" class="top-more-btn">
-          ⋮
+        <button id="openSidebar" class="menu-btn">
+          ☰
         </button>
 
-        <div id="topMoreMenu" class="top-more-menu">
-
-          <button id="topVoiceBtn">
-            🎤 Voice
-          </button>
-
-          <button id="topLanguageBtn">
-            🌐 Language
-          </button>
-
-          <button id="topClearBtn">
-            🗑 Clear Chat
-          </button>
-
-          <button id="topHistoryBtn">
-            🕘 Show History
-          </button>
-
-          <button id="topSavedBtn">
-            💾 Saved Chats
-          </button>
-
-          <button id="topSelectBtn">
-            ☑ Select Chats
-          </button>
-
-          <button id="topDeleteBtn">
-            🗑 Delete Selected
-          </button>
-
+        <div class="brand">
+          Viggo AI
         </div>
 
       </div>
 
+
+      <!-- SHARE ON RIGHT SIDE -->
+      <button id="shareBtn" class="share-btn">
+        🔗 Share
+      </button>
+
     </header>
 
 
-    <!-- CHAT AREA -->
-    <section id="chatArea" class="chat-area">
+    <!-- CHAT -->
+    <section class="chat-area">
 
       <div id="conversation" class="conversation"></div>
 
     </section>
 
 
-    <!-- INPUT AREA -->
+    <!-- INPUT -->
     <div class="input-area">
 
       <button id="plusBtn" class="input-plus">
@@ -162,11 +126,11 @@
         placeholder="Message Viggo AI..."
       ></textarea>
 
-      <button id="mic" class="input-icon" title="Voice">
+      <button id="mic" class="input-icon">
         🎤
       </button>
 
-      <button id="send" class="send-btn" title="Send">
+      <button id="send" class="send-btn">
         ➤
       </button>
 
@@ -202,15 +166,11 @@
 
     <div class="modal-box">
 
-      <button class="modal-close" id="closeVoice">
+      <button id="closeVoice" class="modal-close">
         ✕
       </button>
 
       <h3>Voice Settings</h3>
-
-      <label>
-        Voice
-      </label>
 
       <select id="voiceSelect">
         <option value="female">Female</option>
@@ -231,7 +191,7 @@
 
     <div class="modal-box">
 
-      <button class="modal-close" id="closeLanguage">
+      <button id="closeLanguage" class="modal-close">
         ✕
       </button>
 
