@@ -47,6 +47,8 @@
     </div>
 
 
+    <!-- NEW CHAT -->
+
     <button
       id="newChat"
       class="new-chat"
@@ -55,23 +57,30 @@
     </button>
 
 
+    <!-- SEARCH -->
+
     <div class="search-box">
 
-      🔎
+      <span>🔎</span>
 
       <input
         id="searchChat"
         type="text"
         placeholder="Search Chat"
+        autocomplete="off"
       >
 
     </div>
 
 
+    <!-- HISTORY TITLE -->
+
     <div class="history-title">
       CHAT HISTORY
     </div>
 
+
+    <!-- CHAT HISTORY -->
 
     <div
       id="chatHistory"
@@ -79,13 +88,16 @@
     ></div>
 
 
-    <!-- MORE -->
+    <!-- =======================================
+         MORE
+    ======================================== -->
 
     <div class="sidebar-more">
 
       <button
         id="moreBtn"
         class="more-button"
+        type="button"
       >
 
         <span class="more-dots">
@@ -104,37 +116,58 @@
         class="more-menu"
       >
 
-        <button id="voiceMenuBtn">
+        <button
+          id="voiceMenuBtn"
+          type="button"
+        >
           🎤 Voice
         </button>
 
 
-        <button id="languageBtn">
+        <button
+          id="languageBtn"
+          type="button"
+        >
           🌐 Language
         </button>
 
 
-        <button id="clearChatBtn">
+        <button
+          id="clearChatBtn"
+          type="button"
+        >
           🗑 Clear Chat
         </button>
 
 
-        <button id="showHistoryBtn">
+        <button
+          id="showHistoryBtn"
+          type="button"
+        >
           🕘 Show History
         </button>
 
 
-        <button id="savedChatsBtn">
+        <button
+          id="savedChatsBtn"
+          type="button"
+        >
           💾 Saved Chats
         </button>
 
 
-        <button id="selectChatsBtn">
+        <button
+          id="selectChatsBtn"
+          type="button"
+        >
           ☑ Select Chats
         </button>
 
 
-        <button id="deleteSelectedBtn">
+        <button
+          id="deleteSelectedBtn"
+          type="button"
+        >
           🗑 Delete Selected
         </button>
 
@@ -162,6 +195,8 @@
         <button
           id="openSidebar"
           class="menu-btn"
+          type="button"
+          aria-label="Open sidebar"
         >
           ☰
         </button>
@@ -179,6 +214,7 @@
       <button
         id="shareBtn"
         class="share-btn"
+        type="button"
       >
         🔗 Share
       </button>
@@ -187,9 +223,9 @@
 
 
 
-    <!-- =======================================
+    <!-- =========================================
          CHAT AREA
-    ======================================== -->
+    ========================================== -->
 
     <section class="chat-area">
 
@@ -202,9 +238,9 @@
 
 
 
-    <!-- =======================================
+    <!-- =========================================
          INPUT AREA
-    ======================================== -->
+    ========================================== -->
 
     <div class="input-area">
 
@@ -214,6 +250,8 @@
       <button
         id="plusBtn"
         class="input-plus"
+        type="button"
+        aria-label="More options"
       >
         ＋
       </button>
@@ -225,6 +263,7 @@
         id="message"
         rows="1"
         placeholder="Message Viggo AI..."
+        autocomplete="off"
       ></textarea>
 
 
@@ -233,6 +272,8 @@
       <button
         id="mic"
         class="input-icon"
+        type="button"
+        aria-label="Voice input"
       >
         🎤
       </button>
@@ -243,6 +284,8 @@
       <button
         id="send"
         class="send-btn"
+        type="button"
+        aria-label="Send message"
       >
         ➤
       </button>
@@ -262,22 +305,31 @@
     class="plus-menu"
   >
 
-    <button>
+    <button
+      type="button"
+    >
       📷 Photo
     </button>
 
 
-    <button>
+    <button
+      type="button"
+    >
       🎥 Video
     </button>
 
 
-    <button>
+    <button
+      type="button"
+    >
       📎 File
     </button>
 
 
-    <button id="plusVoiceBtn">
+    <button
+      id="plusVoiceBtn"
+      type="button"
+    >
       🎤 Voice
     </button>
 
@@ -300,6 +352,7 @@
       <button
         id="closeVoice"
         class="modal-close"
+        type="button"
       >
         ✕
       </button>
@@ -326,6 +379,7 @@
       <button
         id="voiceTest"
         class="modal-button"
+        type="button"
       >
         🔊 Test Voice
       </button>
@@ -351,6 +405,7 @@
       <button
         id="closeLanguage"
         class="modal-close"
+        type="button"
       >
         ✕
       </button>
@@ -393,6 +448,7 @@
       <button
         id="saveLanguage"
         class="modal-button"
+        type="button"
       >
         Save
       </button>
@@ -404,53 +460,16 @@
 
 
   <!-- =========================================
-       SERVICE WORKER
+       NO SERVICE WORKER
+       
+       IMPORTANT:
+       Service Worker intentionally removed
+       to prevent old cache problems.
   ========================================== -->
-
-  <script>
-
-    if ("serviceWorker" in navigator) {
-
-      window.addEventListener(
-        "load",
-        () => {
-
-          navigator.serviceWorker
-            .register(
-              "/AI-Tool/service-worker.js?v=100"
-            )
-            .then(
-              registration => {
-
-                console.log(
-                  "Viggo Service Worker registered:",
-                  registration.scope
-                );
-
-              }
-            )
-            .catch(
-              error => {
-
-                console.error(
-                  "Service Worker error:",
-                  error
-                );
-
-              }
-            );
-
-        }
-      );
-
-    }
-
-  </script>
-
 
 
   <!-- =========================================
-       MAIN SCRIPT
+       MAIN JAVASCRIPT
   ========================================== -->
 
   <script src="script.js?v=100"></script>
