@@ -1,892 +1,760 @@
-/* =========================================
-   RESET
-========================================= */
+/* =========================================================
+   VIGGO AI - FULL RESPONSIVE CSS
+   Desktop + Mobile
+========================================================= */
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html,
 body {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #05070d;
+  color: #ffffff;
+  overflow: hidden;
 }
 
-body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: #050b18;
-    color: #ffffff;
-    overflow: hidden;
+/* =========================================================
+   APP
+========================================================= */
+
+.app {
+  width: 100%;
+  height: 100dvh;
+  display: flex;
+  overflow: hidden;
+  background: #05070d;
 }
 
-
-/* =========================================
+/* =========================================================
    SIDEBAR
-========================================= */
+========================================================= */
 
 .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-
-    width: 280px;
-    height: 100vh;
-
-    background: #081225;
-    border-right: 1px solid #172b4d;
-
-    display: flex;
-    flex-direction: column;
-
-    z-index: 1000;
-
-    transition: transform 0.25s ease;
+  width: 280px;
+  height: 100dvh;
+  flex-shrink: 0;
+  background: #080b12;
+  border-right: 1px solid #1b2433;
+  display: flex;
+  flex-direction: column;
+  z-index: 2000;
 }
 
 .sidebar-header {
-    height: 65px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    padding: 0 16px;
-
-    border-bottom: 1px solid #172b4d;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 15px;
+  border-bottom: 1px solid #1b2433;
 }
 
-.sidebar-header h2 {
-    font-size: 21px;
-    color: #ffffff;
+.sidebar-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
 }
 
-.icon-btn {
-    width: 36px;
-    height: 36px;
-
-    border: none;
-    border-radius: 8px;
-
-    background: transparent;
-    color: #ffffff;
-
-    font-size: 20px;
-
-    cursor: pointer;
+.sidebar-close {
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #ffffff;
+  font-size: 22px;
+  cursor: pointer;
 }
 
-.icon-btn:hover {
-    background: #14284a;
+.sidebar-close:hover {
+  background: #151c28;
 }
 
-
-/* =========================================
-   NEW CHAT
-========================================= */
-
-.new-chat {
-    margin: 15px;
-
-    padding: 12px;
-
-    border: 1px solid #2563eb;
-    border-radius: 10px;
-
-    background: #0d2b61;
-    color: #ffffff;
-
-    font-size: 15px;
-
-    cursor: pointer;
+.new-chat-btn {
+  margin: 14px;
+  height: 45px;
+  border: 1px solid #26354a;
+  border-radius: 12px;
+  background: #0d1420;
+  color: #ffffff;
+  font-size: 15px;
+  cursor: pointer;
 }
 
-.new-chat:hover {
-    background: #17479a;
-}
-
-
-/* =========================================
-   SEARCH
-========================================= */
-
-.search-box {
-    margin: 0 15px 15px;
-
-    height: 42px;
-
-    display: flex;
-    align-items: center;
-
-    gap: 8px;
-
-    padding: 0 12px;
-
-    background: #0d1b31;
-
-    border: 1px solid #1b355d;
-    border-radius: 9px;
-}
-
-.search-box input {
-    width: 100%;
-
-    border: none;
-    outline: none;
-
-    background: transparent;
-    color: #ffffff;
-
-    font-size: 14px;
-}
-
-.search-box input::placeholder {
-    color: #7d8ca6;
-}
-
-
-/* =========================================
-   HISTORY
-========================================= */
-
-.history-title {
-    padding: 0 16px 10px;
-
-    color: #6f83a4;
-
-    font-size: 11px;
-    font-weight: bold;
-    letter-spacing: 1px;
+.new-chat-btn:hover {
+  background: #132033;
+  border-color: #247cff;
 }
 
 .chat-history {
-    flex: 1;
-
-    overflow-y: auto;
-
-    padding: 0 10px;
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
 }
 
 .chat-history::-webkit-scrollbar {
-    width: 5px;
+  width: 5px;
 }
 
 .chat-history::-webkit-scrollbar-thumb {
-    background: #24436e;
-    border-radius: 10px;
+  background: #26354a;
+  border-radius: 10px;
 }
 
-
-/* =========================================
-   SIDEBAR MORE
-========================================= */
-
-.sidebar-more {
-    position: relative;
-
-    padding: 10px;
-
-    border-top: 1px solid #172b4d;
+.history-item {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 9px 12px;
+  margin-bottom: 5px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #d7dce5;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
 }
 
-.more-button {
-    width: 100%;
-
-    display: flex;
-    align-items: center;
-
-    gap: 12px;
-
-    padding: 12px;
-
-    border: none;
-    border-radius: 9px;
-
-    background: transparent;
-
-    color: #ffffff;
-
-    cursor: pointer;
-
-    font-size: 15px;
-    text-align: left;
+.history-item:hover {
+  background: #111a28;
 }
 
-.more-button:hover {
-    background: #14284a;
+.history-item.active {
+  background: #142238;
+  color: #ffffff;
 }
 
-.more-dots {
-    font-size: 22px;
-}
-
-
-/* =========================================
-   MORE MENU
-========================================= */
-
-.more-menu {
-    position: absolute;
-
-    left: 10px;
-    right: 10px;
-    bottom: 58px;
-
-    display: none;
-
-    padding: 7px;
-
-    background: #101d33;
-
-    border: 1px solid #24436e;
-    border-radius: 10px;
-
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
-
-    z-index: 5000;
-}
-
-.more-menu.show {
-    display: block;
-}
-
-.more-menu button {
-    width: 100%;
-
-    padding: 10px;
-
-    border: none;
-    border-radius: 7px;
-
-    background: transparent;
-
-    color: #ffffff;
-
-    text-align: left;
-
-    cursor: pointer;
-}
-
-.more-menu button:hover {
-    background: #17376d;
-}
-
-
-/* =========================================
+/* =========================================================
    MAIN
-========================================= */
+========================================================= */
 
 .main {
-    width: calc(100% - 280px);
-    height: 100vh;
-
-    margin-left: 280px;
-
-    display: flex;
-    flex-direction: column;
-
-    background: #050b18;
-
-    transition: all 0.25s ease;
+  flex: 1;
+  min-width: 0;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
 }
 
-
-/* =========================================
+/* =========================================================
    TOP BAR
-========================================= */
+========================================================= */
 
 .topbar {
-    height: 65px;
-
-    flex-shrink: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    padding: 0 18px;
-
-    background: #071022;
-
-    border-bottom: 1px solid #172b4d;
-}
-
-.top-left {
-    display: flex;
-    align-items: center;
-
-    gap: 12px;
-}
-
-.brand {
-    font-size: 20px;
-    font-weight: bold;
+  width: 100%;
+  height: 60px;
+  min-height: 60px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+  border-bottom: 1px solid #1b2433;
+  background: #070a11;
+  z-index: 1000;
 }
 
 .menu-btn {
-    width: 40px;
-    height: 40px;
-
-    border: none;
-    border-radius: 8px;
-
-    background: transparent;
-
-    color: #ffffff;
-
-    font-size: 21px;
-
-    cursor: pointer;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #ffffff;
+  font-size: 22px;
+  cursor: pointer;
 }
 
 .menu-btn:hover {
-    background: #14284a;
+  background: #151c28;
 }
 
-
-/* =========================================
-   SHARE BUTTON
-========================================= */
-
-.share-btn {
-    padding: 9px 14px;
-
-    border: 1px solid #2563eb;
-    border-radius: 8px;
-
-    background: #0c2552;
-
-    color: #ffffff;
-
-    cursor: pointer;
+.logo {
+  margin-left: 10px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
 }
 
-.share-btn:hover {
-    background: #17479a;
+.topbar-spacer {
+  flex: 1;
 }
 
+.share-btn,
+.more-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #ffffff;
+  font-size: 20px;
+  cursor: pointer;
+}
 
-/* =========================================
+.share-btn:hover,
+.more-btn:hover {
+  background: #151c28;
+}
+
+/* =========================================================
    CHAT AREA
-========================================= */
+========================================================= */
 
 .chat-area {
-    flex: 1;
-
-    overflow-y: auto;
-
-    padding: 20px;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px 18px 150px;
+  scroll-behavior: smooth;
 }
 
-.conversation {
-    width: 100%;
-    max-width: 900px;
-
-    margin: 0 auto;
+.chat-area::-webkit-scrollbar {
+  width: 6px;
 }
 
-
-/* =========================================
-   INPUT AREA
-========================================= */
-
-.input-area {
-    position: relative;
-
-    width: calc(100% - 30px);
-    max-width: 900px;
-
-    min-height: 58px;
-
-    margin: 10px auto 18px;
-
-    display: flex;
-    align-items: center;
-
-    gap: 8px;
-
-    padding: 8px 10px;
-
-    background: #0b1629;
-
-    border: 1px solid #1d3b69;
-
-    border-radius: 16px;
-
-    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.25);
+.chat-area::-webkit-scrollbar-thumb {
+  background: #26354a;
+  border-radius: 10px;
 }
 
+/* =========================================================
+   WELCOME
+========================================================= */
 
-/* =========================================
-   PLUS BUTTON
-========================================= */
-
-.input-plus {
-    flex-shrink: 0;
-
-    width: 40px;
-    height: 40px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border: none;
-    border-radius: 50%;
-
-    background: #12366f;
-
-    color: #ffffff;
-
-    font-size: 25px;
-
-    cursor: pointer;
-
-    position: relative;
-
-    z-index: 100000;
-
-    transition: background 0.2s ease,
-                transform 0.2s ease;
+.welcome {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 30px 15px;
 }
 
-.input-plus:hover {
-    background: #1d55a3;
-
-    transform: scale(1.05);
+.welcome-content {
+  max-width: 650px;
 }
 
-.input-plus:active {
-    transform: scale(0.95);
+.welcome h1 {
+  font-size: 38px;
+  margin-bottom: 12px;
 }
 
-
-/* =========================================
-   PLUS MENU
-========================================= */
-
-.plus-menu {
-    position: fixed;
-
-    left: 20px;
-    bottom: 85px;
-
-    width: 180px;
-
-    display: none;
-    flex-direction: column;
-
-    gap: 5px;
-
-    padding: 8px;
-
-    background: #101d33;
-
-    border: 1px solid #2563eb;
-
-    border-radius: 12px;
-
-    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.55);
-
-    z-index: 99999;
+.welcome p {
+  color: #8d98a8;
+  font-size: 16px;
 }
 
-.plus-menu.show {
-    display: flex;
-}
-
-.plus-menu button {
-    width: 100%;
-
-    padding: 11px 13px;
-
-    border: none;
-
-    border-radius: 8px;
-
-    background: transparent;
-
-    color: #ffffff;
-
-    font-size: 15px;
-
-    text-align: left;
-
-    cursor: pointer;
-
-    transition: background 0.15s ease;
-}
-
-.plus-menu button:hover {
-    background: #17376d;
-}
-
-
-/* =========================================
-   MESSAGE TEXTAREA
-========================================= */
-
-#message {
-    flex: 1;
-
-    min-width: 0;
-
-    max-height: 130px;
-
-    resize: none;
-
-    overflow-y: auto;
-
-    padding: 10px 4px;
-
-    border: none;
-    outline: none;
-
-    background: transparent;
-
-    color: #ffffff;
-
-    font-family: inherit;
-    font-size: 15px;
-
-    line-height: 22px;
-}
-
-#message::placeholder {
-    color: #71819e;
-}
-
-
-/* =========================================
-   INPUT ICON
-========================================= */
-
-.input-icon {
-    flex-shrink: 0;
-
-    width: 40px;
-    height: 40px;
-
-    border: none;
-    border-radius: 50%;
-
-    background: transparent;
-
-    color: #ffffff;
-
-    font-size: 19px;
-
-    cursor: pointer;
-}
-
-.input-icon:hover {
-    background: #14284a;
-}
-
-
-/* =========================================
-   SEND BUTTON
-========================================= */
-
-.send-btn {
-    flex-shrink: 0;
-
-    width: 42px;
-    height: 42px;
-
-    border: none;
-    border-radius: 50%;
-
-    background: #1769e0;
-
-    color: #ffffff;
-
-    font-size: 19px;
-
-    cursor: pointer;
-
-    transition: background 0.2s ease,
-                transform 0.2s ease;
-}
-
-.send-btn:hover {
-    background: #2580ff;
-
-    transform: scale(1.05);
-}
-
-.send-btn:active {
-    transform: scale(0.95);
-}
-
-
-/* =========================================
-   MESSAGE BUBBLES
-========================================= */
+/* =========================================================
+   MESSAGES
+========================================================= */
 
 .message {
-    display: flex;
-
-    margin-bottom: 15px;
+  width: 100%;
+  display: flex;
+  margin: 14px 0;
 }
 
 .message.user {
-    justify-content: flex-end;
+  justify-content: flex-end;
 }
 
 .message.ai {
-    justify-content: flex-start;
+  justify-content: flex-start;
 }
 
-.message-bubble {
-    max-width: 75%;
-
-    padding: 12px 15px;
-
-    border-radius: 14px;
-
-    line-height: 1.5;
-
-    white-space: pre-wrap;
-
-    word-wrap: break-word;
+.message-content {
+  max-width: min(760px, 85%);
+  padding: 12px 15px;
+  border-radius: 16px;
+  line-height: 1.55;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
-.message.user .message-bubble {
-    background: #1458b8;
+.message.user .message-content {
+  background: #1769e0;
+  color: #ffffff;
+  border-bottom-right-radius: 5px;
 }
 
-.message.ai .message-bubble {
-    background: #101d33;
-
-    border: 1px solid #1b355d;
+.message.ai .message-content {
+  background: #101722;
+  border: 1px solid #1d2939;
+  color: #e9edf3;
+  border-bottom-left-radius: 5px;
 }
 
+/* =========================================================
+   INPUT WRAPPER
+========================================================= */
 
-/* =========================================
-   MODAL
-========================================= */
+.input-wrapper {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  padding: 12px 18px 18px;
+  background: linear-gradient(
+    to top,
+    #05070d 70%,
+    rgba(5, 7, 13, 0)
+  );
+  z-index: 1500;
+}
 
-.modal {
+/* =========================================================
+   INPUT BOX
+========================================================= */
+
+.input-box {
+  width: 100%;
+  max-width: 850px;
+  margin: 0 auto;
+  min-height: 56px;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 8px;
+  background: #0c111a;
+  border: 1px solid #26354a;
+  border-radius: 18px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+
+/* =========================================================
+   PLUS BUTTON
+========================================================= */
+
+.plus-btn {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border: none;
+  border-radius: 12px;
+  background: #151e2b;
+  color: #ffffff;
+  font-size: 23px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.plus-btn:hover {
+  background: #1d2b40;
+}
+
+/* =========================================================
+   TEXTAREA
+========================================================= */
+
+#messageInput,
+.message-input,
+textarea {
+  flex: 1;
+  min-width: 0;
+  min-height: 40px;
+  max-height: 120px;
+  padding: 10px 8px;
+  resize: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+#messageInput::placeholder,
+.message-input::placeholder,
+textarea::placeholder {
+  color: #697586;
+}
+
+/* =========================================================
+   PHOTO / VIDEO / FILE / VOICE / SEND
+========================================================= */
+
+.photo-btn,
+.video-btn,
+.file-btn,
+.voice-btn,
+.send-btn {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border: none;
+  border-radius: 12px;
+  background: #151e2b;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.photo-btn:hover,
+.video-btn:hover,
+.file-btn:hover,
+.voice-btn:hover {
+  background: #1d2b40;
+}
+
+.send-btn {
+  background: #1769e0;
+  font-size: 19px;
+}
+
+.send-btn:hover {
+  background: #2380ff;
+}
+
+/* =========================================================
+   PLUS MENU
+========================================================= */
+
+.plus-menu {
+  position: absolute;
+  left: 18px;
+  bottom: 82px;
+  width: 210px;
+  padding: 8px;
+  background: #0c111a;
+  border: 1px solid #26354a;
+  border-radius: 14px;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.5);
+  z-index: 3000;
+}
+
+.plus-menu button {
+  width: 100%;
+  height: 42px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: #ffffff;
+  text-align: left;
+  padding: 0 12px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.plus-menu button:hover {
+  background: #151e2b;
+}
+
+/* =========================================================
+   OVERLAY
+========================================================= */
+
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 1800;
+}
+
+.overlay.active {
+  display: block;
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+
+  .sidebar {
     position: fixed;
+    left: -290px;
+    top: 0;
+    transition: left 0.25s ease;
+  }
 
-    inset: 0;
+  .sidebar.open {
+    left: 0;
+  }
 
-    display: none;
-    align-items: center;
-    justify-content: center;
-
-    background: rgba(0, 0, 0, 0.65);
-
-    z-index: 20000;
+  .message-content {
+    max-width: 88%;
+  }
 }
 
-.modal.show {
-    display: flex;
-}
-
-.modal-box {
-    position: relative;
-
-    width: min(90%, 380px);
-
-    padding: 25px;
-
-    background: #0d192d;
-
-    border: 1px solid #2563eb;
-
-    border-radius: 15px;
-
-    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6);
-
-    text-align: center;
-}
-
-.modal-box h3 {
-    margin-bottom: 18px;
-
-    font-size: 20px;
-}
-
-.modal-close {
-    position: absolute;
-
-    top: 10px;
-    right: 10px;
-
-    width: 32px;
-    height: 32px;
-
-    border: none;
-    border-radius: 7px;
-
-    background: transparent;
-
-    color: #ffffff;
-
-    font-size: 18px;
-
-    cursor: pointer;
-}
-
-.modal-close:hover {
-    background: #14284a;
-}
-
-.modal-box select {
-    width: 100%;
-
-    padding: 11px;
-
-    margin-bottom: 15px;
-
-    border: 1px solid #24436e;
-    border-radius: 8px;
-
-    outline: none;
-
-    background: #081225;
-
-    color: #ffffff;
-
-    font-size: 14px;
-}
-
-.modal-button {
-    width: 100%;
-
-    padding: 11px;
-
-    border: none;
-    border-radius: 8px;
-
-    background: #1769e0;
-
-    color: #ffffff;
-
-    cursor: pointer;
-
-    font-size: 14px;
-}
-
-.modal-button:hover {
-    background: #2580ff;
-}
-
-
-/* =========================================
-   SCROLLBARS
-========================================= */
-
-::-webkit-scrollbar {
-    width: 7px;
-}
-
-::-webkit-scrollbar-track {
-    background: #071022;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #1d3b69;
-
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #28548e;
-}
-
-
-/* =========================================
+/* =========================================================
    MOBILE
-========================================= */
+========================================================= */
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
 
-    .sidebar {
-        transform: translateX(-100%);
-    }
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    overflow: hidden;
+  }
 
-    .sidebar.open {
-        transform: translateX(0);
-    }
+  .app {
+    width: 100%;
+    height: 100dvh;
+    min-height: 100dvh;
+    overflow: hidden;
+  }
 
-    .main {
-        width: 100%;
-        margin-left: 0;
-    }
+  .main {
+    width: 100%;
+    height: 100dvh;
+    min-height: 0;
+  }
 
-    .topbar {
-        padding: 0 12px;
-    }
+  /* ---------- TOP BAR ---------- */
 
-    .brand {
-        font-size: 18px;
-    }
+  .topbar {
+    height: 54px;
+    min-height: 54px;
+    padding: 0 8px;
+  }
 
-    .share-btn {
-        padding: 8px 10px;
+  .menu-btn,
+  .share-btn,
+  .more-btn {
+    width: 38px;
+    height: 38px;
+  }
 
-        font-size: 13px;
-    }
+  .logo {
+    margin-left: 6px;
+    font-size: 18px;
+  }
 
-    .chat-area {
-        padding: 12px;
-    }
+  /* ---------- CHAT ---------- */
 
-    .input-area {
-        width: calc(100% - 16px);
+  .chat-area {
+    height: auto;
+    min-height: 0;
+    flex: 1;
+    padding: 12px 10px 125px;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
 
-        margin-bottom: 10px;
+  /* ---------- WELCOME ---------- */
 
-        border-radius: 14px;
-    }
+  .welcome {
+    padding: 20px 12px;
+  }
 
-    .message-bubble {
-        max-width: 88%;
-    }
+  .welcome h1 {
+    font-size: 27px;
+  }
 
-    .plus-menu {
-        left: 10px;
-        bottom: 72px;
+  .welcome p {
+    font-size: 14px;
+  }
 
-        width: 170px;
-    }
+  /* ---------- MESSAGES ---------- */
+
+  .message {
+    margin: 10px 0;
+  }
+
+  .message-content {
+    max-width: 92%;
+    padding: 10px 12px;
+    border-radius: 14px;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+
+  /* ---------- INPUT AREA ---------- */
+
+  .input-wrapper {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 6px 7px calc(7px + env(safe-area-inset-bottom));
+    background: linear-gradient(
+      to top,
+      #05070d 80%,
+      rgba(5, 7, 13, 0)
+    );
+  }
+
+  .input-box {
+    width: 100%;
+    min-height: 50px;
+    max-height: 105px;
+    padding: 5px;
+    gap: 4px;
+    border-radius: 16px;
+  }
+
+  /* ---------- TEXT BOX ---------- */
+
+  #messageInput,
+  .message-input,
+  textarea {
+    min-height: 38px;
+    max-height: 76px;
+    padding: 8px 5px;
+    font-size: 16px;
+    line-height: 1.35;
+  }
+
+  /* ---------- BUTTONS ---------- */
+
+  .plus-btn,
+  .photo-btn,
+  .video-btn,
+  .file-btn,
+  .voice-btn,
+  .send-btn {
+    width: 38px;
+    min-width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 10px;
+  }
+
+  /* Hide extra buttons on very small screens
+     ONLY if your HTML uses these classes */
+  .video-btn {
+    display: none;
+  }
+
+  /* ---------- PLUS MENU ---------- */
+
+  .plus-menu {
+    left: 7px;
+    bottom: 65px;
+    width: 190px;
+    max-width: calc(100vw - 14px);
+  }
+
+  .plus-menu button {
+    height: 40px;
+  }
+
+  /* ---------- SIDEBAR ---------- */
+
+  .sidebar {
+    width: 280px;
+    max-width: 85vw;
+  }
 
 }
 
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
 
-/* =========================================
-   SMALL MOBILE
-========================================= */
+@media (max-width: 380px) {
 
-@media (max-width: 430px) {
+  .topbar {
+    height: 52px;
+    min-height: 52px;
+  }
 
-    .input-area {
-        gap: 4px;
+  .logo {
+    font-size: 17px;
+  }
 
-        padding: 7px;
-    }
+  .chat-area {
+    padding-left: 7px;
+    padding-right: 7px;
+    padding-bottom: 115px;
+  }
 
-    .input-plus,
-    .input-icon {
-        width: 36px;
-        height: 36px;
-    }
+  .message-content {
+    max-width: 94%;
+    font-size: 14px;
+  }
 
-    .send-btn {
-        width: 38px;
-        height: 38px;
-    }
+  .input-wrapper {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
 
-    #message {
-        font-size: 14px;
-    }
+  .input-box {
+    gap: 3px;
+    padding: 4px;
+  }
 
-    .share-btn {
-        font-size: 12px;
-    }
+  .plus-btn,
+  .photo-btn,
+  .file-btn,
+  .voice-btn,
+  .send-btn {
+    width: 35px;
+    min-width: 35px;
+    height: 35px;
+    border-radius: 9px;
+  }
+
+  #messageInput,
+  .message-input,
+  textarea {
+    font-size: 15px;
+  }
+}
+
+/* =========================================================
+   SAFE AREA - ANDROID / MODERN PHONES
+========================================================= */
+
+@supports (padding: env(safe-area-inset-bottom)) {
+
+  .input-wrapper {
+    padding-bottom: calc(
+      8px + env(safe-area-inset-bottom)
+    );
+  }
+
+}
+
+/* =========================================================
+   BUTTON RESET
+========================================================= */
+
+button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+button:focus {
+  outline: none;
+}
+
+/* =========================================================
+   MOBILE TOUCH
+========================================================= */
+
+@media (hover: none) {
+
+  button:hover {
+    background: inherit;
+  }
+
+  button:active {
+    opacity: 0.75;
+  }
 
 }
