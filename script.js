@@ -2,7 +2,7 @@
 
 /* =========================================
    API
-   ========================================= */
+========================================= */
 
 const API_BASE = "https://ai-tool-2-zpul.onrender.com";
 const CHAT_API = `${API_BASE}/chat`;
@@ -12,7 +12,7 @@ console.log("Viggo API:", CHAT_API);
 
 /* =========================================
    ELEMENTS
-   ========================================= */
+========================================= */
 
 const sidebar = document.getElementById("sidebar");
 const openSidebar = document.getElementById("openSidebar");
@@ -33,7 +33,7 @@ const shareBtn = document.getElementById("shareBtn");
 
 /* =========================================
    MODALS
-   ========================================= */
+========================================= */
 
 const voiceModal = document.getElementById("voiceModal");
 const languageModal = document.getElementById("languageModal");
@@ -47,7 +47,7 @@ const saveLanguage = document.getElementById("saveLanguage");
 
 /* =========================================
    DATA
-   ========================================= */
+========================================= */
 
 let chats = JSON.parse(
   localStorage.getItem("viggo_chats") || "[]"
@@ -65,7 +65,7 @@ let speakingButton = null;
 
 /* =========================================
    SAVE CHATS
-   ========================================= */
+========================================= */
 
 function saveChats() {
   localStorage.setItem(
@@ -77,7 +77,7 @@ function saveChats() {
 
 /* =========================================
    NEW CHAT
-   ========================================= */
+========================================= */
 
 function createNewChat() {
 
@@ -105,7 +105,7 @@ function createNewChat() {
 
 /* =========================================
    LOAD CHAT
-   ========================================= */
+========================================= */
 
 function loadChat(id) {
 
@@ -131,7 +131,7 @@ function loadChat(id) {
 
 /* =========================================
    HISTORY
-   ========================================= */
+========================================= */
 
 function renderHistory(filter = "") {
 
@@ -257,7 +257,7 @@ function renderHistory(filter = "") {
 
 /* =========================================
    ADD MESSAGE
-   ========================================= */
+========================================= */
 
 function addMessage(
   role,
@@ -291,7 +291,7 @@ function addMessage(
 
   /* =====================================
      ACTIONS
-     ===================================== */
+  ====================================== */
 
   const actions =
     document.createElement("div");
@@ -421,7 +421,7 @@ function addMessage(
 
   /* =====================================
      SAVE MESSAGE
-     ===================================== */
+  ====================================== */
 
   if (save) {
 
@@ -452,7 +452,7 @@ function addMessage(
 
 /* =========================================
    SPEAKER
-   ========================================= */
+========================================= */
 
 function toggleSpeaker(
   text,
@@ -527,7 +527,7 @@ function toggleSpeaker(
 
 /* =========================================
    LANGUAGE
-   ========================================= */
+========================================= */
 
 function getSpeechLanguage() {
 
@@ -555,7 +555,7 @@ function getSpeechLanguage() {
 
 /* =========================================
    SEND MESSAGE
-   ========================================= */
+========================================= */
 
 async function sendMessage() {
 
@@ -588,7 +588,7 @@ async function sendMessage() {
 
   /* =====================================
      LOADING
-     ===================================== */
+  ====================================== */
 
   const loading =
     document.createElement("div");
@@ -614,7 +614,7 @@ async function sendMessage() {
 
   /* =====================================
      API REQUEST
-     ===================================== */
+  ====================================== */
 
   try {
 
@@ -673,7 +673,7 @@ async function sendMessage() {
 
     /* =====================================
        404 FALLBACK
-       ===================================== */
+  ====================================== */
 
     if (response.status === 404) {
 
@@ -712,7 +712,7 @@ async function sendMessage() {
 
     /* =====================================
        CHECK HTTP STATUS
-       ===================================== */
+  ====================================== */
 
     if (!response.ok) {
 
@@ -749,7 +749,7 @@ async function sendMessage() {
 
     /* =====================================
        READ JSON
-       ===================================== */
+  ====================================== */
 
     const data =
       await response.json();
@@ -776,7 +776,7 @@ async function sendMessage() {
 
     /* =====================================
        GET REPLY
-       ===================================== */
+  ====================================== */
 
     const reply =
       data.reply ||
@@ -795,7 +795,7 @@ async function sendMessage() {
 
     /* =====================================
        DISPLAY AI RESPONSE
-       ===================================== */
+  ====================================== */
 
     addMessage(
       "assistant",
@@ -825,10 +825,6 @@ async function sendMessage() {
     loading.remove();
 
 
-    /* =====================================
-       SHOW ACTUAL ERROR
-       ===================================== */
-
     addMessage(
       "assistant",
       `Viggo AI Error: ${error.message}`,
@@ -840,7 +836,7 @@ async function sendMessage() {
 
 /* =========================================
    EVENT LISTENERS
-   ========================================= */
+========================================= */
 
 messageInput.addEventListener(
   "keydown",
@@ -869,7 +865,7 @@ newChat.onclick =
 
 /* =========================================
    SIDEBAR
-   ========================================= */
+========================================= */
 
 openSidebar.onclick = () => {
 
@@ -891,7 +887,7 @@ closeSidebar.onclick = () => {
 
 /* =========================================
    MORE MENU
-   ========================================= */
+========================================= */
 
 moreBtn.onclick = event => {
 
@@ -926,7 +922,7 @@ moreMenu.onclick =
 
 /* =========================================
    PLUS MENU
-   ========================================= */
+========================================= */
 
 plusBtn.onclick = event => {
 
@@ -945,7 +941,7 @@ plusMenu.onclick =
 
 /* =========================================
    SEARCH
-   ========================================= */
+========================================= */
 
 searchChat.oninput = () => {
 
@@ -958,80 +954,230 @@ searchChat.oninput = () => {
 
 /* =========================================
    SHARE
-   ========================================= */
+   CREATE SHAREABLE LINK
+========================================= */
 
-shareBtn.onclick =
-  async () => {
+shareBtn.onclick = async () => {
 
-    let shareText =
-      "Viggo AI Chat";
+  if (
+    !currentChat ||
+    !currentChat.messages ||
+    currentChat.messages.length === 0
+  ) {
+
+    alert(
+      "There is no chat to share."
+    );
+
+    return;
+  }
+
+
+  try {
+
+    shareBtn.disabled = true;
+
+    shareBtn.innerText =
+      "🔗 Creating...";
+
+
+    /* =====================================
+       SEND CHAT TO SERVER
+    ====================================== */
+
+    const response =
+      await fetch(
+        `${API_BASE}/share`,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            chat: currentChat
+          })
+        }
+      );
+
+
+    if (!response.ok) {
+
+      const errorText =
+        await response.text();
+
+      throw new Error(
+        `Share server error: ${response.status} ${errorText}`
+      );
+    }
+
+
+    const data =
+      await response.json();
 
 
     if (
-      currentChat &&
-      currentChat.messages.length
+      !data.success ||
+      !data.url
     ) {
 
-      shareText =
-        currentChat.messages
-          .map(
-            item =>
-              `${
-                item.role === "user"
-                  ? "You"
-                  : "Viggo AI"
-              }: ${item.text}`
-          )
-          .join("\n\n");
+      throw new Error(
+        data.error ||
+        "Share link could not be created."
+      );
     }
 
+
+    /* =====================================
+       GET SHARE URL
+    ====================================== */
+
+    const shareURL =
+      data.url;
+
+
+    console.log(
+      "Share URL:",
+      shareURL
+    );
+
+
+    /* =====================================
+       CREATE 3-4 LINE PREVIEW
+    ====================================== */
+
+    const preview =
+      currentChat.messages
+        .slice(0, 4)
+        .map(item => {
+
+          const name =
+            item.role === "user"
+              ? "You"
+              : "Viggo AI";
+
+          return `${name}: ${item.text}`;
+
+        })
+        .join("\n");
+
+
+    const shareText =
+      `Viggo AI Chat\n\n${preview}\n\nOpen Chat:\n${shareURL}`;
+
+
+    /* =====================================
+       NATIVE SHARE
+    ====================================== */
 
     if (navigator.share) {
 
       try {
 
         await navigator.share({
+
           title:
-            "Viggo AI",
+            currentChat.title ||
+            "Viggo AI Chat",
 
           text:
-            shareText
+            shareText,
+
+          url:
+            shareURL
+
         });
+
+        return;
 
       } catch (error) {
 
+        if (
+          error &&
+          error.name === "AbortError"
+        ) {
+
+          console.log(
+            "Share cancelled."
+          );
+
+          return;
+        }
+
         console.log(
-          "Share cancelled"
+          "Native share failed:",
+          error
         );
-
       }
-
-      return;
     }
 
 
+    /* =====================================
+       COPY LINK
+    ====================================== */
+
     try {
 
-      await navigator.clipboard
-        .writeText(shareText);
+      await navigator.clipboard.writeText(
+        shareURL
+      );
 
       alert(
-        "Chat copied to clipboard."
+        "Share link copied!\n\n" +
+        "You can now paste it in WhatsApp."
       );
 
     } catch (error) {
 
-      alert(
-        "Sharing is not supported on this device."
+      console.error(
+        "Clipboard error:",
+        error
       );
 
+      prompt(
+        "Copy this share link:",
+        shareURL
+      );
     }
-  };
+
+  } catch (error) {
+
+    console.error(
+      "================================="
+    );
+
+    console.error(
+      "SHARE ERROR"
+    );
+
+    console.error(
+      error
+    );
+
+    console.error(
+      "================================="
+    );
+
+    alert(
+      "Could not create share link.\n\n" +
+      error.message
+    );
+
+  } finally {
+
+    shareBtn.disabled = false;
+
+    shareBtn.innerText =
+      "🔗 Share";
+  }
+};
 
 
 /* =========================================
    VOICE MODAL
-   ========================================= */
+========================================= */
 
 function openVoiceModal() {
 
@@ -1098,7 +1244,7 @@ voiceTest.onclick = () => {
 
 /* =========================================
    LANGUAGE MODAL
-   ========================================= */
+========================================= */
 
 const languageBtn =
   document.getElementById(
@@ -1149,7 +1295,7 @@ saveLanguage.onclick = () => {
 
 /* =========================================
    CLEAR CHAT
-   ========================================= */
+========================================= */
 
 function clearChat() {
 
@@ -1179,7 +1325,7 @@ if (clearChatBtn) {
 
 /* =========================================
    SHOW HISTORY
-   ========================================= */
+========================================= */
 
 const showHistoryBtn =
   document.getElementById(
@@ -1202,7 +1348,7 @@ if (showHistoryBtn) {
 
 /* =========================================
    DELETE ALL CHATS
-   ========================================= */
+========================================= */
 
 const deleteSelectedBtn =
   document.getElementById(
@@ -1239,7 +1385,7 @@ if (deleteSelectedBtn) {
 
 /* =========================================
    SELECT CHATS
-   ========================================= */
+========================================= */
 
 const selectChatsBtn =
   document.getElementById(
@@ -1262,7 +1408,7 @@ if (selectChatsBtn) {
 
 /* =========================================
    SAVED CHATS
-   ========================================= */
+========================================= */
 
 const savedChatsBtn =
   document.getElementById(
@@ -1292,7 +1438,7 @@ if (savedChatsBtn) {
 
 /* =========================================
    MICROPHONE
-   ========================================= */
+========================================= */
 
 let recognition = null;
 
@@ -1374,7 +1520,7 @@ micButton.onclick = () => {
 
 /* =========================================
    TEXTAREA HEIGHT
-   ========================================= */
+========================================= */
 
 messageInput.oninput = () => {
 
@@ -1391,7 +1537,7 @@ messageInput.oninput = () => {
 
 /* =========================================
    HELPERS
-   ========================================= */
+========================================= */
 
 function escapeHTML(text) {
 
@@ -1413,8 +1559,194 @@ function formatText(text) {
 
 
 /* =========================================
+   LOAD SHARED CHAT FROM URL
+========================================= */
+
+async function loadSharedChat() {
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  const shareId =
+    params.get("share");
+
+  if (!shareId) {
+    return false;
+  }
+
+
+  try {
+
+    console.log(
+      "Loading shared chat:",
+      shareId
+    );
+
+
+    /* =====================================
+       GET SHARED CHAT
+    ====================================== */
+
+    const response =
+      await fetch(
+        `${API_BASE}/share/${encodeURIComponent(
+          shareId
+        )}`
+      );
+
+
+    if (!response.ok) {
+
+      const errorText =
+        await response.text();
+
+      throw new Error(
+        `Shared chat server returned ${response.status}: ${errorText}`
+      );
+    }
+
+
+    const data =
+      await response.json();
+
+
+    if (
+      !data.success ||
+      !data.chat
+    ) {
+
+      throw new Error(
+        data.error ||
+        "Invalid shared chat."
+      );
+    }
+
+
+    const sharedChat =
+      data.chat;
+
+
+    /* =====================================
+       CREATE LOCAL CHAT
+    ====================================== */
+
+    const localChat = {
+
+      id:
+        `shared-${Date.now()}`,
+
+      title:
+        sharedChat.title ||
+        "Shared Chat",
+
+      messages:
+        Array.isArray(
+          sharedChat.messages
+        )
+          ? sharedChat.messages
+          : [],
+
+      pinned: false,
+
+      saved: false
+    };
+
+
+    /* =====================================
+       DISPLAY SHARED CHAT
+    ====================================== */
+
+    currentChat =
+      localChat;
+
+    conversation.innerHTML =
+      "";
+
+
+    localChat.messages.forEach(
+      item => {
+
+        addMessage(
+          item.role,
+          item.text,
+          false
+        );
+
+      }
+    );
+
+
+    /* =====================================
+       SAVE TO LOCAL HISTORY
+    ====================================== */
+
+    const alreadyExists =
+      chats.some(
+        chat =>
+          chat.title ===
+            localChat.title &&
+          JSON.stringify(
+            chat.messages
+          ) ===
+            JSON.stringify(
+              localChat.messages
+            )
+      );
+
+
+    if (!alreadyExists) {
+
+      chats.unshift(
+        localChat
+      );
+
+      saveChats();
+
+    }
+
+
+    renderHistory();
+
+
+    /* =====================================
+       REMOVE SHARE QUERY FROM URL
+    ===================================== */
+
+    window.history.replaceState(
+      {},
+      document.title,
+      window.location.pathname
+    );
+
+
+    console.log(
+      "Shared chat loaded successfully."
+    );
+
+    return true;
+
+  } catch (error) {
+
+    console.error(
+      "Shared chat loading error:",
+      error
+    );
+
+    alert(
+      "This shared chat could not be loaded.\n\n" +
+      error.message
+    );
+
+    return false;
+  }
+}
+
+
+/* =========================================
    INITIAL LOAD
-   ========================================= */
+========================================= */
 
 languageSelect.value =
   selectedLanguage;
@@ -1422,9 +1754,35 @@ languageSelect.value =
 renderHistory();
 
 
-if (chats.length > 0) {
+/* =========================================
+   CHECK SHARED CHAT FIRST
+========================================= */
 
-  loadChat(
-    chats[0].id
-  );
-}
+(async () => {
+
+  const loadedSharedChat =
+    await loadSharedChat();
+
+  /*
+    If URL does not contain ?share=...
+    then load the normal local history.
+  */
+
+  if (
+    !loadedSharedChat &&
+    !new URLSearchParams(
+      window.location.search
+    ).has("share")
+  ) {
+
+    if (chats.length > 0) {
+
+      loadChat(
+        chats[0].id
+      );
+
+    }
+
+  }
+
+})();
