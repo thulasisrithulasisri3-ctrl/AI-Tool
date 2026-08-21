@@ -17,22 +17,9 @@ body {
 }
 
 body {
-    font-family:
-        Inter,
-        Arial,
-        Helvetica,
-        sans-serif;
-
+    font-family: Inter, Arial, Helvetica, sans-serif;
     background: #050b14;
     color: #ffffff;
-}
-
-
-/* =====================================================
-   MAIN LAYOUT
-===================================================== */
-
-body {
     display: flex;
 }
 
@@ -43,7 +30,6 @@ body {
 
 .sidebar {
     position: fixed;
-
     left: 0;
     top: 0;
 
@@ -51,7 +37,6 @@ body {
     height: 100vh;
 
     background: #07111f;
-
     border-right: 1px solid #14263d;
 
     display: flex;
@@ -59,8 +44,7 @@ body {
 
     z-index: 1000;
 
-    transition:
-        transform 0.25s ease;
+    transition: transform 0.25s ease;
 }
 
 
@@ -83,7 +67,6 @@ body {
 .sidebar-header h2 {
     font-size: 18px;
     font-weight: 700;
-
     color: #ffffff;
 }
 
@@ -95,11 +78,9 @@ body {
     border-radius: 7px;
 
     background: transparent;
-
     color: #9db2ca;
 
     cursor: pointer;
-
     font-size: 17px;
 }
 
@@ -119,11 +100,9 @@ body {
     height: 40px;
 
     border: 1px solid #164b91;
-
     border-radius: 8px;
 
     background: #0b2443;
-
     color: #dcecff;
 
     font-size: 14px;
@@ -157,7 +136,6 @@ body {
     background: #0a1728;
 
     border: 1px solid #172c45;
-
     border-radius: 8px;
 
     color: #7e94ae;
@@ -170,7 +148,6 @@ body {
     outline: none;
 
     background: transparent;
-
     color: #ffffff;
 
     font-size: 13px;
@@ -251,8 +228,7 @@ body {
 
     cursor: pointer;
 
-    transition:
-        background 0.15s ease;
+    transition: background 0.15s ease;
 }
 
 .history-item:hover {
@@ -284,8 +260,7 @@ body {
     color: #dce8f7;
 }
 
-.history-item.active
-.history-chat-title {
+.history-item.active .history-chat-title {
     color: #ffffff;
 }
 
@@ -306,7 +281,7 @@ body {
 
 
 /* =====================================================
-   HISTORY PIN / DELETE BUTTON
+   PIN / DELETE
 ===================================================== */
 
 .history-action-btn {
@@ -321,7 +296,6 @@ body {
     padding: 0;
 
     border: none;
-
     outline: none;
 
     border-radius: 5px;
@@ -337,7 +311,6 @@ body {
 
 .history-action-btn:hover {
     background: #132b4a;
-
     color: #ffffff;
 }
 
@@ -345,22 +318,18 @@ body {
     transform: scale(0.92);
 }
 
-
-/* PIN */
-
 .history-action-btn:first-child {
     color: #6fa8ff;
 }
-
-
-/* DELETE */
 
 .history-action-btn:last-child {
     color: #8da7c5;
 }
 
 
-/* SELECT */
+/* =====================================================
+   SELECT BUTTON
+===================================================== */
 
 .select-btn {
     color: #62a8ff !important;
@@ -437,8 +406,7 @@ body {
 
     border-radius: 10px;
 
-    box-shadow:
-        0 12px 35px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
 
     z-index: 1200;
 }
@@ -471,8 +439,68 @@ body {
 
 .more-menu button:hover {
     background: #102b4b;
+    color: #ffffff;
+}
+
+
+/* =====================================================
+   VIGGO PROFILE
+===================================================== */
+
+.viggo-profile {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    padding: 10px 12px;
+
+    background: #07111f;
+
+    border-top: 1px solid #14263d;
+
+    flex-shrink: 0;
+}
+
+.viggo-avatar,
+.viggo-profile img {
+    width: 38px;
+    height: 38px;
+
+    min-width: 38px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    border: 1px solid #2364a8;
+
+    background: #0c2542;
+}
+
+.viggo-profile-info {
+    min-width: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 2px;
+}
+
+.viggo-profile-name {
+    font-size: 13px;
+
+    font-weight: 700;
 
     color: #ffffff;
+}
+
+.viggo-profile-status {
+    font-size: 10px;
+
+    color: #6fa8ff;
 }
 
 
@@ -699,10 +727,11 @@ body {
 }
 
 
-/* AI BUBBLE */
+/* =====================================================
+   AI BUBBLE - LEFT
+===================================================== */
 
-.message.ai
-.message-bubble {
+.message.ai .message-bubble {
     background: #0c1828;
 
     border: 1px solid #172d47;
@@ -713,10 +742,11 @@ body {
 }
 
 
-/* USER BUBBLE */
+/* =====================================================
+   USER BUBBLE - RIGHT
+===================================================== */
 
-.message.user
-.message-bubble {
+.message.user .message-bubble {
     background: #0c3b70;
 
     border: 1px solid #145ca5;
@@ -741,25 +771,17 @@ body {
     margin-top: 5px;
 }
 
-
-/* AI actions LEFT */
-
-.message.ai
-.message-actions {
+.message.ai .message-actions {
     justify-content: flex-start;
 }
 
-
-/* USER actions RIGHT */
-
-.message.user
-.message-actions {
+.message.user .message-actions {
     justify-content: flex-end;
 }
 
 
 /* =====================================================
-   ACTION BUTTONS
+   MESSAGE ACTION BUTTONS
 ===================================================== */
 
 .message-actions button {
@@ -796,7 +818,7 @@ body {
 
     max-width: 900px;
 
-    margin: 0 auto;
+    margin: 0 auto 12px;
 
     min-height: 58px;
 
@@ -814,7 +836,9 @@ body {
 
     border-radius: 13px;
 
-    margin-bottom: 12px;
+    position: relative;
+
+    z-index: 100;
 }
 
 
@@ -822,49 +846,56 @@ body {
    PLUS BUTTON
 ===================================================== */
 
+#plusBtn,
 .input-plus {
-    width: 36px;
-    height: 36px;
+    width: 38px !important;
+    height: 38px !important;
 
-    flex-shrink: 0;
+    min-width: 38px !important;
+    min-height: 38px !important;
 
-    border: 1px solid #1a456f;
+    flex-shrink: 0 !important;
 
-    border-radius: 8px;
+    display: flex !important;
 
-    background: #0b1e34;
+    align-items: center !important;
+    justify-content: center !important;
 
-    color: #a9cfff;
+    border: 1px solid #1d5fa7 !important;
 
-    font-size: 21px;
+    border-radius: 9px !important;
 
-    line-height: 1;
+    background: #0b2443 !important;
 
-    cursor: pointer;
+    color: #7dbaff !important;
 
-    display: flex;
+    font-size: 22px !important;
 
-    align-items: center;
+    line-height: 1 !important;
 
-    justify-content: center;
+    cursor: pointer !important;
 
-    pointer-events: auto;
+    visibility: visible !important;
 
-    position: relative;
+    opacity: 1 !important;
 
-    z-index: 20;
+    position: relative !important;
+
+    z-index: 100 !important;
 }
 
+#plusBtn:hover,
 .input-plus:hover {
-    background: #12365a;
+    background: #123b68 !important;
 
-    border-color: #2a75bd;
+    border-color: #3287e6 !important;
 
-    color: #ffffff;
+    color: #ffffff !important;
 }
 
+#plusBtn:active,
 .input-plus:active {
-    transform: scale(0.94);
+    transform: scale(0.92);
 }
 
 
@@ -973,6 +1004,7 @@ body {
    PLUS MENU
 ===================================================== */
 
+#plusMenu,
 .plus-menu {
     position: fixed;
 
@@ -996,14 +1028,20 @@ body {
 
     border-radius: 10px;
 
-    box-shadow:
-        0 12px 35px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
 
-    z-index: 2000;
+    z-index: 9999 !important;
+
+    pointer-events: auto;
 }
 
+#plusMenu.show,
 .plus-menu.show {
-    display: flex;
+    display: flex !important;
+
+    visibility: visible !important;
+
+    opacity: 1 !important;
 }
 
 .plus-menu button {
@@ -1072,8 +1110,7 @@ body {
 
     border: 1px solid #1b395c;
 
-    box-shadow:
-        0 20px 60px rgba(0, 0, 0, 0.55);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
 }
 
 .modal-box h3 {
@@ -1108,7 +1145,6 @@ body {
     position: absolute;
 
     top: 8px;
-
     right: 8px;
 
     width: 30px;
@@ -1161,13 +1197,11 @@ body {
     .sidebar {
         width: 245px;
 
-        transform:
-            translateX(-100%);
+        transform: translateX(-100%);
     }
 
     .sidebar.open {
-        transform:
-            translateX(0);
+        transform: translateX(0);
     }
 
     .main {
@@ -1191,8 +1225,7 @@ body {
     }
 
     .conversation {
-        padding:
-            14px 10px 18px;
+        padding: 14px 10px 18px;
     }
 
     .message {
@@ -1204,8 +1237,7 @@ body {
     }
 
     .message-bubble {
-        padding:
-            9px 11px;
+        padding: 9px 11px;
 
         font-size: 13px;
 
@@ -1221,8 +1253,7 @@ body {
     .message-actions button {
         font-size: 10px;
 
-        padding:
-            2px 4px;
+        padding: 2px 4px;
     }
 
     .input-area {
@@ -1230,16 +1261,28 @@ body {
 
         min-height: 52px;
 
-        margin:
-            0 7px 7px;
+        margin: 0 7px 7px;
 
-        padding:
-            6px 7px;
+        padding: 6px 7px;
 
         border-radius: 11px;
+
+        gap: 5px;
     }
 
-    .input-plus,
+    #plusBtn,
+    .input-plus {
+        width: 36px !important;
+        height: 36px !important;
+
+        min-width: 36px !important;
+        min-height: 36px !important;
+
+        display: flex !important;
+
+        font-size: 20px !important;
+    }
+
     .input-icon,
     .send-btn {
         width: 34px;
@@ -1263,8 +1306,7 @@ body {
     .history-item {
         min-height: 34px;
 
-        padding:
-            4px 6px;
+        padding: 4px 6px;
     }
 
     .history-chat-title {
@@ -1276,6 +1318,18 @@ body {
         height: 22px;
 
         font-size: 11px;
+    }
+
+    .viggo-profile {
+        padding: 9px 10px;
+    }
+
+    .viggo-avatar,
+    .viggo-profile img {
+        width: 34px;
+        height: 34px;
+
+        min-width: 34px;
     }
 }
 
@@ -1297,8 +1351,7 @@ body {
     }
 
     .conversation {
-        padding:
-            10px 7px 15px;
+        padding: 10px 7px 15px;
     }
 
     .message-content {
@@ -1308,8 +1361,7 @@ body {
     .message-bubble {
         font-size: 12px;
 
-        padding:
-            8px 10px;
+        padding: 8px 10px;
     }
 
     .message-actions button {
@@ -1317,17 +1369,38 @@ body {
     }
 
     .input-area {
-        margin:
-            0 5px 5px;
+        margin: 0 5px 5px;
 
         gap: 4px;
     }
 
-    .input-plus,
+    #plusBtn,
+    .input-plus {
+        width: 34px !important;
+        height: 34px !important;
+
+        min-width: 34px !important;
+        min-height: 34px !important;
+
+        font-size: 19px !important;
+    }
+
     .input-icon,
     .send-btn {
         width: 32px;
         height: 32px;
+    }
+
+    .viggo-profile {
+        padding: 8px;
+    }
+
+    .viggo-avatar,
+    .viggo-profile img {
+        width: 32px;
+        height: 32px;
+
+        min-width: 32px;
     }
 }
 
@@ -1339,8 +1412,7 @@ body {
 button {
     font-family: inherit;
 
-    -webkit-tap-highlight-color:
-        transparent;
+    -webkit-tap-highlight-color: transparent;
 }
 
 button:focus {
@@ -1349,7 +1421,7 @@ button:focus {
 
 
 /* =====================================================
-   PREVENT MENU FROM GOING BEHIND INPUT
+   MENU FIX
 ===================================================== */
 
 .plus-menu,
