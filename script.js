@@ -110,7 +110,6 @@ document.body.appendChild(videoInput);
 const fileInput = document.createElement("input");
 
 fileInput.type = "file";
-
 fileInput.style.display = "none";
 
 document.body.appendChild(fileInput);
@@ -121,12 +120,34 @@ document.body.appendChild(fileInput);
 ===================================================== */
 
 let chats =
-    JSON.parse(localStorage.getItem("viggoChats") || "[]");
+    JSON.parse(
+        localStorage.getItem("viggoChats") || "[]"
+    );
 
 let currentChatId =
     localStorage.getItem("viggoCurrentChatId");
 
 let selectingChats = false;
+
+
+/* =====================================================
+   SAVED / LIKED DATA
+===================================================== */
+
+let savedMessages =
+    JSON.parse(
+        localStorage.getItem("viggoSavedMessages") || "[]"
+    );
+
+
+function saveSavedMessages() {
+
+    localStorage.setItem(
+        "viggoSavedMessages",
+        JSON.stringify(savedMessages)
+    );
+
+}
 
 
 /* =====================================================
@@ -246,19 +267,39 @@ function renderHistory(filter = "") {
             item.textContent =
                 chat.title || "New Chat";
 
+
             item.addEventListener(
                 "mouseenter",
                 () => {
-                    item.style.background =
-                        "#14284a";
+
+                    if (
+                        item.dataset.selected !==
+                        "true"
+                    ) {
+
+                        item.style.background =
+                            "#14284a";
+
+                    }
+
                 }
             );
+
 
             item.addEventListener(
                 "mouseleave",
                 () => {
-                    item.style.background =
-                        "transparent";
+
+                    if (
+                        item.dataset.selected !==
+                        "true"
+                    ) {
+
+                        item.style.background =
+                            "transparent";
+
+                    }
+
                 }
             );
 
@@ -283,15 +324,20 @@ function renderHistory(filter = "") {
 
                     }
 
-                    currentChatId = chat.id;
+
+                    currentChatId =
+                        chat.id;
 
                     saveChats();
 
                     renderConversation();
 
+
                     if (window.innerWidth <= 768) {
 
-                        sidebar.classList.remove("open");
+                        sidebar.classList.remove(
+                            "open"
+                        );
 
                     }
 
@@ -302,6 +348,226 @@ function renderHistory(filter = "") {
             chatHistory.appendChild(item);
 
         });
+
+}
+
+
+/* =====================================================
+   MESSAGE ACTIONS
+===================================================== */
+
+function saveMessage(messageData) {
+
+    const exists =
+        savedMessages.some(
+            item =>
+                item.chatId === messageData.chatId &&
+                item.messageId === messageData.messageId
+        );
+
+    if (!exists) {
+
+        savedMessages.push(messageData);
+
+        saveSavedMessages();
+
+        alert("Message saved.");
+
+    } else {
+
+        savedMessages =
+            savedMessages.filter(
+                item =>
+                    !(
+                        item.chatId === messageData.chatId &&
+                        item.messageId === messageData.messageId
+                    )
+            );
+
+        saveSavedMessages();
+
+        alert("Message removed from saved.");
+
+    }
+
+}
+
+
+/* =====================================================
+   COPY MESSAGE
+===================================================== */
+
+async function copyMessage(text) {
+
+    try {
+
+        await navigator.clipboard.writeText(text);
+
+        alert("Message copied.");
+
+    } catch (error) {
+
+        console.error(
+            "Copy error:",
+            error
+        );
+
+        const textarea =
+            document.createElement("textarea");
+
+        textarea.value = text;
+
+        document.body.appendChild(textarea);
+
+        textarea.select();
+
+        document.execCommand("copy");
+
+        textarea.remove();
+
+        alert("Message copied.");
+
+    }
+
+}
+
+
+/* =====================================================
+   LIKE MESSAGE
+===================================================== */
+
+function toggleLike(chatId, messageId) {
+
+    const chat =
+        chats.find(
+            item => item.id === chatId
+        );
+
+    if (!chat) return;
+
+    const msg =
+        chat.messages.find(
+            item => item.id === messageId
+        );
+
+    if (!msg) return;
+
+    msg.liked =
+        !Boolean(msg.liked);
+
+    saveChats();
+
+    renderConversation();
+
+}
+
+
+/* =====================================================
+   DELETE MESSAGE
+===================================================== */
+
+function deleteMessage(chatId, messageId) {
+
+    const chat =
+        chats.find(
+            item => item.id === chatId
+        );
+
+    if (!chat) return;
+
+
+    chat.messages =
+        chat.messages.filter(
+            item =>
+                item.id !== messageId
+        );
+
+
+    savedMessages =
+        savedMessages.filter(
+            item =>
+                !(
+                    item.chatId === chatId &&
+                    item.messageId === messageId
+                )
+        );
+
+
+    saveChats();
+
+    saveSavedMessages();
+
+    renderConversation();
+
+}
+
+
+/* =====================================================
+   PIN MESSAGE
+===================================================== */
+
+function togglePin(chatId, messageId) {
+
+    const chat =
+        chats.find(
+            item => item.id === chatId
+        );
+
+    if (!chat) return;
+
+
+    const msg =
+        chat.messages.find(
+            item => item.id === messageId
+        );
+
+    if (!msg) return;
+
+
+    msg.pinned =
+        !Boolean(msg.pinned);
+
+
+    saveChats();
+
+    renderConversation();
+
+}
+
+
+/* =====================================================
+   CREATE MESSAGE ACTION BUTTON
+===================================================== */
+
+function createActionButton(
+    text,
+    title,
+    clickHandler
+) {
+
+    const button =
+        document.createElement("button");
+
+    button.type = "button";
+
+    button.textContent = text;
+
+    button.title = title;
+
+    button.addEventListener(
+        "click",
+        function (event) {
+
+            event.preventDefault();
+
+            event.stopPropagation();
+
+            clickHandler();
+
+        }
+    );
+
+    return button;
 
 }
 
@@ -320,11 +586,31 @@ function renderConversation() {
 
     if (!chat) return;
 
-    chat.messages.forEach(
-        msg => addMessageToUI(
-            msg.role,
-            msg.text
+
+    /* -----------------------------------------
+       PINNED MESSAGES FIRST
+    ----------------------------------------- */
+
+    const messages = [
+        ...chat.messages.filter(
+            msg => msg.pinned
+        ),
+        ...chat.messages.filter(
+            msg => !msg.pinned
         )
+    ];
+
+
+    messages.forEach(
+        msg => {
+
+            addMessageToUI(
+                msg.role,
+                msg.text,
+                msg
+            );
+
+        }
     );
 
 }
@@ -334,15 +620,57 @@ function renderConversation() {
    ADD MESSAGE UI
 ===================================================== */
 
-function addMessageToUI(role, text) {
+function addMessageToUI(
+    role,
+    text,
+    messageData = null
+) {
 
     const wrapper =
         document.createElement("div");
+
 
     wrapper.className =
         "message " +
         (role === "user" ? "user" : "ai");
 
+
+    if (
+        messageData?.pinned
+    ) {
+
+        wrapper.classList.add(
+            "pinned"
+        );
+
+    }
+
+
+    /* -----------------------------------------
+       MESSAGE ROW
+    ----------------------------------------- */
+
+    const row =
+        document.createElement("div");
+
+    row.className =
+        "message-row";
+
+
+    /* -----------------------------------------
+       CONTENT
+    ----------------------------------------- */
+
+    const content =
+        document.createElement("div");
+
+    content.className =
+        "message-content";
+
+
+    /* -----------------------------------------
+       BUBBLE
+    ----------------------------------------- */
 
     const bubble =
         document.createElement("div");
@@ -353,9 +681,191 @@ function addMessageToUI(role, text) {
     bubble.textContent = text;
 
 
-    wrapper.appendChild(bubble);
+    content.appendChild(
+        bubble
+    );
 
-    conversation.appendChild(wrapper);
+
+    /* -----------------------------------------
+       ACTIONS
+       SAVE / COPY / LIKE
+    ----------------------------------------- */
+
+    if (messageData) {
+
+        const actions =
+            document.createElement("div");
+
+        actions.className =
+            "message-actions";
+
+
+        const saveBtn =
+            createActionButton(
+                "💾 Save",
+                "Save message",
+                function () {
+
+                    saveMessage({
+
+                        chatId:
+                            currentChatId,
+
+                        messageId:
+                            messageData.id,
+
+                        role:
+                            messageData.role,
+
+                        text:
+                            messageData.text,
+
+                        savedAt:
+                            Date.now()
+
+                    });
+
+                }
+            );
+
+
+        const copyBtn =
+            createActionButton(
+                "📋 Copy",
+                "Copy message",
+                function () {
+
+                    copyMessage(
+                        messageData.text
+                    );
+
+                }
+            );
+
+
+        const likeBtn =
+            createActionButton(
+                messageData.liked
+                    ? "❤️ Liked"
+                    : "👍 Like",
+
+                "Like message",
+
+                function () {
+
+                    toggleLike(
+                        currentChatId,
+                        messageData.id
+                    );
+
+                }
+            );
+
+
+        actions.appendChild(
+            saveBtn
+        );
+
+        actions.appendChild(
+            copyBtn
+        );
+
+        actions.appendChild(
+            likeBtn
+        );
+
+
+        content.appendChild(
+            actions
+        );
+
+    }
+
+
+    /* -----------------------------------------
+       SIDE ACTIONS
+       DELETE / PIN
+    ----------------------------------------- */
+
+    if (messageData) {
+
+        const sideActions =
+            document.createElement("div");
+
+        sideActions.className =
+            "message-side-actions";
+
+
+        const deleteBtn =
+            createActionButton(
+                "🗑",
+                "Delete message",
+                function () {
+
+                    deleteMessage(
+                        currentChatId,
+                        messageData.id
+                    );
+
+                }
+            );
+
+
+        const pinBtn =
+            createActionButton(
+                messageData.pinned
+                    ? "📌"
+                    : "📍",
+
+                messageData.pinned
+                    ? "Unpin message"
+                    : "Pin message",
+
+                function () {
+
+                    togglePin(
+                        currentChatId,
+                        messageData.id
+                    );
+
+                }
+            );
+
+
+        sideActions.appendChild(
+            deleteBtn
+        );
+
+        sideActions.appendChild(
+            pinBtn
+        );
+
+
+        row.appendChild(
+            content
+        );
+
+        row.appendChild(
+            sideActions
+        );
+
+    } else {
+
+        row.appendChild(
+            content
+        );
+
+    }
+
+
+    wrapper.appendChild(
+        row
+    );
+
+    conversation.appendChild(
+        wrapper
+    );
+
 
     conversation.scrollTop =
         conversation.scrollHeight;
@@ -367,23 +877,49 @@ function addMessageToUI(role, text) {
    ADD MESSAGE
 ===================================================== */
 
-function addMessage(role, text) {
+function addMessage(
+    role,
+    text
+) {
 
     ensureChat();
 
-    const chat = getCurrentChat();
+    const chat =
+        getCurrentChat();
 
     if (!chat) return;
 
-    chat.messages.push({
 
-        role: role,
+    const newMessage = {
 
-        text: text,
+        id:
+            Date.now().toString() +
+            "-" +
+            Math.random()
+                .toString(36)
+                .substring(2, 8),
 
-        time: Date.now()
+        role:
+            role,
 
-    });
+        text:
+            text,
+
+        time:
+            Date.now(),
+
+        liked:
+            false,
+
+        pinned:
+            false
+
+    };
+
+
+    chat.messages.push(
+        newMessage
+    );
 
 
     if (
@@ -399,7 +935,11 @@ function addMessage(role, text) {
 
     saveChats();
 
-    addMessageToUI(role, text);
+    addMessageToUI(
+        role,
+        text,
+        newMessage
+    );
 
     renderHistory();
 
@@ -413,6 +953,7 @@ function addMessage(role, text) {
 async function sendMessage() {
 
     if (!message) return;
+
 
     const text =
         message.value.trim();
@@ -431,7 +972,8 @@ async function sendMessage() {
 
     message.value = "";
 
-    message.style.height = "auto";
+    message.style.height =
+        "auto";
 
 
     const loading =
@@ -440,10 +982,15 @@ async function sendMessage() {
     loading.className =
         "message ai";
 
+
     loading.innerHTML =
         '<div class="message-bubble">Thinking...</div>';
 
-    conversation.appendChild(loading);
+
+    conversation.appendChild(
+        loading
+    );
+
 
     conversation.scrollTop =
         conversation.scrollHeight;
@@ -452,32 +999,39 @@ async function sendMessage() {
     try {
 
         const response =
-            await fetch(API_URL, {
+            await fetch(
+                API_URL,
+                {
 
-                method: "POST",
+                    method: "POST",
 
-                headers: {
+                    headers: {
 
-                    "Content-Type":
-                        "application/json"
+                        "Content-Type":
+                            "application/json"
 
-                },
+                    },
 
-                body: JSON.stringify({
+                    body:
+                        JSON.stringify({
 
-                    message: text,
+                            message:
+                                text,
 
-                    chatId: currentChatId
+                            chatId:
+                                currentChatId
 
-                })
+                        })
 
-            });
+                }
+            );
 
 
         if (!response.ok) {
 
             throw new Error(
-                "HTTP " + response.status
+                "HTTP " +
+                response.status
             );
 
         }
@@ -568,7 +1122,8 @@ if (message) {
         "input",
         function () {
 
-            this.style.height = "auto";
+            this.style.height =
+                "auto";
 
             this.style.height =
                 Math.min(
@@ -625,6 +1180,7 @@ const photoBtn =
         "button:nth-child(1)"
     );
 
+
 if (photoBtn) {
 
     photoBtn.addEventListener(
@@ -648,6 +1204,7 @@ const videoBtn =
         "button:nth-child(2)"
     );
 
+
 if (videoBtn) {
 
     videoBtn.addEventListener(
@@ -670,6 +1227,7 @@ const fileBtn =
     plusMenu?.querySelector(
         "button:nth-child(3)"
     );
+
 
 if (fileBtn) {
 
@@ -695,14 +1253,17 @@ photoInput.addEventListener(
 
         if (!this.files.length) return;
 
+
         const file =
             this.files[0];
+
 
         addMessage(
             "user",
             "📷 Photo selected: " +
             file.name
         );
+
 
         plusMenu.classList.remove(
             "show"
@@ -722,14 +1283,17 @@ videoInput.addEventListener(
 
         if (!this.files.length) return;
 
+
         const file =
             this.files[0];
+
 
         addMessage(
             "user",
             "🎥 Video selected: " +
             file.name
         );
+
 
         plusMenu.classList.remove(
             "show"
@@ -749,14 +1313,17 @@ fileInput.addEventListener(
 
         if (!this.files.length) return;
 
+
         const file =
             this.files[0];
+
 
         addMessage(
             "user",
             "📎 File selected: " +
             file.name
         );
+
 
         plusMenu.classList.remove(
             "show"
@@ -781,6 +1348,7 @@ if (plusVoiceBtn) {
                     "voiceModal"
                 );
 
+
             if (modal) {
 
                 modal.classList.add(
@@ -788,6 +1356,7 @@ if (plusVoiceBtn) {
                 );
 
             }
+
 
             plusMenu.classList.remove(
                 "show"
@@ -944,6 +1513,7 @@ if (voiceMenuBtn) {
                     "voiceModal"
                 );
 
+
             if (modal) {
 
                 modal.classList.add(
@@ -951,6 +1521,7 @@ if (voiceMenuBtn) {
                 );
 
             }
+
 
             moreMenu.classList.remove(
                 "show"
@@ -977,6 +1548,7 @@ if (languageBtn) {
                     "languageModal"
                 );
 
+
             if (modal) {
 
                 modal.classList.add(
@@ -984,6 +1556,7 @@ if (languageBtn) {
                 );
 
             }
+
 
             moreMenu.classList.remove(
                 "show"
@@ -1008,13 +1581,27 @@ if (clearChatBtn) {
             const chat =
                 getCurrentChat();
 
+
             if (!chat) return;
+
 
             chat.messages = [];
 
+
+            savedMessages =
+                savedMessages.filter(
+                    item =>
+                        item.chatId !==
+                        currentChatId
+                );
+
+
             saveChats();
 
+            saveSavedMessages();
+
             renderConversation();
+
 
             moreMenu.classList.remove(
                 "show"
@@ -1111,30 +1698,35 @@ if (deleteSelectedBtn) {
 
             }
 
-            const selected =
-                Array.from(
-                    chatHistory.children
-                );
 
-            selected.forEach(
-                (item, index) => {
+            const selectedIds = [];
+
+
+            Array.from(
+                chatHistory.children
+            ).forEach(
+                item => {
 
                     if (
                         item.dataset.selected ===
                         "true"
                     ) {
 
+                        const title =
+                            item.textContent;
+
                         const chat =
-                            chats[index];
+                            chats.find(
+                                c =>
+                                    c.title ===
+                                    title
+                            );
 
                         if (chat) {
 
-                            chats =
-                                chats.filter(
-                                    c =>
-                                        c.id !==
-                                        chat.id
-                                );
+                            selectedIds.push(
+                                chat.id
+                            );
 
                         }
 
@@ -1142,6 +1734,15 @@ if (deleteSelectedBtn) {
 
                 }
             );
+
+
+            chats =
+                chats.filter(
+                    chat =>
+                        !selectedIds.includes(
+                            chat.id
+                        )
+                );
 
 
             if (!getCurrentChat()) {
@@ -1153,6 +1754,7 @@ if (deleteSelectedBtn) {
 
 
             selectingChats = false;
+
 
             saveChats();
 
@@ -1192,6 +1794,7 @@ if (closeVoice) {
                     "voiceModal"
                 );
 
+
             modal?.classList.remove(
                 "show"
             );
@@ -1212,6 +1815,7 @@ if (closeLanguage) {
                 document.getElementById(
                     "languageModal"
                 );
+
 
             modal?.classList.remove(
                 "show"
@@ -1237,6 +1841,7 @@ if (mic) {
                 window.SpeechRecognition ||
                 window.webkitSpeechRecognition;
 
+
             if (!SpeechRecognition) {
 
                 alert(
@@ -1251,9 +1856,14 @@ if (mic) {
             const recognition =
                 new SpeechRecognition();
 
-            recognition.lang = "en-IN";
 
-            recognition.interimResults = false;
+            recognition.lang =
+                "en-IN";
+
+
+            recognition.interimResults =
+                false;
+
 
             recognition.start();
 
@@ -1297,6 +1907,7 @@ if (shareBtn) {
             const chat =
                 getCurrentChat();
 
+
             if (!chat) return;
 
 
@@ -1320,9 +1931,11 @@ if (shareBtn) {
                     shareText
                 );
 
+
                 alert(
                     "Chat copied to clipboard."
                 );
+
 
             } catch (error) {
 
@@ -1363,7 +1976,10 @@ document.addEventListener(
    INITIALIZE
 ===================================================== */
 
-if (!currentChatId || !getCurrentChat()) {
+if (
+    !currentChatId ||
+    !getCurrentChat()
+) {
 
     if (chats.length === 0) {
 
@@ -1380,6 +1996,54 @@ if (!currentChatId || !getCurrentChat()) {
 
 }
 
+
+/* =====================================================
+   OLD MESSAGE COMPATIBILITY
+===================================================== */
+
+chats.forEach(
+    chat => {
+
+        chat.messages.forEach(
+            msg => {
+
+                if (!msg.id) {
+
+                    msg.id =
+                        Date.now().toString() +
+                        "-" +
+                        Math.random()
+                            .toString(36)
+                            .substring(2, 8);
+
+                }
+
+                if (
+                    typeof msg.liked !==
+                    "boolean"
+                ) {
+
+                    msg.liked = false;
+
+                }
+
+                if (
+                    typeof msg.pinned !==
+                    "boolean"
+                ) {
+
+                    msg.pinned = false;
+
+                }
+
+            }
+        );
+
+    }
+);
+
+
+saveChats();
 
 renderHistory();
 
