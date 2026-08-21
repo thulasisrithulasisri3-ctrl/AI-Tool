@@ -4,12 +4,15 @@
 /* =========================================
    API
    ========================================= */
+"use strict";
 
 const API_BASE =
-      " https://ai-tool-2-zpul.onrender.com";
+  "https://ai-tool-2-zpul.onrender.com";
 
 const CHAT_API =
   `${API_BASE}/chat`;
+
+console.log("Viggo API:", CHAT_API);
 
 
 /* =========================================
