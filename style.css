@@ -9,7 +9,6 @@
   --sidebar: #07123a;
   --panel: #0a1748;
   --blue: #1769ff;
-  --bright-blue: #2675ff;
   --border: #315bd0;
   --text: #ffffff;
   --muted: #9caee8;
@@ -18,7 +17,7 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
   background: var(--bg);
-  color: var(--text);
+  color: white;
   height: 100vh;
   overflow: hidden;
 }
@@ -64,9 +63,6 @@ body {
   cursor: pointer;
 }
 
-
-/* NEW CHAT */
-
 .new-chat {
   width: 100%;
   height: 43px;
@@ -77,15 +73,11 @@ body {
   font-size: 15px;
   font-weight: bold;
   cursor: pointer;
-  box-shadow: 0 0 8px rgba(30, 100, 255, .25);
 }
 
 .new-chat:hover {
   background: #0c2868;
 }
-
-
-/* SEARCH */
 
 .search-box {
   margin-top: 12px;
@@ -110,9 +102,6 @@ body {
 .search-box input::placeholder {
   color: #9aa9d7;
 }
-
-
-/* HISTORY */
 
 .history-title {
   margin-top: 25px;
@@ -153,18 +142,12 @@ body {
 .delete-history-btn {
   border: none;
   background: transparent;
-  color: #ff8bd5;
+  color: white;
   cursor: pointer;
-  font-size: 15px;
 }
 
 
 /* ================= MORE ================= */
-
-/*
-   THIS IS THE REQUESTED BUTTON
-   ⋮ More
-*/
 
 .sidebar-more {
   position: relative;
@@ -193,11 +176,7 @@ body {
 
 .more-dots {
   font-size: 23px;
-  line-height: 1;
 }
-
-
-/* MORE MENU */
 
 .more-menu {
   position: absolute;
@@ -209,15 +188,14 @@ body {
   border-radius: 10px;
   padding: 7px;
   display: none;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, .45);
+  box-shadow: 0 8px 30px rgba(0,0,0,.45);
 }
 
 .more-menu.show {
   display: block;
 }
 
-.more-menu button,
-.top-more-menu button {
+.more-menu button {
   width: 100%;
   border: none;
   background: transparent;
@@ -229,8 +207,7 @@ body {
   font-size: 13px;
 }
 
-.more-menu button:hover,
-.top-more-menu button:hover {
+.more-menu button:hover {
   background: #102861;
 }
 
@@ -252,16 +229,22 @@ body {
 }
 
 
-/* TOPBAR */
+/* ================= TOP BAR ================= */
 
 .topbar {
   height: 62px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  padding: 0 16px;
+  justify-content: space-between;
+  padding: 0 18px;
   border-bottom: 1px solid #203b8e;
-  background: rgba(5, 13, 45, .8);
+  background: rgba(5,13,45,.8);
+}
+
+.top-left {
+  display: flex;
+  align-items: center;
 }
 
 .menu-btn {
@@ -279,34 +262,25 @@ body {
   color: #2b80ff;
 }
 
-.top-actions {
-  margin-left: auto;
-  position: relative;
-}
 
-.top-more-btn {
-  border: none;
-  background: transparent;
+/* ================= SHARE ================= */
+
+/*
+   SHARE IS ON THE RIGHT SIDE
+*/
+
+.share-btn {
+  border: 1px solid #315bd0;
+  background: #081941;
   color: white;
-  font-size: 23px;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 14px;
   cursor: pointer;
 }
 
-.top-more-menu {
-  position: absolute;
-  top: 38px;
-  right: 0;
-  width: 175px;
-  padding: 7px;
-  background: #07163e;
-  border: 1px solid #315bd0;
-  border-radius: 10px;
-  display: none;
-  z-index: 500;
-}
-
-.top-more-menu.show {
-  display: block;
+.share-btn:hover {
+  background: #1769ff;
 }
 
 
@@ -322,9 +296,6 @@ body {
   max-width: 1000px;
   margin: 0 auto;
 }
-
-
-/* MESSAGE */
 
 .message {
   width: 100%;
@@ -360,7 +331,7 @@ body {
 }
 
 
-/* ================= ACTION BUTTONS ================= */
+/* ================= MESSAGE BUTTONS ================= */
 
 .message-actions {
   display: flex;
@@ -384,20 +355,14 @@ body {
   background: #163477;
 }
 
-
-/*
-   SPEAKER IS ONLY HERE
-   NEXT TO LIKE
-*/
+.message-action.active {
+  background: #1769ff;
+  border-color: #4388ff;
+}
 
 .message-action.speaker {
   min-width: 34px;
   padding: 5px 8px;
-}
-
-.message-action.speaker.active {
-  background: #1769ff;
-  border-color: #4388ff;
 }
 
 
@@ -415,7 +380,7 @@ body {
   gap: 9px;
   background: linear-gradient(
     180deg,
-    rgba(5, 11, 36, .1),
+    rgba(5,11,36,.1),
     #050b24 45%
   );
 }
@@ -503,7 +468,7 @@ body {
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, .65);
+  background: rgba(0,0,0,.65);
   display: none;
   align-items: center;
   justify-content: center;
@@ -588,5 +553,9 @@ body {
 
   .message-bubble {
     max-width: 94%;
+  }
+
+  .share-btn {
+    padding: 7px 10px;
   }
 }
