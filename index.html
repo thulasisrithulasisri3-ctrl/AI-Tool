@@ -1,2042 +1,261 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Viggo AI</title>
-
-<style>
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-    font-family:Arial,sans-serif;
-}
-
-body{
-    height:100vh;
-    background:#050b16;
-    color:#fff;
-    overflow:hidden;
-}
-
-.app{
-    display:flex;
-    height:100vh;
-}
-
-/* ================= SIDEBAR ================= */
-
-.sidebar{
-    width:280px;
-    background:#07101f;
-    border-right:1px solid #12345c;
-    display:flex;
-    flex-direction:column;
-    transition:.3s;
-}
-
-.sidebar-header{
-    padding:15px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    border-bottom:1px solid #12345c;
-}
-
-.logo{
-    font-size:22px;
-    font-weight:bold;
-    color:#1683ff;
-}
-
-.close-sidebar{
-    border:0;
-    background:none;
-    color:#fff;
-    font-size:22px;
-    cursor:pointer;
-}
-
-.new-chat{
-    margin:15px;
-    padding:12px;
-    border:1px solid #1677ff;
-    border-radius:10px;
-    cursor:pointer;
-    font-size:15px;
-    background:#0b1d38;
-    color:#fff;
-}
-
-.new-chat:hover{
-    background:#0d47a1;
-}
-
-.search-box{
-    margin:0 15px 10px;
-    padding:10px;
-    border:1px solid #12345c;
-    border-radius:9px;
-    outline:none;
-    background:#050b16;
-    color:#fff;
-}
-
-.search-box::placeholder{
-    color:#789;
-}
-
-.history{
-    flex:1;
-    overflow-y:auto;
-    padding:8px;
-}
-
-.history-title{
-    font-size:13px;
-    color:#7f9abb;
-    padding:8px;
-}
-
-.history-item{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    padding:10px;
-    border-radius:9px;
-    margin-bottom:4px;
-}
-
-.history-item:hover{
-    background:#0c1e35;
-}
-
-.chat-name{
-    flex:1;
-    overflow:hidden;
-    white-space:nowrap;
-    text-overflow:ellipsis;
-    cursor:pointer;
-}
-
-.history-btn{
-    width:30px;
-    height:30px;
-    border:0;
-    background:transparent;
-    color:#fff;
-    cursor:pointer;
-    border-radius:6px;
-}
-
-.history-btn:hover{
-    background:#12345c;
-}
-
-/* ================= MAIN ================= */
-
-.main{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    min-width:0;
-}
-
-.topbar{
-    height:65px;
-    display:flex;
-    align-items:center;
-    padding:0 15px;
-    border-bottom:1px solid #12345c;
-    background:#07101f;
-    position:relative;
-}
-
-.menu-btn{
-    border:0;
-    background:none;
-    color:#fff;
-    font-size:24px;
-    cursor:pointer;
-    margin-right:12px;
-}
-
-.title{
-    flex:1;
-    font-size:20px;
-    font-weight:bold;
-    color:#1683ff;
-}
-
-.hint-btn{
-    border:0;
-    background:none;
-    color:#fff;
-    font-size:20px;
-    cursor:pointer;
-    margin-right:8px;
-}
-
-.more-btn{
-    border:0;
-    background:none;
-    color:#fff;
-    font-size:25px;
-    cursor:pointer;
-}
-
-/* ================= MORE MENU ================= */
-
-.more-menu{
-    position:absolute;
-    right:15px;
-    top:55px;
-    width:245px;
-    background:#07101f;
-    border:1px solid #1677ff;
-    border-radius:12px;
-    box-shadow:0 5px 25px rgba(0,0,0,.5);
-    display:none;
-    z-index:1000;
-    overflow:hidden;
-}
-
-.more-menu.show{
-    display:block;
-}
-
-.more-item{
-    padding:13px 15px;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    gap:12px;
-    font-size:14px;
-}
-
-.more-item:hover{
-    background:#0d47a1;
-}
-
-.more-item span:first-child{
-    width:22px;
-    text-align:center;
-}
-
-/* ================= CHAT ================= */
-
-.chat-area{
-    flex:1;
-    overflow-y:auto;
-    padding:25px;
-}
-
-.welcome{
-    height:100%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-}
-
-.welcome h1{
-    font-size:30px;
-    color:#1683ff;
-}
-
-.welcome p{
-    color:#789;
-    margin-top:8px;
-}
-
-.message{
-    max-width:80%;
-    margin:12px 0;
-    padding:13px 15px;
-    border-radius:14px;
-    line-height:1.5;
-    word-wrap:break-word;
-}
-
-.user{
-    margin-left:auto;
-    background:#0d47a1;
-    color:#fff;
-}
-
-.ai{
-    margin-right:auto;
-    background:#0a1424;
-    border:1px solid #12345c;
-    color:#fff;
-}
-
-.message-actions{
-    display:flex;
-    gap:7px;
-    margin-top:7px;
-    flex-wrap:wrap;
-}
-
-.message-actions button{
-    border:1px solid #12345c;
-    background:#07101f;
-    color:#fff;
-    padding:6px 9px;
-    border-radius:7px;
-    cursor:pointer;
-}
-
-.message-actions button:hover{
-    background:#0d47a1;
-}
-
-/* ================= INPUT ================= */
-
-.input-area{
-    padding:12px 15px;
-    border-top:1px solid #12345c;
-    background:#07101f;
-}
-
-.input-box{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    border:1px solid #12345c;
-    border-radius:15px;
-    padding:7px;
-    background:#050b16;
-}
-
-.plus-wrapper{
-    position:relative;
-    display:flex;
-    align-items:center;
-}
-
-.plus-btn,
-.voice-btn,
-.send-btn{
-    border:0;
-    background:transparent;
-    color:#fff;
-    cursor:pointer;
-    font-size:19px;
-    width:38px;
-    height:38px;
-    border-radius:9px;
-}
-
-.plus-btn:hover,
-.voice-btn:hover,
-.send-btn:hover{
-    background:#0d47a1;
-}
-
-/* ================= PLUS MENU ================= */
-
-.plus-menu{
-    position:absolute;
-    left:0;
-    bottom:48px;
-    width:170px;
-    background:#07101f;
-    border:1px solid #1677ff;
-    border-radius:12px;
-    padding:7px;
-    display:none;
-    flex-direction:column;
-    gap:4px;
-    box-shadow:0 8px 25px rgba(0,0,0,.5);
-    z-index:3000;
-}
-
-.plus-menu.show{
-    display:flex;
-}
-
-.plus-menu button{
-    border:0;
-    background:transparent;
-    color:#fff;
-    text-align:left;
-    padding:11px;
-    border-radius:8px;
-    cursor:pointer;
-    font-size:14px;
-}
-
-.plus-menu button:hover{
-    background:#0d47a1;
-}
-
-.message-input{
-    flex:1;
-    border:0;
-    outline:none;
-    resize:none;
-    min-height:38px;
-    max-height:120px;
-    padding:9px;
-    background:transparent;
-    color:#fff;
-}
-
-.message-input::placeholder{
-    color:#789;
-}
-
-/* ================= MODAL ================= */
-
-.modal{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.65);
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index:2000;
-}
-
-.modal.show{
-    display:flex;
-}
-
-.modal-box{
-    width:min(420px,90%);
-    max-height:80vh;
-    overflow-y:auto;
-    background:#07101f;
-    border:1px solid #1677ff;
-    border-radius:15px;
-    padding:20px;
-}
-
-.modal-header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    margin-bottom:15px;
-}
-
-.modal-close{
-    border:0;
-    background:none;
-    color:#fff;
-    font-size:22px;
-    cursor:pointer;
-}
-
-.option{
-    padding:13px;
-    border:1px solid #12345c;
-    border-radius:9px;
-    margin:8px 0;
-    cursor:pointer;
-}
-
-.option:hover{
-    background:#0d47a1;
-}
-
-.saved-item{
-    padding:10px;
-    border-bottom:1px solid #12345c;
-}
-
-/* ================= MOBILE ================= */
-
-@media(max-width:700px){
-
-    .sidebar{
-        position:fixed;
-        left:-290px;
-        top:0;
-        bottom:0;
-        z-index:1500;
-    }
-
-    .sidebar.open{
-        left:0;
-    }
-
-    .chat-area{
-        padding:15px;
-    }
-
-    .message{
-        max-width:90%;
-    }
-
-    .title{
-        font-size:18px;
-    }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Viggo AI</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<div class="app">
-
-<!-- ================= SIDEBAR ================= -->
-
-<aside class="sidebar" id="sidebar">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
 
     <div class="sidebar-header">
-        <div class="logo">Viggo AI</div>
+      <h2>Viggo AI</h2>
 
-        <button
-            class="close-sidebar"
-            onclick="closeSidebar()">
-            ✕
-        </button>
+      <button id="closeSidebar" class="icon-btn" title="Close">
+        ✕
+      </button>
     </div>
 
-    <button
-        class="new-chat"
-        onclick="newChat()">
-        ＋ New Chat
+    <button id="newChat" class="new-chat">
+      ＋ New Chat
     </button>
 
-    <input
-        id="searchChat"
-        class="search-box"
+    <div class="search-box">
+      🔎
+      <input
         type="text"
-        placeholder="🔎 Search Chat"
-        oninput="searchChats()"
-    >
+        id="searchChat"
+        placeholder="Search Chat"
+      >
+    </div>
 
-    <div class="history">
+    <div class="history-title">
+      CHAT HISTORY
+    </div>
 
-        <div class="history-title">
-            CHAT HISTORY
-        </div>
+    <div id="chatHistory" class="chat-history"></div>
 
-        <div id="historyList"></div>
+    <!-- ONLY NEW MORE BUTTON -->
+    <div class="sidebar-more">
+
+      <button id="moreBtn" class="more-button">
+        <span class="more-dots">⋮</span>
+        <span>More</span>
+      </button>
+
+      <div id="moreMenu" class="more-menu">
+
+        <button id="voiceMenuBtn">
+          🎤 <span>Voice</span>
+        </button>
+
+        <button id="languageBtn">
+          🌐 <span>Language</span>
+        </button>
+
+        <button id="clearChatBtn">
+          🗑 <span>Clear Chat</span>
+        </button>
+
+        <button id="showHistoryBtn">
+          🕘 <span>Show History</span>
+        </button>
+
+        <button id="savedChatsBtn">
+          💾 <span>Saved Chats</span>
+        </button>
+
+        <button id="selectChatsBtn">
+          ☑ <span>Select Chats</span>
+        </button>
+
+        <button id="deleteSelectedBtn">
+          🗑 <span>Delete Selected</span>
+        </button>
+
+      </div>
 
     </div>
 
-</aside>
+  </aside>
 
 
-<!-- ================= MAIN ================= -->
+  <!-- MAIN -->
+  <main class="main">
 
-<main class="main">
+    <!-- TOP BAR -->
+    <header class="topbar">
 
-    <div class="topbar">
+      <button id="openSidebar" class="menu-btn">
+        ☰
+      </button>
 
-        <button
-            class="menu-btn"
-            onclick="openSidebar()">
-            ☰
+      <div class="brand">
+        Viggo AI
+      </div>
+
+      <div class="top-actions">
+
+        <button id="topMoreBtn" class="top-more-btn">
+          ⋮
         </button>
 
-        <div class="title">
-            Viggo AI
-        </div>
+        <div id="topMoreMenu" class="top-more-menu">
 
-        <button
-            class="hint-btn"
-            onclick="showHint()">
-            💡
-        </button>
+          <button id="topVoiceBtn">
+            🎤 Voice
+          </button>
 
-        <button
-            class="more-btn"
-            onclick="toggleMore()">
-            ⋮
-        </button>
+          <button id="topLanguageBtn">
+            🌐 Language
+          </button>
 
-        <!-- MORE MENU -->
+          <button id="topClearBtn">
+            🗑 Clear Chat
+          </button>
 
-        <div
-            class="more-menu"
-            id="moreMenu">
+          <button id="topHistoryBtn">
+            🕘 Show History
+          </button>
 
-            <div
-                class="more-item"
-                onclick="openVoiceSettings()">
-                <span>🎤</span>
-                <span>Voice</span>
-            </div>
+          <button id="topSavedBtn">
+            💾 Saved Chats
+          </button>
 
-            <div
-                class="more-item"
-                onclick="openVoiceGender()">
-                <span>👩</span>
-                <span>Voice / Female - Male</span>
-            </div>
+          <button id="topSelectBtn">
+            ☑ Select Chats
+          </button>
 
-            <div
-                class="more-item"
-                onclick="openLanguages()">
-                <span>🌐</span>
-                <span>Language</span>
-            </div>
-
-            <div
-                class="more-item"
-                onclick="clearCurrentChat()">
-                <span>🗑️</span>
-                <span>Clear Chat</span>
-            </div>
-
-            <div
-                class="more-item"
-                onclick="showHistory()">
-                <span>📜</span>
-                <span>Show History</span>
-            </div>
-
-            <div
-                class="more-item"
-                onclick="showSavedChats()">
-                <span>💾</span>
-                <span>Saved Chats</span>
-            </div>
-
-            <div
-                class="more-item"
-                onclick="selectChats()">
-                <span>☑️</span>
-                <span>Select Chats</span>
-            </div>
-
-            <div
-                class="more-item"
-                onclick="deleteSelectedChats()">
-                <span>🗑️</span>
-                <span>Delete Selected</span>
-            </div>
+          <button id="topDeleteBtn">
+            🗑 Delete Selected
+          </button>
 
         </div>
 
-    </div>
+      </div>
+
+    </header>
 
 
-    <!-- ================= CHAT ================= -->
+    <!-- CHAT AREA -->
+    <section id="chatArea" class="chat-area">
 
-    <section
-        class="chat-area"
-        id="chatArea">
-
-        <div
-            class="welcome"
-            id="welcome">
-
-            <div>
-
-                <h1>Viggo AI</h1>
-
-                <p>
-                    How can I help you?
-                </p>
-
-            </div>
-
-        </div>
+      <div id="conversation" class="conversation"></div>
 
     </section>
 
 
-    <!-- ================= INPUT ================= -->
-
+    <!-- INPUT AREA -->
     <div class="input-area">
 
-        <div class="input-box">
+      <button id="plusBtn" class="input-plus">
+        ＋
+      </button>
 
-            <!-- PLUS -->
+      <textarea
+        id="message"
+        rows="1"
+        placeholder="Message Viggo AI..."
+      ></textarea>
 
-            <div class="plus-wrapper">
+      <button id="mic" class="input-icon" title="Voice">
+        🎤
+      </button>
 
-                <button
-                    class="plus-btn"
-                    onclick="togglePlus(event)">
-                    ＋
-                </button>
-
-                <div
-                    class="plus-menu"
-                    id="plusMenu">
-
-                    <button
-                        onclick="photoInput.click(); closePlusMenu();">
-                        📷 Photo
-                    </button>
-
-                    <button
-                        onclick="videoInput.click(); closePlusMenu();">
-                        🎥 Video
-                    </button>
-
-                    <button
-                        onclick="fileInput.click(); closePlusMenu();">
-                        📎 File
-                    </button>
-
-                </div>
-
-            </div>
-
-
-            <!-- MESSAGE -->
-
-            <textarea
-                id="messageInput"
-                class="message-input"
-                placeholder="Message Viggo AI..."
-                onkeydown="handleEnter(event)"
-            ></textarea>
-
-
-            <!-- VOICE -->
-
-            <button
-                class="voice-btn"
-                onclick="startVoice()">
-                🎤
-            </button>
-
-
-            <!-- SEND -->
-
-            <button
-                class="send-btn"
-                onclick="sendMessage()">
-                ➤
-            </button>
-
-        </div>
+      <button id="send" class="send-btn" title="Send">
+        ➤
+      </button>
 
     </div>
 
-</main>
-
-</div>
+  </main>
 
 
-<!-- FILE INPUTS -->
+  <!-- PLUS MENU -->
+  <div id="plusMenu" class="plus-menu">
 
-<input
-    type="file"
-    id="photoInput"
-    accept="image/*"
-    hidden
->
+    <button>
+      📷 Photo
+    </button>
 
-<input
-    type="file"
-    id="videoInput"
-    accept="video/*"
-    hidden
->
+    <button>
+      🎥 Video
+    </button>
 
-<input
-    type="file"
-    id="fileInput"
-    hidden
->
+    <button>
+      📎 File
+    </button>
+
+    <button id="plusVoiceBtn">
+      🎤 Voice
+    </button>
+
+  </div>
 
 
-<!-- ================= MODAL ================= -->
-
-<div
-    class="modal"
-    id="modal">
+  <!-- VOICE MODAL -->
+  <div id="voiceModal" class="modal">
 
     <div class="modal-box">
 
-        <div class="modal-header">
+      <button class="modal-close" id="closeVoice">
+        ✕
+      </button>
 
-            <h3 id="modalTitle">
-                Options
-            </h3>
+      <h3>Voice Settings</h3>
 
-            <button
-                class="modal-close"
-                onclick="closeModal()">
-                ✕
-            </button>
+      <label>
+        Voice
+      </label>
 
-        </div>
+      <select id="voiceSelect">
+        <option value="female">Female</option>
+        <option value="male">Male</option>
+      </select>
 
-        <div id="modalContent"></div>
+      <button id="voiceTest" class="modal-button">
+        🔊 Test Voice
+      </button>
 
     </div>
 
-</div>
+  </div>
 
 
-<script>
+  <!-- LANGUAGE MODAL -->
+  <div id="languageModal" class="modal">
 
-/* ================= DATA ================= */
+    <div class="modal-box">
 
-let chats =
-    JSON.parse(
-        localStorage.getItem("viggoChats")
-    ) || [];
+      <button class="modal-close" id="closeLanguage">
+        ✕
+      </button>
 
-let currentChatId = null;
+      <h3>Language</h3>
 
-let selectedChats = new Set();
+      <select id="languageSelect">
+        <option value="English">English</option>
+        <option value="Tamil">தமிழ்</option>
+        <option value="Hindi">हिन्दी</option>
+        <option value="Malayalam">മലയാളം</option>
+        <option value="Telugu">తెలుగు</option>
+        <option value="Kannada">ಕನ್ನಡ</option>
+      </select>
 
+      <button id="saveLanguage" class="modal-button">
+        Save
+      </button>
 
-/* ================= SIDEBAR ================= */
+    </div>
 
-function openSidebar(){
+  </div>
 
-    document
-        .getElementById("sidebar")
-        .classList.add("open");
 
-}
-
-
-function closeSidebar(){
-
-    document
-        .getElementById("sidebar")
-        .classList.remove("open");
-
-}
-
-
-/* ================= MORE ================= */
-
-function toggleMore(){
-
-    document
-        .getElementById("moreMenu")
-        .classList.toggle("show");
-
-}
-
-
-/* ================= PLUS ================= */
-
-function togglePlus(event){
-
-    event.stopPropagation();
-
-    document
-        .getElementById("plusMenu")
-        .classList.toggle("show");
-
-}
-
-
-function closePlusMenu(){
-
-    document
-        .getElementById("plusMenu")
-        .classList.remove("show");
-
-}
-
-
-/* ================= OUTSIDE CLICK ================= */
-
-document.addEventListener(
-    "click",
-    function(e){
-
-        const more =
-            document.getElementById("moreMenu");
-
-        const moreButton =
-            document.querySelector(".more-btn");
-
-        if(
-            more &&
-            !more.contains(e.target) &&
-            !moreButton.contains(e.target)
-        ){
-
-            more.classList.remove("show");
-
-        }
-
-
-        const plus =
-            document.getElementById("plusMenu");
-
-        const plusButton =
-            document.querySelector(".plus-btn");
-
-        if(
-            plus &&
-            !plus.contains(e.target) &&
-            !plusButton.contains(e.target)
-        ){
-
-            plus.classList.remove("show");
-
-        }
-
-    }
-);
-
-
-/* ================= NEW CHAT ================= */
-
-function newChat(){
-
-    currentChatId = null;
-
-    document
-        .getElementById("chatArea")
-        .innerHTML = `
-
-        <div
-            class="welcome"
-            id="welcome">
-
-            <div>
-
-                <h1>Viggo AI</h1>
-
-                <p>
-                    How can I help you?
-                </p>
-
-            </div>
-
-        </div>
-
-    `;
-
-    document
-        .getElementById("messageInput")
-        .value = "";
-
-    closeSidebar();
-
-}
-
-
-/* ================= SEND ================= */
-
-async function sendMessage(){
-
-    const input =
-        document.getElementById(
-            "messageInput"
-        );
-
-    const text =
-        input.value.trim();
-
-    if(!text) return;
-
-
-    document
-        .getElementById("welcome")
-        ?.remove();
-
-
-    if(!currentChatId){
-
-        currentChatId =
-            Date.now().toString();
-
-        chats.unshift({
-
-            id:currentChatId,
-
-            title:
-                text.substring(0,35),
-
-            messages:[]
-
-        });
-
-    }
-
-
-    const chat =
-        chats.find(
-            c => c.id === currentChatId
-        );
-
-
-    chat.messages.push({
-
-        sender:"user",
-
-        text:text
-
-    });
-
-
-    addMessage(
-        "user",
-        text,
-        true
-    );
-
-
-    input.value = "";
-
-    saveChats();
-
-    renderHistory();
-
-
-    /* AI RESPONSE */
-
-    try{
-
-        const response =
-            await fetch(
-                "https://ai-tool-2-zpul.onrender.com/chat",
-                {
-                    method:"POST",
-
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:JSON.stringify({
-
-                        message:text,
-
-                        language:
-                            getLanguageCode()
-
-                    })
-                }
-            );
-
-
-        const data =
-            await response.json();
-
-
-        if(!response.ok){
-
-            throw new Error(
-                data.error ||
-                "Server error"
-            );
-
-        }
-
-
-        const reply =
-            data.reply ||
-            "Sorry, I couldn't get a response.";
-
-
-        chat.messages.push({
-
-            sender:"ai",
-
-            text:reply
-
-        });
-
-
-        addMessage(
-            "ai",
-            reply,
-            false
-        );
-
-
-        saveChats();
-
-    }
-
-    catch(error){
-
-        console.error(
-            "Viggo AI Error:",
-            error
-        );
-
-
-        const errorText =
-            "Sorry friend, I couldn't connect to Viggo AI right now.";
-
-
-        chat.messages.push({
-
-            sender:"ai",
-
-            text:errorText
-
-        });
-
-
-        addMessage(
-            "ai",
-            errorText,
-            false
-        );
-
-
-        saveChats();
-
-    }
-
-}
-
-
-/* ================= LANGUAGE ================= */
-
-function getLanguageCode(){
-
-    const language =
-        localStorage.getItem(
-            "viggoLanguage"
-        ) || "English";
-
-
-    const codes = {
-
-        "English":"en",
-
-        "தமிழ்":"ta",
-
-        "हिन्दी":"hi",
-
-        "తెలుగు":"te",
-
-        "ಕನ್ನಡ":"kn",
-
-        "മലയാളം":"ml",
-
-        "বাংলা":"bn",
-
-        "मराठी":"mr",
-
-        "ગુજરાતી":"gu",
-
-        "ਪੰਜਾਬੀ":"pa",
-
-        "اردو":"ur"
-
-    };
-
-
-    return codes[language] || "en";
-
-}
-
-
-/* ================= MESSAGE ================= */
-
-function addMessage(
-    type,
-    text,
-    isUser
-){
-
-    const area =
-        document.getElementById(
-            "chatArea"
-        );
-
-
-    const message =
-        document.createElement("div");
-
-
-    message.className =
-        "message " + type;
-
-
-    const content =
-        document.createElement("div");
-
-
-    content.textContent = text;
-
-
-    message.appendChild(content);
-
-
-    const actions =
-        document.createElement("div");
-
-
-    actions.className =
-        "message-actions";
-
-
-    const save =
-        document.createElement("button");
-
-
-    save.innerHTML =
-        "💾 Save";
-
-
-    save.onclick =
-        () => saveMessage(text);
-
-
-    const link =
-        document.createElement("button");
-
-
-    link.innerHTML =
-        "🔗 Link";
-
-
-    link.onclick =
-        () => copyMessage(text);
-
-
-    const like =
-        document.createElement("button");
-
-
-    like.innerHTML =
-        "👍 Like";
-
-
-    like.onclick =
-        () => likeMessage(like);
-
-
-    actions.appendChild(save);
-
-    actions.appendChild(link);
-
-    actions.appendChild(like);
-
-
-    message.appendChild(actions);
-
-
-    area.appendChild(message);
-
-
-    area.scrollTop =
-        area.scrollHeight;
-
-}
-
-
-/* ================= SAVE MESSAGE ================= */
-
-function saveMessage(text){
-
-    let saved =
-        JSON.parse(
-            localStorage.getItem(
-                "viggoSaved"
-            )
-        ) || [];
-
-
-    if(!saved.includes(text)){
-
-        saved.push(text);
-
-        localStorage.setItem(
-            "viggoSaved",
-            JSON.stringify(saved)
-        );
-
-        alert(
-            "Message saved"
-        );
-
-    }
-
-}
-
-
-/* ================= LINK ================= */
-
-function copyMessage(text){
-
-    navigator.clipboard
-        .writeText(text)
-        .then(() => {
-
-            alert(
-                "Message copied"
-            );
-
-        });
-
-}
-
-
-/* ================= LIKE ================= */
-
-function likeMessage(button){
-
-    button.innerHTML =
-        "❤️ Liked";
-
-}
-
-
-/* ================= STORAGE ================= */
-
-function saveChats(){
-
-    localStorage.setItem(
-        "viggoChats",
-        JSON.stringify(chats)
-    );
-
-}
-
-
-/* ================= HISTORY ================= */
-
-function renderHistory(){
-
-    const list =
-        document.getElementById(
-            "historyList"
-        );
-
-
-    list.innerHTML = "";
-
-
-    chats.forEach(chat => {
-
-        const item =
-            document.createElement("div");
-
-
-        item.className =
-            "history-item";
-
-
-        const checkbox =
-            document.createElement("input");
-
-
-        checkbox.type =
-            "checkbox";
-
-
-        checkbox.style.display =
-            "none";
-
-
-        checkbox.className =
-            "select-checkbox";
-
-
-        checkbox.dataset.id =
-            chat.id;
-
-
-        const name =
-            document.createElement("div");
-
-
-        name.className =
-            "chat-name";
-
-
-        name.textContent =
-            chat.title;
-
-
-        name.onclick =
-            () => loadChat(chat.id);
-
-
-        const pin =
-            document.createElement("button");
-
-
-        pin.className =
-            "history-btn";
-
-
-        pin.innerHTML =
-            chat.pinned
-                ? "📌"
-                : "📍";
-
-
-        pin.title =
-            "Pin";
-
-
-        pin.onclick =
-            () => togglePin(chat.id);
-
-
-        const del =
-            document.createElement("button");
-
-
-        del.className =
-            "history-btn";
-
-
-        del.innerHTML =
-            "🗑️";
-
-
-        del.title =
-            "Delete";
-
-
-        del.onclick =
-            () => deleteChat(chat.id);
-
-
-        item.appendChild(checkbox);
-
-        item.appendChild(name);
-
-        item.appendChild(pin);
-
-        item.appendChild(del);
-
-
-        list.appendChild(item);
-
-    });
-
-}
-
-
-/* ================= LOAD CHAT ================= */
-
-function loadChat(id){
-
-    const chat =
-        chats.find(
-            c => c.id === id
-        );
-
-
-    if(!chat) return;
-
-
-    currentChatId = id;
-
-
-    const area =
-        document.getElementById(
-            "chatArea"
-        );
-
-
-    area.innerHTML = "";
-
-
-    chat.messages.forEach(
-        message => {
-
-            addMessage(
-                message.sender,
-                message.text,
-                message.sender === "user"
-            );
-
-        }
-    );
-
-
-    closeSidebar();
-
-}
-
-
-/* ================= PIN ================= */
-
-function togglePin(id){
-
-    const chat =
-        chats.find(
-            c => c.id === id
-        );
-
-
-    if(!chat) return;
-
-
-    chat.pinned =
-        !chat.pinned;
-
-
-    saveChats();
-
-    renderHistory();
-
-}
-
-
-/* ================= DELETE CHAT ================= */
-
-function deleteChat(id){
-
-    if(
-        !confirm(
-            "Delete this chat?"
-        )
-    ) return;
-
-
-    chats =
-        chats.filter(
-            c => c.id !== id
-        );
-
-
-    if(currentChatId === id){
-
-        currentChatId = null;
-
-        newChat();
-
-    }
-
-
-    saveChats();
-
-    renderHistory();
-
-}
-
-
-/* ================= SEARCH ================= */
-
-function searchChats(){
-
-    const value =
-        document
-            .getElementById(
-                "searchChat"
-            )
-            .value
-            .toLowerCase();
-
-
-    document
-        .querySelectorAll(
-            ".history-item"
-        )
-        .forEach(item => {
-
-            const name =
-                item
-                    .querySelector(
-                        ".chat-name"
-                    )
-                    .textContent
-                    .toLowerCase();
-
-
-            item.style.display =
-                name.includes(value)
-                    ? "flex"
-                    : "none";
-
-        });
-
-}
-
-
-/* ================= SELECT CHATS ================= */
-
-function selectChats(){
-
-    document
-        .querySelectorAll(
-            ".select-checkbox"
-        )
-        .forEach(cb => {
-
-            cb.style.display =
-                cb.style.display === "none"
-                    ? "block"
-                    : "none";
-
-
-            cb.onchange =
-                function(){
-
-                    if(this.checked){
-
-                        selectedChats.add(
-                            this.dataset.id
-                        );
-
-                    }else{
-
-                        selectedChats.delete(
-                            this.dataset.id
-                        );
-
-                    }
-
-                };
-
-        });
-
-
-    document
-        .getElementById("moreMenu")
-        .classList.remove("show");
-
-}
-
-
-/* ================= DELETE SELECTED ================= */
-
-function deleteSelectedChats(){
-
-    if(
-        selectedChats.size === 0
-    ){
-
-        alert(
-            "Select chats first"
-        );
-
-        return;
-
-    }
-
-
-    if(
-        !confirm(
-            "Delete selected chats?"
-        )
-    ) return;
-
-
-    chats =
-        chats.filter(
-            c =>
-                !selectedChats.has(c.id)
-        );
-
-
-    selectedChats.clear();
-
-    saveChats();
-
-    renderHistory();
-
-}
-
-
-/* ================= CLEAR CHAT ================= */
-
-function clearCurrentChat(){
-
-    document
-        .getElementById(
-            "chatArea"
-        )
-        .innerHTML = `
-
-        <div class="welcome">
-
-            <div>
-
-                <h1>Viggo AI</h1>
-
-                <p>
-                    How can I help you?
-                </p>
-
-            </div>
-
-        </div>
-
-    `;
-
-
-    if(currentChatId){
-
-        const chat =
-            chats.find(
-                c =>
-                    c.id === currentChatId
-            );
-
-
-        if(chat){
-
-            chat.messages = [];
-
-            saveChats();
-
-        }
-
-    }
-
-}
-
-
-/* ================= SHOW HISTORY ================= */
-
-function showHistory(){
-
-    openSidebar();
-
-    document
-        .getElementById(
-            "moreMenu"
-        )
-        .classList.remove("show");
-
-}
-
-
-/* ================= SAVED ================= */
-
-function showSavedChats(){
-
-    const saved =
-        JSON.parse(
-            localStorage.getItem(
-                "viggoSaved"
-            )
-        ) || [];
-
-
-    openModal(
-
-        "Saved Chats",
-
-        saved.length
-
-            ? saved.map(
-                x =>
-                    `<div class="saved-item">
-                        ${escapeHTML(x)}
-                     </div>`
-              ).join("")
-
-            : "<p>No saved messages.</p>"
-
-    );
-
-}
-
-
-/* ================= LANGUAGE ================= */
-
-function openLanguages(){
-
-    const languages = [
-
-        "English",
-        "தமிழ்",
-        "हिन्दी",
-        "తెలుగు",
-        "ಕನ್ನಡ",
-        "മലയാളം",
-        "বাংলা",
-        "मराठी",
-        "ગુજરાતી",
-        "ਪੰਜਾਬੀ",
-        "اردو",
-        "Español",
-        "Français",
-        "Deutsch",
-        "日本語",
-        "한국어",
-        "中文",
-        "العربية"
-
-    ];
-
-
-    openModal(
-
-        "🌐 Select Language",
-
-        languages.map(
-            lang =>
-            `<div
-                class="option"
-                onclick="selectLanguage('${lang}')">
-                ${lang}
-            </div>`
-        ).join("")
-
-    );
-
-}
-
-
-function selectLanguage(language){
-
-    localStorage.setItem(
-        "viggoLanguage",
-        language
-    );
-
-
-    alert(
-        "Language selected: " +
-        language
-    );
-
-
-    closeModal();
-
-}
-
-
-/* ================= VOICE ================= */
-
-function openVoiceSettings(){
-
-    openModal(
-
-        "🎤 Voice",
-
-        `
-        <div
-            class="option"
-            onclick="selectVoice('On')">
-            🎤 Voice On
-        </div>
-
-        <div
-            class="option"
-            onclick="selectVoice('Off')">
-            🔇 Voice Off
-        </div>
-        `
-
-    );
-
-}
-
-
-function selectVoice(value){
-
-    localStorage.setItem(
-        "viggoVoice",
-        value
-    );
-
-
-    alert(
-        "Voice: " + value
-    );
-
-
-    closeModal();
-
-}
-
-
-/* ================= GENDER ================= */
-
-function openVoiceGender(){
-
-    openModal(
-
-        "👩 Voice",
-
-        `
-        <div
-            class="option"
-            onclick="selectGender('Female')">
-            👩 Female
-        </div>
-
-        <div
-            class="option"
-            onclick="selectGender('Male')">
-            👨 Male
-        </div>
-        `
-
-    );
-
-}
-
-
-function selectGender(value){
-
-    localStorage.setItem(
-        "viggoVoiceGender",
-        value
-    );
-
-
-    alert(
-        "Voice selected: " +
-        value
-    );
-
-
-    closeModal();
-
-}
-
-
-/* ================= HINT ================= */
-
-function showHint(){
-
-    alert(
-        "You can type a message or use the voice button."
-    );
-
-}
-
-
-/* ================= VOICE INPUT ================= */
-
-function startVoice(){
-
-    if(
-        !(
-            "webkitSpeechRecognition"
-            in window
-        )
-    ){
-
-        alert(
-            "Voice recognition is not supported."
-        );
-
-        return;
-
-    }
-
-
-    const recognition =
-        new webkitSpeechRecognition();
-
-
-    recognition.lang =
-        "en-IN";
-
-
-    recognition.start();
-
-
-    recognition.onresult =
-        function(event){
-
-            document
-                .getElementById(
-                    "messageInput"
-                )
-                .value =
-                event.results[0][0]
-                    .transcript;
-
-        };
-
-}
-
-
-/* ================= ENTER ================= */
-
-function handleEnter(event){
-
-    if(
-        event.key === "Enter" &&
-        !event.shiftKey
-    ){
-
-        event.preventDefault();
-
-        sendMessage();
-
-    }
-
-}
-
-
-/* ================= MODAL ================= */
-
-function openModal(
-    title,
-    content
-){
-
-    document
-        .getElementById(
-            "modalTitle"
-        )
-        .textContent =
-        title;
-
-
-    document
-        .getElementById(
-            "modalContent"
-        )
-        .innerHTML =
-        content;
-
-
-    document
-        .getElementById(
-            "modal"
-        )
-        .classList.add("show");
-
-}
-
-
-function closeModal(){
-
-    document
-        .getElementById(
-            "modal"
-        )
-        .classList.remove("show");
-
-}
-
-
-/* ================= ESCAPE ================= */
-
-function escapeHTML(text){
-
-    return text
-        .replaceAll(
-            "&",
-            "&amp;"
-        )
-        .replaceAll(
-            "<",
-            "&lt;"
-        )
-        .replaceAll(
-            ">",
-            "&gt;"
-        )
-        .replaceAll(
-            '"',
-            "&quot;"
-        )
-        .replaceAll(
-            "'",
-            "&#039;"
-        );
-
-}
-
-
-/* ================= INITIAL ================= */
-
-renderHistory();
-
-</script>
+  <script src="script.js"></script>
 
 </body>
 </html>
