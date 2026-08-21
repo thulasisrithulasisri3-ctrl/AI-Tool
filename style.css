@@ -1,136 +1,166 @@
-/* =========================================================
-   VIGGO AI - FULL STYLE.CSS
-========================================================= */
+/* =====================================================
+   VIGGO AI - FULL CSS
+   BLACK + BLUE THEME
+===================================================== */
 
 * {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
 }
 
 html,
 body {
     width: 100%;
     height: 100%;
-}
-
-body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: #050b18;
-    color: #ffffff;
     overflow: hidden;
 }
 
+body {
+    font-family:
+        Inter,
+        Arial,
+        Helvetica,
+        sans-serif;
 
-/* =========================================================
+    background: #050b14;
+    color: #ffffff;
+}
+
+
+/* =====================================================
+   MAIN LAYOUT
+===================================================== */
+
+body {
+    display: flex;
+}
+
+
+/* =====================================================
    SIDEBAR
-========================================================= */
+===================================================== */
 
 .sidebar {
     position: fixed;
-    top: 0;
-    left: 0;
 
-    width: 280px;
+    left: 0;
+    top: 0;
+
+    width: 260px;
     height: 100vh;
 
-    background: #081225;
+    background: #07111f;
 
-    border-right: 1px solid #172b4d;
+    border-right: 1px solid #14263d;
 
     display: flex;
     flex-direction: column;
 
     z-index: 1000;
 
-    transition: transform 0.25s ease;
+    transition:
+        transform 0.25s ease;
 }
 
+
+/* =====================================================
+   SIDEBAR HEADER
+===================================================== */
+
 .sidebar-header {
-    height: 65px;
+    height: 58px;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
 
-    padding: 0 16px;
+    padding: 0 14px;
 
-    border-bottom: 1px solid #172b4d;
+    border-bottom: 1px solid #14263d;
 }
 
 .sidebar-header h2 {
-    font-size: 21px;
+    font-size: 18px;
+    font-weight: 700;
+
+    color: #ffffff;
 }
 
 .icon-btn {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
 
     border: none;
-    border-radius: 8px;
+    border-radius: 7px;
 
     background: transparent;
 
-    color: #ffffff;
-
-    font-size: 20px;
+    color: #9db2ca;
 
     cursor: pointer;
+
+    font-size: 17px;
 }
 
 .icon-btn:hover {
-    background: #14284a;
+    background: #10243c;
+    color: #ffffff;
 }
 
 
-/* =========================================================
+/* =====================================================
    NEW CHAT
-========================================================= */
+===================================================== */
 
 .new-chat {
-    margin: 15px;
+    margin: 12px;
 
-    padding: 12px;
+    height: 40px;
 
-    border: 1px solid #2563eb;
+    border: 1px solid #164b91;
 
-    border-radius: 10px;
+    border-radius: 8px;
 
-    background: #0d2b61;
+    background: #0b2443;
 
-    color: #ffffff;
+    color: #dcecff;
 
-    font-size: 15px;
+    font-size: 14px;
+    font-weight: 600;
 
     cursor: pointer;
 }
 
 .new-chat:hover {
-    background: #17479a;
+    background: #12365f;
+    border-color: #2371d1;
 }
 
 
-/* =========================================================
+/* =====================================================
    SEARCH
-========================================================= */
+===================================================== */
 
 .search-box {
-    height: 42px;
+    margin: 0 12px 12px;
 
-    margin: 0 15px 15px;
+    height: 38px;
 
     display: flex;
     align-items: center;
 
-    gap: 8px;
+    gap: 7px;
 
-    padding: 0 12px;
+    padding: 0 10px;
 
-    background: #0d1b31;
+    background: #0a1728;
 
-    border: 1px solid #1b355d;
+    border: 1px solid #172c45;
 
-    border-radius: 9px;
+    border-radius: 8px;
+
+    color: #7e94ae;
 }
 
 .search-box input {
@@ -143,106 +173,274 @@ body {
 
     color: #ffffff;
 
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .search-box input::placeholder {
-    color: #7d8ca6;
+    color: #71849a;
 }
 
 
-/* =========================================================
-   HISTORY
-========================================================= */
+/* =====================================================
+   HISTORY TITLE
+===================================================== */
 
 .history-title {
-    padding: 0 16px 10px;
+    padding: 4px 14px 7px;
 
-    color: #6f83a4;
-
-    font-size: 11px;
-
-    font-weight: bold;
+    font-size: 10px;
 
     letter-spacing: 1px;
+
+    color: #607895;
+
+    font-weight: 700;
 }
+
+
+/* =====================================================
+   CHAT HISTORY
+===================================================== */
 
 .chat-history {
     flex: 1;
 
     overflow-y: auto;
 
-    padding: 0 10px;
+    padding: 0 8px 8px;
+}
+
+.chat-history::-webkit-scrollbar {
+    width: 4px;
+}
+
+.chat-history::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chat-history::-webkit-scrollbar-thumb {
+    background: #183454;
+    border-radius: 5px;
 }
 
 
-/* =========================================================
+/* =====================================================
+   HISTORY ITEM
+===================================================== */
+
+.history-item {
+    width: 100%;
+
+    min-height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 4px;
+
+    padding: 5px 7px;
+
+    margin-bottom: 3px;
+
+    border-radius: 7px;
+
+    background: transparent;
+
+    color: #dce8f7;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s ease;
+}
+
+.history-item:hover {
+    background: #0d1d33;
+}
+
+.history-item.active {
+    background: #0d2542;
+}
+
+
+/* =====================================================
+   HISTORY TITLE TEXT
+===================================================== */
+
+.history-chat-title {
+    flex: 1;
+
+    min-width: 0;
+
+    overflow: hidden;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+
+    font-size: 13px;
+
+    color: #dce8f7;
+}
+
+.history-item.active
+.history-chat-title {
+    color: #ffffff;
+}
+
+
+/* =====================================================
+   HISTORY ACTIONS
+===================================================== */
+
+.history-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 2px;
+
+    flex-shrink: 0;
+}
+
+
+/* =====================================================
+   HISTORY PIN / DELETE BUTTON
+===================================================== */
+
+.history-action-btn {
+    width: 24px;
+    height: 24px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+
+    outline: none;
+
+    border-radius: 5px;
+
+    background: transparent;
+
+    color: #8da7c5;
+
+    font-size: 12px;
+
+    cursor: pointer;
+}
+
+.history-action-btn:hover {
+    background: #132b4a;
+
+    color: #ffffff;
+}
+
+.history-action-btn:active {
+    transform: scale(0.92);
+}
+
+
+/* PIN */
+
+.history-action-btn:first-child {
+    color: #6fa8ff;
+}
+
+
+/* DELETE */
+
+.history-action-btn:last-child {
+    color: #8da7c5;
+}
+
+
+/* SELECT */
+
+.select-btn {
+    color: #62a8ff !important;
+}
+
+
+/* =====================================================
    SIDEBAR MORE
-========================================================= */
+===================================================== */
 
 .sidebar-more {
     position: relative;
 
-    padding: 10px;
+    padding: 8px;
 
-    border-top: 1px solid #172b4d;
+    border-top: 1px solid #14263d;
 }
 
 .more-button {
     width: 100%;
 
+    height: 40px;
+
     display: flex;
+
     align-items: center;
 
-    gap: 12px;
+    gap: 10px;
 
-    padding: 12px;
+    padding: 0 12px;
 
     border: none;
 
-    border-radius: 9px;
+    border-radius: 8px;
 
     background: transparent;
 
-    color: #ffffff;
+    color: #b6c7da;
 
     cursor: pointer;
 
-    text-align: left;
+    font-size: 14px;
 }
 
 .more-button:hover {
-    background: #14284a;
+    background: #10243c;
+    color: #ffffff;
 }
 
 .more-dots {
-    font-size: 22px;
+    font-size: 20px;
 }
 
 
-/* =========================================================
+/* =====================================================
    MORE MENU
-========================================================= */
+===================================================== */
 
 .more-menu {
     position: absolute;
 
-    left: 10px;
-    right: 10px;
+    left: 8px;
+    right: 8px;
 
-    bottom: 58px;
+    bottom: 52px;
 
     display: none;
 
-    padding: 7px;
+    padding: 6px;
 
-    background: #101d33;
+    background: #0a1728;
 
-    border: 1px solid #24436e;
+    border: 1px solid #1a3555;
 
     border-radius: 10px;
 
-    z-index: 5000;
+    box-shadow:
+        0 12px 35px rgba(0, 0, 0, 0.45);
+
+    z-index: 1200;
 }
 
 .more-menu.show {
@@ -252,7 +450,7 @@ body {
 .more-menu button {
     width: 100%;
 
-    padding: 10px;
+    min-height: 36px;
 
     border: none;
 
@@ -260,45 +458,48 @@ body {
 
     background: transparent;
 
-    color: #ffffff;
+    color: #c9d8e9;
 
     text-align: left;
+
+    padding: 0 10px;
+
+    font-size: 13px;
 
     cursor: pointer;
 }
 
 .more-menu button:hover {
-    background: #17376d;
+    background: #102b4b;
+
+    color: #ffffff;
 }
 
 
-/* =========================================================
+/* =====================================================
    MAIN
-========================================================= */
+===================================================== */
 
 .main {
-    width: calc(100% - 280px);
-
+    width: 100%;
     height: 100vh;
 
-    margin-left: 280px;
+    margin-left: 260px;
 
     display: flex;
 
     flex-direction: column;
 
-    background: #050b18;
-
-    transition: all 0.25s ease;
+    background: #050b14;
 }
 
 
-/* =========================================================
-   TOP BAR
-========================================================= */
+/* =====================================================
+   TOPBAR
+===================================================== */
 
 .topbar {
-    height: 65px;
+    height: 58px;
 
     flex-shrink: 0;
 
@@ -308,11 +509,11 @@ body {
 
     justify-content: space-between;
 
-    padding: 0 18px;
+    padding: 0 16px;
 
-    background: #071022;
+    border-bottom: 1px solid #14263d;
 
-    border-bottom: 1px solid #172b4d;
+    background: #07111f;
 }
 
 .top-left {
@@ -323,232 +524,14 @@ body {
     gap: 12px;
 }
 
-.brand {
-    font-size: 20px;
 
-    font-weight: bold;
-}
+/* =====================================================
+   MENU BUTTON
+===================================================== */
 
 .menu-btn {
-    width: 40px;
-    height: 40px;
-
-    border: none;
-
-    border-radius: 8px;
-
-    background: transparent;
-
-    color: #ffffff;
-
-    font-size: 21px;
-
-    cursor: pointer;
-}
-
-.menu-btn:hover {
-    background: #14284a;
-}
-
-
-/* =========================================================
-   SHARE
-========================================================= */
-
-.share-btn {
-    padding: 9px 14px;
-
-    border: 1px solid #2563eb;
-
-    border-radius: 8px;
-
-    background: #0c2552;
-
-    color: #ffffff;
-
-    cursor: pointer;
-}
-
-.share-btn:hover {
-    background: #17479a;
-}
-
-
-/* =========================================================
-   CHAT AREA
-========================================================= */
-
-.chat-area {
-    flex: 1;
-
-    overflow-y: auto;
-
-    padding: 18px 20px 10px;
-}
-
-.conversation {
-    width: 100%;
-
-    max-width: 900px;
-
-    margin: 0 auto;
-
-    padding-bottom: 8px;
-}
-
-
-/* =========================================================
-   MESSAGE
-========================================================= */
-
-.message {
-    display: flex;
-
-    margin-bottom: 16px;
-
-    width: 100%;
-}
-
-.message.user {
-    justify-content: flex-end;
-}
-
-.message.ai {
-    justify-content: flex-start;
-}
-
-
-/* =========================================================
-   MESSAGE BUBBLE
-========================================================= */
-
-.message-bubble {
-    max-width: 75%;
-
-    padding: 12px 15px;
-
-    border-radius: 14px;
-
-    line-height: 1.5;
-
-    white-space: pre-wrap;
-
-    word-wrap: break-word;
-}
-
-.message.user .message-bubble {
-    background: #1458b8;
-}
-
-.message.ai .message-bubble {
-    background: #101d33;
-
-    border: 1px solid #1b355d;
-}
-
-
-/* =========================================================
-   MESSAGE CONTENT
-========================================================= */
-
-.message-content {
-    display: flex;
-
-    flex-direction: column;
-
-    max-width: 75%;
-}
-
-
-/* =========================================================
-   MESSAGE ACTIONS
-   SAVE / COPY / LIKE
-========================================================= */
-
-.message-actions {
-    display: flex;
-
-    align-items: center;
-
-    gap: 4px;
-
-    margin-top: 5px;
-
-    padding-left: 3px;
-}
-
-.message-actions button {
-    border: none;
-
-    background: transparent;
-
-    color: #71819e;
-
-    font-size: 13px;
-
-    padding: 5px 7px;
-
-    border-radius: 6px;
-
-    cursor: pointer;
-
-    transition: 0.15s ease;
-}
-
-.message-actions button:hover {
-    background: #14284a;
-
-    color: #ffffff;
-}
-
-.message-actions button:active {
-    transform: scale(0.94);
-}
-
-
-/* =========================================================
-   SIDE ACTIONS
-   DELETE / PIN
-========================================================= */
-
-.message-row {
-    display: flex;
-
-    align-items: flex-start;
-
-    width: 100%;
-}
-
-.message-side-actions {
-    display: flex;
-
-    align-items: center;
-
-    gap: 3px;
-
-    margin-left: 6px;
-
-    margin-top: 4px;
-
-    opacity: 0;
-
-    transition: opacity 0.2s ease;
-}
-
-.message-row:hover .message-side-actions {
-    opacity: 1;
-}
-
-.message-side-actions button {
-    width: 30px;
-
-    height: 30px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
+    width: 34px;
+    height: 34px;
 
     border: none;
 
@@ -556,78 +539,308 @@ body {
 
     background: transparent;
 
-    color: #71819e;
+    color: #b5c8dc;
+
+    font-size: 20px;
 
     cursor: pointer;
 }
 
-.message-side-actions button:hover {
-    background: #14284a;
+.menu-btn:hover {
+    background: #10243c;
+    color: #ffffff;
+}
+
+
+/* =====================================================
+   BRAND
+===================================================== */
+
+.brand {
+    font-size: 18px;
+
+    font-weight: 700;
 
     color: #ffffff;
 }
 
 
-/* =========================================================
-   PINNED MESSAGE
-========================================================= */
+/* =====================================================
+   SHARE
+===================================================== */
 
-.message.pinned .message-bubble {
-    border-color: #2563eb;
+.share-btn {
+    height: 34px;
+
+    padding: 0 12px;
+
+    border: 1px solid #1b4f91;
+
+    border-radius: 7px;
+
+    background: #0b2039;
+
+    color: #a9d0ff;
+
+    font-size: 12px;
+
+    cursor: pointer;
 }
 
-.message.pinned::before {
-    content: "📌";
-
-    margin-right: 5px;
-
-    font-size: 13px;
+.share-btn:hover {
+    background: #12365f;
 }
 
 
-/* =========================================================
-   INPUT AREA
-========================================================= */
+/* =====================================================
+   CHAT AREA
+===================================================== */
 
-.input-area {
-    position: relative;
+.chat-area {
+    flex: 1;
 
-    width: calc(100% - 30px);
+    min-height: 0;
+
+    overflow: hidden;
+
+    display: flex;
+
+    justify-content: center;
+}
+
+
+/* =====================================================
+   CONVERSATION
+===================================================== */
+
+.conversation {
+    width: 100%;
 
     max-width: 900px;
 
-    min-height: 58px;
+    height: 100%;
 
-    margin: 8px auto 15px;
+    overflow-y: auto;
 
+    padding: 22px 20px 25px;
+}
+
+.conversation::-webkit-scrollbar {
+    width: 5px;
+}
+
+.conversation::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.conversation::-webkit-scrollbar-thumb {
+    background: #183454;
+
+    border-radius: 5px;
+}
+
+
+/* =====================================================
+   MESSAGE
+===================================================== */
+
+.message {
+    width: 100%;
+
+    display: flex;
+
+    margin-bottom: 20px;
+}
+
+
+/* AI LEFT */
+
+.message.ai {
+    justify-content: flex-start;
+}
+
+
+/* USER RIGHT */
+
+.message.user {
+    justify-content: flex-end;
+}
+
+
+/* =====================================================
+   MESSAGE CONTENT
+===================================================== */
+
+.message-content {
+    max-width: min(75%, 680px);
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+
+/* =====================================================
+   MESSAGE BUBBLE
+===================================================== */
+
+.message-bubble {
+    padding: 11px 14px;
+
+    border-radius: 12px;
+
+    font-size: 14px;
+
+    line-height: 1.55;
+
+    word-wrap: break-word;
+
+    white-space: pre-wrap;
+}
+
+
+/* AI BUBBLE */
+
+.message.ai
+.message-bubble {
+    background: #0c1828;
+
+    border: 1px solid #172d47;
+
+    color: #dce8f7;
+
+    border-bottom-left-radius: 4px;
+}
+
+
+/* USER BUBBLE */
+
+.message.user
+.message-bubble {
+    background: #0c3b70;
+
+    border: 1px solid #145ca5;
+
+    color: #ffffff;
+
+    border-bottom-right-radius: 4px;
+}
+
+
+/* =====================================================
+   MESSAGE ACTIONS
+===================================================== */
+
+.message-actions {
     display: flex;
 
     align-items: center;
 
-    gap: 8px;
+    gap: 5px;
 
-    padding: 8px 10px;
-
-    background: #0b1629;
-
-    border: 1px solid #1d3b69;
-
-    border-radius: 16px;
-
-    z-index: 100;
+    margin-top: 5px;
 }
 
 
-/* =========================================================
+/* AI actions LEFT */
+
+.message.ai
+.message-actions {
+    justify-content: flex-start;
+}
+
+
+/* USER actions RIGHT */
+
+.message.user
+.message-actions {
+    justify-content: flex-end;
+}
+
+
+/* =====================================================
+   ACTION BUTTONS
+===================================================== */
+
+.message-actions button {
+    border: none;
+
+    background: transparent;
+
+    color: #7188a2;
+
+    font-size: 11px;
+
+    padding: 3px 5px;
+
+    border-radius: 5px;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+}
+
+.message-actions button:hover {
+    background: #10243c;
+
+    color: #d9e9ff;
+}
+
+
+/* =====================================================
+   INPUT AREA
+===================================================== */
+
+.input-area {
+    width: 100%;
+
+    max-width: 900px;
+
+    margin: 0 auto;
+
+    min-height: 58px;
+
+    padding: 8px 12px;
+
+    display: flex;
+
+    align-items: flex-end;
+
+    gap: 7px;
+
+    background: #07111f;
+
+    border: 1px solid #172d47;
+
+    border-radius: 13px;
+
+    margin-bottom: 12px;
+}
+
+
+/* =====================================================
    PLUS BUTTON
-========================================================= */
+===================================================== */
 
 .input-plus {
+    width: 36px;
+    height: 36px;
+
     flex-shrink: 0;
 
-    width: 40px;
+    border: 1px solid #1a456f;
 
-    height: 40px;
+    border-radius: 8px;
+
+    background: #0b1e34;
+
+    color: #a9cfff;
+
+    font-size: 21px;
+
+    line-height: 1;
+
+    cursor: pointer;
 
     display: flex;
 
@@ -635,98 +848,29 @@ body {
 
     justify-content: center;
 
-    border: none;
-
-    border-radius: 50%;
-
-    background: #12366f;
-
-    color: #ffffff;
-
-    font-size: 25px;
-
-    cursor: pointer;
+    pointer-events: auto;
 
     position: relative;
 
-    z-index: 100001;
+    z-index: 20;
 }
 
 .input-plus:hover {
-    background: #1d55a3;
+    background: #12365a;
+
+    border-color: #2a75bd;
+
+    color: #ffffff;
 }
 
 .input-plus:active {
-    transform: scale(0.95);
+    transform: scale(0.94);
 }
 
 
-/* =========================================================
-   PLUS MENU
-========================================================= */
-
-.plus-menu {
-    position: fixed;
-
-    left: 20px;
-
-    bottom: 85px;
-
-    width: 180px;
-
-    display: none;
-
-    flex-direction: column;
-
-    gap: 5px;
-
-    padding: 8px;
-
-    background: #101d33;
-
-    border: 1px solid #2563eb;
-
-    border-radius: 12px;
-
-    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.55);
-
-    z-index: 999999;
-}
-
-.plus-menu.show {
-    display: flex;
-}
-
-.plus-menu button {
-    width: 100%;
-
-    min-height: 42px;
-
-    padding: 11px 14px;
-
-    border: none;
-
-    border-radius: 8px;
-
-    background: transparent;
-
-    color: #ffffff;
-
-    font-size: 15px;
-
-    text-align: left;
-
-    cursor: pointer;
-}
-
-.plus-menu button:hover {
-    background: #17376d;
-}
-
-
-/* =========================================================
-   MESSAGE TEXTAREA
-========================================================= */
+/* =====================================================
+   TEXTAREA
+===================================================== */
 
 #message {
     flex: 1;
@@ -735,11 +879,11 @@ body {
 
     max-height: 130px;
 
+    min-height: 36px;
+
     resize: none;
 
     overflow-y: auto;
-
-    padding: 10px 4px;
 
     border: none;
 
@@ -751,81 +895,149 @@ body {
 
     font-family: inherit;
 
-    font-size: 15px;
+    font-size: 14px;
 
-    line-height: 22px;
+    line-height: 20px;
+
+    padding: 8px 4px;
 }
 
 #message::placeholder {
-    color: #71819e;
+    color: #617790;
 }
 
 
-/* =========================================================
-   MICROPHONE
-========================================================= */
+/* =====================================================
+   INPUT ICON
+===================================================== */
 
 .input-icon {
+    width: 36px;
+    height: 36px;
+
     flex-shrink: 0;
-
-    width: 40px;
-
-    height: 40px;
 
     border: none;
 
-    border-radius: 50%;
+    border-radius: 8px;
 
     background: transparent;
 
-    color: #ffffff;
+    color: #8ba3bd;
 
-    font-size: 19px;
+    font-size: 16px;
 
     cursor: pointer;
 }
 
 .input-icon:hover {
-    background: #14284a;
+    background: #10243c;
+
+    color: #ffffff;
 }
 
 
-/* =========================================================
+/* =====================================================
    SEND
-========================================================= */
+===================================================== */
 
 .send-btn {
+    width: 36px;
+    height: 36px;
+
     flex-shrink: 0;
-
-    width: 42px;
-
-    height: 42px;
 
     border: none;
 
-    border-radius: 50%;
+    border-radius: 8px;
 
-    background: #1769e0;
+    background: #145ca5;
 
     color: #ffffff;
 
-    font-size: 19px;
+    font-size: 17px;
 
     cursor: pointer;
 }
 
 .send-btn:hover {
-    background: #2580ff;
+    background: #1b70c5;
 }
 
 .send-btn:active {
-    transform: scale(0.95);
+    transform: scale(0.94);
 }
 
 
-/* =========================================================
+/* =====================================================
+   PLUS MENU
+===================================================== */
+
+.plus-menu {
+    position: fixed;
+
+    left: 15px;
+
+    bottom: 78px;
+
+    width: 150px;
+
+    display: none;
+
+    flex-direction: column;
+
+    gap: 3px;
+
+    padding: 6px;
+
+    background: #0a1728;
+
+    border: 1px solid #1b395c;
+
+    border-radius: 10px;
+
+    box-shadow:
+        0 12px 35px rgba(0, 0, 0, 0.5);
+
+    z-index: 2000;
+}
+
+.plus-menu.show {
+    display: flex;
+}
+
+.plus-menu button {
+    width: 100%;
+
+    height: 36px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: transparent;
+
+    color: #c7d8ea;
+
+    text-align: left;
+
+    padding: 0 10px;
+
+    font-size: 13px;
+
+    cursor: pointer;
+}
+
+.plus-menu button:hover {
+    background: #102b4b;
+
+    color: #ffffff;
+}
+
+
+/* =====================================================
    MODAL
-========================================================= */
+===================================================== */
 
 .modal {
     position: fixed;
@@ -840,7 +1052,7 @@ body {
 
     background: rgba(0, 0, 0, 0.65);
 
-    z-index: 2000000;
+    z-index: 3000;
 }
 
 .modal.show {
@@ -850,53 +1062,71 @@ body {
 .modal-box {
     position: relative;
 
-    width: min(90%, 380px);
+    width: min(90%, 360px);
 
-    padding: 25px;
+    padding: 22px;
 
-    background: #0d192d;
+    border-radius: 12px;
 
-    border: 1px solid #2563eb;
+    background: #0a1728;
 
-    border-radius: 15px;
+    border: 1px solid #1b395c;
 
-    text-align: center;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.55);
 }
 
-.modal-close {
-    position: absolute;
+.modal-box h3 {
+    margin-bottom: 15px;
 
-    top: 10px;
-
-    right: 10px;
-
-    width: 32px;
-
-    height: 32px;
-
-    border: none;
-
-    border-radius: 7px;
-
-    background: transparent;
+    font-size: 17px;
 
     color: #ffffff;
-
-    cursor: pointer;
 }
 
 .modal-box select {
     width: 100%;
 
-    padding: 11px;
+    height: 40px;
 
-    margin: 15px 0;
+    margin-bottom: 12px;
 
-    background: #081225;
+    padding: 0 10px;
 
-    border: 1px solid #24436e;
+    border: 1px solid #24486c;
 
-    border-radius: 8px;
+    border-radius: 7px;
+
+    outline: none;
+
+    background: #07111f;
+
+    color: #ffffff;
+}
+
+.modal-close {
+    position: absolute;
+
+    top: 8px;
+
+    right: 8px;
+
+    width: 30px;
+    height: 30px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    background: transparent;
+
+    color: #8fa6bf;
+
+    cursor: pointer;
+}
+
+.modal-close:hover {
+    background: #132b4a;
 
     color: #ffffff;
 }
@@ -904,232 +1134,238 @@ body {
 .modal-button {
     width: 100%;
 
-    padding: 11px;
+    height: 38px;
 
     border: none;
 
-    border-radius: 8px;
+    border-radius: 7px;
 
-    background: #1769e0;
+    background: #145ca5;
 
     color: #ffffff;
 
     cursor: pointer;
 }
 
-
-/* =========================================================
-   SCROLLBAR
-========================================================= */
-
-::-webkit-scrollbar {
-    width: 6px;
-}
-
-::-webkit-scrollbar-track {
-    background: #071022;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #1d3b69;
-
-    border-radius: 10px;
+.modal-button:hover {
+    background: #1b70c5;
 }
 
 
-/* =========================================================
+/* =====================================================
    MOBILE
-========================================================= */
+===================================================== */
 
 @media (max-width: 768px) {
 
     .sidebar {
-        transform: translateX(-100%);
+        width: 245px;
+
+        transform:
+            translateX(-100%);
     }
 
     .sidebar.open {
-        transform: translateX(0);
+        transform:
+            translateX(0);
     }
 
     .main {
-        width: 100%;
-
         margin-left: 0;
     }
 
     .topbar {
-        height: 58px;
+        height: 52px;
 
         padding: 0 10px;
     }
 
     .brand {
-        font-size: 18px;
+        font-size: 16px;
     }
 
     .share-btn {
-        padding: 7px 10px;
+        padding: 0 8px;
 
-        font-size: 12px;
-    }
-
-    .chat-area {
-        padding: 8px 10px 4px;
+        font-size: 11px;
     }
 
     .conversation {
-        padding-bottom: 2px;
+        padding:
+            14px 10px 18px;
     }
 
     .message {
-        margin-bottom: 10px;
+        margin-bottom: 16px;
     }
 
     .message-content {
-        max-width: 88%;
+        max-width: 82%;
     }
 
     .message-bubble {
-        max-width: 100%;
+        padding:
+            9px 11px;
 
-        padding: 10px 12px;
+        font-size: 13px;
 
-        font-size: 14px;
-    }
-
-    .message-side-actions {
-        opacity: 1;
+        line-height: 1.45;
     }
 
     .message-actions {
-        margin-top: 3px;
-
         gap: 2px;
-    }
 
-    .message-actions button {
-        font-size: 11px;
-
-        padding: 4px 5px;
-    }
-
-    .message-side-actions button {
-        width: 27px;
-
-        height: 27px;
-
-        font-size: 12px;
-    }
-
-    .input-area {
-        width: calc(100% - 12px);
-
-        min-height: 52px;
-
-        margin: 4px auto 7px;
-
-        padding: 6px 7px;
-
-        border-radius: 14px;
-    }
-
-    .input-plus,
-    .input-icon {
-        width: 36px;
-
-        height: 36px;
-
-        font-size: 17px;
-    }
-
-    .send-btn {
-        width: 38px;
-
-        height: 38px;
-
-        font-size: 17px;
-    }
-
-    #message {
-        font-size: 14px;
-
-        line-height: 20px;
-
-        padding: 7px 3px;
-    }
-
-    .plus-menu {
-        left: 10px;
-
-        bottom: 68px;
-
-        width: 170px;
-    }
-}
-
-
-/* =========================================================
-   SMALL PHONE
-========================================================= */
-
-@media (max-width: 430px) {
-
-    .topbar {
-        height: 54px;
-    }
-
-    .chat-area {
-        padding: 5px 7px 2px;
-    }
-
-    .message {
-        margin-bottom: 8px;
-    }
-
-    .message-bubble {
-        padding: 9px 11px;
-
-        font-size: 13px;
+        margin-top: 3px;
     }
 
     .message-actions button {
         font-size: 10px;
 
-        padding: 3px 4px;
-    }
-
-    .message-side-actions button {
-        width: 25px;
-
-        height: 25px;
-
-        font-size: 11px;
+        padding:
+            2px 4px;
     }
 
     .input-area {
-        min-height: 50px;
+        max-width: none;
 
-        margin-bottom: 5px;
+        min-height: 52px;
+
+        margin:
+            0 7px 7px;
+
+        padding:
+            6px 7px;
+
+        border-radius: 11px;
     }
 
     .input-plus,
-    .input-icon {
+    .input-icon,
+    .send-btn {
         width: 34px;
-
         height: 34px;
     }
 
-    .send-btn {
-        width: 36px;
+    #message {
+        font-size: 13px;
 
-        height: 36px;
+        min-height: 34px;
     }
 
     .plus-menu {
-        bottom: 63px;
-
         left: 8px;
 
-        width: 165px;
+        bottom: 66px;
+
+        width: 140px;
     }
+
+    .history-item {
+        min-height: 34px;
+
+        padding:
+            4px 6px;
+    }
+
+    .history-chat-title {
+        font-size: 12px;
+    }
+
+    .history-action-btn {
+        width: 22px;
+        height: 22px;
+
+        font-size: 11px;
+    }
+}
+
+
+/* =====================================================
+   VERY SMALL PHONES
+===================================================== */
+
+@media (max-width: 420px) {
+
+    .topbar {
+        padding: 0 7px;
+    }
+
+    .share-btn {
+        font-size: 10px;
+
+        padding: 0 6px;
+    }
+
+    .conversation {
+        padding:
+            10px 7px 15px;
+    }
+
+    .message-content {
+        max-width: 86%;
+    }
+
+    .message-bubble {
+        font-size: 12px;
+
+        padding:
+            8px 10px;
+    }
+
+    .message-actions button {
+        font-size: 9px;
+    }
+
+    .input-area {
+        margin:
+            0 5px 5px;
+
+        gap: 4px;
+    }
+
+    .input-plus,
+    .input-icon,
+    .send-btn {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+
+/* =====================================================
+   SAFE BUTTON FIX
+===================================================== */
+
+button {
+    font-family: inherit;
+
+    -webkit-tap-highlight-color:
+        transparent;
+}
+
+button:focus {
+    outline: none;
+}
+
+
+/* =====================================================
+   PREVENT MENU FROM GOING BEHIND INPUT
+===================================================== */
+
+.plus-menu,
+.more-menu {
+    pointer-events: auto;
+}
+
+
+/* =====================================================
+   MOBILE TOUCH
+===================================================== */
+
+@media (hover: none) {
+
+    button:active {
+        opacity: 0.8;
+    }
+
 }
