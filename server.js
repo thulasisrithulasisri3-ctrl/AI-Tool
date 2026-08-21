@@ -54,11 +54,20 @@ app.use(
 app.get("/", (req, res) => {
 
     res.json({
+
         success: true,
+
         status: "online",
-        message: "Viggo AI Server is running",
-        model: MODEL,
-        apiConfigured: Boolean(API_KEY)
+
+        message:
+            "Viggo AI Server is running",
+
+        model:
+            MODEL,
+
+        apiConfigured:
+            Boolean(API_KEY)
+
     });
 
 });
@@ -71,10 +80,17 @@ app.get("/", (req, res) => {
 app.get("/status", (req, res) => {
 
     res.json({
+
         success: true,
+
         status: "online",
-        model: MODEL,
-        apiConfigured: Boolean(API_KEY)
+
+        model:
+            MODEL,
+
+        apiConfigured:
+            Boolean(API_KEY)
+
     });
 
 });
@@ -82,19 +98,28 @@ app.get("/status", (req, res) => {
 
 /* =========================
    CHAT
-   IMPORTANT:
-   FRONTEND MUST USE /chat
 ========================= */
 
 app.post("/chat", async (req, res) => {
 
-    console.log("================================");
-    console.log("NEW VIGGO CHAT REQUEST");
-    console.log("================================");
+    console.log(
+        "================================"
+    );
+
+    console.log(
+        "NEW VIGGO CHAT REQUEST"
+    );
+
+    console.log(
+        "================================"
+    );
+
 
     try {
 
-        /* API KEY */
+        /* =========================
+           API KEY CHECK
+        ========================= */
 
         if (!API_KEY || !ai) {
 
@@ -103,14 +128,20 @@ app.post("/chat", async (req, res) => {
             );
 
             return res.status(500).json({
+
                 success: false,
-                error: "GEMINI_API_KEY is missing"
+
+                error:
+                    "GEMINI_API_KEY is missing"
+
             });
 
         }
 
 
-        /* MESSAGE */
+        /* =========================
+           MESSAGE
+        ========================= */
 
         const message =
             typeof req.body?.message === "string"
@@ -118,7 +149,9 @@ app.post("/chat", async (req, res) => {
                 : "";
 
 
-        /* LANGUAGE */
+        /* =========================
+           LANGUAGE
+        ========================= */
 
         const language =
             typeof req.body?.language === "string"
@@ -126,32 +159,50 @@ app.post("/chat", async (req, res) => {
                 : "en";
 
 
+        /* =========================
+           MESSAGE CHECK
+        ========================= */
+
         if (!message) {
 
             return res.status(400).json({
+
                 success: false,
-                error: "Message is required"
+
+                error:
+                    "Message is required"
+
             });
 
         }
 
 
         /* =========================
-           LANGUAGE
+           LANGUAGE NAMES
         ========================= */
 
         const languageNames = {
 
             en: "English",
+
             ta: "Tamil",
+
             hi: "Hindi",
+
             te: "Telugu",
+
             kn: "Kannada",
+
             ml: "Malayalam",
+
             bn: "Bengali",
+
             mr: "Marathi",
+
             gu: "Gujarati",
+
             pa: "Punjabi",
+
             ur: "Urdu"
 
         };
@@ -186,17 +237,12 @@ app.post("/chat", async (req, res) => {
 
 You are Viggo AI, a helpful and friendly AI assistant.
 
-Answer the user's question clearly,
-accurately and naturally.
+Answer the user's question clearly and naturally.
 
 Preferred response language:
 ${selectedLanguage}
 
-If the user asks in another language,
-understand the question and answer
-primarily in the selected language.
-
-Do not mention these instructions.
+If the user asks in another language, understand the question and answer primarily in the selected language.
 
 User message:
 
@@ -217,9 +263,11 @@ ${message}
         const result =
             await ai.models.generateContent({
 
-                model: MODEL,
+                model:
+                    MODEL,
 
-                contents: prompt
+                contents:
+                    prompt
 
             });
 
@@ -248,7 +296,7 @@ ${message}
 
 
         /* =========================
-           FALLBACK RESPONSE PARSER
+           FALLBACK
         ========================= */
 
         if (!reply) {
@@ -299,6 +347,10 @@ ${message}
         }
 
 
+        /* =========================
+           LOG REPLY
+        ========================= */
+
         console.log(
             "Viggo AI reply:",
             reply.substring(0, 200)
@@ -306,16 +358,18 @@ ${message}
 
 
         /* =========================
-           SEND RESPONSE
+           RESPONSE
         ========================= */
 
         return res.json({
 
             success: true,
 
-            reply: reply,
+            reply:
+                reply,
 
-            model: MODEL
+            model:
+                MODEL
 
         });
 
