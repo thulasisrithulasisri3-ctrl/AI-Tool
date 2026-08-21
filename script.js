@@ -9,7 +9,7 @@ const API_BASE =
   "https://ai-tool-1-fgmc.onrender.com";
 
 const CHAT_API =
-  `${API_BASE}/api/chat`;
+  `${API_BASE}/chat`;
 
 
 /* =========================================
@@ -62,7 +62,9 @@ const shareBtn =
   document.getElementById("shareBtn");
 
 
-/* MODALS */
+/* =========================================
+   MODALS
+   ========================================= */
 
 const voiceModal =
   document.getElementById("voiceModal");
@@ -135,7 +137,11 @@ function createNewChat() {
 
     title: "New Chat",
 
-    messages: []
+    messages: [],
+
+    pinned: false,
+
+    saved: false
 
   };
 
@@ -192,100 +198,136 @@ function renderHistory(filter = "") {
 
   chatHistory.innerHTML = "";
 
-  chats
-    .filter(chat =>
-      chat.title
-        .toLowerCase()
-        .includes(filter.toLowerCase())
-    )
-    .forEach(chat => {
-
-      const item =
-        document.createElement("div");
-
-      item.className =
-        "history-item";
-
-      item.innerHTML = `
-
-        <span class="history-name">
-          ${escapeHTML(chat.title)}
-        </span>
-
-        <button
-          class="pin-btn"
-          title="Pin">
-          📌
-        </button>
-
-        <button
-          class="delete-history-btn"
-          title="Delete">
-          🗑
-        </button>
-      `;
+  const filteredChats =
+    chats
+      .filter(chat =>
+        chat.title
+          .toLowerCase()
+          .includes(filter.toLowerCase())
+      )
+      .sort(
+        (a, b) =>
+          Number(b.pinned) -
+          Number(a.pinned)
+      );
 
 
-      item
-        .querySelector(".history-name")
-        .addEventListener(
-          "click",
-          () => loadChat(chat.id)
-        );
+  filteredChats.forEach(chat => {
+
+    const item =
+      document.createElement("div");
+
+    item.className =
+      "history-item";
 
 
-      item
-        .querySelector(".pin-btn")
-        .addEventListener(
-          "click",
-          event => {
+    if (
+      currentChat &&
+      currentChat.id === chat.id
+    ) {
 
-            event.stopPropagation();
+      item.classList.add("active");
 
-            chat.pinned =
-              !chat.pinned;
+    }
 
-            saveChats();
+
+    item.innerHTML = `
+
+      <span class="history-name">
+        ${escapeHTML(chat.title)}
+      </span>
+
+      <button
+        class="pin-btn"
+        title="Pin">
+        ${chat.pinned ? "📌" : "📍"}
+      </button>
+
+      <button
+        class="delete-history-btn"
+        title="Delete">
+        🗑
+      </button>
+
+    `;
+
+
+    item
+      .querySelector(".history-name")
+      .addEventListener(
+        "click",
+        () => {
+
+          loadChat(chat.id);
+
+          renderHistory(
+            searchChat.value
+          );
+
+        }
+      );
+
+
+    item
+      .querySelector(".pin-btn")
+      .addEventListener(
+        "click",
+        event => {
+
+          event.stopPropagation();
+
+          chat.pinned =
+            !chat.pinned;
+
+          saveChats();
+
+          renderHistory(
+            searchChat.value
+          );
+
+        }
+      );
+
+
+    item
+      .querySelector(".delete-history-btn")
+      .addEventListener(
+        "click",
+        event => {
+
+          event.stopPropagation();
+
+          chats =
+            chats.filter(
+              c => c.id !== chat.id
+            );
+
+
+          if (
+            currentChat &&
+            currentChat.id === chat.id
+          ) {
+
+            currentChat = null;
+
+            conversation.innerHTML = "";
 
           }
-        );
 
 
-      item
-        .querySelector(".delete-history-btn")
-        .addEventListener(
-          "click",
-          event => {
+          saveChats();
 
-            event.stopPropagation();
+          renderHistory(
+            searchChat.value
+          );
 
-            chats =
-              chats.filter(
-                c => c.id !== chat.id
-              );
-
-            if (
-              currentChat &&
-              currentChat.id === chat.id
-            ) {
-
-              currentChat = null;
-
-              conversation.innerHTML = "";
-
-            }
-
-            saveChats();
-
-            renderHistory(filter);
-
-          }
-        );
+        }
+      );
 
 
-      chatHistory.appendChild(item);
+    chatHistory.appendChild(item);
 
-    });
+  });
 
 }
 
@@ -326,7 +368,9 @@ function addMessage(
   bubble.appendChild(textDiv);
 
 
-  /* ACTIONS */
+  /* =====================================
+     ACTIONS
+     ===================================== */
 
   const actions =
     document.createElement("div");
@@ -348,7 +392,9 @@ function addMessage(
 
   like.onclick = () => {
 
-    like.classList.toggle("active");
+    like.classList.toggle(
+      "active"
+    );
 
   };
 
@@ -366,7 +412,9 @@ function addMessage(
 
   dislike.onclick = () => {
 
-    dislike.classList.toggle("active");
+    dislike.classList.toggle(
+      "active"
+    );
 
   };
 
@@ -410,7 +458,9 @@ function addMessage(
 
     try {
 
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(
+        text
+      );
 
       copy.innerHTML =
         "✓ Copied";
@@ -424,7 +474,10 @@ function addMessage(
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        "Copy error:",
+        error
+      );
 
     }
 
@@ -460,7 +513,9 @@ function addMessage(
     conversation.parentElement.scrollHeight;
 
 
-  /* SAVE */
+  /* =====================================
+     SAVE MESSAGE
+     ===================================== */
 
   if (save) {
 
@@ -469,6 +524,7 @@ function addMessage(
       createNewChat();
 
     }
+
 
     currentChat.messages.push({
 
@@ -488,6 +544,7 @@ function addMessage(
         text.substring(0, 30);
 
     }
+
 
     saveChats();
 
@@ -607,6 +664,7 @@ function getSpeechLanguage() {
 
   };
 
+
   return (
     languages[selectedLanguage] ||
     "en-US"
@@ -616,7 +674,7 @@ function getSpeechLanguage() {
 
 
 /* =========================================
-   SEND
+   SEND MESSAGE
    ========================================= */
 
 async function sendMessage() {
@@ -624,8 +682,13 @@ async function sendMessage() {
   const text =
     messageInput.value.trim();
 
+
   if (!text) return;
 
+
+  /* =====================================
+     CREATE CHAT
+     ===================================== */
 
   if (!currentChat) {
 
@@ -633,6 +696,10 @@ async function sendMessage() {
 
   }
 
+
+  /* =====================================
+     USER MESSAGE
+     ===================================== */
 
   addMessage(
     "user",
@@ -647,30 +714,52 @@ async function sendMessage() {
     "auto";
 
 
+  /* =====================================
+     LOADING
+     ===================================== */
+
   const loading =
     document.createElement("div");
 
   loading.className =
     "message assistant";
 
+
   loading.innerHTML = `
 
     <div class="message-bubble">
 
       <div class="message-text">
+
         Viggo AI is thinking...
+
       </div>
 
     </div>
 
   `;
 
+
   conversation.appendChild(
     loading
   );
 
 
+  conversation.parentElement.scrollTop =
+    conversation.parentElement.scrollHeight;
+
+
+  /* =====================================
+     API REQUEST
+     ===================================== */
+
   try {
+
+    console.log(
+      "Sending request to:",
+      CHAT_API
+    );
+
 
     const response =
       await fetch(
@@ -680,8 +769,10 @@ async function sendMessage() {
           method: "POST",
 
           headers: {
+
             "Content-Type":
               "application/json"
+
           },
 
           body: JSON.stringify({
@@ -700,7 +791,22 @@ async function sendMessage() {
       );
 
 
+    console.log(
+      "Server status:",
+      response.status
+    );
+
+
     if (!response.ok) {
+
+      const errorText =
+        await response.text();
+
+      console.error(
+        "Server error:",
+        errorText
+      );
+
 
       throw new Error(
         `HTTP ${response.status}`
@@ -711,6 +817,13 @@ async function sendMessage() {
 
     const data =
       await response.json();
+
+
+    console.log(
+      "AI response:",
+      data
+    );
+
 
     loading.remove();
 
@@ -732,7 +845,11 @@ async function sendMessage() {
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      "Viggo AI Error:",
+      error
+    );
+
 
     loading.remove();
 
@@ -749,7 +866,7 @@ async function sendMessage() {
 
 
 /* =========================================
-   ENTER
+   ENTER KEY
    ========================================= */
 
 messageInput.addEventListener(
@@ -810,7 +927,7 @@ closeSidebar.onclick = () => {
 
 
 /* =========================================
-   MORE
+   MORE MENU
    ========================================= */
 
 moreBtn.onclick = event => {
@@ -845,7 +962,7 @@ moreMenu.onclick =
 
 
 /* =========================================
-   PLUS
+   PLUS MENU
    ========================================= */
 
 plusBtn.onclick = event => {
@@ -877,18 +994,15 @@ searchChat.oninput = () => {
 
 
 /* =========================================
-   SHARE BUTTON
+   SHARE
    ========================================= */
 
 shareBtn.onclick =
   async () => {
 
-    /*
-       Share current chat text
-    */
-
     let shareText =
       "Viggo AI Chat";
+
 
     if (
       currentChat &&
@@ -907,7 +1021,7 @@ shareBtn.onclick =
     }
 
 
-    /* Native share */
+    /* Native Share */
 
     if (
       navigator.share
@@ -976,16 +1090,30 @@ function openVoiceModal() {
 }
 
 
-document
-  .getElementById("voiceMenuBtn")
-  .onclick =
-  openVoiceModal;
+const voiceMenuBtn =
+  document.getElementById(
+    "voiceMenuBtn"
+  );
+
+if (voiceMenuBtn) {
+
+  voiceMenuBtn.onclick =
+    openVoiceModal;
+
+}
 
 
-document
-  .getElementById("plusVoiceBtn")
-  .onclick =
-  openVoiceModal;
+const plusVoiceBtn =
+  document.getElementById(
+    "plusVoiceBtn"
+  );
+
+if (plusVoiceBtn) {
+
+  plusVoiceBtn.onclick =
+    openVoiceModal;
+
+}
 
 
 closeVoice.onclick = () => {
@@ -1022,9 +1150,15 @@ voiceTest.onclick = () => {
    LANGUAGE MODAL
    ========================================= */
 
-document
-  .getElementById("languageBtn")
-  .onclick = () => {
+const languageBtn =
+  document.getElementById(
+    "languageBtn"
+  );
+
+
+if (languageBtn) {
+
+  languageBtn.onclick = () => {
 
     languageModal.classList.add(
       "show"
@@ -1036,6 +1170,8 @@ document
 
   };
 
+}
+
 
 closeLanguage.onclick = () => {
 
@@ -1046,15 +1182,21 @@ closeLanguage.onclick = () => {
 };
 
 
+/* =========================================
+   SAVE LANGUAGE
+   ========================================= */
+
 saveLanguage.onclick = () => {
 
   selectedLanguage =
     languageSelect.value;
 
+
   localStorage.setItem(
     "viggo_language",
     selectedLanguage
   );
+
 
   languageModal.classList.remove(
     "show"
@@ -1071,6 +1213,7 @@ function clearChat() {
 
   conversation.innerHTML = "";
 
+
   if (currentChat) {
 
     currentChat.messages = [];
@@ -1082,19 +1225,33 @@ function clearChat() {
 }
 
 
-document
-  .getElementById("clearChatBtn")
-  .onclick =
-  clearChat;
+const clearChatBtn =
+  document.getElementById(
+    "clearChatBtn"
+  );
+
+
+if (clearChatBtn) {
+
+  clearChatBtn.onclick =
+    clearChat;
+
+}
 
 
 /* =========================================
    SHOW HISTORY
    ========================================= */
 
-document
-  .getElementById("showHistoryBtn")
-  .onclick = () => {
+const showHistoryBtn =
+  document.getElementById(
+    "showHistoryBtn"
+  );
+
+
+if (showHistoryBtn) {
+
+  showHistoryBtn.onclick = () => {
 
     sidebar.classList.add(
       "open"
@@ -1102,20 +1259,29 @@ document
 
   };
 
+}
+
 
 /* =========================================
    DELETE ALL
    ========================================= */
 
-document
-  .getElementById("deleteSelectedBtn")
-  .onclick = () => {
+const deleteSelectedBtn =
+  document.getElementById(
+    "deleteSelectedBtn"
+  );
+
+
+if (deleteSelectedBtn) {
+
+  deleteSelectedBtn.onclick = () => {
 
     if (
       !confirm(
         "Delete all chat history?"
       )
     ) return;
+
 
     chats = [];
 
@@ -1129,14 +1295,22 @@ document
 
   };
 
+}
+
 
 /* =========================================
    SELECT CHATS
    ========================================= */
 
-document
-  .getElementById("selectChatsBtn")
-  .onclick = () => {
+const selectChatsBtn =
+  document.getElementById(
+    "selectChatsBtn"
+  );
+
+
+if (selectChatsBtn) {
+
+  selectChatsBtn.onclick = () => {
 
     alert(
       "Select Chats mode"
@@ -1144,19 +1318,28 @@ document
 
   };
 
+}
+
 
 /* =========================================
    SAVED CHATS
    ========================================= */
 
-document
-  .getElementById("savedChatsBtn")
-  .onclick = () => {
+const savedChatsBtn =
+  document.getElementById(
+    "savedChatsBtn"
+  );
+
+
+if (savedChatsBtn) {
+
+  savedChatsBtn.onclick = () => {
 
     const saved =
       chats.filter(
         chat => chat.saved
       );
+
 
     alert(
       saved.length
@@ -1166,12 +1349,15 @@ document
 
   };
 
+}
+
 
 /* =========================================
    MICROPHONE
    ========================================= */
 
 let recognition = null;
+
 
 if (
   "SpeechRecognition" in window ||
@@ -1182,11 +1368,14 @@ if (
     window.SpeechRecognition ||
     window.webkitSpeechRecognition;
 
+
   recognition =
     new SpeechRecognition();
 
+
   recognition.continuous =
     false;
+
 
   recognition.interimResults =
     false;
@@ -1198,6 +1387,22 @@ if (
       messageInput.value +=
         event.results[0][0]
           .transcript;
+
+
+      messageInput.dispatchEvent(
+        new Event("input")
+      );
+
+    };
+
+
+  recognition.onerror =
+    error => {
+
+      console.error(
+        "Speech recognition error:",
+        error
+      );
 
     };
 
@@ -1216,10 +1421,22 @@ micButton.onclick = () => {
 
   }
 
+
   recognition.lang =
     getSpeechLanguage();
 
-  recognition.start();
+
+  try {
+
+    recognition.start();
+
+  } catch (error) {
+
+    console.log(
+      "Voice recognition already running."
+    );
+
+  }
 
 };
 
@@ -1232,6 +1449,7 @@ messageInput.oninput = () => {
 
   messageInput.style.height =
     "auto";
+
 
   messageInput.style.height =
     Math.min(
@@ -1251,8 +1469,10 @@ function escapeHTML(text) {
   const div =
     document.createElement("div");
 
+
   div.textContent =
     text;
+
 
   return div.innerHTML;
 
@@ -1262,7 +1482,10 @@ function escapeHTML(text) {
 function formatText(text) {
 
   return escapeHTML(text)
-    .replace(/\n/g, "<br>");
+    .replace(
+      /\n/g,
+      "<br>"
+    );
 
 }
 
