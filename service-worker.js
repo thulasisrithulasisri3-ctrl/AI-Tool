@@ -1,101 +1,173 @@
 "use strict";
 
-const CACHE_NAME = "viggo-ai-v1";
+const CACHE_NAME = "viggo-ai-v2";
+
+const BASE = "/AI-Tool/";
 
 const FILES_TO_CACHE = [
-    "/AI-Tool/",
-    "/AI-Tool/index.html",
-    "/AI-Tool/style.css",
-    "/AI-Tool/script.js",
-    "/AI-Tool/manifest.json",
-    "/AI-Tool/icon-192.png",
-    "/AI-Tool/icon-512.png"
+  BASE,
+  BASE + "index.html",
+  BASE + "style.css",
+  BASE + "script.js",
+  BASE + "manifest.json",
+  BASE + "icon-192.png",
+  BASE + "icon-512.png"
 ];
 
-/* =========================
+
+/* =========================================
    INSTALL
-========================= */
+========================================= */
 
 self.addEventListener("install", event => {
 
-    event.waitUntil(
+  event.waitUntil(
 
-        caches.open(CACHE_NAME)
-            .then(cache => {
+    caches.open(CACHE_NAME)
+      .then(cache => {
 
-                return cache.addAll(
-                    FILES_TO_CACHE
-                );
+        return cache.addAll(
+          FILES_TO_CACHE
+        );
 
-            })
+      })
 
-    );
+  );
 
-    self.skipWaiting();
+  self.skipWaiting();
 
 });
 
 
-/* =========================
+/* =========================================
    ACTIVATE
-========================= */
+========================================= */
 
 self.addEventListener("activate", event => {
 
-    event.waitUntil(
+  event.waitUntil(
 
-        caches.keys()
-            .then(cacheNames => {
+    caches.keys()
+      .then(cacheNames => {
 
-                return Promise.all(
+        return Promise.all(
 
-                    cacheNames
-                        .filter(
-                            name =>
-                                name !== CACHE_NAME
-                        )
-                        .map(
-                            name =>
-                                caches.delete(name)
-                        )
+          cacheNames
+            .filter(
+              name =>
+                name !== CACHE_NAME
+            )
+            .map(
+              name =>
+                caches.delete(name)
+            )
 
-                );
+        );
 
-            })
+      })
 
-    );
+  );
 
-    self.clients.claim();
+  self.clients.claim();
 
 });
 
 
-/* =========================
+/* =========================================
    FETCH
-========================= */
+========================================= */
 
 self.addEventListener("fetch", event => {
 
+  const request =
+    event.request;
+
+  /* ---------------------------------------
+     API requests
+     NEVER CACHE
+  --------------------------------------- */
+
+  if (
+    request.url.includes(
+      "ai-tool-1-fgmc.onrender.com"
+    )
+  ) {
+
+    return;
+
+  }
+
+
+  /* ---------------------------------------
+     HTML / CSS / JS
+     NETWORK FIRST
+  --------------------------------------- */
+
+  if (
+    request.method === "GET" &&
+    (
+      request.destination === "document" ||
+      request.destination === "script" ||
+      request.destination === "style"
+    )
+  ) {
+
     event.respondWith(
 
-        caches.match(event.request)
-            .then(cachedResponse => {
+      fetch(request)
+        .then(response => {
 
-                if (cachedResponse) {
-                    return cachedResponse;
-                }
+          const responseClone =
+            response.clone();
 
-                return fetch(event.request);
+          caches.open(CACHE_NAME)
+            .then(cache => {
 
-            })
-            .catch(() => {
+              cache.put(
+                request,
+                responseClone
+              );
 
-                return caches.match(
-                    "/AI-Tool/"
-                );
+            });
 
-            })
+          return response;
+
+        })
+        .catch(() => {
+
+          return caches.match(
+            request
+          );
+
+        })
 
     );
+
+    return;
+
+  }
+
+
+  /* ---------------------------------------
+     OTHER FILES
+     CACHE FIRST
+  --------------------------------------- */
+
+  event.respondWith(
+
+    caches.match(request)
+      .then(cachedResponse => {
+
+        if (cachedResponse) {
+
+          return cachedResponse;
+
+        }
+
+        return fetch(request);
+
+      })
+
+  );
 
 });
