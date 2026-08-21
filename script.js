@@ -6,7 +6,7 @@
    ========================================= */
 
 const API_BASE =
-  "https://ai-tool-1-fgmc.onrender.com";
+      " https://ai-tool-2-zpul.onrender.com";
 
 const CHAT_API =
   `${API_BASE}/chat`;
