@@ -1,4 +1,4 @@
-```javascript
+
 "use strict";
 
 require("dotenv").config();
@@ -19,7 +19,7 @@ const HOST = "0.0.0.0";
 
 const API_KEY = process.env.GEMINI_API_KEY;
 const MODEL =
-  process.env.GEMINI_MODEL || "gemini-1.5-flash";
+  process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
 /* =========================================
    GEMINI AI
@@ -657,4 +657,3 @@ app.listen(
     );
   }
 );
-```
