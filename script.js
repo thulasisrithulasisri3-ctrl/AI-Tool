@@ -1050,7 +1050,7 @@ shareBtn.onclick = async () => {
 
     const preview =
       currentChat.messages
-        .slice(0, 4)
+        .slice(-2)
         .map(item => {
 
           const name =
@@ -1058,7 +1058,7 @@ shareBtn.onclick = async () => {
               ? "You"
               : "Viggo AI";
 
-          return `${name}: ${item.text}`;
+          return `${name}: ${item.text.slice(0,50)}`;
 
         })
         .join("\n");
