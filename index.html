@@ -1,71 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
   <title>Viggo AI</title>
-  <link rel="stylesheet" href="style.css">
+
+  <!-- CSS -->
+  <link
+    rel="stylesheet"
+    href="style.css?v=100"
+  >
+
 </head>
+
 
 <body>
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
+
+  <!-- =========================================
+       SIDEBAR
+  ========================================== -->
+
+  <aside
+    class="sidebar"
+    id="sidebar"
+  >
 
     <div class="sidebar-header">
+
       <h2>Viggo AI</h2>
 
-      <button id="closeSidebar" class="icon-btn">✕</button>
+      <button
+        id="closeSidebar"
+        class="icon-btn"
+      >
+        ✕
+      </button>
+
     </div>
 
-    <button id="newChat" class="new-chat">
+
+    <button
+      id="newChat"
+      class="new-chat"
+    >
       ＋ New Chat
     </button>
 
+
     <div class="search-box">
+
       🔎
-      <input id="searchChat" type="text" placeholder="Search Chat">
+
+      <input
+        id="searchChat"
+        type="text"
+        placeholder="Search Chat"
+      >
+
     </div>
+
 
     <div class="history-title">
       CHAT HISTORY
     </div>
 
-    <div id="chatHistory" class="chat-history"></div>
 
-    <!-- MORE BUTTON AT BOTTOM -->
+    <div
+      id="chatHistory"
+      class="chat-history"
+    ></div>
+
+
+    <!-- MORE -->
+
     <div class="sidebar-more">
 
-      <button id="moreBtn" class="more-button">
-        <span class="more-dots">⋮</span>
-        <span>More</span>
+      <button
+        id="moreBtn"
+        class="more-button"
+      >
+
+        <span class="more-dots">
+          ⋮
+        </span>
+
+        <span>
+          More
+        </span>
+
       </button>
 
-      <div id="moreMenu" class="more-menu">
+
+      <div
+        id="moreMenu"
+        class="more-menu"
+      >
 
         <button id="voiceMenuBtn">
           🎤 Voice
         </button>
 
+
         <button id="languageBtn">
           🌐 Language
         </button>
+
 
         <button id="clearChatBtn">
           🗑 Clear Chat
         </button>
 
+
         <button id="showHistoryBtn">
           🕘 Show History
         </button>
+
 
         <button id="savedChatsBtn">
           💾 Saved Chats
         </button>
 
+
         <button id="selectChatsBtn">
           ☑ Select Chats
         </button>
+
 
         <button id="deleteSelectedBtn">
           🗑 Delete Selected
@@ -78,17 +145,27 @@
   </aside>
 
 
-  <!-- MAIN -->
+
+  <!-- =========================================
+       MAIN
+  ========================================== -->
+
   <main class="main">
 
+
     <!-- TOP BAR -->
+
     <header class="topbar">
 
       <div class="top-left">
 
-        <button id="openSidebar" class="menu-btn">
+        <button
+          id="openSidebar"
+          class="menu-btn"
+        >
           ☰
         </button>
+
 
         <div class="brand">
           Viggo AI
@@ -97,28 +174,52 @@
       </div>
 
 
-      <!-- SHARE ON RIGHT SIDE -->
-      <button id="shareBtn" class="share-btn">
+      <!-- SHARE -->
+
+      <button
+        id="shareBtn"
+        class="share-btn"
+      >
         🔗 Share
       </button>
 
     </header>
 
 
-    <!-- CHAT -->
+
+    <!-- =======================================
+         CHAT AREA
+    ======================================== -->
+
     <section class="chat-area">
 
-      <div id="conversation" class="conversation"></div>
+      <div
+        id="conversation"
+        class="conversation"
+      ></div>
 
     </section>
 
 
-    <!-- INPUT -->
+
+    <!-- =======================================
+         INPUT AREA
+    ======================================== -->
+
     <div class="input-area">
 
-      <button id="plusBtn" class="input-plus">
+
+      <!-- PLUS -->
+
+      <button
+        id="plusBtn"
+        class="input-plus"
+      >
         ＋
       </button>
+
+
+      <!-- MESSAGE -->
 
       <textarea
         id="message"
@@ -126,11 +227,23 @@
         placeholder="Message Viggo AI..."
       ></textarea>
 
-      <button id="mic" class="input-icon">
+
+      <!-- MICROPHONE -->
+
+      <button
+        id="mic"
+        class="input-icon"
+      >
         🎤
       </button>
 
-      <button id="send" class="send-btn">
+
+      <!-- SEND -->
+
+      <button
+        id="send"
+        class="send-btn"
+      >
         ➤
       </button>
 
@@ -139,20 +252,30 @@
   </main>
 
 
-  <!-- PLUS MENU -->
-  <div id="plusMenu" class="plus-menu">
+
+  <!-- =========================================
+       PLUS MENU
+  ========================================== -->
+
+  <div
+    id="plusMenu"
+    class="plus-menu"
+  >
 
     <button>
       📷 Photo
     </button>
 
+
     <button>
       🎥 Video
     </button>
 
+
     <button>
       📎 File
     </button>
+
 
     <button id="plusVoiceBtn">
       🎤 Voice
@@ -161,23 +284,49 @@
   </div>
 
 
-  <!-- VOICE MODAL -->
-  <div id="voiceModal" class="modal">
+
+  <!-- =========================================
+       VOICE MODAL
+  ========================================== -->
+
+  <div
+    id="voiceModal"
+    class="modal"
+  >
 
     <div class="modal-box">
 
-      <button id="closeVoice" class="modal-close">
+
+      <button
+        id="closeVoice"
+        class="modal-close"
+      >
         ✕
       </button>
 
-      <h3>Voice Settings</h3>
+
+      <h3>
+        Voice Settings
+      </h3>
+
 
       <select id="voiceSelect">
-        <option value="female">Female</option>
-        <option value="male">Male</option>
+
+        <option value="female">
+          Female
+        </option>
+
+        <option value="male">
+          Male
+        </option>
+
       </select>
 
-      <button id="voiceTest" class="modal-button">
+
+      <button
+        id="voiceTest"
+        class="modal-button"
+      >
         🔊 Test Voice
       </button>
 
@@ -186,27 +335,65 @@
   </div>
 
 
-  <!-- LANGUAGE MODAL -->
-  <div id="languageModal" class="modal">
+
+  <!-- =========================================
+       LANGUAGE MODAL
+  ========================================== -->
+
+  <div
+    id="languageModal"
+    class="modal"
+  >
 
     <div class="modal-box">
 
-      <button id="closeLanguage" class="modal-close">
+
+      <button
+        id="closeLanguage"
+        class="modal-close"
+      >
         ✕
       </button>
 
-      <h3>Language</h3>
+
+      <h3>
+        Language
+      </h3>
+
 
       <select id="languageSelect">
-        <option value="English">English</option>
-        <option value="Tamil">தமிழ்</option>
-        <option value="Hindi">हिन्दी</option>
-        <option value="Malayalam">മലയാളം</option>
-        <option value="Telugu">తెలుగు</option>
-        <option value="Kannada">ಕನ್ನಡ</option>
+
+        <option value="English">
+          English
+        </option>
+
+        <option value="Tamil">
+          தமிழ்
+        </option>
+
+        <option value="Hindi">
+          हिन्दी
+        </option>
+
+        <option value="Malayalam">
+          മലയാളം
+        </option>
+
+        <option value="Telugu">
+          తెలుగు
+        </option>
+
+        <option value="Kannada">
+          ಕನ್ನಡ
+        </option>
+
       </select>
 
-      <button id="saveLanguage" class="modal-button">
+
+      <button
+        id="saveLanguage"
+        class="modal-button"
+      >
         Save
       </button>
 
@@ -215,7 +402,60 @@
   </div>
 
 
-<script src="script.js?v=3"></script>
+
+  <!-- =========================================
+       SERVICE WORKER
+  ========================================== -->
+
+  <script>
+
+    if ("serviceWorker" in navigator) {
+
+      window.addEventListener(
+        "load",
+        () => {
+
+          navigator.serviceWorker
+            .register(
+              "/AI-Tool/service-worker.js?v=100"
+            )
+            .then(
+              registration => {
+
+                console.log(
+                  "Viggo Service Worker registered:",
+                  registration.scope
+                );
+
+              }
+            )
+            .catch(
+              error => {
+
+                console.error(
+                  "Service Worker error:",
+                  error
+                );
+
+              }
+            );
+
+        }
+      );
+
+    }
+
+  </script>
+
+
+
+  <!-- =========================================
+       MAIN SCRIPT
+  ========================================== -->
+
+  <script src="script.js?v=100"></script>
+
 
 </body>
+
 </html>
