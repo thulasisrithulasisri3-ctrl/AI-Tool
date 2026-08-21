@@ -13,14 +13,13 @@ const HOST = "0.0.0.0";
 
 const API_KEY = process.env.GEMINI_API_KEY;
 
-/*
-  Render Environment Variable:
-  GEMINI_MODEL
-
-  If not set, this model will be used.
-*/
 const MODEL =
     process.env.GEMINI_MODEL || "gemini-2.5-flash";
+
+
+/* =========================
+   GEMINI AI
+========================= */
 
 const ai = API_KEY
     ? new GoogleGenAI({
@@ -55,19 +54,11 @@ app.use(
 app.get("/", (req, res) => {
 
     res.json({
-
         success: true,
-
         status: "online",
-
-        message:
-            "Viggo AI Server is running",
-
+        message: "Viggo AI Server is running",
         model: MODEL,
-
-        apiConfigured:
-            Boolean(API_KEY)
-
+        apiConfigured: Boolean(API_KEY)
     });
 
 });
@@ -80,16 +71,10 @@ app.get("/", (req, res) => {
 app.get("/status", (req, res) => {
 
     res.json({
-
         success: true,
-
         status: "online",
-
         model: MODEL,
-
-        apiConfigured:
-            Boolean(API_KEY)
-
+        apiConfigured: Boolean(API_KEY)
     });
 
 });
@@ -97,26 +82,19 @@ app.get("/status", (req, res) => {
 
 /* =========================
    CHAT
+   IMPORTANT:
+   FRONTEND MUST USE /chat
 ========================= */
 
 app.post("/chat", async (req, res) => {
 
-    console.log(
-        "================================"
-    );
-
-    console.log(
-        "NEW VIGGO CHAT REQUEST"
-    );
-
-    console.log(
-        "================================"
-    );
-
+    console.log("================================");
+    console.log("NEW VIGGO CHAT REQUEST");
+    console.log("================================");
 
     try {
 
-        /* API KEY CHECK */
+        /* API KEY */
 
         if (!API_KEY || !ai) {
 
@@ -125,12 +103,8 @@ app.post("/chat", async (req, res) => {
             );
 
             return res.status(500).json({
-
                 success: false,
-
-                error:
-                    "GEMINI_API_KEY is missing"
-
+                error: "GEMINI_API_KEY is missing"
             });
 
         }
@@ -155,41 +129,29 @@ app.post("/chat", async (req, res) => {
         if (!message) {
 
             return res.status(400).json({
-
                 success: false,
-
-                error:
-                    "Message is required"
-
+                error: "Message is required"
             });
 
         }
 
 
-        /* LANGUAGE NAMES */
+        /* =========================
+           LANGUAGE
+        ========================= */
 
         const languageNames = {
 
             en: "English",
-
             ta: "Tamil",
-
             hi: "Hindi",
-
             te: "Telugu",
-
             kn: "Kannada",
-
             ml: "Malayalam",
-
             bn: "Bengali",
-
             mr: "Marathi",
-
             gu: "Gujarati",
-
             pa: "Punjabi",
-
             ur: "Urdu"
 
         };
@@ -216,18 +178,25 @@ app.post("/chat", async (req, res) => {
         );
 
 
-        /* PROMPT */
+        /* =========================
+           PROMPT
+        ========================= */
 
         const prompt = `
 
 You are Viggo AI, a helpful and friendly AI assistant.
 
-Answer the user's question clearly and naturally.
+Answer the user's question clearly,
+accurately and naturally.
 
 Preferred response language:
 ${selectedLanguage}
 
-If the user asks in another language, understand the question and answer primarily in the selected language.
+If the user asks in another language,
+understand the question and answer
+primarily in the selected language.
+
+Do not mention these instructions.
 
 User message:
 
@@ -236,7 +205,9 @@ ${message}
 `;
 
 
-        /* GEMINI REQUEST */
+        /* =========================
+           GEMINI REQUEST
+        ========================= */
 
         console.log(
             "Sending request to Gemini..."
@@ -258,7 +229,9 @@ ${message}
         );
 
 
-        /* GET RESPONSE */
+        /* =========================
+           GET RESPONSE
+        ========================= */
 
         let reply = "";
 
@@ -274,7 +247,9 @@ ${message}
         }
 
 
-        /* FALLBACK */
+        /* =========================
+           FALLBACK RESPONSE PARSER
+        ========================= */
 
         if (!reply) {
 
@@ -302,7 +277,9 @@ ${message}
         }
 
 
-        /* EMPTY RESPONSE */
+        /* =========================
+           EMPTY RESPONSE
+        ========================= */
 
         if (!reply) {
 
@@ -328,7 +305,9 @@ ${message}
         );
 
 
-        /* SEND TO FRONTEND */
+        /* =========================
+           SEND RESPONSE
+        ========================= */
 
         return res.json({
 
@@ -374,7 +353,9 @@ ${message}
             errorMessage.toLowerCase();
 
 
-        /* API KEY ERROR */
+        /* =========================
+           API KEY ERROR
+        ========================= */
 
         if (
             lower.includes("401") ||
@@ -399,7 +380,9 @@ ${message}
         }
 
 
-        /* MODEL ERROR */
+        /* =========================
+           MODEL ERROR
+        ========================= */
 
         if (
             lower.includes("404") ||
@@ -424,7 +407,9 @@ ${message}
         }
 
 
-        /* QUOTA */
+        /* =========================
+           QUOTA ERROR
+        ========================= */
 
         if (
             lower.includes("429") ||
@@ -448,7 +433,9 @@ ${message}
         }
 
 
-        /* OTHER ERROR */
+        /* =========================
+           OTHER ERROR
+        ========================= */
 
         return res.status(500).json({
 
@@ -468,7 +455,7 @@ ${message}
 
 
 /* =========================
-   404
+   404 HANDLER
 ========================= */
 
 app.use(
