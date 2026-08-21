@@ -12,10 +12,12 @@
 
   <title>Viggo AI</title>
 
-  <!-- CSS -->
+  <!-- Prevent favicon.ico 404 -->
+  <link rel="icon" href="data:,">
+
   <link
     rel="stylesheet"
-    href="style.css?v=100"
+    href="style.css?v=4"
   >
 
 </head>
@@ -35,11 +37,14 @@
 
     <div class="sidebar-header">
 
-      <h2>Viggo AI</h2>
+      <h2>
+        Viggo AI
+      </h2>
 
       <button
         id="closeSidebar"
         class="icon-btn"
+        type="button"
       >
         ✕
       </button>
@@ -52,6 +57,7 @@
     <button
       id="newChat"
       class="new-chat"
+      type="button"
     >
       ＋ New Chat
     </button>
@@ -61,7 +67,7 @@
 
     <div class="search-box">
 
-      <span>🔎</span>
+      🔎
 
       <input
         id="searchChat"
@@ -88,9 +94,7 @@
     ></div>
 
 
-    <!-- =======================================
-         MORE
-    ======================================== -->
+    <!-- MORE -->
 
     <div class="sidebar-more">
 
@@ -110,6 +114,8 @@
 
       </button>
 
+
+      <!-- MORE MENU -->
 
       <div
         id="moreMenu"
@@ -196,7 +202,6 @@
           id="openSidebar"
           class="menu-btn"
           type="button"
-          aria-label="Open sidebar"
         >
           ☰
         </button>
@@ -223,9 +228,9 @@
 
 
 
-    <!-- =========================================
+    <!-- =====================================
          CHAT AREA
-    ========================================== -->
+    ====================================== -->
 
     <section class="chat-area">
 
@@ -238,9 +243,9 @@
 
 
 
-    <!-- =========================================
+    <!-- =====================================
          INPUT AREA
-    ========================================== -->
+    ====================================== -->
 
     <div class="input-area">
 
@@ -251,7 +256,6 @@
         id="plusBtn"
         class="input-plus"
         type="button"
-        aria-label="More options"
       >
         ＋
       </button>
@@ -273,7 +277,7 @@
         id="mic"
         class="input-icon"
         type="button"
-        aria-label="Voice input"
+        title="Voice input"
       >
         🎤
       </button>
@@ -285,7 +289,7 @@
         id="send"
         class="send-btn"
         type="button"
-        aria-label="Send message"
+        title="Send"
       >
         ➤
       </button>
@@ -305,23 +309,17 @@
     class="plus-menu"
   >
 
-    <button
-      type="button"
-    >
+    <button type="button">
       📷 Photo
     </button>
 
 
-    <button
-      type="button"
-    >
+    <button type="button">
       🎥 Video
     </button>
 
 
-    <button
-      type="button"
-    >
+    <button type="button">
       📎 File
     </button>
 
@@ -460,19 +458,49 @@
 
 
   <!-- =========================================
-       NO SERVICE WORKER
-       
-       IMPORTANT:
-       Service Worker intentionally removed
-       to prevent old cache problems.
+       SERVICE WORKER
   ========================================== -->
+
+  <script>
+
+    if ("serviceWorker" in navigator) {
+
+      window.addEventListener(
+        "load",
+        () => {
+
+          navigator.serviceWorker
+            .register("./service-worker.js")
+            .then(() => {
+
+              console.log(
+                "Viggo Service Worker registered successfully."
+              );
+
+            })
+            .catch(error => {
+
+              console.error(
+                "Service Worker error:",
+                error
+              );
+
+            });
+
+        }
+      );
+
+    }
+
+  </script>
+
 
 
   <!-- =========================================
-       MAIN JAVASCRIPT
+       VIGGO SCRIPT
   ========================================== -->
 
-  <script src="script.js?v=100"></script>
+  <script src="script.js?v=4"></script>
 
 
 </body>
