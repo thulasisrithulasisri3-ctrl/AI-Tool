@@ -1,6 +1,7 @@
 /* =====================================================
    VIGGO AI - FULL CSS
    BLACK + BLUE THEME
+   PHONE + COMPUTER RESPONSIVE
 ===================================================== */
 
 * {
@@ -62,6 +63,8 @@ body {
     padding: 0 14px;
 
     border-bottom: 1px solid #14263d;
+
+    flex-shrink: 0;
 }
 
 .sidebar-header h2 {
@@ -109,6 +112,8 @@ body {
     font-weight: 600;
 
     cursor: pointer;
+
+    flex-shrink: 0;
 }
 
 .new-chat:hover {
@@ -139,6 +144,8 @@ body {
     border-radius: 8px;
 
     color: #7e94ae;
+
+    flex-shrink: 0;
 }
 
 .search-box input {
@@ -172,6 +179,8 @@ body {
     color: #607895;
 
     font-weight: 700;
+
+    flex-shrink: 0;
 }
 
 
@@ -181,6 +190,8 @@ body {
 
 .chat-history {
     flex: 1;
+
+    min-height: 0;
 
     overflow-y: auto;
 
@@ -346,6 +357,8 @@ body {
     padding: 8px;
 
     border-top: 1px solid #14263d;
+
+    flex-shrink: 0;
 }
 
 .more-button {
@@ -509,7 +522,7 @@ body {
 ===================================================== */
 
 .main {
-    width: 100%;
+    width: calc(100% - 260px);
     height: 100vh;
 
     margin-left: 260px;
@@ -519,6 +532,8 @@ body {
     flex-direction: column;
 
     background: #050b14;
+
+    min-width: 0;
 }
 
 
@@ -550,6 +565,8 @@ body {
     align-items: center;
 
     gap: 12px;
+
+    min-width: 0;
 }
 
 
@@ -572,6 +589,8 @@ body {
     font-size: 20px;
 
     cursor: pointer;
+
+    flex-shrink: 0;
 }
 
 .menu-btn:hover {
@@ -590,6 +609,12 @@ body {
     font-weight: 700;
 
     color: #ffffff;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
 }
 
 
@@ -613,6 +638,8 @@ body {
     font-size: 12px;
 
     cursor: pointer;
+
+    flex-shrink: 0;
 }
 
 .share-btn:hover {
@@ -634,6 +661,8 @@ body {
     display: flex;
 
     justify-content: center;
+
+    position: relative;
 }
 
 
@@ -705,6 +734,8 @@ body {
     display: flex;
 
     flex-direction: column;
+
+    min-width: 0;
 }
 
 
@@ -723,12 +754,14 @@ body {
 
     word-wrap: break-word;
 
+    overflow-wrap: anywhere;
+
     white-space: pre-wrap;
 }
 
 
 /* =====================================================
-   AI BUBBLE - LEFT
+   AI BUBBLE
 ===================================================== */
 
 .message.ai .message-bubble {
@@ -743,7 +776,7 @@ body {
 
 
 /* =====================================================
-   USER BUBBLE - RIGHT
+   USER BUBBLE
 ===================================================== */
 
 .message.user .message-bubble {
@@ -765,6 +798,8 @@ body {
     display: flex;
 
     align-items: center;
+
+    flex-wrap: wrap;
 
     gap: 5px;
 
@@ -800,6 +835,8 @@ body {
     cursor: pointer;
 
     white-space: nowrap;
+
+    flex-shrink: 0;
 }
 
 .message-actions button:hover {
@@ -839,6 +876,8 @@ body {
     position: relative;
 
     z-index: 100;
+
+    flex-shrink: 0;
 }
 
 
@@ -1189,51 +1228,146 @@ body {
 
 
 /* =====================================================
-   MOBILE
+   MOBILE - PHONE
 ===================================================== */
 
 @media (max-width: 768px) {
 
-    .sidebar {
-        width: 245px;
+    html,
+    body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
 
-        transform: translateX(-100%);
+    body {
+        display: block;
+    }
+
+
+    /* =============================================
+       SIDEBAR
+    ============================================= */
+
+    .sidebar {
+        width: min(280px, 82vw);
+
+        height: 100dvh;
+
+        left: 0;
+        top: 0;
+
+        transform: translateX(-105%);
+
+        box-shadow: 8px 0 30px rgba(0, 0, 0, 0.45);
+
+        z-index: 5000;
     }
 
     .sidebar.open {
         transform: translateX(0);
     }
 
+
+    /* =============================================
+       MAIN FULL SCREEN
+    ============================================= */
+
     .main {
+        width: 100%;
+
+        height: 100dvh;
+
         margin-left: 0;
+
+        min-width: 0;
     }
 
+
+    /* =============================================
+       TOPBAR
+    ============================================= */
+
     .topbar {
+        width: 100%;
+
         height: 52px;
 
-        padding: 0 10px;
+        padding: 0 8px;
+
+        flex-shrink: 0;
+    }
+
+    .top-left {
+        gap: 5px;
+
+        min-width: 0;
+    }
+
+    .menu-btn {
+        width: 34px;
+        height: 34px;
+
+        font-size: 19px;
     }
 
     .brand {
-        font-size: 16px;
+        font-size: 15px;
+
+        max-width: 140px;
     }
 
     .share-btn {
+        height: 32px;
+
         padding: 0 8px;
 
-        font-size: 11px;
+        font-size: 10px;
     }
+
+
+    /* =============================================
+       CHAT AREA
+    ============================================= */
+
+    .chat-area {
+        width: 100%;
+
+        min-height: 0;
+
+        flex: 1;
+    }
+
+
+    /* =============================================
+       CONVERSATION
+    ============================================= */
 
     .conversation {
-        padding: 14px 10px 18px;
+        width: 100%;
+
+        max-width: none;
+
+        height: 100%;
+
+        padding: 12px 8px 12px;
     }
 
+
+    /* =============================================
+       MESSAGE
+    ============================================= */
+
     .message {
-        margin-bottom: 16px;
+        width: 100%;
+
+        margin-bottom: 15px;
     }
 
     .message-content {
-        max-width: 82%;
+        max-width: 88%;
+
+        min-width: 0;
     }
 
     .message-bubble {
@@ -1241,34 +1375,59 @@ body {
 
         font-size: 13px;
 
-        line-height: 1.45;
+        line-height: 1.48;
+
+        border-radius: 11px;
     }
 
+
+    /* =============================================
+       MESSAGE ACTIONS
+    ============================================= */
+
     .message-actions {
-        gap: 2px;
+        gap: 1px;
 
         margin-top: 3px;
+
+        flex-wrap: wrap;
     }
 
     .message-actions button {
         font-size: 10px;
 
-        padding: 2px 4px;
+        padding: 3px 4px;
+
+        min-height: 24px;
     }
 
+
+    /* =============================================
+       INPUT AREA
+    ============================================= */
+
     .input-area {
+        width: calc(100% - 10px);
+
         max-width: none;
 
         min-height: 52px;
 
-        margin: 0 7px 7px;
+        margin: 0 5px 6px;
 
-        padding: 6px 7px;
+        padding: 6px;
+
+        gap: 4px;
 
         border-radius: 11px;
 
-        gap: 5px;
+        flex-shrink: 0;
     }
+
+
+    /* =============================================
+       PLUS
+    ============================================= */
 
     #plusBtn,
     .input-plus {
@@ -1278,35 +1437,71 @@ body {
         min-width: 36px !important;
         min-height: 36px !important;
 
-        display: flex !important;
-
         font-size: 20px !important;
     }
+
+
+    /* =============================================
+       TEXTAREA
+    ============================================= */
+
+    #message {
+        width: 100%;
+
+        min-width: 0;
+
+        min-height: 34px;
+
+        max-height: 110px;
+
+        font-size: 13px;
+
+        line-height: 19px;
+
+        padding: 7px 3px;
+    }
+
+
+    /* =============================================
+       MIC / SEND
+    ============================================= */
 
     .input-icon,
     .send-btn {
         width: 34px;
+
         height: 34px;
+
+        min-width: 34px;
+
+        font-size: 15px;
     }
 
-    #message {
-        font-size: 13px;
 
-        min-height: 34px;
-    }
+    /* =============================================
+       PLUS MENU
+    ============================================= */
 
+    #plusMenu,
     .plus-menu {
-        left: 8px;
+        left: 7px;
 
-        bottom: 66px;
+        bottom: 64px;
 
-        width: 140px;
+        width: 145px;
+
+        z-index: 9999 !important;
     }
+
+
+    /* =============================================
+       HISTORY
+    ============================================= */
 
     .history-item {
-        min-height: 34px;
+        min-height: 36px;
 
-        padding: 4px 6px;
+        padding: 5px 6px;
     }
 
     .history-chat-title {
@@ -1314,14 +1509,19 @@ body {
     }
 
     .history-action-btn {
-        width: 22px;
-        height: 22px;
+        width: 23px;
+        height: 23px;
 
         font-size: 11px;
     }
 
+
+    /* =============================================
+       PROFILE
+    ============================================= */
+
     .viggo-profile {
-        padding: 9px 10px;
+        padding: 8px 10px;
     }
 
     .viggo-avatar,
@@ -1341,37 +1541,85 @@ body {
 @media (max-width: 420px) {
 
     .topbar {
-        padding: 0 7px;
-    }
-
-    .share-btn {
-        font-size: 10px;
+        height: 50px;
 
         padding: 0 6px;
     }
 
+    .menu-btn {
+        width: 32px;
+        height: 32px;
+    }
+
+    .brand {
+        font-size: 14px;
+
+        max-width: 120px;
+    }
+
+    .share-btn {
+        height: 30px;
+
+        padding: 0 6px;
+
+        font-size: 9px;
+    }
+
+
+    /* =============================================
+       CHAT
+    ============================================= */
+
     .conversation {
-        padding: 10px 7px 15px;
+        padding: 9px 6px 10px;
+    }
+
+    .message {
+        margin-bottom: 13px;
     }
 
     .message-content {
-        max-width: 86%;
+        max-width: 91%;
     }
 
     .message-bubble {
         font-size: 12px;
 
         padding: 8px 10px;
+
+        line-height: 1.45;
+    }
+
+
+    /* =============================================
+       ACTIONS
+    ============================================= */
+
+    .message-actions {
+        gap: 0;
     }
 
     .message-actions button {
         font-size: 9px;
+
+        padding: 2px 3px;
     }
 
-    .input-area {
-        margin: 0 5px 5px;
 
-        gap: 4px;
+    /* =============================================
+       INPUT
+    ============================================= */
+
+    .input-area {
+        width: calc(100% - 8px);
+
+        margin: 0 4px 4px;
+
+        min-height: 50px;
+
+        padding: 5px;
+
+        gap: 3px;
     }
 
     #plusBtn,
@@ -1388,11 +1636,41 @@ body {
     .input-icon,
     .send-btn {
         width: 32px;
+
         height: 32px;
+
+        min-width: 32px;
+
+        font-size: 14px;
     }
 
+    #message {
+        font-size: 12px;
+
+        min-height: 32px;
+    }
+
+
+    /* =============================================
+       PLUS MENU
+    ============================================= */
+
+    #plusMenu,
+    .plus-menu {
+        left: 6px;
+
+        bottom: 61px;
+
+        width: 140px;
+    }
+
+
+    /* =============================================
+       PROFILE
+    ============================================= */
+
     .viggo-profile {
-        padding: 8px;
+        padding: 7px 8px;
     }
 
     .viggo-avatar,
@@ -1406,6 +1684,40 @@ body {
 
 
 /* =====================================================
+   LANDSCAPE PHONE
+===================================================== */
+
+@media (max-width: 768px) and (orientation: landscape) {
+
+    .topbar {
+        height: 48px;
+    }
+
+    .conversation {
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+
+    .input-area {
+        min-height: 48px;
+
+        margin-bottom: 4px;
+    }
+
+    #plusBtn,
+    .input-plus,
+    .input-icon,
+    .send-btn {
+        width: 32px !important;
+        height: 32px !important;
+
+        min-width: 32px !important;
+        min-height: 32px !important;
+    }
+}
+
+
+/* =====================================================
    SAFE BUTTON FIX
 ===================================================== */
 
@@ -1413,6 +1725,8 @@ button {
     font-family: inherit;
 
     -webkit-tap-highlight-color: transparent;
+
+    touch-action: manipulation;
 }
 
 button:focus {
@@ -1439,5 +1753,4 @@ button:focus {
     button:active {
         opacity: 0.8;
     }
-
-}
+   }
