@@ -141,15 +141,17 @@ try {
 
 
 /* =====================================================
-   SPEAKER STATE
+   SPEAKER
 ===================================================== */
 
-let speakerEnabled =
-    localStorage.getItem(
-        "viggoSpeakerEnabled"
-    ) !== "false";
+/*
+   Speaker is independent from chat storage.
 
-let currentSpeakingButton = null;
+   true  = voice available
+   false = voice muted
+*/
+
+let speakerEnabled = true;
 
 
 /* =====================================================
@@ -620,16 +622,16 @@ function renderHistory(filter = "") {
    SPEAKER FUNCTION
 ===================================================== */
 
-function speakText(
-    text,
-    button = null
-) {
+function speakText(text, button) {
 
-    if (!speakerEnabled) return;
+    if (!speakerEnabled) {
+        return;
+    }
 
 
     if (
-        !("speechSynthesis" in window)
+        !window.speechSynthesis ||
+        !window.SpeechSynthesisUtterance
     ) {
 
         alert(
@@ -639,6 +641,8 @@ function speakText(
         return;
     }
 
+
+    /* Stop previous speech */
 
     window.speechSynthesis.cancel();
 
@@ -649,23 +653,23 @@ function speakText(
         );
 
 
-    const language =
+    /* LANGUAGE */
+
+    const selectedLanguage =
         localStorage.getItem(
             "viggoLanguage"
         ) || "en-IN";
 
 
-    speech.lang = language;
+    speech.lang =
+        selectedLanguage;
+
 
     speech.rate = 1;
 
     speech.pitch = 1;
 
     speech.volume = 1;
-
-
-    currentSpeakingButton =
-        button;
 
 
     if (button) {
@@ -675,38 +679,40 @@ function speakText(
     }
 
 
-    speech.onend =
-        () => {
+    speech.onstart = () => {
 
-            if (button) {
+        if (button) {
 
-                button.textContent =
-                    speakerEnabled
-                        ? "🔊 Speaker ON"
-                        : "🔇 Speaker OFF";
-            }
+            button.textContent =
+                "🔊 Stop";
+        }
+    };
 
 
-            currentSpeakingButton =
-                null;
-        };
+    speech.onend = () => {
+
+        if (button) {
+
+            button.textContent =
+                "🔊 Speaker";
+        }
+    };
 
 
-    speech.onerror =
-        () => {
+    speech.onerror = error => {
 
-            if (button) {
-
-                button.textContent =
-                    speakerEnabled
-                        ? "🔊 Speaker ON"
-                        : "🔇 Speaker OFF";
-            }
+        console.error(
+            "Speech error:",
+            error
+        );
 
 
-            currentSpeakingButton =
-                null;
-        };
+        if (button) {
+
+            button.textContent =
+                "🔊 Speaker";
+        }
+    };
 
 
     window.speechSynthesis.speak(
@@ -716,86 +722,24 @@ function speakText(
 
 
 /* =====================================================
-   TOGGLE SPEAKER
+   SPEAKER STOP
 ===================================================== */
 
-function toggleSpeaker(
-    text,
-    button
-) {
+function stopSpeaker(button) {
 
     if (
-        !("speechSynthesis" in window)
-    ) {
-
-        alert(
-            "Speaker is not supported in this browser."
-        );
-
-        return;
-    }
-
-
-    /* SPEAKER ON */
-
-    if (!speakerEnabled) {
-
-        speakerEnabled = true;
-
-
-        localStorage.setItem(
-            "viggoSpeakerEnabled",
-            "true"
-        );
-
-
-        button.textContent =
-            "🔊 Speaker ON";
-
-
-        speakText(
-            text,
-            button
-        );
-
-
-        return;
-    }
-
-
-    /* STOP CURRENT SPEECH */
-
-    if (
-        window.speechSynthesis.speaking ||
-        window.speechSynthesis.pending
+        window.speechSynthesis
     ) {
 
         window.speechSynthesis.cancel();
-
-
-        speakerEnabled = false;
-
-
-        localStorage.setItem(
-            "viggoSpeakerEnabled",
-            "false"
-        );
-
-
-        button.textContent =
-            "🔇 Speaker OFF";
-
-
-        return;
     }
 
 
-    /* SPEAK */
+    if (button) {
 
-    speakText(
-        text,
-        button
-    );
+        button.textContent =
+            "🔇 Speaker OFF";
+    }
 }
 
 
@@ -859,7 +803,9 @@ function addMessageToUI(
         "message-actions";
 
 
-    /* SAVE */
+    /* =================================================
+       SAVE
+    ================================================= */
 
     const saveBtn =
         document.createElement("button");
@@ -889,7 +835,9 @@ function addMessageToUI(
     );
 
 
-    /* COPY */
+    /* =================================================
+       COPY
+    ================================================= */
 
     const copyBtn =
         document.createElement("button");
@@ -936,7 +884,8 @@ function addMessageToUI(
                     );
 
 
-                temp.value = text;
+                temp.value =
+                    text;
 
 
                 document.body.appendChild(
@@ -973,7 +922,9 @@ function addMessageToUI(
     );
 
 
-    /* LIKE */
+    /* =================================================
+       LIKE
+    ================================================= */
 
     const likeBtn =
         document.createElement("button");
@@ -1000,7 +951,7 @@ function addMessageToUI(
 
 
     /* =================================================
-       SPEAKER ON / OFF
+       SPEAKER
     ================================================= */
 
     const speakerBtn =
@@ -1011,16 +962,48 @@ function addMessageToUI(
 
 
     speakerBtn.textContent =
-        speakerEnabled
-            ? "🔊 Speaker ON"
-            : "🔇 Speaker OFF";
+        "🔊 Speaker";
+
+
+    speakerBtn.title =
+        "Read this message aloud";
 
 
     speakerBtn.addEventListener(
         "click",
         () => {
 
-            toggleSpeaker(
+            /* If already speaking → STOP */
+
+            if (
+                window.speechSynthesis &&
+                window.speechSynthesis.speaking
+            ) {
+
+                stopSpeaker(
+                    speakerBtn
+                );
+
+                return;
+            }
+
+
+            /* If speaker disabled → ENABLE */
+
+            if (!speakerEnabled) {
+
+                speakerEnabled =
+                    true;
+
+
+                speakerBtn.textContent =
+                    "🔊 Speaker";
+            }
+
+
+            /* START */
+
+            speakText(
                 text,
                 speakerBtn
             );
@@ -1028,21 +1011,39 @@ function addMessageToUI(
     );
 
 
-    actions.appendChild(saveBtn);
-
-    actions.appendChild(copyBtn);
-
-    actions.appendChild(likeBtn);
-
-    actions.appendChild(speakerBtn);
+    actions.appendChild(
+        saveBtn
+    );
 
 
-    content.appendChild(actions);
+    actions.appendChild(
+        copyBtn
+    );
 
-    wrapper.appendChild(content);
+
+    actions.appendChild(
+        likeBtn
+    );
 
 
-    conversation.appendChild(wrapper);
+    actions.appendChild(
+        speakerBtn
+    );
+
+
+    content.appendChild(
+        actions
+    );
+
+
+    wrapper.appendChild(
+        content
+    );
+
+
+    conversation.appendChild(
+        wrapper
+    );
 
 
     conversation.scrollTop =
@@ -1069,13 +1070,15 @@ function renderConversation() {
     if (!chat) return;
 
 
-    chat.messages.forEach(msg => {
+    chat.messages.forEach(
+        msg => {
 
-        addMessageToUI(
-            msg.role,
-            msg.text
-        );
-    });
+            addMessageToUI(
+                msg.role,
+                msg.text
+            );
+        }
+    );
 }
 
 
@@ -1114,7 +1117,10 @@ function addMessage(
     ) {
 
         chat.title =
-            text.substring(0, 30);
+            text.substring(
+                0,
+                30
+            );
     }
 
 
@@ -1165,7 +1171,8 @@ async function sendMessage() {
 
     if (send) {
 
-        send.disabled = true;
+        send.disabled =
+            true;
     }
 
 
@@ -1273,7 +1280,8 @@ async function sendMessage() {
 
         if (send) {
 
-            send.disabled = false;
+            send.disabled =
+                false;
         }
 
 
@@ -1490,8 +1498,12 @@ document.addEventListener(
         if (
             plusMenu &&
             plusBtn &&
-            !plusMenu.contains(event.target) &&
-            !plusBtn.contains(event.target)
+            !plusMenu.contains(
+                event.target
+            ) &&
+            !plusBtn.contains(
+                event.target
+            )
         ) {
 
             plusMenu.classList.remove(
@@ -1507,8 +1519,12 @@ document.addEventListener(
         if (
             moreMenu &&
             moreBtn &&
-            !moreMenu.contains(event.target) &&
-            !moreBtn.contains(event.target)
+            !moreMenu.contains(
+                event.target
+            ) &&
+            !moreBtn.contains(
+                event.target
+            )
         ) {
 
             moreMenu.classList.remove(
@@ -1687,6 +1703,7 @@ function startVoiceRecognition() {
             "Voice input is not supported in this browser."
         );
 
+
         return;
     }
 
@@ -1695,14 +1712,10 @@ function startVoiceRecognition() {
         new SpeechRecognition();
 
 
-    const language =
+    recognition.lang =
         localStorage.getItem(
             "viggoLanguage"
         ) || "en-IN";
-
-
-    recognition.lang =
-        language;
 
 
     recognition.interimResults =
@@ -1852,7 +1865,9 @@ if (languageBtn) {
 
 
             const index =
-                languages.indexOf(current);
+                languages.indexOf(
+                    current
+                );
 
 
             const next =
@@ -1869,7 +1884,8 @@ if (languageBtn) {
 
 
             alert(
-                "Language: " + next
+                "Language: " +
+                next
             );
         }
     );
@@ -2037,19 +2053,22 @@ if (deleteSelectedBtn) {
             ) {
 
                 currentChatId =
-                    chats[0]?.id || null;
+                    chats[0]?.id ||
+                    null;
             }
 
 
             chats.forEach(
                 chat => {
 
-                    chat.selected = false;
+                    chat.selected =
+                        false;
                 }
             );
 
 
-            selectingChats = false;
+            selectingChats =
+                false;
 
 
             saveChats();
@@ -2100,7 +2119,9 @@ if (shareBtn) {
                             ) +
                             msg.text
                     )
-                    .join("\n\n");
+                    .join(
+                        "\n\n"
+                    );
 
 
             try {
@@ -2115,7 +2136,8 @@ if (shareBtn) {
                             chat.title ||
                             "Viggo AI",
 
-                        text: text
+                        text:
+                            text
                     });
 
                 } else {
@@ -2195,6 +2217,10 @@ if (
 }
 
 
+/* =====================================================
+   CONSOLE
+===================================================== */
+
 console.log(
     "================================="
 );
@@ -2208,6 +2234,12 @@ console.log(
 console.log(
     "API:",
     API_URL
+);
+
+
+console.log(
+    "Speech Synthesis:",
+    "speechSynthesis" in window
 );
 
 
