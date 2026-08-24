@@ -1,4 +1,3 @@
-
 "use strict";
 
 require("dotenv").config();
@@ -18,8 +17,10 @@ const PORT = Number(process.env.PORT) || 10000;
 const HOST = "0.0.0.0";
 
 const API_KEY = process.env.GEMINI_API_KEY;
+
 const MODEL =
   process.env.GEMINI_MODEL || "gemini-3.6-flash";
+
 
 /* =========================================
    GEMINI AI
@@ -30,6 +31,7 @@ const ai = API_KEY
       apiKey: API_KEY
     })
   : null;
+
 
 /* =========================================
    CORS
@@ -43,23 +45,25 @@ app.use(
   })
 );
 
+
 /* =========================================
    BODY PARSER
+   Increased for image/video base64 uploads
 ========================================= */
 
 app.use(
   express.json({
-    limit: "5mb"
+    limit: "50mb"
   })
 );
 
+
 /* =========================================
    SHARED CHAT STORAGE
-   NOTE:
-   This is temporary in-memory storage.
 ========================================= */
 
 const sharedChats = new Map();
+
 
 /* =========================================
    ROOT / HEALTH CHECK
@@ -75,6 +79,7 @@ app.get("/", (req, res) => {
     shareEnabled: true
   });
 });
+
 
 /* =========================================
    HEALTH API
@@ -92,28 +97,65 @@ app.get("/health", (req, res) => {
   });
 });
 
+
+/* =========================================
+   HELPER
+   Validate uploaded file data
+========================================= */
+
+function isValidFile(file) {
+
+  if (!file || typeof file !== "object") {
+    return false;
+  }
+
+  if (
+    typeof file.mimeType !== "string" ||
+    !file.mimeType.trim()
+  ) {
+    return false;
+  }
+
+  if (
+    typeof file.data !== "string" ||
+    !file.data.trim()
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+
 /* =========================================
    CHAT API
 ========================================= */
 
 app.post("/chat", async (req, res) => {
+
   try {
+
     console.log("=================================");
     console.log("New chat request received");
     console.log("=================================");
+
 
     /* -----------------------------------------
        CHECK API KEY
     ----------------------------------------- */
 
     if (!API_KEY || !ai) {
-      console.error("GEMINI_API_KEY is missing");
+
+      console.error(
+        "GEMINI_API_KEY is missing"
+      );
 
       return res.status(500).json({
         success: false,
         error: "GEMINI_API_KEY is missing on server"
       });
     }
+
 
     /* -----------------------------------------
        GET REQUEST DATA
@@ -124,65 +166,272 @@ app.post("/chat", async (req, res) => {
         ? req.body.message.trim()
         : "";
 
+
     const chatId =
       typeof req.body?.chatId === "string"
         ? req.body.chatId
         : "";
+
 
     const language =
       typeof req.body?.language === "string"
         ? req.body.language
         : "English";
 
-    console.log("Chat ID:", chatId);
-    console.log("Language:", language);
-    console.log("Message:", message);
+
+    /*
+       NEW:
+       Optional uploaded file
+
+       Expected:
+
+       {
+         mimeType: "image/jpeg",
+         data: "BASE64_DATA"
+       }
+
+       OR
+
+       {
+         mimeType: "video/mp4",
+         data: "BASE64_DATA"
+       }
+    */
+
+    const file =
+      req.body?.file &&
+      typeof req.body.file === "object"
+        ? req.body.file
+        : null;
+
+
+    console.log(
+      "Chat ID:",
+      chatId
+    );
+
+    console.log(
+      "Language:",
+      language
+    );
+
+    console.log(
+      "Message:",
+      message
+    );
+
+
+    if (file) {
+
+      console.log(
+        "File MIME:",
+        file.mimeType
+      );
+
+      console.log(
+        "File received:",
+        isValidFile(file)
+      );
+    }
+
 
     /* -----------------------------------------
-       VALIDATE MESSAGE
+       VALIDATE REQUEST
     ----------------------------------------- */
 
-    if (!message) {
+    if (!message && !file) {
+
       return res.status(400).json({
         success: false,
-        error: "Message is required"
+        error: "Message or file is required"
       });
     }
 
+
     /* -----------------------------------------
-       SYSTEM PROMPT
+       SYSTEM INSTRUCTION
     ----------------------------------------- */
 
-    const prompt = `
+    const systemInstruction = `
 You are Viggo AI, a helpful, friendly, intelligent AI assistant.
 
 Important instructions:
+
 - Give clear and useful answers.
 - Be friendly and respectful.
 - Keep answers easy to understand.
 - If the user asks for technical help, explain step-by-step.
 - Respond in the requested language when possible.
+- If an image is uploaded, analyze the image carefully and answer the user's question about it.
+- If a video is uploaded, analyze the available video content and answer the user's question about it.
+- Do not claim to see something that is not present in the uploaded media.
 
 Requested language:
 ${language}
-
-User message:
-${message}
 `;
 
-    console.log("Sending request to Gemini...");
-    console.log("Model:", MODEL);
+
+    /* -----------------------------------------
+       CREATE GEMINI CONTENT
+    ----------------------------------------- */
+
+    const parts = [];
+
+
+    /*
+       TEXT PART
+    */
+
+    if (message) {
+
+      parts.push({
+        text:
+          `${systemInstruction}\n\n` +
+          `User message:\n${message}`
+      });
+
+    } else {
+
+      parts.push({
+        text:
+          `${systemInstruction}\n\n` +
+          `Please analyze the uploaded media and describe what you can determine from it.`
+      });
+
+    }
+
+
+    /*
+       FILE PART
+    */
+
+    if (file) {
+
+      if (!isValidFile(file)) {
+
+        return res.status(400).json({
+          success: false,
+          error: "Invalid file data"
+        });
+
+      }
+
+
+      /*
+         Only image/video MIME types
+         are handled here.
+      */
+
+      const mimeType =
+        file.mimeType.trim().toLowerCase();
+
+
+      const isImage =
+        mimeType.startsWith("image/");
+
+
+      const isVideo =
+        mimeType.startsWith("video/");
+
+
+      if (!isImage && !isVideo) {
+
+        return res.status(400).json({
+          success: false,
+          error:
+            "Only image and video files are supported."
+        });
+
+      }
+
+
+      /*
+         Remove possible data URL prefix.
+
+         Example:
+
+         data:image/jpeg;base64,AAAA...
+
+         becomes:
+
+         AAAA...
+      */
+
+      let base64Data =
+        file.data.trim();
+
+
+      if (
+        base64Data.includes(
+          "base64,"
+        )
+      ) {
+
+        base64Data =
+          base64Data.split(
+            "base64,"
+          )[1];
+
+      }
+
+
+      parts.push({
+
+        inlineData: {
+
+          mimeType:
+            mimeType,
+
+          data:
+            base64Data
+
+        }
+
+      });
+
+
+      console.log(
+        isImage
+          ? "Image added to Gemini request"
+          : "Video added to Gemini request"
+      );
+
+    }
+
 
     /* -----------------------------------------
        GEMINI REQUEST
     ----------------------------------------- */
 
-    const result = await ai.models.generateContent({
-      model: MODEL,
-      contents: prompt
-    });
+    console.log(
+      "Sending request to Gemini..."
+    );
 
-    console.log("Gemini response received");
+    console.log(
+      "Model:",
+      MODEL
+    );
+
+
+    const result =
+      await ai.models.generateContent({
+
+        model: MODEL,
+
+        contents: [
+          {
+            role: "user",
+            parts: parts
+          }
+        ]
+
+      });
+
+
+    console.log(
+      "Gemini response received"
+    );
+
 
     /* -----------------------------------------
        EXTRACT RESPONSE
@@ -190,9 +439,16 @@ ${message}
 
     let reply = "";
 
-    if (typeof result?.text === "string") {
-      reply = result.text.trim();
+
+    if (
+      typeof result?.text === "string"
+    ) {
+
+      reply =
+        result.text.trim();
+
     }
+
 
     /* -----------------------------------------
        FALLBACK RESPONSE EXTRACTION
@@ -200,46 +456,72 @@ ${message}
 
     if (
       !reply &&
-      Array.isArray(result?.candidates)
+      Array.isArray(
+        result?.candidates
+      )
     ) {
-      const parts =
-        result.candidates[0]?.content?.parts || [];
 
-      reply = parts
-        .map(part => part?.text || "")
-        .join("")
-        .trim();
+      const responseParts =
+        result
+          .candidates?.[0]
+          ?.content
+          ?.parts || [];
+
+
+      reply =
+        responseParts
+          .map(
+            part =>
+              part?.text || ""
+          )
+          .join("")
+          .trim();
+
     }
+
 
     /* -----------------------------------------
        EMPTY RESPONSE CHECK
     ----------------------------------------- */
 
     if (!reply) {
+
       console.error(
         "Gemini returned an empty response"
       );
 
       return res.status(502).json({
+
         success: false,
-        error: "Empty response from AI model"
+
+        error:
+          "Empty response from AI model"
+
       });
+
     }
 
-    console.log(
-      "Reply generated successfully"
-    );
 
     /* -----------------------------------------
        SEND RESPONSE
     ----------------------------------------- */
 
+    console.log(
+      "Reply generated successfully"
+    );
+
+
     return res.status(200).json({
+
       success: true,
+
       reply: reply
+
     });
 
+
   } catch (error) {
+
     console.error(
       "================================="
     );
@@ -254,22 +536,35 @@ ${message}
 
     console.error(error);
 
+
     return res.status(500).json({
+
       success: false,
-      error: "Viggo AI server error",
-      details: String(
-        error?.message || error
-      )
+
+      error:
+        "Viggo AI server error",
+
+      details:
+        String(
+          error?.message ||
+          error
+        )
+
     });
+
   }
+
 });
+
 
 /* =========================================
    CREATE SHARE LINK
 ========================================= */
 
 app.post("/share", (req, res) => {
+
   try {
+
     console.log(
       "================================="
     );
@@ -282,67 +577,111 @@ app.post("/share", (req, res) => {
       "================================="
     );
 
+
     const chat =
       req.body?.chat;
+
 
     /* -----------------------------------------
        VALIDATE CHAT
     ----------------------------------------- */
 
-    if (!chat || typeof chat !== "object") {
+    if (
+      !chat ||
+      typeof chat !== "object"
+    ) {
+
       return res.status(400).json({
+
         success: false,
-        error: "Chat data is required"
+
+        error:
+          "Chat data is required"
+
       });
+
     }
 
+
     if (
-      !Array.isArray(chat.messages) ||
+      !Array.isArray(
+        chat.messages
+      ) ||
       chat.messages.length === 0
     ) {
+
       return res.status(400).json({
+
         success: false,
-        error: "Chat has no messages to share"
+
+        error:
+          "Chat has no messages to share"
+
       });
+
     }
+
 
     /* -----------------------------------------
        CREATE UNIQUE ID
     ----------------------------------------- */
 
     const shareId =
-      crypto.randomBytes(9).toString("base64url");
+      crypto
+        .randomBytes(9)
+        .toString("base64url");
+
 
     /* -----------------------------------------
        CLEAN CHAT DATA
     ----------------------------------------- */
 
     const safeChat = {
-      id: shareId,
+
+      id:
+        shareId,
+
 
       title:
         typeof chat.title === "string"
-          ? chat.title.substring(0, 200)
+          ? chat.title.substring(
+              0,
+              200
+            )
           : "Viggo AI Chat",
 
-      messages: chat.messages
-        .filter(
-          item =>
-            item &&
-            typeof item.text === "string" &&
-            (
-              item.role === "user" ||
-              item.role === "assistant"
-            )
-        )
-        .map(item => ({
-          role: item.role,
-          text: item.text
-        })),
+
+      messages:
+        chat.messages
+
+          .filter(
+            item =>
+              item &&
+              typeof item.text === "string" &&
+              (
+                item.role === "user" ||
+                item.role === "assistant"
+              )
+          )
+
+          .map(
+            item => ({
+
+              role:
+                item.role,
+
+              text:
+                item.text
+
+            })
+          ),
+
 
       createdAt:
         new Date().toISOString()
+
     };
+
 
     /* -----------------------------------------
        SAVE
@@ -353,19 +692,20 @@ app.post("/share", (req, res) => {
       safeChat
     );
 
+
     /* -----------------------------------------
        FRONTEND URL
-       Change this only if your GitHub Pages
-       URL changes.
     ----------------------------------------- */
 
     const frontendURL =
       "https://thulasisrithulasisri3-ctrl.github.io/AI-Tool/";
 
+
     const shareURL =
       `${frontendURL}?share=${encodeURIComponent(
         shareId
       )}`;
+
 
     console.log(
       "Share ID:",
@@ -377,11 +717,13 @@ app.post("/share", (req, res) => {
       shareURL
     );
 
+
     /* -----------------------------------------
        RESPONSE
     ----------------------------------------- */
 
     return res.status(200).json({
+
       success: true,
 
       shareId:
@@ -392,115 +734,202 @@ app.post("/share", (req, res) => {
 
       title:
         safeChat.title
+
     });
 
+
   } catch (error) {
+
     console.error(
       "Share creation error:",
       error
     );
 
+
     return res.status(500).json({
+
       success: false,
-      error: "Could not create share link"
+
+      error:
+        "Could not create share link"
+
     });
+
   }
+
 });
+
 
 /* =========================================
    GET SHARED CHAT
 ========================================= */
 
-app.get("/share/:id", (req, res) => {
-  try {
-    const shareId =
-      String(req.params.id || "").trim();
+app.get(
+  "/share/:id",
+  (req, res) => {
 
-    if (!shareId) {
-      return res.status(400).json({
-        success: false,
-        error: "Share ID is required"
+    try {
+
+      const shareId =
+        String(
+          req.params.id || ""
+        ).trim();
+
+
+      if (!shareId) {
+
+        return res.status(400).json({
+
+          success: false,
+
+          error:
+            "Share ID is required"
+
+        });
+
+      }
+
+
+      const chat =
+        sharedChats.get(
+          shareId
+        );
+
+
+      if (!chat) {
+
+        return res.status(404).json({
+
+          success: false,
+
+          error:
+            "Shared chat not found or expired"
+
+        });
+
+      }
+
+
+      return res.status(200).json({
+
+        success: true,
+
+        chat:
+          chat
+
       });
+
+
+    } catch (error) {
+
+      console.error(
+        "Get shared chat error:",
+        error
+      );
+
+
+      return res.status(500).json({
+
+        success: false,
+
+        error:
+          "Could not load shared chat"
+
+      });
+
     }
 
-    const chat =
-      sharedChats.get(shareId);
-
-    if (!chat) {
-      return res.status(404).json({
-        success: false,
-        error: "Shared chat not found or expired"
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      chat: chat
-    });
-
-  } catch (error) {
-    console.error(
-      "Get shared chat error:",
-      error
-    );
-
-    return res.status(500).json({
-      success: false,
-      error: "Could not load shared chat"
-    });
   }
-});
+);
+
 
 /* =========================================
    SHARE PREVIEW
 ========================================= */
 
-app.get("/share/:id/preview", (req, res) => {
-  try {
-    const shareId =
-      String(req.params.id || "").trim();
+app.get(
+  "/share/:id/preview",
+  (req, res) => {
 
-    const chat =
-      sharedChats.get(shareId);
+    try {
 
-    if (!chat) {
-      return res.status(404).send(
-        "Shared chat not found"
-      );
-    }
+      const shareId =
+        String(
+          req.params.id || ""
+        ).trim();
 
-    const previewMessages =
-      chat.messages
-        .slice(0, 4)
-        .map(item => {
-          const name =
-            item.role === "user"
-              ? "You"
-              : "Viggo AI";
 
-          return `${name}: ${item.text}`;
-        })
-        .join("\n");
+      const chat =
+        sharedChats.get(
+          shareId
+        );
 
-    res
-      .status(200)
-      .type("html")
-      .send(`
+
+      if (!chat) {
+
+        return res
+          .status(404)
+          .send(
+            "Shared chat not found"
+          );
+
+      }
+
+
+      const previewMessages =
+        chat.messages
+
+          .slice(0, 4)
+
+          .map(
+            item => {
+
+              const name =
+                item.role === "user"
+                  ? "You"
+                  : "Viggo AI";
+
+
+              return (
+                `${name}: ${item.text}`
+              );
+
+            }
+          )
+
+          .join("\n");
+
+
+      res
+        .status(200)
+        .type("html")
+        .send(`
+
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
 
-<title>${escapeHTML(
-      chat.title
-    )} - Viggo AI</title>
+<title>
+${escapeHTML(
+  chat.title
+)} - Viggo AI
+</title>
+
 
 <meta
   name="description"
   content="${escapeHTML(
-    previewMessages.substring(0, 300)
+    previewMessages.substring(
+      0,
+      300
+    )
   )}"
 >
+
 
 <meta
   property="og:title"
@@ -509,12 +938,17 @@ app.get("/share/:id/preview", (req, res) => {
   )}"
 >
 
+
 <meta
   property="og:description"
   content="${escapeHTML(
-    previewMessages.substring(0, 300)
+    previewMessages.substring(
+      0,
+      300
+    )
   )}"
 >
+
 
 <meta
   property="og:type"
@@ -523,77 +957,148 @@ app.get("/share/:id/preview", (req, res) => {
 
 </head>
 
+
 <body>
 
 <h1>
-${escapeHTML(chat.title)}
+${escapeHTML(
+  chat.title
+)}
 </h1>
+
 
 <p>
 ${escapeHTML(
   previewMessages
-).replace(/\n/g, "<br>")}
+).replace(
+  /\n/g,
+  "<br>"
+)}
 </p>
 
+
 </body>
+
 </html>
+
       `);
 
-  } catch (error) {
-    console.error(
-      "Preview error:",
-      error
-    );
 
-    res.status(500).send(
-      "Preview error"
-    );
+    } catch (error) {
+
+      console.error(
+        "Preview error:",
+        error
+      );
+
+
+      res
+        .status(500)
+        .send(
+          "Preview error"
+        );
+
+    }
+
   }
-});
+);
+
 
 /* =========================================
    HTML ESCAPE HELPER
 ========================================= */
 
 function escapeHTML(value) {
+
   return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
 }
+
 
 /* =========================================
    404 HANDLER
 ========================================= */
 
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    error: "Endpoint not found",
-    path: req.path
-  });
-});
+app.use(
+  (req, res) => {
+
+    res.status(404).json({
+
+      success: false,
+
+      error:
+        "Endpoint not found",
+
+      path:
+        req.path
+
+    });
+
+  }
+);
+
 
 /* =========================================
    GLOBAL ERROR HANDLER
 ========================================= */
 
-app.use((err, req, res, next) => {
-  console.error(
-    "Global server error:",
-    err
-  );
+app.use(
+  (
+    err,
+    req,
+    res,
+    next
+  ) => {
 
-  res.status(500).json({
-    success: false,
-    error: "Internal server error",
-    details: String(
-      err?.message || err
-    )
-  });
-});
+    console.error(
+      "Global server error:",
+      err
+    );
+
+
+    res.status(500).json({
+
+      success: false,
+
+      error:
+        "Internal server error",
+
+      details:
+        String(
+          err?.message ||
+          err
+        )
+
+    });
+
+  }
+);
+
 
 /* =========================================
    START SERVER
@@ -653,7 +1158,12 @@ app.listen(
     );
 
     console.log(
+      "IMAGE/VIDEO UPLOAD: ENABLED"
+    );
+
+    console.log(
       "================================="
     );
+
   }
 );
