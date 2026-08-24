@@ -9,12 +9,15 @@
         width: 100%;
         height: 100%;
         min-height: 100%;
+        margin: 0;
         overflow: hidden;
     }
 
     body {
         position: fixed;
         inset: 0;
+        height: 100dvh;
+        height: calc(var(--app-height, 100vh));
     }
 
     #app,
@@ -22,90 +25,195 @@
     .container {
         width: 100%;
         height: 100dvh;
+        height: calc(var(--app-height, 100vh));
         min-height: 0;
         overflow: hidden;
     }
 
-    /* Main chat area */
+    /* =================================================
+       MAIN CHAT
+    ================================================= */
 
     .main,
     .main-content,
     .chat-container {
+        width: 100%;
         height: 100dvh;
+        height: calc(var(--app-height, 100vh));
         min-height: 0;
         display: flex;
         flex-direction: column;
         overflow: hidden;
     }
 
-    /* Messages */
+    /* =================================================
+       CONVERSATION
+    ================================================= */
 
     #conversation,
     .conversation {
-        flex: 1 1 auto;
+        flex: 1 1 0;
         min-height: 0;
-        height: auto;
-        overflow-y: auto;
-        overflow-x: hidden;
-        padding-bottom: 140px;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    /* Message itself */
-
-    .message {
-        max-width: 100%;
-        min-width: 0;
-    }
-
-    .message-content {
-        max-width: 100%;
-        min-width: 0;
-    }
-
-    .message-bubble {
-        max-width: 100%;
-        overflow-wrap: anywhere;
-        word-break: break-word;
-    }
-
-    /* Bottom message/input area */
-
-    .input-area,
-    .chat-input-area,
-    .message-input-area,
-    .input-container {
-        flex-shrink: 0;
+        height: 0;
         width: 100%;
         max-width: 100%;
-        position: relative;
-        bottom: auto;
-        left: auto;
-        right: auto;
-        margin-bottom: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        box-sizing: border-box;
+        padding-bottom: 150px;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
     }
 
-    /* Text box */
+    /* =================================================
+       MESSAGE
+    ================================================= */
 
-    textarea,
-    #message {
+    .message {
+        width: auto;
         max-width: 100%;
         min-width: 0;
         box-sizing: border-box;
     }
 
-    /* Sidebar */
+    .message-content {
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    .message-bubble {
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    /* =================================================
+       PHOTO / VIDEO
+    ================================================= */
+
+    .message-bubble img,
+    .message-bubble video {
+        display: block;
+        max-width: 100%;
+        width: auto;
+        height: auto;
+        max-height: 45dvh;
+        box-sizing: border-box;
+        object-fit: contain;
+    }
+
+    .message-bubble video {
+        width: 100%;
+    }
+
+    /* =================================================
+       MESSAGE ACTIONS
+    ================================================= */
+
+    .message-actions {
+        max-width: 100%;
+        min-width: 0;
+        display: flex;
+        flex-wrap: wrap;
+        box-sizing: border-box;
+    }
+
+    .message-actions button {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* =================================================
+       INPUT AREA
+    ================================================= */
+
+    .input-area,
+    .chat-input-area,
+    .message-input-area,
+    .input-container {
+        flex: 0 0 auto;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+        position: relative;
+        left: auto;
+        right: auto;
+        bottom: auto;
+        margin-bottom: 0;
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    /* =================================================
+       MESSAGE INPUT
+    ================================================= */
+
+    textarea,
+    #message {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    /* =================================================
+       SIDEBAR
+    ================================================= */
 
     #sidebar {
+        width: min(85vw, 320px);
         max-width: 85vw;
         height: 100dvh;
+        height: calc(var(--app-height, 100vh));
         max-height: 100dvh;
+        min-height: 0;
+        box-sizing: border-box;
         overflow-y: auto;
         overflow-x: hidden;
         -webkit-overflow-scrolling: touch;
     }
 
-    /* Prevent buttons/elements from going outside */
+    /* =================================================
+       HISTORY
+    ================================================= */
+
+    #chatHistory,
+    .chat-history {
+        max-width: 100%;
+        min-width: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+        box-sizing: border-box;
+    }
+
+    .history-item {
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    .history-chat-title {
+        min-width: 0;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .history-actions {
+        flex-shrink: 0;
+        max-width: 45%;
+    }
+
+    /* =================================================
+       BUTTONS / INPUTS
+    ================================================= */
 
     button,
     input,
@@ -115,18 +223,25 @@
         box-sizing: border-box;
     }
 
+    /* =================================================
+       IMAGES / VIDEOS
+    ================================================= */
+
     img,
     video {
         max-width: 100%;
-        height: auto;
+        box-sizing: border-box;
     }
 
-    /* Keyboard-safe bottom space */
+    /* =================================================
+       MENUS
+    ================================================= */
 
-    .input-area,
-    .chat-input-area,
-    .message-input-area,
-    .input-container {
-        padding-bottom: env(safe-area-inset-bottom);
+    #plusMenu,
+    #moreMenu,
+    .plus-menu,
+    .more-menu {
+        max-width: calc(100vw - 20px);
+        box-sizing: border-box;
     }
 }
