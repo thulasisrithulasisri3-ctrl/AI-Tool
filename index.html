@@ -16,7 +16,7 @@
 
   <link
     rel="stylesheet"
-    href="style.css?v=5"
+    href="style.css?v=6"
   >
 
 </head>
@@ -36,7 +36,9 @@
 
     <div class="sidebar-header">
 
-      <h2>Viggo AI</h2>
+      <h2>
+        Viggo AI
+      </h2>
 
       <button
         id="closeSidebar"
@@ -64,7 +66,7 @@
 
     <div class="search-box">
 
-      <span>🔎</span>
+      🔎
 
       <input
         id="searchChat"
@@ -76,10 +78,14 @@
     </div>
 
 
+    <!-- HISTORY TITLE -->
+
     <div class="history-title">
       CHAT HISTORY
     </div>
 
+
+    <!-- CHAT HISTORY -->
 
     <div
       id="chatHistory"
@@ -97,9 +103,13 @@
         type="button"
       >
 
-        <span class="more-dots">⋮</span>
+        <span class="more-dots">
+          ⋮
+        </span>
 
-        <span>More</span>
+        <span>
+          More
+        </span>
 
       </button>
 
@@ -111,13 +121,18 @@
         class="more-menu"
       >
 
+
+        <!-- VOICE OPTIONS -->
+
         <button
           id="voiceMenuBtn"
           type="button"
         >
-          🎤 Voice
+          🎤 Voice Options
         </button>
 
+
+        <!-- LANGUAGE -->
 
         <button
           id="languageBtn"
@@ -127,6 +142,8 @@
         </button>
 
 
+        <!-- CLEAR CHAT -->
+
         <button
           id="clearChatBtn"
           type="button"
@@ -134,6 +151,8 @@
           🗑 Clear Chat
         </button>
 
+
+        <!-- SHOW HISTORY -->
 
         <button
           id="showHistoryBtn"
@@ -143,6 +162,8 @@
         </button>
 
 
+        <!-- SAVED CHATS -->
+
         <button
           id="savedChatsBtn"
           type="button"
@@ -151,6 +172,8 @@
         </button>
 
 
+        <!-- SELECT CHATS -->
+
         <button
           id="selectChatsBtn"
           type="button"
@@ -158,6 +181,8 @@
           ☑ Select Chats
         </button>
 
+
+        <!-- DELETE SELECTED -->
 
         <button
           id="deleteSelectedBtn"
@@ -203,6 +228,8 @@
       </div>
 
 
+      <!-- SHARE -->
+
       <button
         id="shareBtn"
         class="share-btn"
@@ -215,7 +242,9 @@
 
 
 
-    <!-- CHAT -->
+    <!-- =====================================
+         CHAT AREA
+    ====================================== -->
 
     <section class="chat-area">
 
@@ -228,10 +257,14 @@
 
 
 
-    <!-- INPUT -->
+    <!-- =====================================
+         INPUT AREA
+    ====================================== -->
 
     <div class="input-area">
 
+
+      <!-- PLUS -->
 
       <button
         id="plusBtn"
@@ -242,6 +275,8 @@
       </button>
 
 
+      <!-- MESSAGE -->
+
       <textarea
         id="message"
         rows="1"
@@ -249,6 +284,8 @@
         autocomplete="off"
       ></textarea>
 
+
+      <!-- MICROPHONE -->
 
       <button
         id="mic"
@@ -259,6 +296,8 @@
         🎤
       </button>
 
+
+      <!-- SEND -->
 
       <button
         id="send"
@@ -277,12 +316,15 @@
 
   <!-- =========================================
        PLUS MENU
+       VOICE REMOVED
   ========================================== -->
 
   <div
     id="plusMenu"
     class="plus-menu"
   >
+
+    <!-- PHOTO -->
 
     <button
       type="button"
@@ -292,6 +334,8 @@
     </button>
 
 
+    <!-- VIDEO -->
+
     <button
       type="button"
       data-action="video"
@@ -300,6 +344,8 @@
     </button>
 
 
+    <!-- FILE -->
+
     <button
       type="button"
       data-action="file"
@@ -307,21 +353,12 @@
       📎 File
     </button>
 
-
-    <button
-      id="plusVoiceBtn"
-      type="button"
-      data-action="voice"
-    >
-      🎤 Voice
-    </button>
-
   </div>
 
 
 
   <!-- =========================================
-       VOICE MODAL
+       VOICE OPTIONS MODAL
   ========================================== -->
 
   <div
@@ -330,6 +367,7 @@
   >
 
     <div class="modal-box">
+
 
       <button
         id="closeVoice"
@@ -341,18 +379,18 @@
 
 
       <h3>
-        Voice Settings
+        🎤 Voice Options
       </h3>
 
 
       <select id="voiceSelect">
 
         <option value="female">
-          Female Voice
+          👩 Female Voice
         </option>
 
         <option value="male">
-          Male Voice
+          👨 Male Voice
         </option>
 
       </select>
@@ -383,6 +421,7 @@
 
     <div class="modal-box">
 
+
       <button
         id="closeLanguage"
         class="modal-close"
@@ -393,35 +432,117 @@
 
 
       <h3>
-        Select Language
+        🌐 Select Language
       </h3>
 
 
       <select id="languageSelect">
 
+
         <option value="en-IN">
-          🇮🇳 English
+          🇬🇧 English
         </option>
+
 
         <option value="ta-IN">
           🇮🇳 தமிழ்
         </option>
 
+
         <option value="hi-IN">
           🇮🇳 हिन्दी
         </option>
+
 
         <option value="ml-IN">
           🇮🇳 മലയാളം
         </option>
 
+
         <option value="te-IN">
           🇮🇳 తెలుగు
         </option>
 
+
         <option value="kn-IN">
           🇮🇳 ಕನ್ನಡ
         </option>
+
+
+        <option value="bn-IN">
+          🇮🇳 বাংলা
+        </option>
+
+
+        <option value="mr-IN">
+          🇮🇳 मराठी
+        </option>
+
+
+        <option value="gu-IN">
+          🇮🇳 ગુજરાતી
+        </option>
+
+
+        <option value="pa-IN">
+          🇮🇳 ਪੰਜਾਬੀ
+        </option>
+
+
+        <option value="ur-IN">
+          🇮🇳 اردو
+        </option>
+
+
+        <option value="es-ES">
+          🇪🇸 Spanish
+        </option>
+
+
+        <option value="fr-FR">
+          🇫🇷 French
+        </option>
+
+
+        <option value="de-DE">
+          🇩🇪 German
+        </option>
+
+
+        <option value="it-IT">
+          🇮🇹 Italian
+        </option>
+
+
+        <option value="pt-BR">
+          🇧🇷 Portuguese
+        </option>
+
+
+        <option value="ja-JP">
+          🇯🇵 Japanese
+        </option>
+
+
+        <option value="ko-KR">
+          🇰🇷 Korean
+        </option>
+
+
+        <option value="zh-CN">
+          🇨🇳 Chinese
+        </option>
+
+
+        <option value="ar-SA">
+          🇸🇦 Arabic
+        </option>
+
+
+        <option value="ru-RU">
+          🇷🇺 Russian
+        </option>
+
 
       </select>
 
@@ -444,7 +565,8 @@
        SCRIPT
   ========================================== -->
 
-  <script src="script.js?v=5"></script>
+  <script src="script.js?v=6"></script>
+
 
 </body>
 
