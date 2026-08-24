@@ -2,11 +2,12 @@
 
 /* =====================================================
    VIGGO AI - SERVER.JS
-   FULL CODE
+   FULL VERSION
 ===================================================== */
 
 const express = require("express");
 const cors = require("cors");
+
 
 /* =====================================================
    APP
@@ -52,15 +53,12 @@ app.use(
 );
 
 
-/*
- * Large JSON limit is needed because
- * your frontend can send base64 files.
- */
 app.use(
     express.json({
         limit: "50mb"
     })
 );
+
 
 app.use(
     express.urlencoded({
@@ -78,12 +76,21 @@ app.get(
     "/",
     (req, res) => {
 
-        res.json({
+        res.status(200).json({
+
             status: "online",
-            service: "Viggo AI Server",
-            model: MODEL,
+
+            service:
+                "Viggo AI Server",
+
+            model:
+                MODEL,
+
             apiConfigured:
-                Boolean(GEMINI_API_KEY)
+                Boolean(
+                    GEMINI_API_KEY
+                )
+
         });
 
     }
@@ -98,14 +105,24 @@ app.get(
     "/health",
     (req, res) => {
 
-        res.json({
+        res.status(200).json({
+
             status: "ok",
-            service: "Viggo AI",
-            model: MODEL,
+
+            service:
+                "Viggo AI",
+
+            model:
+                MODEL,
+
             apiConfigured:
-                Boolean(GEMINI_API_KEY),
+                Boolean(
+                    GEMINI_API_KEY
+                ),
+
             time:
                 new Date().toISOString()
+
         });
 
     }
@@ -113,7 +130,7 @@ app.get(
 
 
 /* =====================================================
-   CHAT
+   CHAT API
 ===================================================== */
 
 app.post(
@@ -122,12 +139,22 @@ app.post(
 
         try {
 
+            console.log(
+                "---------------------------------"
+            );
+
+            console.log(
+                "POST /chat"
+            );
+
+
             const body =
                 req.body || {};
 
 
             const userMessage =
-                typeof body.message === "string"
+                typeof body.message ===
+                "string"
                     ? body.message.trim()
                     : "";
 
@@ -136,19 +163,51 @@ app.post(
                 body.file || null;
 
 
+            console.log(
+                "Message:",
+                userMessage
+            );
+
+
+            console.log(
+                "File:",
+                uploadedFile
+                    ? uploadedFile.name
+                    : "none"
+            );
+
+
+            /* =================================================
+               CHECK MESSAGE
+            ================================================= */
+
             if (
                 !userMessage &&
                 !uploadedFile
             ) {
 
                 return res.status(400).json({
-                    error: "Message is required."
+
+                    success: false,
+
+                    error:
+                        "Message is required.",
+
+                    reply:
+                        "Please enter a message."
+
                 });
 
             }
 
 
-            if (!GEMINI_API_KEY) {
+            /* =================================================
+               CHECK API KEY
+            ================================================= */
+
+            if (
+                !GEMINI_API_KEY
+            ) {
 
                 console.error(
                     "GEMINI_API_KEY is missing."
@@ -157,34 +216,46 @@ app.post(
 
                 return res.status(500).json({
 
+                    success: false,
+
                     error:
-                        "Gemini API key is not configured on the server.",
+                        "Gemini API key is not configured.",
 
                     reply:
-                        "Sorry friend, the AI server API key is not configured."
+                        "Sorry friend, the Viggo AI API key is not configured on the server."
+
                 });
 
             }
 
 
             /* =================================================
-               BUILD CONTENT
+               BUILD GEMINI PARTS
             ================================================= */
 
             const parts = [];
 
 
-            if (userMessage) {
+            /* =================================================
+               TEXT
+            ================================================= */
+
+            if (
+                userMessage
+            ) {
 
                 parts.push({
-                    text: userMessage
+
+                    text:
+                        userMessage
+
                 });
 
             }
 
 
             /* =================================================
-               FILE SUPPORT
+               FILE
             ================================================= */
 
             if (
@@ -193,21 +264,20 @@ app.post(
                 uploadedFile.type
             ) {
 
-                const dataUrl =
+                let base64Data =
                     String(
                         uploadedFile.data
                     );
 
 
-                let base64Data =
-                    dataUrl;
-
-
                 /*
-                 * Remove:
-                 * data:image/png;base64,
-                 * data:video/mp4;base64,
-                 * etc.
+                 * Example:
+                 *
+                 * data:image/png;base64,AAAA...
+                 *
+                 * becomes:
+                 *
+                 * AAAA...
                  */
 
                 if (
@@ -217,28 +287,59 @@ app.post(
                 ) {
 
                     base64Data =
-                        base64Data.split(
-                            "base64,"
-                        )[1];
+                        base64Data.substring(
+                            base64Data.indexOf(
+                                "base64,"
+                            ) + 7
+                        );
 
                 }
 
 
-                /*
-                 * Gemini inlineData format
-                 */
+                base64Data =
+                    base64Data.trim();
 
-                parts.push({
 
-                    inlineData: {
+                if (
+                    base64Data
+                ) {
 
-                        mimeType:
-                            uploadedFile.type,
+                    parts.push({
 
-                        data:
-                            base64Data
+                        inlineData: {
 
-                    }
+                            mimeType:
+                                uploadedFile.type,
+
+                            data:
+                                base64Data
+
+                        }
+
+                    });
+
+                }
+
+            }
+
+
+            /* =================================================
+               CHECK PARTS
+            ================================================= */
+
+            if (
+                !parts.length
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    error:
+                        "No valid content received.",
+
+                    reply:
+                        "Please send a message or supported file."
 
                 });
 
@@ -246,29 +347,36 @@ app.post(
 
 
             /* =================================================
+               GEMINI URL
+            ================================================= */
+
+            const geminiURL =
+                "https://generativelanguage.googleapis.com/v1beta/models/" +
+                encodeURIComponent(
+                    MODEL
+                ) +
+                ":generateContent";
+
+
+            /* =================================================
                GEMINI REQUEST
             ================================================= */
 
-            const url =
-                "https://generativelanguage.googleapis.com/v1beta/models/" +
-                encodeURIComponent(MODEL) +
-                ":generateContent?key=" +
-                encodeURIComponent(
-                    GEMINI_API_KEY
-                );
-
-
             const geminiResponse =
                 await fetch(
-                    url,
+                    geminiURL,
                     {
 
-                        method: "POST",
+                        method:
+                            "POST",
 
                         headers: {
 
                             "Content-Type":
-                                "application/json"
+                                "application/json",
+
+                            "x-goog-api-key":
+                                GEMINI_API_KEY
 
                         },
 
@@ -278,7 +386,9 @@ app.post(
                                 contents: [
 
                                     {
-                                        role: "user",
+
+                                        role:
+                                            "user",
 
                                         parts:
                                             parts
@@ -303,6 +413,10 @@ app.post(
                 );
 
 
+            /* =================================================
+               READ RESPONSE
+            ================================================= */
+
             const rawText =
                 await geminiResponse.text();
 
@@ -320,7 +434,8 @@ app.post(
             } catch {
 
                 geminiData = {
-                    raw: rawText
+                    raw:
+                        rawText
                 };
 
             }
@@ -335,77 +450,88 @@ app.post(
             ) {
 
                 console.error(
-                    "Gemini API error:",
+                    "Gemini HTTP Error:",
+                    geminiResponse.status
+                );
+
+
+                console.error(
+                    "Gemini Response:",
                     geminiData
                 );
 
 
-                const apiMessage =
-                    geminiData?.error?.message ||
+                const apiError =
+                    geminiData
+                        ?.error
+                        ?.message ||
                     "Gemini API request failed.";
 
 
-                return res.status(
-                    geminiResponse.status >= 400 &&
-                    geminiResponse.status < 600
-                        ? geminiResponse.status
-                        : 500
-                ).json({
+                return res.status(500).json({
+
+                    success: false,
 
                     error:
-                        apiMessage,
+                        apiError,
 
                     reply:
-                        "Sorry friend, Viggo AI could not get a response from Gemini."
+                        "Sorry friend, Viggo AI could not connect to the AI model."
+
                 });
 
             }
 
 
             /* =================================================
-               EXTRACT RESPONSE
+               GET AI RESPONSE
             ================================================= */
 
             let reply = "";
 
 
-            if (
+            const candidates =
                 Array.isArray(
                     geminiData?.candidates
                 )
+                    ? geminiData.candidates
+                    : [];
+
+
+            for (
+                const candidate
+                of candidates
             ) {
 
-                for (
-                    const candidate
-                    of geminiData.candidates
+                const candidateParts =
+                    candidate
+                        ?.content
+                        ?.parts;
+
+
+                if (
+                    !Array.isArray(
+                        candidateParts
+                    )
                 ) {
 
-                    const candidateParts =
-                        candidate?.content?.parts;
+                    continue;
 
+                }
+
+
+                for (
+                    const part
+                    of candidateParts
+                ) {
 
                     if (
-                        Array.isArray(
-                            candidateParts
-                        )
+                        typeof part?.text ===
+                        "string"
                     ) {
 
-                        for (
-                            const part
-                            of candidateParts
-                        ) {
-
-                            if (
-                                typeof part.text ===
-                                "string"
-                            ) {
-
-                                reply +=
-                                    part.text;
-
-                            }
-
-                        }
+                        reply +=
+                            part.text;
 
                     }
 
@@ -418,7 +544,13 @@ app.post(
                 reply.trim();
 
 
-            if (!reply) {
+            /* =================================================
+               EMPTY RESPONSE
+            ================================================= */
+
+            if (
+                !reply
+            ) {
 
                 reply =
                     "Sorry friend, I couldn't generate a response.";
@@ -427,37 +559,64 @@ app.post(
 
 
             /* =================================================
-               SEND RESPONSE TO FRONTEND
+               SUCCESS
             ================================================= */
 
-            return res.json({
+            console.log(
+                "Viggo AI response generated."
+            );
 
-                success: true,
 
-                reply: reply,
+            console.log(
+                "---------------------------------"
+            );
 
-                response: reply,
 
-                text: reply,
+            return res.status(200).json({
 
-                model: MODEL
+                success:
+                    true,
+
+                reply:
+                    reply,
+
+                response:
+                    reply,
+
+                text:
+                    reply,
+
+                model:
+                    MODEL
 
             });
 
         } catch (error) {
 
             console.error(
-                "Viggo /chat error:",
+                "================================="
+            );
+
+            console.error(
+                "VIGGO SERVER ERROR"
+            );
+
+            console.error(
                 error
+            );
+
+            console.error(
+                "================================="
             );
 
 
             return res.status(500).json({
 
-                success: false,
+                success:
+                    false,
 
                 error:
-                    error.message ||
+                    error?.message ||
                     "Internal server error.",
 
                 reply:
@@ -480,6 +639,9 @@ app.use(
 
         res.status(404).json({
 
+            success:
+                false,
+
             error:
                 "Route not found.",
 
@@ -493,7 +655,7 @@ app.use(
 
 
 /* =====================================================
-   GLOBAL ERROR HANDLER
+   GLOBAL ERROR
 ===================================================== */
 
 app.use(
@@ -505,7 +667,7 @@ app.use(
     ) => {
 
         console.error(
-            "Global server error:",
+            "Global error:",
             error
         );
 
@@ -521,7 +683,10 @@ app.use(
         }
 
 
-        res.status(500).json({
+        return res.status(500).json({
+
+            success:
+                false,
 
             error:
                 "Internal server error.",
@@ -570,11 +735,19 @@ app.listen(
         );
 
         console.log(
-            "CHAT ENDPOINT: /chat"
+            "CHAT ENDPOINT:"
         );
 
         console.log(
-            "HEALTH ENDPOINT: /health"
+            "/chat"
+        );
+
+        console.log(
+            "HEALTH ENDPOINT:"
+        );
+
+        console.log(
+            "/health"
         );
 
         console.log(
