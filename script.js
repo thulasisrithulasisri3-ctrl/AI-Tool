@@ -2,6 +2,7 @@
 
 /* =====================================================
    VIGGO AI - FULL SCRIPT
+   ONLY REQUIRED FIXES
 ===================================================== */
 
 /* =====================================================
@@ -60,6 +61,60 @@ const plusVoiceBtn =
 
 
 /* =====================================================
+   MOBILE / FULL SCREEN FIX
+===================================================== */
+
+function fixViewportHeight() {
+
+    const root =
+        document.documentElement;
+
+    const height =
+        window.visualViewport
+            ? window.visualViewport.height
+            : window.innerHeight;
+
+    root.style.setProperty(
+        "--app-height",
+        `${height}px`
+    );
+}
+
+
+fixViewportHeight();
+
+
+window.addEventListener(
+    "resize",
+    fixViewportHeight,
+    { passive: true }
+);
+
+
+window.addEventListener(
+    "orientationchange",
+    () => {
+
+        setTimeout(
+            fixViewportHeight,
+            100
+        );
+    },
+    { passive: true }
+);
+
+
+if (window.visualViewport) {
+
+    window.visualViewport.addEventListener(
+        "resize",
+        fixViewportHeight,
+        { passive: true }
+    );
+}
+
+
+/* =====================================================
    FILE INPUTS
 ===================================================== */
 
@@ -69,7 +124,10 @@ const photoInput =
 photoInput.type = "file";
 photoInput.accept = "image/*";
 photoInput.style.display = "none";
-document.body.appendChild(photoInput);
+
+document.body.appendChild(
+    photoInput
+);
 
 
 const videoInput =
@@ -78,7 +136,10 @@ const videoInput =
 videoInput.type = "file";
 videoInput.accept = "video/*";
 videoInput.style.display = "none";
-document.body.appendChild(videoInput);
+
+document.body.appendChild(
+    videoInput
+);
 
 
 const fileInput =
@@ -87,7 +148,10 @@ const fileInput =
 fileInput.type = "file";
 fileInput.accept = "*/*";
 fileInput.style.display = "none";
-document.body.appendChild(fileInput);
+
+document.body.appendChild(
+    fileInput
+);
 
 
 /* =====================================================
@@ -100,7 +164,9 @@ try {
 
     chats =
         JSON.parse(
-            localStorage.getItem("viggoChats") || "[]"
+            localStorage.getItem(
+                "viggoChats"
+            ) || "[]"
         );
 
 } catch (error) {
@@ -143,13 +209,6 @@ try {
 /* =====================================================
    SPEAKER
 ===================================================== */
-
-/*
-   Speaker is independent from chat storage.
-
-   true  = voice available
-   false = voice muted
-*/
 
 let speakerEnabled = true;
 
@@ -323,7 +382,10 @@ function togglePinChat(chatId) {
 
     } else {
 
-        pinnedChats.splice(index, 1);
+        pinnedChats.splice(
+            index,
+            1
+        );
     }
 
 
@@ -357,7 +419,8 @@ function renderHistory(filter = "") {
     const filtered =
         chats.filter(chat =>
             String(
-                chat.title || "New Chat"
+                chat.title ||
+                "New Chat"
             )
             .toLowerCase()
             .includes(search)
@@ -390,8 +453,12 @@ function renderHistory(filter = "") {
 
 
             return (
-                Number(b.createdAt || 0) -
-                Number(a.createdAt || 0)
+                Number(
+                    b.createdAt || 0
+                ) -
+                Number(
+                    a.createdAt || 0
+                )
             );
         }
     );
@@ -412,7 +479,9 @@ function renderHistory(filter = "") {
             String(currentChatId)
         ) {
 
-            item.classList.add("active");
+            item.classList.add(
+                "active"
+            );
         }
 
 
@@ -425,7 +494,8 @@ function renderHistory(filter = "") {
 
 
         title.textContent =
-            chat.title || "New Chat";
+            chat.title ||
+            "New Chat";
 
 
         const actions =
@@ -436,15 +506,16 @@ function renderHistory(filter = "") {
             "history-actions";
 
 
-        /* SELECT */
-
         if (selectingChats) {
 
             const check =
-                document.createElement("button");
+                document.createElement(
+                    "button"
+                );
 
 
-            check.type = "button";
+            check.type =
+                "button";
 
 
             check.className =
@@ -478,17 +549,20 @@ function renderHistory(filter = "") {
             );
 
 
-            actions.appendChild(check);
+            actions.appendChild(
+                check
+            );
         }
 
 
-        /* PIN */
-
         const pinBtn =
-            document.createElement("button");
+            document.createElement(
+                "button"
+            );
 
 
-        pinBtn.type = "button";
+        pinBtn.type =
+            "button";
 
 
         pinBtn.className =
@@ -519,21 +593,26 @@ function renderHistory(filter = "") {
 
                 event.stopPropagation();
 
-                togglePinChat(chat.id);
+                togglePinChat(
+                    chat.id
+                );
             }
         );
 
 
-        actions.appendChild(pinBtn);
+        actions.appendChild(
+            pinBtn
+        );
 
-
-        /* DELETE */
 
         const deleteBtn =
-            document.createElement("button");
+            document.createElement(
+                "button"
+            );
 
 
-        deleteBtn.type = "button";
+        deleteBtn.type =
+            "button";
 
 
         deleteBtn.className =
@@ -554,20 +633,26 @@ function renderHistory(filter = "") {
 
                 event.stopPropagation();
 
-                deleteChat(chat.id);
+                deleteChat(
+                    chat.id
+                );
             }
         );
 
 
-        actions.appendChild(deleteBtn);
+        actions.appendChild(
+            deleteBtn
+        );
 
 
-        item.appendChild(title);
+        item.appendChild(
+            title
+        );
 
-        item.appendChild(actions);
+        item.appendChild(
+            actions
+        );
 
-
-        /* OPEN CHAT */
 
         item.addEventListener(
             "click",
@@ -597,7 +682,6 @@ function renderHistory(filter = "") {
 
                 saveChats();
 
-
                 renderConversation();
 
 
@@ -613,16 +697,21 @@ function renderHistory(filter = "") {
         );
 
 
-        chatHistory.appendChild(item);
+        chatHistory.appendChild(
+            item
+        );
     });
 }
 
 
 /* =====================================================
-   SPEAKER FUNCTION
+   SPEAKER
 ===================================================== */
 
-function speakText(text, button) {
+function speakText(
+    text,
+    button
+) {
 
     if (!speakerEnabled) {
         return;
@@ -642,8 +731,6 @@ function speakText(text, button) {
     }
 
 
-    /* Stop previous speech */
-
     window.speechSynthesis.cancel();
 
 
@@ -652,8 +739,6 @@ function speakText(text, button) {
             text
         );
 
-
-    /* LANGUAGE */
 
     const selectedLanguage =
         localStorage.getItem(
@@ -749,7 +834,8 @@ function stopSpeaker(button) {
 
 function addMessageToUI(
     role,
-    text
+    text,
+    media = null
 ) {
 
     if (!conversation) return;
@@ -784,16 +870,141 @@ function addMessageToUI(
         "message-bubble";
 
 
-    bubble.textContent =
-        text;
+    if (text) {
 
-
-    content.appendChild(bubble);
+        bubble.textContent =
+            text;
+    }
 
 
     /* =================================================
-       ACTIONS
+       MEDIA PREVIEW
     ================================================= */
+
+    if (media) {
+
+        if (
+            media.type &&
+            media.type.startsWith(
+                "image/"
+            ) &&
+            media.data
+        ) {
+
+            const image =
+                document.createElement(
+                    "img"
+                );
+
+
+            image.src =
+                media.data;
+
+
+            image.alt =
+                media.name ||
+                "Uploaded photo";
+
+
+            image.style.maxWidth =
+                "100%";
+
+
+            image.style.width =
+                "auto";
+
+
+            image.style.maxHeight =
+                "320px";
+
+
+            image.style.display =
+                "block";
+
+
+            image.style.borderRadius =
+                "12px";
+
+
+            image.style.marginBottom =
+                text
+                    ? "10px"
+                    : "0";
+
+
+            bubble.appendChild(
+                image
+            );
+        }
+
+
+        if (
+            media.type &&
+            media.type.startsWith(
+                "video/"
+            ) &&
+            media.data
+        ) {
+
+            const video =
+                document.createElement(
+                    "video"
+                );
+
+
+            video.src =
+                media.data;
+
+
+            video.controls =
+                true;
+
+
+            video.playsInline =
+                true;
+
+
+            video.preload =
+                "metadata";
+
+
+            video.style.maxWidth =
+                "100%";
+
+
+            video.style.width =
+                "100%";
+
+
+            video.style.maxHeight =
+                "320px";
+
+
+            video.style.display =
+                "block";
+
+
+            video.style.borderRadius =
+                "12px";
+
+
+            video.style.marginBottom =
+                text
+                    ? "10px"
+                    : "0";
+
+
+            bubble.appendChild(
+                video
+            );
+        }
+    }
+
+
+    content.appendChild(
+        bubble
+    );
+
 
     const actions =
         document.createElement("div");
@@ -803,15 +1014,16 @@ function addMessageToUI(
         "message-actions";
 
 
-    /* =================================================
-       SAVE
-    ================================================= */
+    /* SAVE */
 
     const saveBtn =
-        document.createElement("button");
+        document.createElement(
+            "button"
+        );
 
 
-    saveBtn.type = "button";
+    saveBtn.type =
+        "button";
 
 
     saveBtn.textContent =
@@ -824,7 +1036,7 @@ function addMessageToUI(
 
             localStorage.setItem(
                 "viggoSavedMessage",
-                text
+                text || ""
             );
 
 
@@ -835,15 +1047,16 @@ function addMessageToUI(
     );
 
 
-    /* =================================================
-       COPY
-    ================================================= */
+    /* COPY */
 
     const copyBtn =
-        document.createElement("button");
+        document.createElement(
+            "button"
+        );
 
 
-    copyBtn.type = "button";
+    copyBtn.type =
+        "button";
 
 
     copyBtn.textContent =
@@ -857,7 +1070,7 @@ function addMessageToUI(
             try {
 
                 await navigator.clipboard.writeText(
-                    text
+                    text || ""
                 );
 
 
@@ -875,7 +1088,6 @@ function addMessageToUI(
                     1200
                 );
 
-
             } catch (error) {
 
                 const temp =
@@ -885,7 +1097,7 @@ function addMessageToUI(
 
 
                 temp.value =
-                    text;
+                    text || "";
 
 
                 document.body.appendChild(
@@ -922,15 +1134,16 @@ function addMessageToUI(
     );
 
 
-    /* =================================================
-       LIKE
-    ================================================= */
+    /* LIKE */
 
     const likeBtn =
-        document.createElement("button");
+        document.createElement(
+            "button"
+        );
 
 
-    likeBtn.type = "button";
+    likeBtn.type =
+        "button";
 
 
     likeBtn.textContent =
@@ -950,15 +1163,16 @@ function addMessageToUI(
     );
 
 
-    /* =================================================
-       SPEAKER
-    ================================================= */
+    /* SPEAKER */
 
     const speakerBtn =
-        document.createElement("button");
+        document.createElement(
+            "button"
+        );
 
 
-    speakerBtn.type = "button";
+    speakerBtn.type =
+        "button";
 
 
     speakerBtn.textContent =
@@ -973,8 +1187,6 @@ function addMessageToUI(
         "click",
         () => {
 
-            /* If already speaking → STOP */
-
             if (
                 window.speechSynthesis &&
                 window.speechSynthesis.speaking
@@ -988,8 +1200,6 @@ function addMessageToUI(
             }
 
 
-            /* If speaker disabled → ENABLE */
-
             if (!speakerEnabled) {
 
                 speakerEnabled =
@@ -1001,10 +1211,8 @@ function addMessageToUI(
             }
 
 
-            /* START */
-
             speakText(
-                text,
+                text || "",
                 speakerBtn
             );
         }
@@ -1015,16 +1223,13 @@ function addMessageToUI(
         saveBtn
     );
 
-
     actions.appendChild(
         copyBtn
     );
 
-
     actions.appendChild(
         likeBtn
     );
-
 
     actions.appendChild(
         speakerBtn
@@ -1046,8 +1251,13 @@ function addMessageToUI(
     );
 
 
-    conversation.scrollTop =
-        conversation.scrollHeight;
+    requestAnimationFrame(
+        () => {
+
+            conversation.scrollTop =
+                conversation.scrollHeight;
+        }
+    );
 }
 
 
@@ -1075,8 +1285,18 @@ function renderConversation() {
 
             addMessageToUI(
                 msg.role,
-                msg.text
+                msg.text,
+                msg.media || null
             );
+        }
+    );
+
+
+    requestAnimationFrame(
+        () => {
+
+            conversation.scrollTop =
+                conversation.scrollHeight;
         }
     );
 }
@@ -1088,7 +1308,8 @@ function renderConversation() {
 
 function addMessage(
     role,
-    text
+    text,
+    media = null
 ) {
 
     ensureChat();
@@ -1101,14 +1322,35 @@ function addMessage(
     if (!chat) return;
 
 
-    chat.messages.push({
+    const msg = {
 
         role: role,
 
-        text: text,
+        text: text || "",
 
         time: Date.now()
-    });
+    };
+
+
+    if (media) {
+
+        msg.media = {
+
+            name:
+                media.name || "",
+
+            type:
+                media.type || "",
+
+            data:
+                media.data || ""
+        };
+    }
+
+
+    chat.messages.push(
+        msg
+    );
 
 
     if (
@@ -1116,8 +1358,14 @@ function addMessage(
         chat.title === "New Chat"
     ) {
 
+        const titleText =
+            text ||
+            media?.name ||
+            "Uploaded file";
+
+
         chat.title =
-            text.substring(
+            titleText.substring(
                 0,
                 30
             );
@@ -1129,7 +1377,8 @@ function addMessage(
 
     addMessageToUI(
         role,
-        text
+        text,
+        media
     );
 
 
@@ -1156,8 +1405,6 @@ async function sendMessage() {
     ensureChat();
 
 
-    /* USER MESSAGE */
-
     addMessage(
         "user",
         text
@@ -1167,8 +1414,6 @@ async function sendMessage() {
     message.value = "";
 
 
-    /* DISABLE SEND */
-
     if (send) {
 
         send.disabled =
@@ -1176,10 +1421,10 @@ async function sendMessage() {
     }
 
 
-    /* TYPING */
-
     const typing =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
 
     typing.className =
@@ -1197,20 +1442,19 @@ async function sendMessage() {
     );
 
 
-    if (conversation) {
+    requestAnimationFrame(
+        () => {
 
-        conversation.scrollTop =
-            conversation.scrollHeight;
-    }
+            if (conversation) {
+
+                conversation.scrollTop =
+                    conversation.scrollHeight;
+            }
+        }
+    );
 
 
     try {
-
-        console.log(
-            "Viggo AI Request:",
-            text
-        );
-
 
         const response =
             await fetch(
@@ -1223,9 +1467,10 @@ async function sendMessage() {
                             "application/json"
                     },
 
-                    body: JSON.stringify({
-                        message: text
-                    })
+                    body:
+                        JSON.stringify({
+                            message: text
+                        })
                 }
             );
 
@@ -1291,6 +1536,225 @@ async function sendMessage() {
 
 
 /* =====================================================
+   SEND FILE TO AI
+===================================================== */
+
+async function sendUploadedFile(
+    file,
+    type
+) {
+
+    if (!file) return;
+
+
+    ensureChat();
+
+
+    const mediaData =
+        await readFileAsDataURL(
+            file
+        );
+
+
+    const label =
+        type === "photo"
+            ? "📷 Photo"
+            : type === "video"
+                ? "🎥 Video"
+                : "📎 File";
+
+
+    addMessage(
+        "user",
+        `${label}: ${file.name}`,
+        {
+            name:
+                file.name,
+
+            type:
+                file.type,
+
+            data:
+                mediaData
+        }
+    );
+
+
+    const typing =
+        document.createElement(
+            "div"
+        );
+
+
+    typing.className =
+        "message ai typing-message";
+
+
+    typing.innerHTML =
+        '<div class="message-content">' +
+        '<div class="message-bubble">Analyzing your upload...</div>' +
+        '</div>';
+
+
+    conversation?.appendChild(
+        typing
+    );
+
+
+    requestAnimationFrame(
+        () => {
+
+            if (conversation) {
+
+                conversation.scrollTop =
+                    conversation.scrollHeight;
+            }
+        }
+    );
+
+
+    try {
+
+        /*
+         * Send both the text information and
+         * base64 file data.
+         *
+         * server.js must support these fields
+         * for actual AI image/video analysis.
+         */
+
+        const response =
+            await fetch(
+                API_URL,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            message:
+                                type === "photo"
+                                    ? "Please analyze the uploaded photo and tell me what you can see."
+                                    : type === "video"
+                                        ? "Please analyze the uploaded video and tell me what you can see."
+                                        : "Please analyze the uploaded file and tell me what you can determine.",
+
+                            file: {
+
+                                name:
+                                    file.name,
+
+                                type:
+                                    file.type,
+
+                                size:
+                                    file.size,
+
+                                data:
+                                    mediaData
+                            }
+                        })
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Server error: " +
+                response.status
+            );
+        }
+
+
+        const data =
+            await response.json();
+
+
+        typing.remove();
+
+
+        const reply =
+            data.reply ||
+            data.response ||
+            data.text ||
+            data.message ||
+            "The file was uploaded successfully, but the AI did not return a response.";
+
+
+        addMessage(
+            "assistant",
+            String(reply)
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Upload error:",
+            error
+        );
+
+
+        typing.remove();
+
+
+        addMessage(
+            "assistant",
+            "The upload was successful, but I couldn't get an AI response. Please check the server file-upload support."
+        );
+
+    }
+}
+
+
+/* =====================================================
+   READ FILE AS DATA URL
+===================================================== */
+
+function readFileAsDataURL(file) {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                () => {
+
+                    resolve(
+                        reader.result
+                    );
+                };
+
+
+            reader.onerror =
+                () => {
+
+                    reject(
+                        new Error(
+                            "Unable to read file."
+                        )
+                    );
+                };
+
+
+            reader.readAsDataURL(
+                file
+            );
+        }
+    );
+}
+
+
+/* =====================================================
    SIDEBAR
 ===================================================== */
 
@@ -1340,7 +1804,6 @@ if (newChat) {
 
             event.preventDefault();
 
-
             createChat();
         }
     );
@@ -1358,7 +1821,6 @@ if (send) {
         event => {
 
             event.preventDefault();
-
 
             sendMessage();
         }
@@ -1382,7 +1844,6 @@ if (message) {
             ) {
 
                 event.preventDefault();
-
 
                 sendMessage();
             }
@@ -1545,7 +2006,7 @@ document.addEventListener(
 
 photoInput.addEventListener(
     "change",
-    () => {
+    async () => {
 
         const file =
             photoInput.files[0];
@@ -1554,14 +2015,24 @@ photoInput.addEventListener(
         if (!file) return;
 
 
-        addMessage(
-            "user",
-            "📷 Photo selected: " +
-            file.name
-        );
+        try {
 
+            await sendUploadedFile(
+                file,
+                "photo"
+            );
 
-        photoInput.value = "";
+        } catch (error) {
+
+            console.error(
+                "Photo upload error:",
+                error
+            );
+
+        } finally {
+
+            photoInput.value = "";
+        }
     }
 );
 
@@ -1572,7 +2043,7 @@ photoInput.addEventListener(
 
 videoInput.addEventListener(
     "change",
-    () => {
+    async () => {
 
         const file =
             videoInput.files[0];
@@ -1581,14 +2052,24 @@ videoInput.addEventListener(
         if (!file) return;
 
 
-        addMessage(
-            "user",
-            "🎥 Video selected: " +
-            file.name
-        );
+        try {
 
+            await sendUploadedFile(
+                file,
+                "video"
+            );
 
-        videoInput.value = "";
+        } catch (error) {
+
+            console.error(
+                "Video upload error:",
+                error
+            );
+
+        } finally {
+
+            videoInput.value = "";
+        }
     }
 );
 
@@ -1599,7 +2080,7 @@ videoInput.addEventListener(
 
 fileInput.addEventListener(
     "change",
-    () => {
+    async () => {
 
         const file =
             fileInput.files[0];
@@ -1608,14 +2089,24 @@ fileInput.addEventListener(
         if (!file) return;
 
 
-        addMessage(
-            "user",
-            "📎 File selected: " +
-            file.name
-        );
+        try {
 
+            await sendUploadedFile(
+                file,
+                "file"
+            );
 
-        fileInput.value = "";
+        } catch (error) {
+
+            console.error(
+                "File upload error:",
+                error
+            );
+
+        } finally {
+
+            fileInput.value = "";
+        }
     }
 );
 
@@ -1703,7 +2194,6 @@ function startVoiceRecognition() {
             "Voice input is not supported in this browser."
         );
 
-
         return;
     }
 
@@ -1742,14 +2232,14 @@ function startVoiceRecognition() {
         event => {
 
             const result =
-                event.results[0][0].transcript;
+                event.results[0][0]
+                    .transcript;
 
 
             if (message) {
 
                 message.value =
                     result;
-
 
                 message.focus();
             }
@@ -1794,7 +2284,6 @@ if (mic) {
 
             event.preventDefault();
 
-
             startVoiceRecognition();
         }
     );
@@ -1812,7 +2301,6 @@ if (plusVoiceBtn) {
         event => {
 
             event.preventDefault();
-
 
             startVoiceRecognition();
         }
@@ -1921,7 +2409,6 @@ if (clearChatBtn) {
 
             renderHistory();
 
-
             renderConversation();
 
 
@@ -2015,7 +2502,6 @@ if (deleteSelectedBtn) {
                     "No chats selected."
                 );
 
-
                 return;
             }
 
@@ -2073,9 +2559,7 @@ if (deleteSelectedBtn) {
 
             saveChats();
 
-
             renderHistory();
-
 
             renderConversation();
         }
@@ -2102,7 +2586,6 @@ if (shareBtn) {
                 alert(
                     "No chat to share."
                 );
-
 
                 return;
             }
@@ -2170,6 +2653,9 @@ if (shareBtn) {
 
 function initializeViggo() {
 
+    fixViewportHeight();
+
+
     if (!chats.length) {
 
         createChat();
@@ -2190,7 +2676,6 @@ function initializeViggo() {
 
 
         renderHistory();
-
 
         renderConversation();
     }
@@ -2225,23 +2710,24 @@ console.log(
     "================================="
 );
 
-
 console.log(
     "VIGGO AI SCRIPT LOADED"
 );
-
 
 console.log(
     "API:",
     API_URL
 );
 
-
 console.log(
     "Speech Synthesis:",
     "speechSynthesis" in window
 );
 
+console.log(
+    "File Upload:",
+    "FileReader" in window
+);
 
 console.log(
     "================================="
