@@ -1,247 +1,1266 @@
 /* =====================================================
-   MOBILE SCREEN FIX - ONLY LAYOUT FIX
+   VIGGO AI - FULL CSS
+   BLACK + BLUE THEME
+===================================================== */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #050505;
+    color: #ffffff;
+}
+
+body {
+    min-height: 100vh;
+}
+
+
+/* =====================================================
+   APP HEIGHT
+===================================================== */
+
+:root {
+    --app-height: 100vh;
+    --blue: #1683ff;
+    --blue-dark: #075fc2;
+    --blue-light: #3da0ff;
+    --black: #050505;
+    --panel: #0d0d0d;
+    --panel-2: #111111;
+    --border: #242424;
+    --text: #ffffff;
+    --muted: #999999;
+}
+
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 280px;
+    height: var(--app-height);
+
+    background: #090909;
+    border-right: 1px solid var(--border);
+
+    display: flex;
+    flex-direction: column;
+
+    z-index: 1000;
+
+    transition:
+        transform 0.25s ease;
+}
+
+
+/* =====================================================
+   SIDEBAR HEADER
+===================================================== */
+
+.sidebar-header {
+    height: 64px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 18px;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.sidebar-header h2 {
+    font-size: 21px;
+    color: #ffffff;
+}
+
+.icon-btn {
+    width: 38px;
+    height: 38px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: transparent;
+    color: #ffffff;
+
+    font-size: 20px;
+
+    cursor: pointer;
+}
+
+.icon-btn:hover {
+    background: #1a1a1a;
+}
+
+
+/* =====================================================
+   NEW CHAT
+===================================================== */
+
+.new-chat {
+    margin: 16px;
+
+    height: 46px;
+
+    border: 1px solid #147cff;
+    border-radius: 12px;
+
+    background: #0b5ed7;
+    color: #ffffff;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.new-chat:hover {
+    background: #0872f9;
+}
+
+
+/* =====================================================
+   SEARCH
+===================================================== */
+
+.search-box {
+    margin: 0 16px 14px;
+
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 0 12px;
+
+    background: #111111;
+
+    border: 1px solid #242424;
+    border-radius: 10px;
+}
+
+.search-box span {
+    font-size: 16px;
+}
+
+.search-box input {
+    width: 100%;
+    height: 100%;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+    color: #ffffff;
+
+    font-size: 14px;
+}
+
+.search-box input::placeholder {
+    color: #777777;
+}
+
+
+/* =====================================================
+   HISTORY TITLE
+===================================================== */
+
+.history-title {
+    padding: 8px 18px;
+
+    color: #777777;
+
+    font-size: 11px;
+    font-weight: bold;
+
+    letter-spacing: 1px;
+}
+
+
+/* =====================================================
+   CHAT HISTORY
+===================================================== */
+
+.chat-history {
+    flex: 1;
+
+    overflow-y: auto;
+
+    padding: 5px 10px 15px;
+}
+
+.chat-history::-webkit-scrollbar {
+    width: 5px;
+}
+
+.chat-history::-webkit-scrollbar-thumb {
+    background: #333333;
+    border-radius: 10px;
+}
+
+
+/* =====================================================
+   HISTORY ITEM
+===================================================== */
+
+.history-item {
+    width: 100%;
+
+    min-height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 8px;
+
+    padding: 8px 9px;
+
+    margin-bottom: 5px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    background: transparent;
+
+    transition: 0.2s;
+}
+
+.history-item:hover {
+    background: #151515;
+}
+
+.history-item.active {
+    background: #102b49;
+    border: 1px solid #174d7d;
+}
+
+
+/* =====================================================
+   HISTORY TITLE
+===================================================== */
+
+.history-chat-title {
+    flex: 1;
+
+    min-width: 0;
+
+    color: #eeeeee;
+
+    font-size: 14px;
+
+    overflow: hidden;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+}
+
+
+/* =====================================================
+   HISTORY ACTIONS
+===================================================== */
+
+.history-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 3px;
+}
+
+.history-action-btn {
+    width: 28px;
+    height: 28px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: transparent;
+
+    color: #bbbbbb;
+
+    cursor: pointer;
+
+    font-size: 14px;
+}
+
+.history-action-btn:hover {
+    background: #222222;
+    color: #ffffff;
+}
+
+
+/* =====================================================
+   SIDEBAR MORE
+===================================================== */
+
+.sidebar-more {
+    position: relative;
+
+    padding: 10px 14px 15px;
+
+    border-top: 1px solid var(--border);
+}
+
+.more-button {
+    width: 100%;
+    height: 44px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #111111;
+
+    color: #ffffff;
+
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 0 14px;
+
+    font-size: 14px;
+}
+
+.more-button:hover {
+    background: #181818;
+}
+
+.more-dots {
+    font-size: 22px;
+}
+
+
+/* =====================================================
+   MORE MENU
+===================================================== */
+
+.more-menu {
+    position: absolute;
+
+    left: 14px;
+    right: 14px;
+
+    bottom: 65px;
+
+    display: none;
+
+    flex-direction: column;
+
+    padding: 7px;
+
+    background: #111111;
+
+    border: 1px solid #292929;
+
+    border-radius: 12px;
+
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.55);
+
+    z-index: 1200;
+}
+
+.more-menu.show,
+.more-menu.open {
+    display: flex;
+}
+
+.more-menu button {
+    width: 100%;
+
+    min-height: 40px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: transparent;
+
+    color: #ffffff;
+
+    text-align: left;
+
+    padding: 0 12px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+}
+
+.more-menu button:hover {
+    background: #1d1d1d;
+}
+
+
+/* =====================================================
+   MAIN
+===================================================== */
+
+.main {
+    position: fixed;
+
+    left: 280px;
+    top: 0;
+
+    width: calc(100% - 280px);
+    height: var(--app-height);
+
+    display: flex;
+    flex-direction: column;
+
+    background: #050505;
+}
+
+
+/* =====================================================
+   TOPBAR
+===================================================== */
+
+.topbar {
+    height: 64px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 18px;
+
+    border-bottom: 1px solid var(--border);
+
+    background: #080808;
+}
+
+.top-left {
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+}
+
+.menu-btn {
+    width: 40px;
+    height: 40px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #111111;
+
+    color: #ffffff;
+
+    font-size: 20px;
+
+    cursor: pointer;
+
+    display: none;
+}
+
+.menu-btn:hover {
+    background: #1b1b1b;
+}
+
+.brand {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+
+/* =====================================================
+   SHARE
+===================================================== */
+
+.share-btn {
+    height: 40px;
+
+    padding: 0 15px;
+
+    border: 1px solid #225d91;
+
+    border-radius: 10px;
+
+    background: #0d1c2b;
+
+    color: #ffffff;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+    transition: 0.2s;
+}
+
+.share-btn:hover {
+    background: #12395a;
+    border-color: #278fff;
+}
+
+
+/* =====================================================
+   CHAT AREA
+===================================================== */
+
+.chat-area {
+    flex: 1;
+
+    min-height: 0;
+
+    overflow: hidden;
+}
+
+.conversation {
+    width: 100%;
+    height: 100%;
+
+    overflow-y: auto;
+
+    padding: 25px 20px 150px;
+}
+
+.conversation::-webkit-scrollbar {
+    width: 7px;
+}
+
+.conversation::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.conversation::-webkit-scrollbar-thumb {
+    background: #292929;
+    border-radius: 10px;
+}
+
+
+/* =====================================================
+   MESSAGE
+===================================================== */
+
+.message {
+    width: 100%;
+
+    display: flex;
+
+    margin-bottom: 18px;
+}
+
+.message.user {
+    justify-content: flex-end;
+}
+
+.message.ai {
+    justify-content: flex-start;
+}
+
+.message-content {
+    max-width: min(820px, 85%);
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* =====================================================
+   MESSAGE BUBBLE
+===================================================== */
+
+.message-bubble {
+    padding: 12px 15px;
+
+    border-radius: 15px;
+
+    font-size: 15px;
+
+    line-height: 1.55;
+
+    word-wrap: break-word;
+
+    white-space: pre-wrap;
+}
+
+.message.user .message-bubble {
+    background: #0868d8;
+
+    color: #ffffff;
+
+    border-bottom-right-radius: 5px;
+}
+
+.message.ai .message-bubble {
+    background: #151515;
+
+    color: #eeeeee;
+
+    border: 1px solid #242424;
+
+    border-bottom-left-radius: 5px;
+}
+
+
+/* =====================================================
+   MESSAGE ACTIONS
+===================================================== */
+
+.message-actions {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 6px;
+
+    margin-top: 7px;
+}
+
+.message-actions button {
+    border: 1px solid #2b2b2b;
+
+    border-radius: 7px;
+
+    background: #0d0d0d;
+
+    color: #aaaaaa;
+
+    padding: 5px 8px;
+
+    font-size: 11px;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.message-actions button:hover {
+    color: #ffffff;
+
+    border-color: #167de8;
+
+    background: #101d2b;
+}
+
+
+/* =====================================================
+   TYPING
+===================================================== */
+
+.typing-message .message-bubble {
+    color: #999999;
+
+    animation: typingPulse 1.2s infinite;
+}
+
+@keyframes typingPulse {
+
+    0% {
+        opacity: 0.45;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.45;
+    }
+}
+
+
+/* =====================================================
+   INPUT AREA
+===================================================== */
+
+.input-area {
+    position: absolute;
+
+    left: 50%;
+
+    bottom: 18px;
+
+    transform: translateX(-50%);
+
+    width: min(900px, calc(100% - 40px));
+
+    min-height: 58px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    padding: 8px 9px;
+
+    background: #111111;
+
+    border: 1px solid #292929;
+
+    border-radius: 17px;
+
+    box-shadow:
+        0 10px 35px rgba(0, 0, 0, 0.45);
+
+    z-index: 500;
+}
+
+
+/* =====================================================
+   PLUS
+===================================================== */
+
+.input-plus {
+    flex: 0 0 auto;
+
+    width: 42px;
+    height: 42px;
+
+    border: none;
+
+    border-radius: 11px;
+
+    background: #1b1b1b;
+
+    color: #ffffff;
+
+    font-size: 25px;
+
+    cursor: pointer;
+}
+
+.input-plus:hover {
+    background: #252525;
+}
+
+
+/* =====================================================
+   TEXTAREA
+===================================================== */
+
+#message {
+    flex: 1;
+
+    min-width: 0;
+
+    min-height: 40px;
+    max-height: 130px;
+
+    resize: none;
+
+    border: none;
+
+    outline: none;
+
+    background: transparent;
+
+    color: #ffffff;
+
+    padding: 10px 7px;
+
+    font-family: inherit;
+
+    font-size: 15px;
+
+    line-height: 20px;
+}
+
+#message::placeholder {
+    color: #777777;
+}
+
+
+/* =====================================================
+   MIC
+===================================================== */
+
+.input-icon {
+    flex: 0 0 auto;
+
+    width: 42px;
+    height: 42px;
+
+    border: none;
+
+    border-radius: 11px;
+
+    background: #1a1a1a;
+
+    color: #ffffff;
+
+    cursor: pointer;
+
+    font-size: 17px;
+}
+
+.input-icon:hover {
+    background: #242424;
+}
+
+.input-icon.active {
+    background: #0a70e8;
+
+    box-shadow:
+        0 0 12px rgba(22, 131, 255, 0.55);
+}
+
+
+/* =====================================================
+   SEND
+===================================================== */
+
+.send-btn {
+    flex: 0 0 auto;
+
+    width: 44px;
+    height: 44px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    background: #0878ef;
+
+    color: #ffffff;
+
+    font-size: 20px;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.send-btn:hover {
+    background: #1688ff;
+
+    transform: scale(1.03);
+}
+
+.send-btn:disabled {
+    opacity: 0.45;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+
+/* =====================================================
+   PLUS MENU
+===================================================== */
+
+.plus-menu {
+    position: fixed;
+
+    left: calc(50% - 450px);
+
+    bottom: 88px;
+
+    width: 180px;
+
+    display: none;
+
+    flex-direction: column;
+
+    padding: 7px;
+
+    background: #111111;
+
+    border: 1px solid #292929;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 10px 35px rgba(0, 0, 0, 0.55);
+
+    z-index: 1500;
+}
+
+.plus-menu.show,
+.plus-menu.open {
+    display: flex;
+}
+
+.plus-menu button {
+    width: 100%;
+
+    min-height: 42px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: transparent;
+
+    color: #ffffff;
+
+    text-align: left;
+
+    padding: 0 12px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+}
+
+.plus-menu button:hover {
+    background: #1d1d1d;
+}
+
+
+/* =====================================================
+   MODAL
+===================================================== */
+
+.modal {
+    position: fixed;
+
+    inset: 0;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(0, 0, 0, 0.72);
+
+    z-index: 3000;
+}
+
+.modal.show,
+.modal.open {
+    display: flex;
+}
+
+.modal-box {
+    position: relative;
+
+    width: min(400px, calc(100% - 30px));
+
+    padding: 25px;
+
+    background: #111111;
+
+    border: 1px solid #292929;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.65);
+}
+
+.modal-box h3 {
+    margin-bottom: 18px;
+
+    font-size: 20px;
+}
+
+.modal-close {
+    position: absolute;
+
+    top: 12px;
+    right: 12px;
+
+    width: 34px;
+    height: 34px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: transparent;
+
+    color: #ffffff;
+
+    cursor: pointer;
+
+    font-size: 18px;
+}
+
+.modal-close:hover {
+    background: #222222;
+}
+
+.modal-box select {
+    width: 100%;
+
+    height: 42px;
+
+    margin-bottom: 15px;
+
+    padding: 0 10px;
+
+    border: 1px solid #303030;
+
+    border-radius: 9px;
+
+    background: #080808;
+
+    color: #ffffff;
+
+    outline: none;
+}
+
+.modal-button {
+    width: 100%;
+
+    height: 43px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    background: #0878ef;
+
+    color: #ffffff;
+
+    cursor: pointer;
+
+    font-size: 14px;
+}
+
+.modal-button:hover {
+    background: #1688ff;
+}
+
+
+/* =====================================================
+   MOBILE
 ===================================================== */
 
 @media (max-width: 768px) {
 
-    html,
-    body {
+    .sidebar {
+        width: 280px;
+
+        transform: translateX(-100%);
+
+        box-shadow:
+            10px 0 35px rgba(0, 0, 0, 0.55);
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .main {
+        left: 0;
+
         width: 100%;
-        height: 100%;
-        min-height: 100%;
-        margin: 0;
-        overflow: hidden;
     }
 
-    body {
-        position: fixed;
-        inset: 0;
-        height: 100dvh;
-        height: calc(var(--app-height, 100vh));
+    .menu-btn {
+        display: block;
     }
 
-    #app,
-    .app,
-    .container {
-        width: 100%;
-        height: 100dvh;
-        height: calc(var(--app-height, 100vh));
-        min-height: 0;
-        overflow: hidden;
+    .topbar {
+        height: 58px;
+
+        padding: 0 10px;
     }
 
-    /* =================================================
-       MAIN CHAT
-    ================================================= */
-
-    .main,
-    .main-content,
-    .chat-container {
-        width: 100%;
-        height: 100dvh;
-        height: calc(var(--app-height, 100vh));
-        min-height: 0;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
+    .brand {
+        font-size: 18px;
     }
 
-    /* =================================================
-       CONVERSATION
-    ================================================= */
+    .share-btn {
+        height: 37px;
 
-    #conversation,
+        padding: 0 10px;
+
+        font-size: 12px;
+    }
+
     .conversation {
-        flex: 1 1 0;
-        min-height: 0;
-        height: 0;
-        width: 100%;
-        max-width: 100%;
-        overflow-y: auto;
-        overflow-x: hidden;
-        box-sizing: border-box;
-        padding-bottom: 150px;
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior: contain;
-    }
-
-    /* =================================================
-       MESSAGE
-    ================================================= */
-
-    .message {
-        width: auto;
-        max-width: 100%;
-        min-width: 0;
-        box-sizing: border-box;
+        padding:
+            18px
+            12px
+            145px;
     }
 
     .message-content {
-        max-width: 100%;
-        min-width: 0;
-        box-sizing: border-box;
+        max-width: 92%;
     }
 
     .message-bubble {
-        max-width: 100%;
-        min-width: 0;
-        box-sizing: border-box;
-        overflow-wrap: anywhere;
-        word-break: break-word;
+        font-size: 14px;
+
+        padding: 10px 12px;
     }
-
-    /* =================================================
-       PHOTO / VIDEO
-    ================================================= */
-
-    .message-bubble img,
-    .message-bubble video {
-        display: block;
-        max-width: 100%;
-        width: auto;
-        height: auto;
-        max-height: 45dvh;
-        box-sizing: border-box;
-        object-fit: contain;
-    }
-
-    .message-bubble video {
-        width: 100%;
-    }
-
-    /* =================================================
-       MESSAGE ACTIONS
-    ================================================= */
 
     .message-actions {
-        max-width: 100%;
-        min-width: 0;
-        display: flex;
-        flex-wrap: wrap;
-        box-sizing: border-box;
+        gap: 4px;
     }
 
     .message-actions button {
-        max-width: 100%;
-        box-sizing: border-box;
+        font-size: 10px;
+
+        padding: 5px 6px;
     }
 
-    /* =================================================
-       INPUT AREA
-    ================================================= */
+    .input-area {
+        width: calc(100% - 16px);
 
-    .input-area,
-    .chat-input-area,
-    .message-input-area,
-    .input-container {
-        flex: 0 0 auto;
-        width: 100%;
-        max-width: 100%;
-        min-width: 0;
-        box-sizing: border-box;
-        position: relative;
-        left: auto;
-        right: auto;
-        bottom: auto;
-        margin-bottom: 0;
-        padding-bottom: env(safe-area-inset-bottom);
+        bottom: 8px;
+
+        min-height: 55px;
+
+        border-radius: 15px;
+
+        padding: 6px;
     }
 
-    /* =================================================
-       MESSAGE INPUT
-    ================================================= */
+    .input-plus,
+    .input-icon {
+        width: 38px;
+        height: 38px;
+    }
 
-    textarea,
+    .send-btn {
+        width: 40px;
+        height: 40px;
+    }
+
     #message {
-        width: 100%;
-        max-width: 100%;
-        min-width: 0;
-        box-sizing: border-box;
-        overflow-y: auto;
-        overflow-x: hidden;
+        font-size: 14px;
+
+        padding:
+            9px
+            5px;
     }
 
-    /* =================================================
-       SIDEBAR
-    ================================================= */
+    .plus-menu {
+        left: 8px;
 
-    #sidebar {
-        width: min(85vw, 320px);
-        max-width: 85vw;
-        height: 100dvh;
-        height: calc(var(--app-height, 100vh));
-        max-height: 100dvh;
-        min-height: 0;
-        box-sizing: border-box;
-        overflow-y: auto;
-        overflow-x: hidden;
-        -webkit-overflow-scrolling: touch;
+        bottom: 75px;
     }
 
-    /* =================================================
-       HISTORY
-    ================================================= */
-
-    #chatHistory,
-    .chat-history {
-        max-width: 100%;
-        min-width: 0;
-        overflow-x: hidden;
-        overflow-y: auto;
-        box-sizing: border-box;
-    }
-
-    .history-item {
-        max-width: 100%;
-        min-width: 0;
-        box-sizing: border-box;
-        overflow: hidden;
-    }
-
-    .history-chat-title {
-        min-width: 0;
-        max-width: 100%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .history-actions {
-        flex-shrink: 0;
-        max-width: 45%;
-    }
-
-    /* =================================================
-       BUTTONS / INPUTS
-    ================================================= */
-
-    button,
-    input,
-    textarea,
-    select {
-        max-width: 100%;
-        box-sizing: border-box;
-    }
-
-    /* =================================================
-       IMAGES / VIDEOS
-    ================================================= */
-
-    img,
-    video {
-        max-width: 100%;
-        box-sizing: border-box;
-    }
-
-    /* =================================================
-       MENUS
-    ================================================= */
-
-    #plusMenu,
-    #moreMenu,
-    .plus-menu,
-    .more-menu {
-        max-width: calc(100vw - 20px);
-        box-sizing: border-box;
-    }
 }
+
+
+/* =====================================================
+   SMALL MOBILE
+===================================================== */
+
+@media (max-width: 420px) {
+
+    .sidebar {
+        width: 85vw;
+    }
+
+    .brand {
+        font-size: 17px;
+    }
+
+    .share-btn {
+        padding: 0 8px;
+    }
+
+    .conversation {
+        padding:
+            15px
+            8px
+            135px;
+    }
+
+    .message-content {
+        max-width: 94%;
+    }
+
+    .message-actions button {
+        font-size: 9px;
+    }
+
+    .input-area {
+        width: calc(100% - 10px);
+    }
+
+    .input-plus,
+    .input-icon {
+        width: 35px;
+        height: 35px;
+
+        font-size: 15px;
+    }
+
+    .send-btn {
+        width: 38px;
+        height: 38px;
+    }
+
+}
+
+
+/* =====================================================
+   TOUCH DEVICES
+===================================================== */
+
+button {
+    -webkit-tap-highlight-color: transparent;
+}
+
+textarea,
+input,
+select {
+    -webkit-tap-highlight-color: transparent;
+}
+
+
+/* =====================================================
+   IMAGE / VIDEO
+===================================================== */
+
+.message-bubble img,
+.message-bubble video {
+    max-width: 100%;
+
+    height: auto;
+
+    object-fit: contain;
+}
+
+
+/* =====================================================
+   SAFE AREA FOR MOBILE
+===================================================== */
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+
+    .input-area {
+        bottom:
+            calc(
+                8px +
+                env(safe-area-inset-bottom)
+            );
+    }
+
+}
+
+
+/* =====================================================
+   END
+===================================================== */
