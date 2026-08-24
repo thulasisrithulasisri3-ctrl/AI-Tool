@@ -3,7 +3,6 @@
 
 <head>
 
-  <!-- FAVICON -->
   <link rel="icon" type="image/png" href="icon.png?v=2">
 
   <meta charset="UTF-8">
@@ -15,10 +14,9 @@
 
   <title>Viggo AI</title>
 
-  <!-- CSS -->
   <link
     rel="stylesheet"
-    href="style.css?v=4"
+    href="style.css?v=5"
   >
 
 </head>
@@ -38,9 +36,7 @@
 
     <div class="sidebar-header">
 
-      <h2>
-        Viggo AI
-      </h2>
+      <h2>Viggo AI</h2>
 
       <button
         id="closeSidebar"
@@ -80,14 +76,10 @@
     </div>
 
 
-    <!-- HISTORY TITLE -->
-
     <div class="history-title">
       CHAT HISTORY
     </div>
 
-
-    <!-- CHAT HISTORY -->
 
     <div
       id="chatHistory"
@@ -105,13 +97,9 @@
         type="button"
       >
 
-        <span class="more-dots">
-          ⋮
-        </span>
+        <span class="more-dots">⋮</span>
 
-        <span>
-          More
-        </span>
+        <span>More</span>
 
       </button>
 
@@ -215,8 +203,6 @@
       </div>
 
 
-      <!-- SHARE -->
-
       <button
         id="shareBtn"
         class="share-btn"
@@ -229,9 +215,7 @@
 
 
 
-    <!-- =====================================
-         CHAT AREA
-    ====================================== -->
+    <!-- CHAT -->
 
     <section class="chat-area">
 
@@ -244,26 +228,19 @@
 
 
 
-    <!-- =====================================
-         INPUT AREA
-    ====================================== -->
+    <!-- INPUT -->
 
     <div class="input-area">
 
-
-      <!-- PLUS -->
 
       <button
         id="plusBtn"
         class="input-plus"
         type="button"
-        title="Add"
       >
         ＋
       </button>
 
-
-      <!-- MESSAGE -->
 
       <textarea
         id="message"
@@ -272,8 +249,6 @@
         autocomplete="off"
       ></textarea>
 
-
-      <!-- MICROPHONE -->
 
       <button
         id="mic"
@@ -284,8 +259,6 @@
         🎤
       </button>
 
-
-      <!-- SEND -->
 
       <button
         id="send"
@@ -311,8 +284,6 @@
     class="plus-menu"
   >
 
-    <!-- PHOTO -->
-
     <button
       type="button"
       data-action="photo"
@@ -320,8 +291,6 @@
       📷 Photo
     </button>
 
-
-    <!-- VIDEO -->
 
     <button
       type="button"
@@ -331,8 +300,6 @@
     </button>
 
 
-    <!-- FILE -->
-
     <button
       type="button"
       data-action="file"
@@ -340,8 +307,6 @@
       📎 File
     </button>
 
-
-    <!-- VOICE -->
 
     <button
       id="plusVoiceBtn"
@@ -366,7 +331,6 @@
 
     <div class="modal-box">
 
-
       <button
         id="closeVoice"
         class="modal-close"
@@ -384,11 +348,11 @@
       <select id="voiceSelect">
 
         <option value="female">
-          Female
+          Female Voice
         </option>
 
         <option value="male">
-          Male
+          Male Voice
         </option>
 
       </select>
@@ -419,7 +383,6 @@
 
     <div class="modal-box">
 
-
       <button
         id="closeLanguage"
         class="modal-close"
@@ -430,34 +393,34 @@
 
 
       <h3>
-        Language
+        Select Language
       </h3>
 
 
       <select id="languageSelect">
 
-        <option value="English">
-          English
+        <option value="en-IN">
+          🇮🇳 English
         </option>
 
-        <option value="Tamil">
-          தமிழ்
+        <option value="ta-IN">
+          🇮🇳 தமிழ்
         </option>
 
-        <option value="Hindi">
-          हिन्दी
+        <option value="hi-IN">
+          🇮🇳 हिन्दी
         </option>
 
-        <option value="Malayalam">
-          മലയാളം
+        <option value="ml-IN">
+          🇮🇳 മലയാളം
         </option>
 
-        <option value="Telugu">
-          తెలుగు
+        <option value="te-IN">
+          🇮🇳 తెలుగు
         </option>
 
-        <option value="Kannada">
-          ಕನ್ನಡ
+        <option value="kn-IN">
+          🇮🇳 ಕನ್ನಡ
         </option>
 
       </select>
@@ -468,7 +431,7 @@
         class="modal-button"
         type="button"
       >
-        Save
+        ✓ Save Language
       </button>
 
     </div>
@@ -478,11 +441,10 @@
 
 
   <!-- =========================================
-       JAVASCRIPT
+       SCRIPT
   ========================================== -->
 
-  <script src="script.js?v=4"></script>
-
+  <script src="script.js?v=5"></script>
 
 </body>
 
