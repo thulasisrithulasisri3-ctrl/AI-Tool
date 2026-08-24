@@ -80,16 +80,13 @@ function fixViewportHeight() {
     );
 }
 
-
 fixViewportHeight();
-
 
 window.addEventListener(
     "resize",
     fixViewportHeight,
     { passive: true }
 );
-
 
 window.addEventListener(
     "orientationchange",
@@ -102,7 +99,6 @@ window.addEventListener(
     },
     { passive: true }
 );
-
 
 if (window.visualViewport) {
 
@@ -224,7 +220,6 @@ function saveChats() {
         JSON.stringify(chats)
     );
 
-
     if (currentChatId) {
 
         localStorage.setItem(
@@ -238,7 +233,6 @@ function saveChats() {
             "viggoCurrentChatId"
         );
     }
-
 
     localStorage.setItem(
         "viggoPinnedChats",
@@ -1615,14 +1609,6 @@ async function sendUploadedFile(
 
     try {
 
-        /*
-         * Send both the text information and
-         * base64 file data.
-         *
-         * server.js must support these fields
-         * for actual AI image/video analysis.
-         */
-
         const response =
             await fetch(
                 API_URL,
@@ -1708,7 +1694,6 @@ async function sendUploadedFile(
             "assistant",
             "The upload was successful, but I couldn't get an AI response. Please check the server file-upload support."
         );
-
     }
 }
 
@@ -2198,6 +2183,22 @@ function startVoiceRecognition() {
     }
 
 
+    if (recognition) {
+
+        try {
+
+            recognition.stop();
+
+        } catch (error) {
+
+            console.log(
+                "Recognition stop:",
+                error
+            );
+        }
+    }
+
+
     recognition =
         new SpeechRecognition();
 
@@ -2268,7 +2269,17 @@ function startVoiceRecognition() {
         };
 
 
-    recognition.start();
+    try {
+
+        recognition.start();
+
+    } catch (error) {
+
+        console.error(
+            "Recognition start error:",
+            error
+        );
+    }
 }
 
 
@@ -2309,7 +2320,7 @@ if (plusVoiceBtn) {
 
 
 /* =====================================================
-   MORE MENU
+   MORE MENU VOICE
 ===================================================== */
 
 if (voiceMenuBtn) {
@@ -2323,6 +2334,10 @@ if (voiceMenuBtn) {
 
             moreMenu?.classList.remove(
                 "show"
+            );
+
+            moreMenu?.classList.remove(
+                "open"
             );
         }
     );
@@ -2415,6 +2430,10 @@ if (clearChatBtn) {
             moreMenu?.classList.remove(
                 "show"
             );
+
+            moreMenu?.classList.remove(
+                "open"
+            );
         }
     );
 }
@@ -2473,6 +2492,10 @@ if (selectChatsBtn) {
 
             moreMenu?.classList.remove(
                 "show"
+            );
+
+            moreMenu?.classList.remove(
+                "open"
             );
         }
     );
@@ -2557,6 +2580,22 @@ if (deleteSelectedBtn) {
                 false;
 
 
+            /*
+             * IMPORTANT:
+             * If all chats are deleted,
+             * automatically create a new chat.
+             */
+
+            if (!chats.length) {
+
+                saveChats();
+
+                createChat();
+
+                return;
+            }
+
+
             saveChats();
 
             renderHistory();
@@ -2585,6 +2624,16 @@ if (shareBtn) {
 
                 alert(
                     "No chat to share."
+                );
+
+                return;
+            }
+
+
+            if (!chat.messages.length) {
+
+                alert(
+                    "There are no messages to share."
                 );
 
                 return;
@@ -2625,14 +2674,50 @@ if (shareBtn) {
 
                 } else {
 
-                    await navigator.clipboard.writeText(
-                        text
-                    );
+                    if (
+                        navigator.clipboard
+                    ) {
+
+                        await navigator.clipboard.writeText(
+                            text
+                        );
+
+                        alert(
+                            "Chat copied. You can share it now."
+                        );
+
+                    } else {
+
+                        const temp =
+                            document.createElement(
+                                "textarea"
+                            );
 
 
-                    alert(
-                        "Chat copied. You can share it now."
-                    );
+                        temp.value =
+                            text;
+
+
+                        document.body.appendChild(
+                            temp
+                        );
+
+
+                        temp.select();
+
+
+                        document.execCommand(
+                            "copy"
+                        );
+
+
+                        temp.remove();
+
+
+                        alert(
+                            "Chat copied. You can share it now."
+                        );
+                    }
                 }
 
             } catch (error) {
