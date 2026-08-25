@@ -2538,20 +2538,92 @@ function openLanguageSelectionMenu(
         title
     );
 
-    const languages = [
-        {
-            code: "en-IN",
-            name: "🇬🇧 English"
-        },
-        {
-            code: "ta-IN",
-            name: "🇮🇳 தமிழ்"
-        },
-        {
-            code: "hi-IN",
-            name: "🇮🇳 हिन्दी"
-        }
-    ];
+   const languages = [
+    {
+        code: "en-IN",
+        name: "🇬🇧 English"
+    },
+    {
+        code: "ta-IN",
+        name: "🇮🇳 தமிழ்"
+    },
+    {
+        code: "hi-IN",
+        name: "🇮🇳 हिन्दी"
+    },
+    {
+        code: "te-IN",
+        name: "🇮🇳 తెలుగు"
+    },
+    {
+        code: "kn-IN",
+        name: "🇮🇳 ಕನ್ನಡ"
+    },
+    {
+        code: "ml-IN",
+        name: "🇮🇳 മലയാളം"
+    },
+    {
+        code: "bn-IN",
+        name: "🇮🇳 বাংলা"
+    },
+    {
+        code: "mr-IN",
+        name: "🇮🇳 मराठी"
+    },
+    {
+        code: "gu-IN",
+        name: "🇮🇳 ગુજરાતી"
+    },
+    {
+        code: "pa-IN",
+        name: "🇮🇳 ਪੰਜਾਬੀ"
+    },
+    {
+        code: "ur-IN",
+        name: "🇮🇳 اردو"
+    },
+    {
+        code: "fr-FR",
+        name: "🇫🇷 Français"
+    },
+    {
+        code: "de-DE",
+        name: "🇩🇪 Deutsch"
+    },
+    {
+        code: "es-ES",
+        name: "🇪🇸 Español"
+    },
+    {
+        code: "it-IT",
+        name: "🇮🇹 Italiano"
+    },
+    {
+        code: "pt-BR",
+        name: "🇧🇷 Português"
+    },
+    {
+        code: "ru-RU",
+        name: "🇷🇺 Русский"
+    },
+    {
+        code: "ja-JP",
+        name: "🇯🇵 日本語"
+    },
+    {
+        code: "ko-KR",
+        name: "🇰🇷 한국어"
+    },
+    {
+        code: "zh-CN",
+        name: "🇨🇳 中文"
+    },
+    {
+        code: "ar-SA",
+        name: "🇸🇦 العربية"
+    }
+];
 
     const current =
         localStorage.getItem(
