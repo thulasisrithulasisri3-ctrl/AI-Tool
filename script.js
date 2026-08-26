@@ -9,7 +9,7 @@
    API
 ===================================================== */
 
-const API_URL = "https://ai-tool-2-zpul.onrender.com";
+const API_URL =" https://ai-tool-2-zpul.onrender.co";
 
 
 
