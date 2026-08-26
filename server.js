@@ -1,15 +1,13 @@
-```javascript
 "use strict";
 
 /* =====================================================
    VIGGO AI - SERVER.JS
-   FULL VERSION
-   STRICT ACCURACY + INDIA DATE/TIME
+   FULL CORRECTED VERSION
+   ACCURACY + INDIA DATE/TIME FIX
 ===================================================== */
 
 const express = require("express");
 const cors = require("cors");
-
 
 /* =====================================================
    APP
@@ -54,13 +52,11 @@ app.use(
     })
 );
 
-
 app.use(
     express.json({
         limit: "50mb"
     })
 );
-
 
 app.use(
     express.urlencoded({
@@ -71,15 +67,23 @@ app.use(
 
 
 /* =====================================================
-   CURRENT INDIA DATE/TIME
+   INDIA TIMEZONE
+===================================================== */
+
+const INDIA_TIMEZONE =
+    "Asia/Kolkata";
+
+
+/* =====================================================
+   CURRENT INDIA DATE + TIME
 ===================================================== */
 
 function getCurrentIndiaDateTime() {
 
-    return new Date().toLocaleString(
+    return new Intl.DateTimeFormat(
         "en-IN",
         {
-            timeZone: "Asia/Kolkata",
+            timeZone: INDIA_TIMEZONE,
             weekday: "long",
             day: "2-digit",
             month: "long",
@@ -89,7 +93,7 @@ function getCurrentIndiaDateTime() {
             second: "2-digit",
             hour12: true
         }
-    );
+    ).format(new Date());
 
 }
 
@@ -100,16 +104,16 @@ function getCurrentIndiaDateTime() {
 
 function getCurrentIndiaDate() {
 
-    return new Date().toLocaleDateString(
+    return new Intl.DateTimeFormat(
         "en-IN",
         {
-            timeZone: "Asia/Kolkata",
+            timeZone: INDIA_TIMEZONE,
             weekday: "long",
             day: "2-digit",
             month: "long",
             year: "numeric"
         }
-    );
+    ).format(new Date());
 
 }
 
@@ -120,244 +124,417 @@ function getCurrentIndiaDate() {
 
 function getCurrentIndiaTime() {
 
-    return new Date().toLocaleTimeString(
+    return new Intl.DateTimeFormat(
         "en-IN",
         {
-            timeZone: "Asia/Kolkata",
+            timeZone: INDIA_TIMEZONE,
             hour: "2-digit",
             minute: "2-digit",
             second: "2-digit",
             hour12: true
         }
+    ).format(new Date());
+
+}
+
+
+/* =====================================================
+   INDIA DATE PARTS
+===================================================== */
+
+function getIndiaDateParts() {
+
+    const parts =
+        new Intl.DateTimeFormat(
+            "en-US",
+            {
+                timeZone: INDIA_TIMEZONE,
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit"
+            }
+        ).formatToParts(
+            new Date()
+        );
+
+    const result = {};
+
+    for (const part of parts) {
+
+        if (
+            part.type !== "literal"
+        ) {
+
+            result[part.type] =
+                part.value;
+        }
+    }
+
+    return {
+        year:
+            Number(result.year),
+
+        month:
+            Number(result.month),
+
+        day:
+            Number(result.day)
+    };
+
+}
+
+
+/* =====================================================
+   INDIA DATE WITH OFFSET
+===================================================== */
+
+function getIndiaDateWithOffset(
+    days
+) {
+
+    const parts =
+        getIndiaDateParts();
+
+    const utcDate =
+        new Date(
+            Date.UTC(
+                parts.year,
+                parts.month - 1,
+                parts.day
+            )
+        );
+
+    utcDate.setUTCDate(
+        utcDate.getUTCDate() + days
+    );
+
+    return new Intl.DateTimeFormat(
+        "en-IN",
+        {
+            timeZone: "UTC",
+            weekday: "long",
+            day: "2-digit",
+            month: "long",
+            year: "numeric"
+        }
+    ).format(
+        utcDate
     );
 
 }
 
 
 /* =====================================================
-   NORMALIZE TEXT
+   NORMALIZE USER TEXT
 ===================================================== */
 
-function normalizeText(message) {
+function normalizeText(
+    message
+) {
 
-    return String(message || "")
+    return String(
+        message || ""
+    )
         .toLowerCase()
-        .replace(/[?!.,;:'"]/g, " ")
-        .replace(/\s+/g, " ")
+        .replace(
+            /[?!.,;:]+/g,
+            " "
+        )
+        .replace(
+            /\s+/g,
+            " "
+        )
         .trim();
 
 }
 
 
 /* =====================================================
-   STRICT DATE QUESTION DETECTOR
+   DATE QUESTION DETECTOR
 ===================================================== */
 
-function isDateQuestion(message) {
+function isDateQuestion(
+    message
+) {
 
     const text =
-        normalizeText(message);
-
-
-    const patterns = [
-
-        /^today$/,
-        /^today s date$/,
-        /^todays date$/,
-        /^what is today s date$/,
-        /^what is todays date$/,
-        /^what s today s date$/,
-        /^what date is it$/,
-        /^what is the date today$/,
-        /^what is today date$/,
-        /^current date$/,
-        /^what is the current date$/,
-        /^tell me today s date$/,
-        /^tell me todays date$/,
-        /^tell me the current date$/,
-        /^date today$/,
-        /^today date$/,
-        /^what day is today$/,
-        /^what is today$/,
-
-        /^இன்று$/,
-        /^இன்றைய தேதி$/,
-        /^இன்று தேதி என்ன$/,
-        /^இன்றைய தேதி என்ன$/,
-        /^தேதி என்ன$/,
-        /^இன்று என்ன தேதி$/,
-        /^இன்று என்ன நாள்$/,
-        /^இன்றைக்கு என்ன தேதி$/,
-        /^இப்போ என்ன தேதி$/,
-        /^இப்போது என்ன தேதி$/,
-        /^இப்ப என்ன தேதி$/
-
-    ];
-
-
-    return patterns.some(
-        pattern => pattern.test(text)
-    );
-
-}
-
-
-/* =====================================================
-   STRICT TIME QUESTION DETECTOR
-===================================================== */
-
-function isTimeQuestion(message) {
-
-    const text =
-        normalizeText(message);
-
-
-    const patterns = [
-
-        /^current time$/,
-        /^what time is it$/,
-        /^what is the time$/,
-        /^what is the current time$/,
-        /^time now$/,
-        /^what time now$/,
-        /^tell me the time$/,
-        /^tell me current time$/,
-        /^india time$/,
-        /^what is india time$/,
-        /^what time is it in india$/,
-        /^current india time$/,
-
-        /^இப்போது மணி என்ன$/,
-        /^இப்போ மணி என்ன$/,
-        /^நேரம் என்ன$/,
-        /^இப்போ நேரம் என்ன$/,
-        /^இப்போது நேரம் என்ன$/,
-        /^தற்போதைய நேரம் என்ன$/,
-        /^இந்திய நேரம் என்ன$/
-
-    ];
-
-
-    return patterns.some(
-        pattern => pattern.test(text)
-    );
-
-}
-
-
-/* =====================================================
-   STRICT TOMORROW QUESTION DETECTOR
-===================================================== */
-
-function isTomorrowQuestion(message) {
-
-    const text =
-        normalizeText(message);
-
-
-    const patterns = [
-
-        /^tomorrow$/,
-        /^what is tomorrow$/,
-        /^what day is tomorrow$/,
-        /^what date is tomorrow$/,
-        /^tomorrow date$/,
-        /^tomorrow s date$/,
-        /^what is tomorrow s date$/,
-        /^what is the date tomorrow$/,
-
-        /^நாளை$/,
-        /^நாளைக்கு$/,
-        /^நாளை என்ன தேதி$/,
-        /^நாளைக்கு என்ன தேதி$/,
-        /^நாளை என்ன நாள்$/,
-        /^நாளைக்கு என்ன நாள்$/
-
-    ];
-
-
-    return patterns.some(
-        pattern => pattern.test(text)
-    );
-
-}
-
-
-/* =====================================================
-   STRICT YESTERDAY QUESTION DETECTOR
-===================================================== */
-
-function isYesterdayQuestion(message) {
-
-    const text =
-        normalizeText(message);
-
-
-    const patterns = [
-
-        /^yesterday$/,
-        /^what was yesterday$/,
-        /^what date was yesterday$/,
-        /^what was yesterday s date$/,
-        /^yesterday date$/,
-        /^yesterday s date$/,
-        /^what was the date yesterday$/,
-
-        /^நேற்று$/,
-        /^நேற்றைய தேதி$/,
-        /^நேற்று என்ன தேதி$/,
-        /^நேற்று என்ன நாள்$/,
-        /^நேற்றைய தேதி என்ன$/
-
-    ];
-
-
-    return patterns.some(
-        pattern => pattern.test(text)
-    );
-
-}
-
-
-/* =====================================================
-   INDIA DATE OFFSET
-===================================================== */
-
-function getIndiaDateWithOffset(days) {
-
-    const now =
-        new Date();
-
-
-    const indiaDateString =
-        now.toLocaleString(
-            "en-US",
-            {
-                timeZone: "Asia/Kolkata"
-            }
+        normalizeText(
+            message
         );
 
+    const patterns = [
 
-    const indiaDate =
-        new Date(
-            indiaDateString
+        /* English */
+
+        /\btoday\b/,
+        /\btodays date\b/,
+        /\btoday date\b/,
+        /\bcurrent date\b/,
+        /\bdate today\b/,
+        /\bwhat date\b/,
+        /\bwhat is todays date\b/,
+        /\bwhat is today's date\b/,
+        /\bwhat day is today\b/,
+        /\bwhich date is today\b/,
+        /\bwhat is the date\b/,
+
+        /* Tamil */
+
+        /இன்று/,
+        /இன்றைய தேதி/,
+        /இன்று தேதி/,
+        /இன்னைக்கு தேதி/,
+        /இன்னைக்கு என்ன தேதி/,
+        /இன்றைக்கு தேதி/,
+        /இன்றைக்கு என்ன தேதி/,
+        /தேதி என்ன/,
+        /இன்று என்ன தேதி/,
+        /இன்றைய நாள்/,
+        /இன்று என்ன நாள்/
+    ];
+
+    return patterns.some(
+        pattern =>
+            pattern.test(text)
+    );
+
+}
+
+
+/* =====================================================
+   TIME QUESTION DETECTOR
+===================================================== */
+
+function isTimeQuestion(
+    message
+) {
+
+    const text =
+        normalizeText(
+            message
         );
 
+    const patterns = [
 
-    indiaDate.setDate(
-        indiaDate.getDate() + days
+        /* English */
+
+        /\bcurrent time\b/,
+        /\bwhat time is it\b/,
+        /\bwhat is the time\b/,
+        /\bwhat's the time\b/,
+        /\btime now\b/,
+        /\btime right now\b/,
+        /\bindia time\b/,
+        /\btime in india\b/,
+        /\bwhat time\b/,
+
+        /* Tamil */
+
+        /இப்போது மணி என்ன/,
+        /இப்போ மணி என்ன/,
+        /இப்பொழுது மணி என்ன/,
+        /நேரம் என்ன/,
+        /இப்போ நேரம் என்ன/,
+        /இப்போது நேரம் என்ன/,
+        /இந்தியா நேரம்/,
+        /இந்திய நேரம்/
+    ];
+
+    return patterns.some(
+        pattern =>
+            pattern.test(text)
     );
 
+}
 
-    return indiaDate.toLocaleDateString(
-        "en-IN",
-        {
-            weekday: "long",
-            day: "2-digit",
-            month: "long",
-            year: "numeric"
-        }
+
+/* =====================================================
+   TOMORROW QUESTION DETECTOR
+===================================================== */
+
+function isTomorrowQuestion(
+    message
+) {
+
+    const text =
+        normalizeText(
+            message
+        );
+
+    return (
+        /\btomorrow\b/.test(text) ||
+        /\btomorrows date\b/.test(text) ||
+        /நாளை/.test(text) ||
+        /நாளைக்கு/.test(text) ||
+        /நாளைய தேதி/.test(text)
     );
+
+}
+
+
+/* =====================================================
+   YESTERDAY QUESTION DETECTOR
+===================================================== */
+
+function isYesterdayQuestion(
+    message
+) {
+
+    const text =
+        normalizeText(
+            message
+        );
+
+    return (
+        /\byesterday\b/.test(text) ||
+        /\byesterdays date\b/.test(text) ||
+        /நேற்று/.test(text) ||
+        /நேற்றைய/.test(text)
+    );
+
+}
+
+
+/* =====================================================
+   DATE-ONLY ANSWER
+===================================================== */
+
+function createDateResponse() {
+
+    const currentDate =
+        getCurrentIndiaDate();
+
+    return {
+
+        success: true,
+
+        reply:
+            `Today is ${currentDate}.`,
+
+        response:
+            `Today is ${currentDate}.`,
+
+        text:
+            `Today is ${currentDate}.`,
+
+        model:
+            "server-date",
+
+        timezone:
+            INDIA_TIMEZONE,
+
+        currentDate:
+            currentDate
+    };
+
+}
+
+
+/* =====================================================
+   TIME-ONLY ANSWER
+===================================================== */
+
+function createTimeResponse() {
+
+    const currentTime =
+        getCurrentIndiaTime();
+
+    return {
+
+        success: true,
+
+        reply:
+            `The current time in India is ${currentTime}.`,
+
+        response:
+            `The current time in India is ${currentTime}.`,
+
+        text:
+            `The current time in India is ${currentTime}.`,
+
+        model:
+            "server-time",
+
+        timezone:
+            INDIA_TIMEZONE,
+
+        currentTime:
+            currentTime
+    };
+
+}
+
+
+/* =====================================================
+   TOMORROW RESPONSE
+===================================================== */
+
+function createTomorrowResponse() {
+
+    const tomorrow =
+        getIndiaDateWithOffset(
+            1
+        );
+
+    return {
+
+        success: true,
+
+        reply:
+            `Tomorrow is ${tomorrow}.`,
+
+        response:
+            `Tomorrow is ${tomorrow}.`,
+
+        text:
+            `Tomorrow is ${tomorrow}.`,
+
+        model:
+            "server-date",
+
+        timezone:
+            INDIA_TIMEZONE,
+
+        date:
+            tomorrow
+    };
+
+}
+
+
+/* =====================================================
+   YESTERDAY RESPONSE
+===================================================== */
+
+function createYesterdayResponse() {
+
+    const yesterday =
+        getIndiaDateWithOffset(
+            -1
+        );
+
+    return {
+
+        success: true,
+
+        reply:
+            `Yesterday was ${yesterday}.`,
+
+        response:
+            `Yesterday was ${yesterday}.`,
+
+        text:
+            `Yesterday was ${yesterday}.`,
+
+        model:
+            "server-date",
+
+        timezone:
+            INDIA_TIMEZONE,
+
+        date:
+            yesterday
+    };
 
 }
 
@@ -370,125 +547,86 @@ const VIGGO_SYSTEM_INSTRUCTION = `
 
 You are Viggo AI, a helpful, accurate and friendly AI assistant.
 
-=====================================================
-MAIN PRIORITY
-=====================================================
+IMPORTANT ACCURACY RULES:
 
-ACCURACY > CLARITY > HELPFULNESS
+1. Always understand the user's question before answering.
 
-=====================================================
-ACCURACY RULES
-=====================================================
+2. Give accurate, useful and direct answers.
 
-1. Understand the exact user question before answering.
+3. NEVER invent facts, names, numbers, dates, links,
+   sources or technical information.
 
-2. NEVER invent facts.
+4. If you are not certain about something, clearly say
+   that you are not certain instead of making up an answer.
 
-3. NEVER guess when you are uncertain.
+5. For mathematics, calculations, conversions and numerical
+   problems, carefully verify the calculation.
 
-4. NEVER invent:
-   - names
-   - numbers
-   - dates
-   - times
-   - links
-   - sources
-   - technical information
-   - statistics
+6. For technical questions, explain clearly and step-by-step
+   when useful.
 
-5. If you do not know something, clearly say that you
-   do not know instead of making up an answer.
+7. If the user asks a simple question, keep the answer simple.
 
-6. For mathematics, carefully calculate and verify
-   the result before answering.
+8. If the user asks for a detailed explanation, provide
+   a structured and detailed explanation.
 
-7. For technical questions, explain clearly and
-   step-by-step when useful.
+9. If the user asks in Tamil, answer primarily in Tamil.
 
-8. For educational questions, give correct definitions,
-   formulas, examples and explanations.
+10. If the user asks in English, answer primarily in English.
 
-9. For multiple-choice questions, identify the correct
-   option and briefly explain why.
-
-10. If the question is ambiguous, ask for clarification
-    instead of guessing.
-
-11. Do not change the meaning of the user's question.
+11. If the user mixes Tamil and English, naturally use
+    Tamil + English as appropriate.
 
 12. Do not claim that you performed an action that you
     did not actually perform.
 
-13. Do not pretend to have live internet access unless
-    live information is actually available.
+13. Do not pretend to have live internet access.
 
-14. Information that may change over time must not be
-    presented as definitely current unless current
-    information is actually available.
+14. When information may have changed over time, clearly
+    say that it may need verification.
 
-=====================================================
-CURRENT DATE AND TIME RULES
-=====================================================
+15. For educational questions, give correct definitions,
+    formulas, examples and steps when appropriate.
 
-15. The server-provided India date and time are the
-    authoritative source for current date and time.
+16. For multiple-choice questions, identify the correct
+    option and briefly explain why.
 
-16. NEVER guess today's date.
+17. If the question is ambiguous, ask a short clarification
+    instead of guessing.
 
-17. NEVER guess the current time.
+18. Always prioritize correctness over creativity.
 
-18. NEVER use an old date from training knowledge when
-    answering a current-date question.
+19. Do not change the meaning of the user's question.
 
-19. NEVER replace the server-provided date with another
-    date.
+20. Be friendly, natural and respectful.
 
-20. NEVER replace the server-provided time with another
-    time.
+21. NEVER GUESS THE CURRENT DATE.
 
-21. Current timezone is:
+22. NEVER GUESS THE CURRENT TIME.
 
-    Asia/Kolkata
+23. The current timezone is Asia/Kolkata.
 
-22. If the server provides current date/time information,
-    use that information.
+24. Current date/time questions are handled by the server
+    before the Gemini request.
 
-23. For direct date/time questions, the server may answer
-    the question before contacting the AI model.
+25. NEVER replace the server date with a date from training
+    data or memory.
 
-=====================================================
-LANGUAGE RULES
-=====================================================
+26. If server date/time information is provided, treat it
+    as authoritative.
 
-24. If the user asks in Tamil, answer primarily in Tamil.
+27. Do not say an old year such as 2024 for a current-date
+    question unless the user explicitly asks about 2024.
 
-25. If the user asks in English, answer primarily in English.
+MAIN GOAL:
 
-26. If the user mixes Tamil and English, naturally use
-    Tamil + English.
-
-=====================================================
-ANSWER STYLE
-=====================================================
-
-27. Keep simple questions simple.
-
-28. Give detailed explanations when requested.
-
-29. Never sound confident about information that you
-    cannot verify.
-
-30. Accuracy is more important than creativity.
-
-31. Do not make up information just to provide an answer.
-
-=====================================================
+ACCURACY + CLARITY + HELPFULNESS.
 
 `;
 
 
 /* =====================================================
-   HOME ROUTE
+   HOME
 ===================================================== */
 
 app.get(
@@ -512,7 +650,7 @@ app.get(
                 ),
 
             timezone:
-                "Asia/Kolkata",
+                INDIA_TIMEZONE,
 
             currentDate:
                 getCurrentIndiaDate(),
@@ -530,7 +668,7 @@ app.get(
 
 
 /* =====================================================
-   HEALTH ROUTE
+   HEALTH
 ===================================================== */
 
 app.get(
@@ -554,7 +692,7 @@ app.get(
                 ),
 
             timezone:
-                "Asia/Kolkata",
+                INDIA_TIMEZONE,
 
             currentDate:
                 getCurrentIndiaDate(),
@@ -565,7 +703,7 @@ app.get(
             currentDateTime:
                 getCurrentIndiaDateTime(),
 
-            time:
+            serverISOTime:
                 new Date().toISOString()
 
         });
@@ -594,7 +732,7 @@ app.post(
 
 
             /* =================================================
-               REQUEST BODY
+               BODY
             ================================================= */
 
             const body =
@@ -602,7 +740,8 @@ app.post(
 
 
             const userMessage =
-                typeof body.message === "string"
+                typeof body.message ===
+                "string"
                     ? body.message.trim()
                     : "";
 
@@ -651,8 +790,9 @@ app.post(
 
 
             /* =================================================
-               DIRECT CURRENT DATE
-               SERVER ONLY
+               IMPORTANT:
+               CURRENT DATE/TIME QUESTIONS MUST NEVER
+               GO TO GEMINI.
             ================================================= */
 
             if (
@@ -662,44 +802,25 @@ app.post(
                 )
             ) {
 
-                const currentDate =
-                    getCurrentIndiaDate();
-
+                const result =
+                    createDateResponse();
 
                 console.log(
-                    "DIRECT DATE RESPONSE:",
-                    currentDate
+                    "DIRECT CURRENT DATE:",
+                    result.currentDate
                 );
 
-
-                return res.status(200).json({
-
-                    success:
-                        true,
-
-                    reply:
-                        `Today is ${currentDate}.`,
-
-                    response:
-                        `Today is ${currentDate}.`,
-
-                    text:
-                        `Today is ${currentDate}.`,
-
-                    model:
-                        "server-date",
-
-                    timezone:
-                        "Asia/Kolkata"
-
-                });
+                return res.status(
+                    200
+                ).json(
+                    result
+                );
 
             }
 
 
             /* =================================================
-               DIRECT CURRENT TIME
-               SERVER ONLY
+               CURRENT TIME
             ================================================= */
 
             if (
@@ -709,44 +830,25 @@ app.post(
                 )
             ) {
 
-                const currentTime =
-                    getCurrentIndiaTime();
-
+                const result =
+                    createTimeResponse();
 
                 console.log(
-                    "DIRECT TIME RESPONSE:",
-                    currentTime
+                    "DIRECT CURRENT TIME:",
+                    result.currentTime
                 );
 
-
-                return res.status(200).json({
-
-                    success:
-                        true,
-
-                    reply:
-                        `The current time in India is ${currentTime}.`,
-
-                    response:
-                        `The current time in India is ${currentTime}.`,
-
-                    text:
-                        `The current time in India is ${currentTime}.`,
-
-                    model:
-                        "server-time",
-
-                    timezone:
-                        "Asia/Kolkata"
-
-                });
+                return res.status(
+                    200
+                ).json(
+                    result
+                );
 
             }
 
 
             /* =================================================
-               DIRECT TOMORROW
-               SERVER ONLY
+               TOMORROW
             ================================================= */
 
             if (
@@ -756,44 +858,25 @@ app.post(
                 )
             ) {
 
-                const tomorrow =
-                    getIndiaDateWithOffset(1);
-
+                const result =
+                    createTomorrowResponse();
 
                 console.log(
-                    "DIRECT TOMORROW RESPONSE:",
-                    tomorrow
+                    "DIRECT TOMORROW:",
+                    result.date
                 );
 
-
-                return res.status(200).json({
-
-                    success:
-                        true,
-
-                    reply:
-                        `Tomorrow is ${tomorrow}.`,
-
-                    response:
-                        `Tomorrow is ${tomorrow}.`,
-
-                    text:
-                        `Tomorrow is ${tomorrow}.`,
-
-                    model:
-                        "server-date",
-
-                    timezone:
-                        "Asia/Kolkata"
-
-                });
+                return res.status(
+                    200
+                ).json(
+                    result
+                );
 
             }
 
 
             /* =================================================
-               DIRECT YESTERDAY
-               SERVER ONLY
+               YESTERDAY
             ================================================= */
 
             if (
@@ -803,37 +886,19 @@ app.post(
                 )
             ) {
 
-                const yesterday =
-                    getIndiaDateWithOffset(-1);
-
+                const result =
+                    createYesterdayResponse();
 
                 console.log(
-                    "DIRECT YESTERDAY RESPONSE:",
-                    yesterday
+                    "DIRECT YESTERDAY:",
+                    result.date
                 );
 
-
-                return res.status(200).json({
-
-                    success:
-                        true,
-
-                    reply:
-                        `Yesterday was ${yesterday}.`,
-
-                    response:
-                        `Yesterday was ${yesterday}.`,
-
-                    text:
-                        `Yesterday was ${yesterday}.`,
-
-                    model:
-                        "server-date",
-
-                    timezone:
-                        "Asia/Kolkata"
-
-                });
+                return res.status(
+                    200
+                ).json(
+                    result
+                );
 
             }
 
@@ -849,7 +914,6 @@ app.post(
                 console.error(
                     "GEMINI_API_KEY is missing."
                 );
-
 
                 return res.status(500).json({
 
@@ -868,7 +932,7 @@ app.post(
 
 
             /* =================================================
-               SERVER CURRENT DATE/TIME
+               CURRENT SERVER DATE/TIME
             ================================================= */
 
             const currentIndiaDate =
@@ -903,7 +967,7 @@ app.post(
 
 
             /* =================================================
-               USER TEXT
+               TEXT
             ================================================= */
 
             if (
@@ -921,7 +985,7 @@ app.post(
 
 
             /* =================================================
-               FILE / IMAGE
+               FILE
             ================================================= */
 
             if (
@@ -980,7 +1044,7 @@ app.post(
 
 
             /* =================================================
-               CHECK CONTENT
+               CHECK PARTS
             ================================================= */
 
             if (
@@ -1026,7 +1090,7 @@ app.post(
                 `
 
 =====================================================
-SERVER-PROVIDED CURRENT INDIA DATE/TIME
+SERVER CURRENT DATE AND TIME
 =====================================================
 
 Current India Date:
@@ -1041,19 +1105,13 @@ ${currentIndiaDateTime}
 Timezone:
 Asia/Kolkata
 
-=====================================================
-IMPORTANT
-=====================================================
+IMPORTANT:
+These values come directly from the server.
 
-These server values are authoritative.
+For current-date/current-time questions,
+the server handles the answer before Gemini.
 
-If the user asks for today's date, current date,
-current time, tomorrow or yesterday, do not guess.
-
-Use the server-provided values.
-
-Never use an old date from training knowledge.
-
+Never substitute an old training-data date.
 `;
 
 
@@ -1076,7 +1134,6 @@ Never use an old date from training knowledge.
 
                 },
 
-
                 contents: [
 
                     {
@@ -1091,11 +1148,10 @@ Never use an old date from training knowledge.
 
                 ],
 
-
                 generationConfig: {
 
                     temperature:
-                        0.1,
+                        0.15,
 
                     maxOutputTokens:
                         2048,
@@ -1120,7 +1176,7 @@ Never use an old date from training knowledge.
 
 
             /* =================================================
-               GEMINI API REQUEST
+               GEMINI API CALL
             ================================================= */
 
             const geminiResponse =
@@ -1151,7 +1207,7 @@ Never use an old date from training knowledge.
 
 
             /* =================================================
-               READ GEMINI RESPONSE
+               READ RESPONSE
             ================================================= */
 
             const rawText =
@@ -1224,7 +1280,7 @@ Never use an old date from training knowledge.
 
 
             /* =================================================
-               EXTRACT AI RESPONSE
+               GET AI RESPONSE
             ================================================= */
 
             let reply = "";
@@ -1285,7 +1341,7 @@ Never use an old date from training knowledge.
 
 
             /* =================================================
-               EMPTY AI RESPONSE
+               EMPTY RESPONSE
             ================================================= */
 
             if (
@@ -1374,7 +1430,7 @@ Never use an old date from training knowledge.
 
 
 /* =====================================================
-   404 ROUTE
+   404
 ===================================================== */
 
 app.use(
@@ -1398,7 +1454,7 @@ app.use(
 
 
 /* =====================================================
-   GLOBAL ERROR HANDLER
+   GLOBAL ERROR
 ===================================================== */
 
 app.use(
@@ -1483,47 +1539,57 @@ app.listen(
 
 
         console.log(
-            "CHAT ENDPOINT: /chat"
+            "CHAT ENDPOINT:"
         );
 
 
         console.log(
-            "HEALTH ENDPOINT: /health"
+            "/chat"
         );
 
 
         console.log(
-            "ACCURACY MODE: STRICT"
+            "HEALTH ENDPOINT:"
         );
 
 
         console.log(
-            "DATE/TIME: SERVER CONTROLLED"
+            "/health"
         );
 
 
         console.log(
-            "DATE GUESSING: DISABLED"
+            "ACCURACY MODE: ENABLED"
         );
 
 
         console.log(
-            "TIME GUESSING: DISABLED"
+            "INDIA DATE/TIME: ENABLED"
         );
 
 
         console.log(
-            "TOMORROW: SERVER CONTROLLED"
+            "DIRECT DATE ANSWER: ENABLED"
         );
 
 
         console.log(
-            "YESTERDAY: SERVER CONTROLLED"
+            "DIRECT TIME ANSWER: ENABLED"
         );
 
 
         console.log(
-            "FILE UPLOAD: ENABLED"
+            "DIRECT TOMORROW ANSWER: ENABLED"
+        );
+
+
+        console.log(
+            "DIRECT YESTERDAY ANSWER: ENABLED"
+        );
+
+
+        console.log(
+            "GEMINI DATE GUESSING: BLOCKED"
         );
 
 
@@ -1538,4 +1604,3 @@ app.listen(
 
     }
 );
-```
