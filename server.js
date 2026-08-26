@@ -5,28 +5,24 @@ const cors = require("cors");
 
 const app = express();
 
-/* =====================================================
-   CONFIG
-===================================================== */
-
 const PORT = process.env.PORT || 10000;
+const API_KEY = process.env.GEMINI_API_KEY;
 
-const API_KEY =
-    process.env.GEMINI_API_KEY ||
-    process.env.GOOGLE_API_KEY ||
-    "";
+// =====================================================
+// MODEL
+// =====================================================
 
-const MODEL =
-    process.env.GEMINI_MODEL ||
-    "gemini-3.6-flash";
+const MODEL = "gemini-3.6-flash";
 
-const TIME_ZONE =
-    "Asia/Kolkata";
+// =====================================================
+// TIMEZONE
+// =====================================================
 
+const DEFAULT_TIMEZONE = "Asia/Kolkata";
 
-/* =====================================================
-   MIDDLEWARE
-===================================================== */
+// =====================================================
+// MIDDLEWARE
+// =====================================================
 
 app.use(
     cors({
@@ -38,593 +34,931 @@ app.use(
 
 app.use(
     express.json({
-        limit: "20mb"
+        limit: "25mb"
     })
 );
 
+// =====================================================
+// DATE / TIME
+// =====================================================
 
-/* =====================================================
-   CURRENT INDIA DATE / TIME
-===================================================== */
-
-function getIndiaDateTime() {
+function getDateTime(timeZone = DEFAULT_TIMEZONE) {
 
     const now = new Date();
 
     const dateFormatter =
-        new Intl.DateTimeFormat(
-            "en-IN",
-            {
-                timeZone: TIME_ZONE,
-                weekday: "long",
-                day: "2-digit",
-                month: "long",
-                year: "numeric"
-            }
-        );
+        new Intl.DateTimeFormat("en-US", {
+            timeZone,
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+        });
 
     const timeFormatter =
-        new Intl.DateTimeFormat(
-            "en-IN",
-            {
-                timeZone: TIME_ZONE,
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-                hour12: true
-            }
-        );
-
-    const isoFormatter =
-        new Intl.DateTimeFormat(
-            "en-CA",
-            {
-                timeZone: TIME_ZONE,
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit"
-            }
-        );
+        new Intl.DateTimeFormat("en-US", {
+            timeZone,
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true
+        });
 
     return {
-        date:
-            dateFormatter.format(now),
-
-        time:
-            timeFormatter.format(now),
-
-        isoDate:
-            isoFormatter.format(now),
-
-        timestamp:
-            now.toISOString()
+        date: dateFormatter.format(now),
+        time: timeFormatter.format(now),
+        dateTime:
+            `${dateFormatter.format(now)} at ${timeFormatter.format(now)}`,
+        iso: now.toISOString(),
+        timezone: timeZone
     };
 }
 
+// =====================================================
+// DATE CALCULATION
+// =====================================================
 
-/* =====================================================
-   ROOT / SERVER STATUS
-===================================================== */
+function getRelativeDate(days, timeZone = DEFAULT_TIMEZONE) {
 
-app.get("/", (req, res) => {
+    const now = new Date();
 
-    const current =
-        getIndiaDateTime();
+    const parts =
+        new Intl.DateTimeFormat("en-US", {
+            timeZone,
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+        }).formatToParts(now);
 
-    res.json({
+    const year =
+        Number(
+            parts.find(
+                p => p.type === "year"
+            ).value
+        );
 
-        status: "online",
+    const month =
+        Number(
+            parts.find(
+                p => p.type === "month"
+            ).value
+        );
 
-        service:
-            "Viggo AI Server",
+    const day =
+        Number(
+            parts.find(
+                p => p.type === "day"
+            ).value
+        );
 
-        model:
-            MODEL,
+    const localDate =
+        new Date(
+            Date.UTC(
+                year,
+                month - 1,
+                day + days
+            )
+        );
 
-        apiConfigured:
-            Boolean(API_KEY),
+    return new Intl.DateTimeFormat(
+        "en-US",
+        {
+            timeZone: "UTC",
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+        }
+    ).format(localDate);
+}
 
-        timezone:
-            TIME_ZONE,
+// =====================================================
+// LANGUAGE
+// =====================================================
 
-        currentDate:
-            current.date,
+const LANGUAGE_NAMES = {
 
-        currentTime:
-            current.time,
+    "en-IN": "English",
+    "ta-IN": "Tamil",
+    "hi-IN": "Hindi",
+    "te-IN": "Telugu",
+    "kn-IN": "Kannada",
+    "ml-IN": "Malayalam",
+    "bn-IN": "Bengali",
+    "mr-IN": "Marathi",
+    "gu-IN": "Gujarati",
+    "pa-IN": "Punjabi",
+    "ur-IN": "Urdu",
+    "or-IN": "Odia",
+    "as-IN": "Assamese",
 
-        currentDateTime:
-            `${current.date} at ${current.time}`,
+    "fr-FR": "French",
+    "de-DE": "German",
+    "es-ES": "Spanish",
+    "it-IT": "Italian",
+    "pt-BR": "Portuguese",
+    "ru-RU": "Russian",
+    "ja-JP": "Japanese",
+    "ko-KR": "Korean",
+    "zh-CN": "Chinese",
+    "ar-SA": "Arabic",
+    "tr-TR": "Turkish",
+    "nl-NL": "Dutch",
+    "pl-PL": "Polish",
+    "sv-SE": "Swedish",
+    "da-DK": "Danish",
+    "fi-FI": "Finnish",
+    "no-NO": "Norwegian",
+    "el-GR": "Greek",
+    "he-IL": "Hebrew",
+    "th-TH": "Thai",
+    "vi-VN": "Vietnamese",
+    "id-ID": "Indonesian",
+    "ms-MY": "Malay"
+};
 
-        message:
-            "Viggo AI Server is running."
-    });
-});
+// =====================================================
+// LANGUAGE → TIMEZONE
+// =====================================================
 
+const LANGUAGE_TIMEZONES = {
 
-/* =====================================================
-   HEALTH CHECK
-===================================================== */
+    "en-IN": "Asia/Kolkata",
+    "ta-IN": "Asia/Kolkata",
+    "hi-IN": "Asia/Kolkata",
+    "te-IN": "Asia/Kolkata",
+    "kn-IN": "Asia/Kolkata",
+    "ml-IN": "Asia/Kolkata",
+    "bn-IN": "Asia/Kolkata",
+    "mr-IN": "Asia/Kolkata",
+    "gu-IN": "Asia/Kolkata",
+    "pa-IN": "Asia/Kolkata",
+    "ur-IN": "Asia/Kolkata",
+    "or-IN": "Asia/Kolkata",
+    "as-IN": "Asia/Kolkata",
 
-app.get("/health", (req, res) => {
+    "fr-FR": "Europe/Paris",
+    "de-DE": "Europe/Berlin",
+    "es-ES": "Europe/Madrid",
+    "it-IT": "Europe/Rome",
+    "pt-BR": "America/Sao_Paulo",
+    "ru-RU": "Europe/Moscow",
+    "ja-JP": "Asia/Tokyo",
+    "ko-KR": "Asia/Seoul",
+    "zh-CN": "Asia/Shanghai",
+    "ar-SA": "Asia/Riyadh",
+    "tr-TR": "Europe/Istanbul",
+    "nl-NL": "Europe/Amsterdam",
+    "pl-PL": "Europe/Warsaw",
+    "sv-SE": "Europe/Stockholm",
+    "da-DK": "Europe/Copenhagen",
+    "fi-FI": "Europe/Helsinki",
+    "no-NO": "Europe/Oslo",
+    "el-GR": "Europe/Athens",
+    "he-IL": "Asia/Jerusalem",
+    "th-TH": "Asia/Bangkok",
+    "vi-VN": "Asia/Ho_Chi_Minh",
+    "id-ID": "Asia/Jakarta",
+    "ms-MY": "Asia/Kuala_Lumpur"
+};
 
-    const current =
-        getIndiaDateTime();
+// =====================================================
+// DIRECT DATE DETECTION
+// =====================================================
 
-    res.json({
+function isDateQuestion(text) {
 
-        status: "ok",
-
-        service:
-            "Viggo AI Server",
-
-        apiConfigured:
-            Boolean(API_KEY),
-
-        model:
-            MODEL,
-
-        timezone:
-            TIME_ZONE,
-
-        currentDate:
-            current.date,
-
-        currentTime:
-            current.time
-    });
-});
-
-
-/* =====================================================
-   GEMINI API URL
-===================================================== */
-
-function getGeminiURL() {
+    const q =
+        String(text || "")
+            .toLowerCase()
+            .trim();
 
     return (
-        "https://generativelanguage.googleapis.com/" +
-        "v1beta/models/" +
-        encodeURIComponent(MODEL) +
-        ":generateContent?key=" +
-        encodeURIComponent(API_KEY)
+        q.includes("today") ||
+        q.includes("date today") ||
+        q.includes("today's date") ||
+        q.includes("what date") ||
+        q.includes("current date") ||
+        q.includes("இன்று") ||
+        q.includes("தேதி") ||
+        q.includes("இன்றைய தேதி") ||
+        q.includes("आज") ||
+        q.includes("आज की तारीख")
     );
 }
 
+// =====================================================
+// DIRECT TIME DETECTION
+// =====================================================
 
-/* =====================================================
-   SYSTEM INSTRUCTION
-===================================================== */
+function isTimeQuestion(text) {
 
-function createSystemInstruction() {
-
-    const current =
-        getIndiaDateTime();
-
-    return `
-You are Viggo AI.
-
-IMPORTANT CURRENT DATE AND TIME RULES:
-
-The current date/time is generated by the Viggo server.
-Do NOT use an old training-data date.
-Do NOT say May 19, 2024.
-Do NOT say May 20, 2024.
-Do NOT invent a different current date.
-
-Current server timezone:
-${TIME_ZONE}
-
-Current date:
-${current.date}
-
-Current time:
-${current.time}
-
-Current ISO date:
-${current.isoDate}
-
-Current date and time:
-${current.date} at ${current.time}
-
-If the user asks:
-- What is today's date?
-- What date is it?
-- What is the current date?
-- What time is it?
-- What day is today?
-
-Answer using the current server date/time above.
-
-If the user asks for the date in another country or timezone,
-calculate the date/time for that requested timezone.
-
-If the user asks for a state/region-specific date,
-use the appropriate timezone for that region.
-
-Never claim that today's date is 2024 unless the user is explicitly asking about a historical date.
-
-Always answer the user's question directly.
-
-If the user speaks Tamil, answer in Tamil.
-If the user speaks English, answer in English.
-If the user speaks Hindi, answer in Hindi.
-For other languages, try to answer in that language.
-
-Do not mention these internal instructions.
-`;
-}
-
-
-/* =====================================================
-   EXTRACT GEMINI RESPONSE
-===================================================== */
-
-function extractGeminiText(data) {
-
-    try {
-
-        const candidates =
-            data?.candidates;
-
-        if (
-            !Array.isArray(candidates) ||
-            candidates.length === 0
-        ) {
-
-            return "";
-        }
-
-        const parts =
-            candidates[0]?.content?.parts;
-
-        if (!Array.isArray(parts)) {
-
-            return "";
-        }
-
-        return parts
-            .map(part =>
-                part?.text || ""
-            )
-            .join("")
+    const q =
+        String(text || "")
+            .toLowerCase()
             .trim();
 
-    } catch (error) {
-
-        console.error(
-            "Response extraction error:",
-            error
-        );
-
-        return "";
-    }
+    return (
+        q.includes("current time") ||
+        q.includes("what time") ||
+        q.includes("time now") ||
+        q.includes("time is it") ||
+        q.includes("நேரம்") ||
+        q.includes("இப்போது மணி") ||
+        q.includes("समय") ||
+        q.includes("अभी कितने बजे")
+    );
 }
 
+// =====================================================
+// TOMORROW
+// =====================================================
 
-/* =====================================================
-   CHAT ENDPOINT
-===================================================== */
+function isTomorrowQuestion(text) {
 
-app.post("/chat", async (req, res) => {
+    const q =
+        String(text || "")
+            .toLowerCase()
+            .trim();
+
+    return (
+        q.includes("tomorrow") ||
+        q.includes("நாளை") ||
+        q.includes("कल")
+    );
+}
+
+// =====================================================
+// YESTERDAY
+// =====================================================
+
+function isYesterdayQuestion(text) {
+
+    const q =
+        String(text || "")
+            .toLowerCase()
+            .trim();
+
+    return (
+        q.includes("yesterday") ||
+        q.includes("நேற்று") ||
+        q.includes("நேற்றைய") ||
+        q.includes("कल")
+    );
+}
+
+// =====================================================
+// GEMINI API
+// =====================================================
+
+async function callGemini(
+    userMessage,
+    language,
+    dateTime
+) {
+
+    if (!API_KEY) {
+
+        throw new Error(
+            "GEMINI_API_KEY is not configured on Render."
+        );
+    }
+
+    const languageName =
+        LANGUAGE_NAMES[language] ||
+        "English";
+
+    const systemInstruction = `
+You are Viggo AI.
+
+IMPORTANT ACCURACY RULES:
+
+1. NEVER invent the current date.
+2. NEVER use a date from your training data as today's date.
+3. The server-provided date below is the ONLY trusted current date.
+4. If the user asks today's date, use the SERVER CURRENT DATE.
+5. If the user asks current time, use the SERVER CURRENT TIME.
+6. If the user asks tomorrow, calculate from the SERVER CURRENT DATE.
+7. If the user asks yesterday, calculate from the SERVER CURRENT DATE.
+8. Do not say May 19 2024.
+9. Do not say May 20 2024.
+10. Do not claim the current date is 2024.
+11. Answer accurately and directly.
+12. Respond in the user's selected language when possible.
+
+SELECTED LANGUAGE:
+${languageName}
+
+SERVER TIMEZONE:
+${dateTime.timezone}
+
+SERVER CURRENT DATE:
+${dateTime.date}
+
+SERVER CURRENT TIME:
+${dateTime.time}
+
+SERVER CURRENT DATE AND TIME:
+${dateTime.dateTime}
+
+SERVER ISO TIME:
+${dateTime.iso}
+`;
+
+    const url =
+        `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${encodeURIComponent(API_KEY)}`;
+
+    const body = {
+
+        systemInstruction: {
+            parts: [
+                {
+                    text:
+                        systemInstruction
+                }
+            ]
+        },
+
+        contents: [
+            {
+                role: "user",
+                parts: [
+                    {
+                        text:
+                            String(userMessage)
+                    }
+                ]
+            }
+        ],
+
+        generationConfig: {
+
+            temperature: 0,
+
+            topP: 0.1,
+
+            topK: 1,
+
+            maxOutputTokens: 2048
+        }
+    };
+
+    const response =
+        await fetch(
+            url,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body:
+                    JSON.stringify(body)
+            }
+        );
+
+    const rawText =
+        await response.text();
+
+    let data = null;
 
     try {
 
-        if (!API_KEY) {
-
-            console.error(
-                "GEMINI_API_KEY is missing."
-            );
-
-            return res.status(500).json({
-
-                error:
-                    "GEMINI_API_KEY is not configured on the server.",
-
-                reply:
-                    "Viggo AI server is online, but the Gemini API key is not configured."
-            });
-        }
-
-
-        /* =============================================
-           USER MESSAGE
-        ============================================= */
-
-        const userMessage =
-            typeof req.body?.message === "string"
-                ? req.body.message.trim()
-                : "";
-
-
-        if (!userMessage) {
-
-            return res.status(400).json({
-
-                error:
-                    "Message is required.",
-
-                reply:
-                    "Please enter a message."
-            });
-        }
-
-
-        /* =============================================
-           CURRENT DATE/TIME
-        ============================================= */
-
-        const current =
-            getIndiaDateTime();
-
-
-        /* =============================================
-           BUILD PROMPT
-        ============================================= */
-
-        const systemInstruction =
-            createSystemInstruction();
-
-        const finalPrompt =
-
-            systemInstruction +
-
-            `
-
-USER MESSAGE:
-
-${userMessage}
-
-Answer the user now.
-`;
-
-
-        /* =============================================
-           GEMINI REQUEST
-        ============================================= */
-
-        const response =
-            await fetch(
-                getGeminiURL(),
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:
-                        JSON.stringify({
-
-                            contents: [
-
-                                {
-                                    role: "user",
-
-                                    parts: [
-
-                                        {
-                                            text:
-                                                finalPrompt
-                                        }
-
-                                    ]
-                                }
-
-                            ],
-
-                            generationConfig: {
-
-                                temperature:
-                                    0.2,
-
-                                topP:
-                                    0.8,
-
-                                maxOutputTokens:
-                                    2048
-                            }
-
-                        })
-                }
-            );
-
-
-        /* =============================================
-           READ RESPONSE
-        ============================================= */
-
-        const rawText =
-            await response.text();
-
-        let data;
-
-        try {
-
-            data =
-                JSON.parse(
-                    rawText
-                );
-
-        } catch (parseError) {
-
-            console.error(
-                "Gemini returned non-JSON:",
+        data =
+            JSON.parse(
                 rawText
             );
 
-            return res.status(500).json({
+    } catch {
 
-                error:
-                    "Invalid response from Gemini API.",
+        data = null;
+    }
 
-                reply:
-                    "Viggo AI received an invalid response from the AI server."
-            });
-        }
-
-
-        /* =============================================
-           GEMINI ERROR
-        ============================================= */
-
-        if (!response.ok) {
-
-            console.error(
-                "Gemini API error:",
-                JSON.stringify(
-                    data,
-                    null,
-                    2
-                )
-            );
-
-            const apiError =
-                data?.error?.message ||
-                `Gemini API returned HTTP ${response.status}`;
-
-            return res.status(500).json({
-
-                error:
-                    apiError,
-
-                reply:
-                    "Viggo AI could not get a response from Gemini right now."
-            });
-        }
-
-
-        /* =============================================
-           EXTRACT ANSWER
-        ============================================= */
-
-        const reply =
-            extractGeminiText(
-                data
-            );
-
-
-        if (!reply) {
-
-            console.error(
-                "Gemini response had no text:",
-                JSON.stringify(
-                    data,
-                    null,
-                    2
-                )
-            );
-
-            return res.status(500).json({
-
-                error:
-                    "Gemini returned no text.",
-
-                reply:
-                    "Viggo AI did not receive a text response from Gemini."
-            });
-        }
-
-
-        /* =============================================
-           SUCCESS
-        ============================================= */
-
-        return res.json({
-
-            reply:
-                reply,
-
-            currentDate:
-                current.date,
-
-            currentTime:
-                current.time,
-
-            timezone:
-                TIME_ZONE,
-
-            model:
-                MODEL
-
-        });
-
-    } catch (error) {
+    if (!response.ok) {
 
         console.error(
-            "Viggo /chat error:",
-            error
+            "GEMINI API ERROR:",
+            response.status,
+            rawText
         );
 
-        return res.status(500).json({
-
-            error:
-                error.message ||
-                "Internal server error.",
-
-            reply:
-                "Sorry friend, Viggo AI server encountered an error."
-        });
+        throw new Error(
+            data?.error?.message ||
+            `Gemini API error ${response.status}`
+        );
     }
-});
 
+    const reply =
+        data?.candidates?.[0]?.content?.parts
+            ?.map(part => part.text || "")
+            .join("")
+            .trim();
 
-/* =====================================================
-   404
-===================================================== */
+    if (!reply) {
 
-app.use(
+        console.error(
+            "EMPTY GEMINI RESPONSE:",
+            JSON.stringify(
+                data
+            )
+        );
+
+        throw new Error(
+            "Gemini returned an empty response."
+        );
+    }
+
+    return reply;
+}
+
+// =====================================================
+// HEALTH
+// =====================================================
+
+app.get(
+    "/health",
     (req, res) => {
 
-        res.status(404).json({
+        const language =
+            req.query.language ||
+            "en-IN";
 
-            error:
-                "Endpoint not found.",
+        const timezone =
+            LANGUAGE_TIMEZONES[language] ||
+            DEFAULT_TIMEZONE;
 
-            path:
-                req.path
+        const dateTime =
+            getDateTime(
+                timezone
+            );
+
+        res.json({
+
+            status: "ok",
+
+            service:
+                "Viggo AI Server",
+
+            apiConfigured:
+                Boolean(API_KEY),
+
+            model:
+                MODEL,
+
+            timezone:
+                timezone,
+
+            language:
+                language,
+
+            languageName:
+                LANGUAGE_NAMES[language] ||
+                "English",
+
+            currentDate:
+                dateTime.date,
+
+            currentTime:
+                dateTime.time,
+
+            currentDateTime:
+                dateTime.dateTime
         });
     }
 );
 
+// =====================================================
+// CHAT
+// =====================================================
 
-/* =====================================================
-   GLOBAL ERROR HANDLER
-===================================================== */
+app.post(
+    "/chat",
+    async (req, res) => {
 
-app.use(
-    (error, req, res, next) => {
+        try {
 
-        console.error(
-            "Express error:",
-            error
-        );
+            const userMessage =
+                String(
+                    req.body?.message ||
+                    ""
+                ).trim();
 
-        res.status(500).json({
+            const language =
+                String(
+                    req.body?.language ||
+                    "en-IN"
+                );
 
-            error:
-                error.message ||
-                "Internal server error.",
+            const timezone =
+                LANGUAGE_TIMEZONES[language] ||
+                DEFAULT_TIMEZONE;
 
-            reply:
-                "Viggo AI server error."
+            const dateTime =
+                getDateTime(
+                    timezone
+                );
+
+            if (!userMessage) {
+
+                return res.status(400).json({
+
+                    error:
+                        "Message is required."
+                });
+            }
+
+            console.log(
+                "---------------------------------"
+            );
+
+            console.log(
+                "CHAT REQUEST"
+            );
+
+            console.log(
+                "Message:",
+                userMessage
+            );
+
+            console.log(
+                "Language:",
+                language
+            );
+
+            console.log(
+                "Timezone:",
+                timezone
+            );
+
+            console.log(
+                "Current Date:",
+                dateTime.date
+            );
+
+            console.log(
+                "Current Time:",
+                dateTime.time
+            );
+
+            // =================================================
+            // DIRECT DATE ANSWER
+            // =================================================
+
+            if (
+                isDateQuestion(
+                    userMessage
+                )
+            ) {
+
+                const languageName =
+                    LANGUAGE_NAMES[language] ||
+                    "English";
+
+                let answer;
+
+                if (
+                    languageName ===
+                    "Tamil"
+                ) {
+
+                    answer =
+                        `இன்றைய தேதி ${dateTime.date}.`;
+
+                } else if (
+                    languageName ===
+                    "Hindi"
+                ) {
+
+                    answer =
+                        `आज की तारीख ${dateTime.date} है।`;
+
+                } else {
+
+                    answer =
+                        `Today's date is ${dateTime.date}.`;
+                }
+
+                console.log(
+                    "DIRECT DATE ANSWER:",
+                    answer
+                );
+
+                return res.json({
+
+                    reply:
+                        answer,
+
+                    date:
+                        dateTime.date,
+
+                    time:
+                        dateTime.time,
+
+                    timezone:
+                        timezone,
+
+                    language:
+                        language
+                });
+            }
+
+            // =================================================
+            // DIRECT TIME ANSWER
+            // =================================================
+
+            if (
+                isTimeQuestion(
+                    userMessage
+                )
+            ) {
+
+                const languageName =
+                    LANGUAGE_NAMES[language] ||
+                    "English";
+
+                let answer;
+
+                if (
+                    languageName ===
+                    "Tamil"
+                ) {
+
+                    answer =
+                        `இப்போது நேரம் ${dateTime.time}.`;
+
+                } else if (
+                    languageName ===
+                    "Hindi"
+                ) {
+
+                    answer =
+                        `अभी समय ${dateTime.time} है।`;
+
+                } else {
+
+                    answer =
+                        `The current time is ${dateTime.time}.`;
+                }
+
+                return res.json({
+
+                    reply:
+                        answer,
+
+                    date:
+                        dateTime.date,
+
+                    time:
+                        dateTime.time,
+
+                    timezone:
+                        timezone,
+
+                    language:
+                        language
+                });
+            }
+
+            // =================================================
+            // TOMORROW
+            // =================================================
+
+            if (
+                isTomorrowQuestion(
+                    userMessage
+                )
+            ) {
+
+                const tomorrow =
+                    getRelativeDate(
+                        1,
+                        timezone
+                    );
+
+                const languageName =
+                    LANGUAGE_NAMES[language] ||
+                    "English";
+
+                let answer;
+
+                if (
+                    languageName ===
+                    "Tamil"
+                ) {
+
+                    answer =
+                        `நாளை ${tomorrow}.`;
+
+                } else if (
+                    languageName ===
+                    "Hindi"
+                ) {
+
+                    answer =
+                        `कल ${tomorrow} है।`;
+
+                } else {
+
+                    answer =
+                        `Tomorrow is ${tomorrow}.`;
+                }
+
+                return res.json({
+
+                    reply:
+                        answer,
+
+                    date:
+                        tomorrow,
+
+                    timezone:
+                        timezone,
+
+                    language:
+                        language
+                });
+            }
+
+            // =================================================
+            // YESTERDAY
+            // =================================================
+
+            if (
+                isYesterdayQuestion(
+                    userMessage
+                )
+            ) {
+
+                const yesterday =
+                    getRelativeDate(
+                        -1,
+                        timezone
+                    );
+
+                const languageName =
+                    LANGUAGE_NAMES[language] ||
+                    "English";
+
+                let answer;
+
+                if (
+                    languageName ===
+                    "Tamil"
+                ) {
+
+                    answer =
+                        `நேற்று ${yesterday}.`;
+
+                } else if (
+                    languageName ===
+                    "Hindi"
+                ) {
+
+                    answer =
+                        `कल से पहले की तारीख ${yesterday} है।`;
+
+                } else {
+
+                    answer =
+                        `Yesterday was ${yesterday}.`;
+                }
+
+                return res.json({
+
+                    reply:
+                        answer,
+
+                    date:
+                        yesterday,
+
+                    timezone:
+                        timezone,
+
+                    language:
+                        language
+                });
+            }
+
+            // =================================================
+            // NORMAL GEMINI CHAT
+            // =================================================
+
+            const reply =
+                await callGemini(
+                    userMessage,
+                    language,
+                    dateTime
+                );
+
+            console.log(
+                "GEMINI RESPONSE OK"
+            );
+
+            return res.json({
+
+                reply:
+                    reply,
+
+                date:
+                    dateTime.date,
+
+                time:
+                    dateTime.time,
+
+                timezone:
+                    timezone,
+
+                language:
+                    language
+            });
+
+        } catch (error) {
+
+            console.error(
+                "================================="
+            );
+
+            console.error(
+                "CHAT ERROR:"
+            );
+
+            console.error(
+                error?.message ||
+                error
+            );
+
+            console.error(
+                "================================="
+            );
+
+            return res.status(500).json({
+
+                error:
+                    "Viggo AI server error",
+
+                details:
+                    error?.message ||
+                    "Unknown server error"
+            });
+        }
+    }
+);
+
+// =====================================================
+// ROOT
+// =====================================================
+
+app.get(
+    "/",
+    (req, res) => {
+
+        res.json({
+
+            status:
+                "online",
+
+            service:
+                "Viggo AI Server",
+
+            model:
+                MODEL,
+
+            endpoint:
+                "/chat",
+
+            health:
+                "/health",
+
+            timezone:
+                DEFAULT_TIMEZONE,
+
+            currentDate:
+                getDateTime(
+                    DEFAULT_TIMEZONE
+                ).date,
+
+            currentTime:
+                getDateTime(
+                    DEFAULT_TIMEZONE
+                ).time
         });
     }
 );
 
-
-/* =====================================================
-   START SERVER
-===================================================== */
+// =====================================================
+// START SERVER
+// =====================================================
 
 app.listen(
     PORT,
-    "0.0.0.0",
     () => {
 
-        const current =
-            getIndiaDateTime();
+        const dateTime =
+            getDateTime(
+                DEFAULT_TIMEZONE
+            );
 
         console.log(
             "================================="
@@ -648,27 +982,35 @@ app.listen(
             "API KEY:",
             API_KEY
                 ? "CONFIGURED"
-                : "MISSING"
+                : "NOT CONFIGURED"
         );
 
         console.log(
             "TIMEZONE:",
-            TIME_ZONE
+            DEFAULT_TIMEZONE
         );
 
         console.log(
             "CURRENT DATE:",
-            current.date
+            dateTime.date
         );
 
         console.log(
             "CURRENT TIME:",
-            current.time
+            dateTime.time
         );
 
         console.log(
             "CURRENT DATE/TIME:",
-            `${current.date} at ${current.time}`
+            dateTime.dateTime
+        );
+
+        console.log(
+            "CHAT ENDPOINT: /chat"
+        );
+
+        console.log(
+            "HEALTH ENDPOINT: /health"
         );
 
         console.log(
