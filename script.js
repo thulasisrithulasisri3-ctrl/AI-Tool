@@ -2,7 +2,7 @@
 
 /* =====================================================
    VIGGO AI - FULL SCRIPT
-   LANGUAGE + VOICE MENU FIX
+   LANGUAGE + VOICE + SCROLL FIX
 ===================================================== */
 
 /* =====================================================
@@ -678,8 +678,7 @@ function getSelectedSpeechVoice() {
                         name.includes("zira") ||
                         name.includes("samantha") ||
                         name.includes("susan") ||
-                        name.includes("hazel") ||
-                        name.includes("google uk english female")
+                        name.includes("hazel")
                     );
                 }
             );
@@ -702,8 +701,7 @@ function getSelectedSpeechVoice() {
                         name.includes("man") ||
                         name.includes("david") ||
                         name.includes("mark") ||
-                        name.includes("daniel") ||
-                        name.includes("google uk english male")
+                        name.includes("daniel")
                     );
                 }
             );
@@ -1176,15 +1174,6 @@ function addMessageToUI(
                 );
 
                 return;
-            }
-
-            if (!speakerEnabled) {
-
-                speakerEnabled =
-                    true;
-
-                speakerBtn.textContent =
-                    "🔊 Speaker";
             }
 
             speakText(
@@ -1917,11 +1906,10 @@ document.addEventListener(
 
         if (
             voiceMenu &&
-            voiceMenu &&
+            voiceMenuBtn &&
             !voiceMenu.contains(
                 event.target
             ) &&
-            voiceMenuBtn &&
             !voiceMenuBtn.contains(
                 event.target
             )
@@ -2073,10 +2061,7 @@ document.addEventListener(
 
         /*
          * IMPORTANT:
-         * Voice option in PLUS menu does NOT
-         * automatically start microphone.
-         *
-         * It only opens the voice selection menu.
+         * Voice option does NOT start microphone.
          */
 
         if (action === "voice") {
@@ -2216,7 +2201,7 @@ function startVoiceRecognition() {
 
 /* =====================================================
    MIC BUTTON
-   ONLY THIS STARTS MICROPHONE
+   ONLY MIC BUTTON STARTS MICROPHONE
 ===================================================== */
 
 if (mic) {
@@ -2411,8 +2396,6 @@ function openVoiceSelectionMenu(
 
 /* =====================================================
    MORE MENU VOICE
-   IMPORTANT:
-   DOES NOT START MICROPHONE
 ===================================================== */
 
 if (voiceMenuBtn) {
@@ -2443,8 +2426,6 @@ if (voiceMenuBtn) {
 
 /* =====================================================
    PLUS VOICE BUTTON
-   IMPORTANT:
-   DOES NOT START MICROPHONE
 ===================================================== */
 
 if (plusVoiceBtn) {
@@ -2475,6 +2456,7 @@ if (plusVoiceBtn) {
 
 /* =====================================================
    LANGUAGE MENU
+   20+ LANGUAGES + SCROLL
 ===================================================== */
 
 function openLanguageSelectionMenu(
@@ -2514,8 +2496,26 @@ function openLanguageSelectionMenu(
     menu.style.minWidth =
         "190px";
 
+    /* =================================================
+       SCROLL
+    ================================================= */
+
+    menu.style.maxHeight =
+        "300px";
+
+    menu.style.overflowY =
+        "auto";
+
+    menu.style.overflowX =
+        "hidden";
+
     menu.style.boxShadow =
         "0 8px 25px rgba(0,0,0,.45)";
+
+
+    /* =================================================
+       TITLE
+    ================================================= */
 
     const title =
         document.createElement(
@@ -2534,101 +2534,221 @@ function openLanguageSelectionMenu(
     title.style.padding =
         "8px";
 
+    title.style.position =
+        "sticky";
+
+    title.style.top =
+        "0";
+
+    title.style.background =
+        "#111";
+
     menu.appendChild(
         title
     );
 
-   const languages = [
-    {
-        code: "en-IN",
-        name: "🇬🇧 English"
-    },
-    {
-        code: "ta-IN",
-        name: "🇮🇳 தமிழ்"
-    },
-    {
-        code: "hi-IN",
-        name: "🇮🇳 हिन्दी"
-    },
-    {
-        code: "te-IN",
-        name: "🇮🇳 తెలుగు"
-    },
-    {
-        code: "kn-IN",
-        name: "🇮🇳 ಕನ್ನಡ"
-    },
-    {
-        code: "ml-IN",
-        name: "🇮🇳 മലയാളം"
-    },
-    {
-        code: "bn-IN",
-        name: "🇮🇳 বাংলা"
-    },
-    {
-        code: "mr-IN",
-        name: "🇮🇳 मराठी"
-    },
-    {
-        code: "gu-IN",
-        name: "🇮🇳 ગુજરાતી"
-    },
-    {
-        code: "pa-IN",
-        name: "🇮🇳 ਪੰਜਾਬੀ"
-    },
-    {
-        code: "ur-IN",
-        name: "🇮🇳 اردو"
-    },
-    {
-        code: "fr-FR",
-        name: "🇫🇷 Français"
-    },
-    {
-        code: "de-DE",
-        name: "🇩🇪 Deutsch"
-    },
-    {
-        code: "es-ES",
-        name: "🇪🇸 Español"
-    },
-    {
-        code: "it-IT",
-        name: "🇮🇹 Italiano"
-    },
-    {
-        code: "pt-BR",
-        name: "🇧🇷 Português"
-    },
-    {
-        code: "ru-RU",
-        name: "🇷🇺 Русский"
-    },
-    {
-        code: "ja-JP",
-        name: "🇯🇵 日本語"
-    },
-    {
-        code: "ko-KR",
-        name: "🇰🇷 한국어"
-    },
-    {
-        code: "zh-CN",
-        name: "🇨🇳 中文"
-    },
-    {
-        code: "ar-SA",
-        name: "🇸🇦 العربية"
-    }
-];
+
+    /* =================================================
+       LANGUAGES
+    ================================================= */
+
+    const languages = [
+
+        {
+            code: "en-IN",
+            name: "🇬🇧 English"
+        },
+
+        {
+            code: "ta-IN",
+            name: "🇮🇳 தமிழ்"
+        },
+
+        {
+            code: "hi-IN",
+            name: "🇮🇳 हिन्दी"
+        },
+
+        {
+            code: "te-IN",
+            name: "🇮🇳 తెలుగు"
+        },
+
+        {
+            code: "kn-IN",
+            name: "🇮🇳 ಕನ್ನಡ"
+        },
+
+        {
+            code: "ml-IN",
+            name: "🇮🇳 മലയാളം"
+        },
+
+        {
+            code: "bn-IN",
+            name: "🇮🇳 বাংলা"
+        },
+
+        {
+            code: "mr-IN",
+            name: "🇮🇳 मराठी"
+        },
+
+        {
+            code: "gu-IN",
+            name: "🇮🇳 ગુજરાતી"
+        },
+
+        {
+            code: "pa-IN",
+            name: "🇮🇳 ਪੰਜਾਬੀ"
+        },
+
+        {
+            code: "ur-IN",
+            name: "🇮🇳 اردو"
+        },
+
+        {
+            code: "or-IN",
+            name: "🇮🇳 ଓଡ଼ିଆ"
+        },
+
+        {
+            code: "as-IN",
+            name: "🇮🇳 অসমীয়া"
+        },
+
+        {
+            code: "fr-FR",
+            name: "🇫🇷 Français"
+        },
+
+        {
+            code: "de-DE",
+            name: "🇩🇪 Deutsch"
+        },
+
+        {
+            code: "es-ES",
+            name: "🇪🇸 Español"
+        },
+
+        {
+            code: "it-IT",
+            name: "🇮🇹 Italiano"
+        },
+
+        {
+            code: "pt-BR",
+            name: "🇧🇷 Português"
+        },
+
+        {
+            code: "ru-RU",
+            name: "🇷🇺 Русский"
+        },
+
+        {
+            code: "ja-JP",
+            name: "🇯🇵 日本語"
+        },
+
+        {
+            code: "ko-KR",
+            name: "🇰🇷 한국어"
+        },
+
+        {
+            code: "zh-CN",
+            name: "🇨🇳 中文"
+        },
+
+        {
+            code: "ar-SA",
+            name: "🇸🇦 العربية"
+        },
+
+        {
+            code: "tr-TR",
+            name: "🇹🇷 Türkçe"
+        },
+
+        {
+            code: "nl-NL",
+            name: "🇳🇱 Nederlands"
+        },
+
+        {
+            code: "pl-PL",
+            name: "🇵🇱 Polski"
+        },
+
+        {
+            code: "sv-SE",
+            name: "🇸🇪 Svenska"
+        },
+
+        {
+            code: "da-DK",
+            name: "🇩🇰 Dansk"
+        },
+
+        {
+            code: "fi-FI",
+            name: "🇫🇮 Suomi"
+        },
+
+        {
+            code: "no-NO",
+            name: "🇳🇴 Norsk"
+        },
+
+        {
+            code: "el-GR",
+            name: "🇬🇷 Ελληνικά"
+        },
+
+        {
+            code: "he-IL",
+            name: "🇮🇱 עברית"
+        },
+
+        {
+            code: "th-TH",
+            name: "🇹🇭 ไทย"
+        },
+
+        {
+            code: "vi-VN",
+            name: "🇻🇳 Tiếng Việt"
+        },
+
+        {
+            code: "id-ID",
+            name: "🇮🇩 Bahasa Indonesia"
+        },
+
+        {
+            code: "ms-MY",
+            name: "🇲🇾 Bahasa Melayu"
+        }
+    ];
+
+
+    /* =================================================
+       CURRENT LANGUAGE
+    ================================================= */
 
     const current =
         localStorage.getItem(
             "viggoLanguage"
         ) || "en-IN";
+
+
+    /* =================================================
+       CREATE LANGUAGE BUTTONS
+    ================================================= */
 
     languages.forEach(
         language => {
@@ -2676,6 +2796,9 @@ function openLanguageSelectionMenu(
             button.style.cursor =
                 "pointer";
 
+            button.style.fontSize =
+                "14px";
+
             button.addEventListener(
                 "click",
                 event => {
@@ -2704,30 +2827,73 @@ function openLanguageSelectionMenu(
         }
     );
 
+
+    /* =================================================
+       ADD MENU
+    ================================================= */
+
     document.body.appendChild(
         menu
     );
 
+
+    /* =================================================
+       POSITION
+    ================================================= */
+
     const rect =
         anchorElement.getBoundingClientRect();
 
+    let left =
+        rect.left;
+
+    let top =
+        rect.bottom + 8;
+
+
+    if (
+        left + 210 >
+        window.innerWidth
+    ) {
+
+        left =
+            window.innerWidth -
+            210;
+    }
+
+
+    if (
+        top + 310 >
+        window.innerHeight
+    ) {
+
+        top =
+            rect.top -
+            310;
+    }
+
+
+    if (left < 5) {
+
+        left = 5;
+    }
+
+    if (top < 5) {
+
+        top = 5;
+    }
+
+
     menu.style.left =
-        `${Math.min(
-            rect.left,
-            window.innerWidth - 210
-        )}px`;
+        `${left}px`;
 
     menu.style.top =
-        `${Math.min(
-            rect.bottom + 8,
-            window.innerHeight - 180
-        )}px`;
+        `${top}px`;
 }
 
 
 /* =====================================================
    LANGUAGE BUTTON
-   CLICK = SHOW OPTIONS
 ===================================================== */
 
 if (languageBtn) {
