@@ -3,7 +3,7 @@
 /* =====================================================
    VIGGO AI - SERVER.JS
    FULL VERSION
-   ACCURACY FIXED
+   ACCURACY + CURRENT DATE/TIME FIXED
 ===================================================== */
 
 const express = require("express");
@@ -70,57 +70,93 @@ app.use(
 
 
 /* =====================================================
+   CURRENT INDIA DATE & TIME
+===================================================== */
+
+function getCurrentIndiaDateTime() {
+
+    return new Date().toLocaleString(
+        "en-IN",
+        {
+            timeZone: "Asia/Kolkata",
+            dateStyle: "full",
+            timeStyle: "long"
+        }
+    );
+
+}
+
+
+/* =====================================================
+   CURRENT INDIA DATE ONLY
+===================================================== */
+
+function getCurrentIndiaDate() {
+
+    return new Date().toLocaleDateString(
+        "en-IN",
+        {
+            timeZone: "Asia/Kolkata",
+            day: "2-digit",
+            month: "long",
+            year: "numeric"
+        }
+    );
+
+}
+
+
+/* =====================================================
    VIGGO AI SYSTEM INSTRUCTION
 ===================================================== */
 
 const VIGGO_SYSTEM_INSTRUCTION = `
-You are Viggo AI, a helpful and accurate AI assistant.
+You are Viggo AI, a helpful, accurate and friendly AI assistant.
 
 IMPORTANT RULES:
 
 1. Always understand the user's question before answering.
 
-2. Give accurate, useful, and direct answers.
+2. Give accurate, useful and direct answers.
 
-3. NEVER invent facts, names, numbers, dates, links, sources,
-   or technical information.
+3. NEVER invent facts, names, numbers, dates, links,
+   sources or technical information.
 
-4. If you are not certain about something, clearly say that
-   you are not certain instead of making up an answer.
+4. If you are not certain about something, clearly say
+   that you are not certain instead of making up an answer.
 
-5. For mathematics, calculations, conversions, and numerical
+5. For mathematics, calculations, conversions and numerical
    problems, carefully verify the calculation before answering.
 
-6. For technical questions, explain the answer clearly and
-   step-by-step when useful.
+6. For technical questions, explain the answer clearly
+   and step-by-step when useful.
 
-7. If the user asks a simple question, do not unnecessarily
-   give a very long answer.
+7. If the user asks a simple question, keep the answer simple.
 
-8. If the user asks for a detailed explanation, provide a
-   structured and detailed explanation.
+8. If the user asks for a detailed explanation, provide
+   a structured and detailed explanation.
 
 9. If the user asks in Tamil, answer primarily in Tamil.
 
 10. If the user asks in English, answer primarily in English.
 
-11. If the user mixes Tamil and English, you may naturally
-    use Tamil + English in the same style.
+11. If the user mixes Tamil and English, naturally use
+    Tamil + English as appropriate.
 
-12. Do not claim that you performed an action that you did not
-    actually perform.
+12. Do not claim that you performed an action that you
+    did not actually perform.
 
-13. Do not pretend to have live internet access unless live
-    information is actually available to you.
+13. Do not pretend to have live internet access unless
+    live information is actually available.
 
-14. When information may have changed over time, clearly mention
-    that the information may need verification.
+14. When information may have changed over time, clearly
+    say that it may need verification.
 
 15. For educational questions, give correct definitions,
-    formulas, examples, and steps when appropriate.
+    formulas, examples and steps when appropriate.
 
-16. For multiple-choice questions, identify the correct option
-    and briefly explain why.
+16. For multiple-choice questions, identify the correct
+    option and briefly explain why.
 
 17. If the user's question is ambiguous, ask a short
     clarification instead of guessing.
@@ -129,9 +165,32 @@ IMPORTANT RULES:
 
 19. Do not change the meaning of the user's question.
 
-20. Be friendly, natural, and respectful.
+20. Be friendly, natural and respectful.
+
+21. For current date and time questions, ALWAYS use the
+    CURRENT DATE AND TIME provided below.
+
+22. NEVER guess today's date.
+
+23. NEVER use an old date from your training knowledge
+    when answering a current date question.
+
+24. The timezone for current date and time is
+    Asia/Kolkata (India).
+
+25. If the user asks "today", use the current India date.
+
+26. If the user asks "tomorrow", calculate it from the
+    current India date.
+
+27. If the user asks "yesterday", calculate it from the
+    current India date.
+
+28. If the user asks for the current time in India,
+    use the current India time provided below.
 
 Your main goal is:
+
 ACCURACY + CLARITY + HELPFULNESS.
 `;
 
@@ -188,6 +247,12 @@ app.get(
                     GEMINI_API_KEY
                 ),
 
+            currentIndiaDate:
+                getCurrentIndiaDate(),
+
+            currentIndiaDateTime:
+                getCurrentIndiaDateTime(),
+
             time:
                 new Date().toISOString()
 
@@ -216,6 +281,10 @@ app.post(
             );
 
 
+            /* =================================================
+               BODY
+            ================================================= */
+
             const body =
                 req.body || {};
 
@@ -242,6 +311,30 @@ app.post(
                 uploadedFile
                     ? uploadedFile.name
                     : "none"
+            );
+
+
+            /* =================================================
+               CURRENT INDIA DATE/TIME
+            ================================================= */
+
+            const currentIndiaDateTime =
+                getCurrentIndiaDateTime();
+
+
+            const currentIndiaDate =
+                getCurrentIndiaDate();
+
+
+            console.log(
+                "India Date:",
+                currentIndiaDate
+            );
+
+
+            console.log(
+                "India Date/Time:",
+                currentIndiaDateTime
             );
 
 
@@ -427,6 +520,62 @@ app.post(
 
 
             /* =================================================
+               DYNAMIC SYSTEM INSTRUCTION
+            ================================================= */
+
+            const dynamicSystemInstruction =
+
+                VIGGO_SYSTEM_INSTRUCTION +
+
+                `
+
+=====================================================
+CURRENT DATE AND TIME
+=====================================================
+
+Current India Date:
+${currentIndiaDate}
+
+Current India Date and Time:
+${currentIndiaDateTime}
+
+Timezone:
+Asia/Kolkata (India)
+
+=====================================================
+CURRENT DATE/TIME RULE
+=====================================================
+
+If the user asks:
+
+"today"
+"today's date"
+"what is today's date"
+"current date"
+"what date is it"
+"what day is today"
+
+use the Current India Date above.
+
+If the user asks:
+
+"current time"
+"what time is it"
+"India time"
+"what is the time now"
+
+use the Current India Date and Time above.
+
+Do NOT guess the date or time.
+
+Do NOT use a date from your training knowledge.
+
+The server-provided current India date/time is the
+source of truth for current date and time questions.
+`;
+
+
+            /* =================================================
                GEMINI REQUEST
             ================================================= */
 
@@ -438,12 +587,13 @@ app.post(
 
                         {
                             text:
-                                VIGGO_SYSTEM_INSTRUCTION
+                                dynamicSystemInstruction
                         }
 
                     ]
 
                 },
+
 
                 contents: [
 
@@ -459,22 +609,25 @@ app.post(
 
                 ],
 
+
                 generationConfig: {
 
                     /*
-                     * Lower temperature helps reduce
+                     * Lower temperature reduces
                      * random / inaccurate answers.
                      */
 
                     temperature:
                         0.25,
 
+
                     /*
-                     * Keep enough room for detailed answers.
+                     * Maximum response length.
                      */
 
                     maxOutputTokens:
                         2048,
+
 
                     /*
                      * More stable generation.
@@ -492,11 +645,16 @@ app.post(
                 "Sending request to Gemini..."
             );
 
+
             console.log(
                 "Model:",
                 MODEL
             );
 
+
+            /* =================================================
+               GEMINI API CALL
+            ================================================= */
 
             const geminiResponse =
                 await fetch(
@@ -878,6 +1036,16 @@ app.listen(
 
         console.log(
             "ACCURACY MODE: ENABLED"
+        );
+
+
+        console.log(
+            "INDIA DATE/TIME: ENABLED"
+        );
+
+
+        console.log(
+            "TIMEZONE: Asia/Kolkata"
         );
 
 
