@@ -3,7 +3,7 @@
 /* =====================================================
    VIGGO AI - SERVER.JS
    FULL VERSION
-   ACCURACY + CURRENT DATE/TIME FIXED
+   ACCURACY + CURRENT DATE/TIME FIX
 ===================================================== */
 
 const express = require("express");
@@ -79,8 +79,14 @@ function getCurrentIndiaDateTime() {
         "en-IN",
         {
             timeZone: "Asia/Kolkata",
-            dateStyle: "full",
-            timeStyle: "long"
+            weekday: "long",
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true
         }
     );
 
@@ -88,7 +94,7 @@ function getCurrentIndiaDateTime() {
 
 
 /* =====================================================
-   CURRENT INDIA DATE ONLY
+   CURRENT INDIA DATE
 ===================================================== */
 
 function getCurrentIndiaDate() {
@@ -97,6 +103,150 @@ function getCurrentIndiaDate() {
         "en-IN",
         {
             timeZone: "Asia/Kolkata",
+            weekday: "long",
+            day: "2-digit",
+            month: "long",
+            year: "numeric"
+        }
+    );
+
+}
+
+
+/* =====================================================
+   CURRENT INDIA TIME
+===================================================== */
+
+function getCurrentIndiaTime() {
+
+    return new Date().toLocaleTimeString(
+        "en-IN",
+        {
+            timeZone: "Asia/Kolkata",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true
+        }
+    );
+
+}
+
+
+/* =====================================================
+   DATE QUESTION DETECTOR
+===================================================== */
+
+function isDateQuestion(message) {
+
+    const text =
+        String(message || "").toLowerCase();
+
+    return (
+        /today/.test(text) ||
+        /today's date/.test(text) ||
+        /current date/.test(text) ||
+        /what date/.test(text) ||
+        /what day is today/.test(text) ||
+        /date today/.test(text) ||
+        /இன்று/.test(text) ||
+        /இன்றைய தேதி/.test(text) ||
+        /தேதி என்ன/.test(text) ||
+        /இன்று தேதி/.test(text)
+    );
+
+}
+
+
+/* =====================================================
+   TIME QUESTION DETECTOR
+===================================================== */
+
+function isTimeQuestion(message) {
+
+    const text =
+        String(message || "").toLowerCase();
+
+    return (
+        /current time/.test(text) ||
+        /what time is it/.test(text) ||
+        /time now/.test(text) ||
+        /what is the time/.test(text) ||
+        /india time/.test(text) ||
+        /இப்போது மணி என்ன/.test(text) ||
+        /நேரம் என்ன/.test(text) ||
+        /இப்போ நேரம் என்ன/.test(text)
+    );
+
+}
+
+
+/* =====================================================
+   TOMORROW QUESTION DETECTOR
+===================================================== */
+
+function isTomorrowQuestion(message) {
+
+    const text =
+        String(message || "").toLowerCase();
+
+    return (
+        /tomorrow/.test(text) ||
+        /நாளை/.test(text) ||
+        /நாளைக்கு/.test(text)
+    );
+
+}
+
+
+/* =====================================================
+   YESTERDAY QUESTION DETECTOR
+===================================================== */
+
+function isYesterdayQuestion(message) {
+
+    const text =
+        String(message || "").toLowerCase();
+
+    return (
+        /yesterday/.test(text) ||
+        /நேற்று/.test(text) ||
+        /நேற்றைய/.test(text)
+    );
+
+}
+
+
+/* =====================================================
+   GET INDIA DATE WITH OFFSET
+===================================================== */
+
+function getIndiaDateWithOffset(days) {
+
+    const now =
+        new Date();
+
+    const indiaDateString =
+        now.toLocaleString(
+            "en-US",
+            {
+                timeZone: "Asia/Kolkata"
+            }
+        );
+
+    const indiaDate =
+        new Date(
+            indiaDateString
+        );
+
+    indiaDate.setDate(
+        indiaDate.getDate() + days
+    );
+
+    return indiaDate.toLocaleDateString(
+        "en-IN",
+        {
+            weekday: "long",
             day: "2-digit",
             month: "long",
             year: "numeric"
@@ -167,27 +317,18 @@ IMPORTANT RULES:
 
 20. Be friendly, natural and respectful.
 
-21. For current date and time questions, ALWAYS use the
-    CURRENT DATE AND TIME provided below.
+21. Never guess the current date or time.
 
-22. NEVER guess today's date.
+22. Current date and time must use the server-provided
+    India date/time information.
 
-23. NEVER use an old date from your training knowledge
-    when answering a current date question.
+23. The current timezone is Asia/Kolkata.
 
-24. The timezone for current date and time is
-    Asia/Kolkata (India).
+24. If the user asks about a current date or time,
+    use the server information provided with the request.
 
-25. If the user asks "today", use the current India date.
-
-26. If the user asks "tomorrow", calculate it from the
-    current India date.
-
-27. If the user asks "yesterday", calculate it from the
-    current India date.
-
-28. If the user asks for the current time in India,
-    use the current India time provided below.
+25. Do not use old dates from model training knowledge
+    for current date questions.
 
 Your main goal is:
 
@@ -216,7 +357,16 @@ app.get(
             apiConfigured:
                 Boolean(
                     GEMINI_API_KEY
-                )
+                ),
+
+            timezone:
+                "Asia/Kolkata",
+
+            currentDate:
+                getCurrentIndiaDate(),
+
+            currentTime:
+                getCurrentIndiaTime()
 
         });
 
@@ -247,10 +397,16 @@ app.get(
                     GEMINI_API_KEY
                 ),
 
-            currentIndiaDate:
+            timezone:
+                "Asia/Kolkata",
+
+            currentDate:
                 getCurrentIndiaDate(),
 
-            currentIndiaDateTime:
+            currentTime:
+                getCurrentIndiaTime(),
+
+            currentDateTime:
                 getCurrentIndiaDateTime(),
 
             time:
@@ -315,30 +471,6 @@ app.post(
 
 
             /* =================================================
-               CURRENT INDIA DATE/TIME
-            ================================================= */
-
-            const currentIndiaDateTime =
-                getCurrentIndiaDateTime();
-
-
-            const currentIndiaDate =
-                getCurrentIndiaDate();
-
-
-            console.log(
-                "India Date:",
-                currentIndiaDate
-            );
-
-
-            console.log(
-                "India Date/Time:",
-                currentIndiaDateTime
-            );
-
-
-            /* =================================================
                CHECK MESSAGE
             ================================================= */
 
@@ -356,6 +488,182 @@ app.post(
 
                     reply:
                         "Please enter a message."
+
+                });
+
+            }
+
+
+            /* =================================================
+               DIRECT CURRENT DATE ANSWER
+            ================================================= */
+
+            if (
+                userMessage &&
+                isDateQuestion(
+                    userMessage
+                )
+            ) {
+
+                const currentDate =
+                    getCurrentIndiaDate();
+
+
+                console.log(
+                    "DIRECT DATE RESPONSE:",
+                    currentDate
+                );
+
+
+                return res.status(200).json({
+
+                    success:
+                        true,
+
+                    reply:
+                        `Today is ${currentDate}.`,
+
+                    response:
+                        `Today is ${currentDate}.`,
+
+                    text:
+                        `Today is ${currentDate}.`,
+
+                    model:
+                        "server-date"
+
+                });
+
+            }
+
+
+            /* =================================================
+               DIRECT CURRENT TIME ANSWER
+            ================================================= */
+
+            if (
+                userMessage &&
+                isTimeQuestion(
+                    userMessage
+                )
+            ) {
+
+                const currentTime =
+                    getCurrentIndiaTime();
+
+
+                console.log(
+                    "DIRECT TIME RESPONSE:",
+                    currentTime
+                );
+
+
+                return res.status(200).json({
+
+                    success:
+                        true,
+
+                    reply:
+                        `The current time in India is ${currentTime}.`,
+
+                    response:
+                        `The current time in India is ${currentTime}.`,
+
+                    text:
+                        `The current time in India is ${currentTime}.`,
+
+                    model:
+                        "server-time"
+
+                });
+
+            }
+
+
+            /* =================================================
+               DIRECT TOMORROW ANSWER
+            ================================================= */
+
+            if (
+                userMessage &&
+                isTomorrowQuestion(
+                    userMessage
+                )
+            ) {
+
+                const tomorrow =
+                    getIndiaDateWithOffset(
+                        1
+                    );
+
+
+                console.log(
+                    "DIRECT TOMORROW RESPONSE:",
+                    tomorrow
+                );
+
+
+                return res.status(200).json({
+
+                    success:
+                        true,
+
+                    reply:
+                        `Tomorrow is ${tomorrow}.`,
+
+                    response:
+                        `Tomorrow is ${tomorrow}.`,
+
+                    text:
+                        `Tomorrow is ${tomorrow}.`,
+
+                    model:
+                        "server-date"
+
+                });
+
+            }
+
+
+            /* =================================================
+               DIRECT YESTERDAY ANSWER
+            ================================================= */
+
+            if (
+                userMessage &&
+                isYesterdayQuestion(
+                    userMessage
+                )
+            ) {
+
+                const yesterday =
+                    getIndiaDateWithOffset(
+                        -1
+                    );
+
+
+                console.log(
+                    "DIRECT YESTERDAY RESPONSE:",
+                    yesterday
+                );
+
+
+                return res.status(200).json({
+
+                    success:
+                        true,
+
+                    reply:
+                        `Yesterday was ${yesterday}.`,
+
+                    response:
+                        `Yesterday was ${yesterday}.`,
+
+                    text:
+                        `Yesterday was ${yesterday}.`,
+
+                    model:
+                        "server-date"
 
                 });
 
@@ -388,6 +696,34 @@ app.post(
                 });
 
             }
+
+
+            /* =================================================
+               CURRENT INDIA DATE/TIME
+            ================================================= */
+
+            const currentIndiaDate =
+                getCurrentIndiaDate();
+
+
+            const currentIndiaDateTime =
+                getCurrentIndiaDateTime();
+
+
+            const currentIndiaTime =
+                getCurrentIndiaTime();
+
+
+            console.log(
+                "India Date:",
+                currentIndiaDate
+            );
+
+
+            console.log(
+                "India Time:",
+                currentIndiaTime
+            );
 
 
             /* =================================================
@@ -430,16 +766,6 @@ app.post(
                         uploadedFile.data
                     );
 
-
-                /*
-                 * Example:
-                 *
-                 * data:image/png;base64,AAAA...
-                 *
-                 * becomes:
-                 *
-                 * AAAA...
-                 */
 
                 if (
                     base64Data.includes(
@@ -530,11 +856,14 @@ app.post(
                 `
 
 =====================================================
-CURRENT DATE AND TIME
+SERVER CURRENT DATE AND TIME
 =====================================================
 
 Current India Date:
 ${currentIndiaDate}
+
+Current India Time:
+${currentIndiaTime}
 
 Current India Date and Time:
 ${currentIndiaDateTime}
@@ -542,36 +871,9 @@ ${currentIndiaDateTime}
 Timezone:
 Asia/Kolkata (India)
 
-=====================================================
-CURRENT DATE/TIME RULE
-=====================================================
-
-If the user asks:
-
-"today"
-"today's date"
-"what is today's date"
-"current date"
-"what date is it"
-"what day is today"
-
-use the Current India Date above.
-
-If the user asks:
-
-"current time"
-"what time is it"
-"India time"
-"what is the time now"
-
-use the Current India Date and Time above.
-
-Do NOT guess the date or time.
-
-Do NOT use a date from your training knowledge.
-
-The server-provided current India date/time is the
-source of truth for current date and time questions.
+IMPORTANT:
+The server-provided date and time above are authoritative
+for current date/time questions.
 `;
 
 
@@ -612,26 +914,11 @@ source of truth for current date and time questions.
 
                 generationConfig: {
 
-                    /*
-                     * Lower temperature reduces
-                     * random / inaccurate answers.
-                     */
-
                     temperature:
                         0.25,
 
-
-                    /*
-                     * Maximum response length.
-                     */
-
                     maxOutputTokens:
                         2048,
-
-
-                    /*
-                     * More stable generation.
-                     */
 
                     topP:
                         0.8
@@ -1041,6 +1328,16 @@ app.listen(
 
         console.log(
             "INDIA DATE/TIME: ENABLED"
+        );
+
+
+        console.log(
+            "DIRECT DATE ANSWER: ENABLED"
+        );
+
+
+        console.log(
+            "DIRECT TIME ANSWER: ENABLED"
         );
 
 
