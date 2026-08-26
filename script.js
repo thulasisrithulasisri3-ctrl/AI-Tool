@@ -1,8 +1,7 @@
-
 "use strict";
 
 /* =====================================================
-   VIGGO AI - FULL SCRIPT v9
+   VIGGO AI - FULL SCRIPT v10
    CHAT + HISTORY + LANGUAGE + VOICE + FILE UPLOAD
    DATE/TIME + TIMEZONE SUPPORT
 ===================================================== */
@@ -13,42 +12,76 @@
 ===================================================== */
 
 const API_URL =
-    "https://ai-tool-2-zpul.onrender.com/chat";
+    "https://ai-tool-2-zpul.onrender.com";
+
+const CHAT_API =
+    `${API_URL}/chat`;
 
 
 /* =====================================================
    ELEMENTS
 ===================================================== */
 
-const sidebar = document.getElementById("sidebar");
-const openSidebar = document.getElementById("openSidebar");
-const closeSidebar = document.getElementById("closeSidebar");
+const sidebar =
+    document.getElementById("sidebar");
 
-const newChat = document.getElementById("newChat");
-const searchChat = document.getElementById("searchChat");
-const chatHistory = document.getElementById("chatHistory");
+const openSidebar =
+    document.getElementById("openSidebar");
 
-const conversation = document.getElementById("conversation");
-const message = document.getElementById("message");
-const send = document.getElementById("send");
-const mic = document.getElementById("mic");
+const closeSidebar =
+    document.getElementById("closeSidebar");
 
-const plusBtn = document.getElementById("plusBtn");
-const plusMenu = document.getElementById("plusMenu");
+const newChat =
+    document.getElementById("newChat");
 
-const shareBtn = document.getElementById("shareBtn");
+const searchChat =
+    document.getElementById("searchChat");
 
-const moreBtn = document.getElementById("moreBtn");
-const moreMenu = document.getElementById("moreMenu");
+const chatHistory =
+    document.getElementById("chatHistory");
 
-const voiceMenuBtn = document.getElementById("voiceMenuBtn");
-const plusVoiceBtn = document.getElementById("plusVoiceBtn");
+const conversation =
+    document.getElementById("conversation");
 
-const languageBtn = document.getElementById("languageBtn");
+const message =
+    document.getElementById("message");
 
-const clearChatBtn = document.getElementById("clearChatBtn");
-const savedChatsBtn = document.getElementById("savedChatsBtn");
-const selectChatsBtn = document.getElementById("selectChatsBtn");
+const send =
+    document.getElementById("send");
+
+const mic =
+    document.getElementById("mic");
+
+const plusBtn =
+    document.getElementById("plusBtn");
+
+const plusMenu =
+    document.getElementById("plusMenu");
+
+const shareBtn =
+    document.getElementById("shareBtn");
+
+const moreBtn =
+    document.getElementById("moreBtn");
+
+const moreMenu =
+    document.getElementById("moreMenu");
+
+const voiceMenuBtn =
+    document.getElementById("voiceMenuBtn");
+
+const languageBtn =
+    document.getElementById("languageBtn");
+
+const clearChatBtn =
+    document.getElementById("clearChatBtn");
+
+const savedChatsBtn =
+    document.getElementById("savedChatsBtn");
+
+const selectChatsBtn =
+    document.getElementById("selectChatsBtn");
+
 const deleteSelectedBtn =
     document.getElementById("deleteSelectedBtn");
 
@@ -62,7 +95,8 @@ const showHistoryBtn =
 
 function fixViewportHeight() {
 
-    const root = document.documentElement;
+    const root =
+        document.documentElement;
 
     const height =
         window.visualViewport
@@ -118,13 +152,16 @@ function createHiddenFileInput(
         document.createElement("input");
 
     input.type = "file";
+
     input.accept = accept;
+
     input.style.display = "none";
 
     document.body.appendChild(input);
 
     return input;
 }
+
 
 const photoInput =
     createHiddenFileInput("image/*");
@@ -144,13 +181,15 @@ let chats = [];
 
 try {
 
-    chats = JSON.parse(
-        localStorage.getItem(
-            "viggoChats"
-        ) || "[]"
-    );
+    chats =
+        JSON.parse(
+            localStorage.getItem(
+                "viggoChats"
+            ) || "[]"
+        );
 
     if (!Array.isArray(chats)) {
+
         chats = [];
     }
 
@@ -178,13 +217,15 @@ let pinnedChats = [];
 
 try {
 
-    pinnedChats = JSON.parse(
-        localStorage.getItem(
-            "viggoPinnedChats"
-        ) || "[]"
-    );
+    pinnedChats =
+        JSON.parse(
+            localStorage.getItem(
+                "viggoPinnedChats"
+            ) || "[]"
+        );
 
     if (!Array.isArray(pinnedChats)) {
+
         pinnedChats = [];
     }
 
@@ -198,7 +239,11 @@ try {
    DEFAULT SETTINGS
 ===================================================== */
 
-if (!localStorage.getItem("viggoLanguage")) {
+if (
+    !localStorage.getItem(
+        "viggoLanguage"
+    )
+) {
 
     localStorage.setItem(
         "viggoLanguage",
@@ -206,7 +251,12 @@ if (!localStorage.getItem("viggoLanguage")) {
     );
 }
 
-if (!localStorage.getItem("viggoVoice")) {
+
+if (
+    !localStorage.getItem(
+        "viggoVoice"
+    )
+) {
 
     localStorage.setItem(
         "viggoVoice",
@@ -229,6 +279,7 @@ function saveChats() {
         JSON.stringify(chats)
     );
 
+
     if (currentChatId) {
 
         localStorage.setItem(
@@ -242,6 +293,7 @@ function saveChats() {
             "viggoCurrentChatId"
         );
     }
+
 
     localStorage.setItem(
         "viggoPinnedChats",
@@ -261,9 +313,10 @@ function createChat() {
     const id =
         Date.now().toString();
 
+
     const chat = {
 
-        id,
+        id: id,
 
         title:
             "New Chat",
@@ -277,9 +330,12 @@ function createChat() {
             false
     };
 
+
     chats.unshift(chat);
 
-    currentChatId = id;
+    currentChatId =
+        id;
+
 
     saveChats();
 
@@ -330,17 +386,20 @@ function deleteChat(chatId) {
     const id =
         String(chatId);
 
+
     chats =
         chats.filter(
             chat =>
                 String(chat.id) !== id
         );
 
+
     pinnedChats =
         pinnedChats.filter(
             pinnedId =>
                 String(pinnedId) !== id
         );
+
 
     if (
         String(currentChatId) === id
@@ -352,12 +411,14 @@ function deleteChat(chatId) {
                 : null;
     }
 
+
     if (!chats.length) {
 
         createChat();
 
         return;
     }
+
 
     saveChats();
 
@@ -376,8 +437,10 @@ function togglePinChat(chatId) {
     const id =
         String(chatId);
 
+
     const index =
         pinnedChats.indexOf(id);
+
 
     if (index === -1) {
 
@@ -390,6 +453,7 @@ function togglePinChat(chatId) {
             1
         );
     }
+
 
     saveChats();
 
@@ -408,15 +472,19 @@ function renderHistory(
 ) {
 
     if (!chatHistory) {
+
         return;
     }
 
+
     chatHistory.innerHTML = "";
+
 
     const search =
         String(filter)
             .toLowerCase()
             .trim();
+
 
     const filtered =
         chats.filter(
@@ -428,6 +496,7 @@ function renderHistory(
                     .toLowerCase()
                     .includes(search)
         );
+
 
     filtered.sort(
         (a, b) => {
@@ -442,23 +511,32 @@ function renderHistory(
                     String(b.id)
                 );
 
+
             if (
                 aPinned &&
                 !bPinned
             ) {
+
                 return -1;
             }
+
 
             if (
                 !aPinned &&
                 bPinned
             ) {
+
                 return 1;
             }
 
+
             return (
-                Number(b.createdAt || 0) -
-                Number(a.createdAt || 0)
+                Number(
+                    b.createdAt || 0
+                ) -
+                Number(
+                    a.createdAt || 0
+                )
             );
         }
     );
@@ -472,8 +550,10 @@ function renderHistory(
                     "div"
                 );
 
+
             item.className =
                 "history-item";
+
 
             if (
                 String(chat.id) ===
@@ -491,8 +571,10 @@ function renderHistory(
                     "div"
                 );
 
+
             title.className =
                 "history-chat-title";
+
 
             title.textContent =
                 chat.title ||
@@ -503,6 +585,7 @@ function renderHistory(
                 document.createElement(
                     "div"
                 );
+
 
             actions.className =
                 "history-actions";
@@ -515,15 +598,20 @@ function renderHistory(
                         "button"
                     );
 
-                check.type = "button";
+
+                check.type =
+                    "button";
+
 
                 check.className =
                     "history-action-btn";
+
 
                 check.textContent =
                     chat.selected
                         ? "☑"
                         : "☐";
+
 
                 check.addEventListener(
                     "click",
@@ -531,10 +619,13 @@ function renderHistory(
 
                         event.stopPropagation();
 
+
                         chat.selected =
                             !chat.selected;
 
+
                         saveChats();
+
 
                         renderHistory(
                             searchChat?.value || ""
@@ -542,7 +633,10 @@ function renderHistory(
                     }
                 );
 
-                actions.appendChild(check);
+
+                actions.appendChild(
+                    check
+                );
             }
 
 
@@ -551,25 +645,32 @@ function renderHistory(
                     "button"
                 );
 
-            pinBtn.type = "button";
+
+            pinBtn.type =
+                "button";
+
 
             pinBtn.className =
                 "history-action-btn";
+
 
             const isPinned =
                 pinnedChats.includes(
                     String(chat.id)
                 );
 
+
             pinBtn.textContent =
                 isPinned
                     ? "📍"
                     : "📌";
 
+
             pinBtn.title =
                 isPinned
                     ? "Unpin"
                     : "Pin";
+
 
             pinBtn.addEventListener(
                 "click",
@@ -577,13 +678,17 @@ function renderHistory(
 
                     event.stopPropagation();
 
+
                     togglePinChat(
                         chat.id
                     );
                 }
             );
 
-            actions.appendChild(pinBtn);
+
+            actions.appendChild(
+                pinBtn
+            );
 
 
             const deleteBtn =
@@ -591,16 +696,22 @@ function renderHistory(
                     "button"
                 );
 
-            deleteBtn.type = "button";
+
+            deleteBtn.type =
+                "button";
+
 
             deleteBtn.className =
                 "history-action-btn";
 
+
             deleteBtn.textContent =
                 "🗑️";
 
+
             deleteBtn.title =
                 "Delete";
+
 
             deleteBtn.addEventListener(
                 "click",
@@ -608,19 +719,26 @@ function renderHistory(
 
                     event.stopPropagation();
 
+
                     deleteChat(
                         chat.id
                     );
                 }
             );
 
+
             actions.appendChild(
                 deleteBtn
             );
 
 
-            item.appendChild(title);
-            item.appendChild(actions);
+            item.appendChild(
+                title
+            );
+
+            item.appendChild(
+                actions
+            );
 
 
             item.addEventListener(
@@ -632,21 +750,27 @@ function renderHistory(
                         chat.selected =
                             !chat.selected;
 
+
                         saveChats();
+
 
                         renderHistory(
                             searchChat?.value || ""
                         );
 
+
                         return;
                     }
+
 
                     currentChatId =
                         chat.id;
 
+
                     saveChats();
 
                     renderConversation();
+
 
                     if (
                         window.innerWidth <=
@@ -660,7 +784,10 @@ function renderHistory(
                 }
             );
 
-            chatHistory.appendChild(item);
+
+            chatHistory.appendChild(
+                item
+            );
         }
     );
 }
@@ -677,14 +804,18 @@ function getSelectedSpeechVoice() {
             "viggoVoice"
         ) || "female";
 
+
     const voices =
         window.speechSynthesis
             ? window.speechSynthesis.getVoices()
             : [];
 
+
     if (!voices.length) {
+
         return null;
     }
+
 
     const language =
         localStorage.getItem(
@@ -692,7 +823,8 @@ function getSelectedSpeechVoice() {
         ) || "en-IN";
 
 
-    let matchingVoice = null;
+    let matchingVoice =
+        null;
 
 
     if (
@@ -706,6 +838,7 @@ function getSelectedSpeechVoice() {
 
                     const name =
                         voice.name.toLowerCase();
+
 
                     return (
                         name.includes("female") ||
@@ -731,6 +864,7 @@ function getSelectedSpeechVoice() {
 
                     const name =
                         voice.name.toLowerCase();
+
 
                     return (
                         name.includes("male") ||
@@ -776,8 +910,10 @@ function speakText(
 ) {
 
     if (!speakerEnabled) {
+
         return;
     }
+
 
     if (
         !window.speechSynthesis ||
@@ -790,6 +926,7 @@ function speakText(
 
         return;
     }
+
 
     window.speechSynthesis.cancel();
 
@@ -809,11 +946,14 @@ function speakText(
     speech.lang =
         language;
 
+
     speech.rate =
         1;
 
+
     speech.pitch =
         1;
+
 
     speech.volume =
         1;
@@ -822,13 +962,16 @@ function speakText(
     const voice =
         getSelectedSpeechVoice();
 
+
     if (voice) {
+
         speech.voice =
             voice;
     }
 
 
     if (button) {
+
         button.textContent =
             "🔊 Speaking...";
     }
@@ -864,6 +1007,7 @@ function speakText(
                 error
             );
 
+
             if (button) {
 
                 button.textContent =
@@ -898,10 +1042,12 @@ function stopSpeaker(button) {
 
     window.speechSynthesis?.cancel();
 
+
     if (button) {
 
         button.textContent =
             "🔇 Speaker OFF";
+
 
         setTimeout(
             () => {
@@ -927,6 +1073,7 @@ function addMessageToUI(
 ) {
 
     if (!conversation) {
+
         return;
     }
 
@@ -935,6 +1082,7 @@ function addMessageToUI(
         document.createElement(
             "div"
         );
+
 
     wrapper.className =
         "message " +
@@ -950,6 +1098,7 @@ function addMessageToUI(
             "div"
         );
 
+
     content.className =
         "message-content";
 
@@ -958,6 +1107,7 @@ function addMessageToUI(
         document.createElement(
             "div"
         );
+
 
     bubble.className =
         "message-bubble";
@@ -984,24 +1134,31 @@ function addMessageToUI(
                 "img"
             );
 
+
         image.src =
             media.data;
+
 
         image.alt =
             media.name ||
             "Uploaded image";
 
+
         image.style.maxWidth =
             "100%";
+
 
         image.style.maxHeight =
             "320px";
 
+
         image.style.display =
             "block";
 
+
         image.style.borderRadius =
             "12px";
+
 
         if (text) {
 
@@ -1009,7 +1166,10 @@ function addMessageToUI(
                 "10px";
         }
 
-        bubble.appendChild(image);
+
+        bubble.appendChild(
+            image
+        );
     }
 
 
@@ -1027,44 +1187,59 @@ function addMessageToUI(
                 "video"
             );
 
+
         video.src =
             media.data;
+
 
         video.controls =
             true;
 
+
         video.playsInline =
             true;
+
 
         video.preload =
             "metadata";
 
+
         video.style.maxWidth =
             "100%";
+
 
         video.style.width =
             "100%";
 
+
         video.style.maxHeight =
             "320px";
+
 
         video.style.display =
             "block";
 
+
         video.style.borderRadius =
             "12px";
 
-        bubble.appendChild(video);
+
+        bubble.appendChild(
+            video
+        );
     }
 
 
-    content.appendChild(bubble);
+    content.appendChild(
+        bubble
+    );
 
 
     const actions =
         document.createElement(
             "div"
         );
+
 
     actions.className =
         "message-actions";
@@ -1077,10 +1252,14 @@ function addMessageToUI(
             "button"
         );
 
-    saveBtn.type = "button";
+
+    saveBtn.type =
+        "button";
+
 
     saveBtn.textContent =
         "💾 Save";
+
 
     saveBtn.addEventListener(
         "click",
@@ -1090,6 +1269,7 @@ function addMessageToUI(
                 "viggoSavedMessage",
                 text || ""
             );
+
 
             alert(
                 "Message saved."
@@ -1105,10 +1285,14 @@ function addMessageToUI(
             "button"
         );
 
-    copyBtn.type = "button";
+
+    copyBtn.type =
+        "button";
+
 
     copyBtn.textContent =
         "📋 Copy";
+
 
     copyBtn.addEventListener(
         "click",
@@ -1127,18 +1311,23 @@ function addMessageToUI(
                         "textarea"
                     );
 
+
                 temp.value =
                     text || "";
+
 
                 document.body.appendChild(
                     temp
                 );
 
+
                 temp.select();
+
 
                 document.execCommand(
                     "copy"
                 );
+
 
                 temp.remove();
             }
@@ -1146,6 +1335,7 @@ function addMessageToUI(
 
             copyBtn.textContent =
                 "✓ Copied";
+
 
             setTimeout(
                 () => {
@@ -1167,10 +1357,14 @@ function addMessageToUI(
             "button"
         );
 
-    likeBtn.type = "button";
+
+    likeBtn.type =
+        "button";
+
 
     likeBtn.textContent =
         "👍 Like";
+
 
     likeBtn.addEventListener(
         "click",
@@ -1192,10 +1386,14 @@ function addMessageToUI(
             "button"
         );
 
-    speakerBtn.type = "button";
+
+    speakerBtn.type =
+        "button";
+
 
     speakerBtn.textContent =
         "🔊 Speaker";
+
 
     speakerBtn.addEventListener(
         "click",
@@ -1220,16 +1418,36 @@ function addMessageToUI(
     );
 
 
-    actions.appendChild(saveBtn);
-    actions.appendChild(copyBtn);
-    actions.appendChild(likeBtn);
-    actions.appendChild(speakerBtn);
+    actions.appendChild(
+        saveBtn
+    );
 
-    content.appendChild(actions);
+    actions.appendChild(
+        copyBtn
+    );
 
-    wrapper.appendChild(content);
+    actions.appendChild(
+        likeBtn
+    );
 
-    conversation.appendChild(wrapper);
+    actions.appendChild(
+        speakerBtn
+    );
+
+
+    content.appendChild(
+        actions
+    );
+
+
+    wrapper.appendChild(
+        content
+    );
+
+
+    conversation.appendChild(
+        wrapper
+    );
 
 
     requestAnimationFrame(
@@ -1249,17 +1467,24 @@ function addMessageToUI(
 function renderConversation() {
 
     if (!conversation) {
+
         return;
     }
 
-    conversation.innerHTML = "";
+
+    conversation.innerHTML =
+        "";
+
 
     const chat =
         getCurrentChat();
 
+
     if (!chat) {
+
         return;
     }
+
 
     if (!Array.isArray(chat.messages)) {
 
@@ -1301,17 +1526,20 @@ function addMessage(
 
     ensureChat();
 
+
     const chat =
         getCurrentChat();
 
+
     if (!chat) {
+
         return;
     }
 
 
     const msg = {
 
-        role,
+        role: role,
 
         text:
             text || "",
@@ -1337,7 +1565,9 @@ function addMessage(
     }
 
 
-    chat.messages.push(msg);
+    chat.messages.push(
+        msg
+    );
 
 
     if (
@@ -1350,6 +1580,7 @@ function addMessage(
             media?.name ||
             "Uploaded file";
 
+
         chat.title =
             titleText.substring(
                 0,
@@ -1360,18 +1591,20 @@ function addMessage(
 
     saveChats();
 
+
     addMessageToUI(
         role,
         text,
         media
     );
 
+
     renderHistory();
 }
 
 
 /* =====================================================
-   GET DATE/TIME INFORMATION
+   DATE / TIME
 ===================================================== */
 
 function getClientDateTimeInfo() {
@@ -1393,7 +1626,9 @@ function getClientDateTimeInfo() {
         new Date();
 
 
-    let currentDateTime = "";
+    let currentDateTime =
+        "";
+
 
     try {
 
@@ -1401,6 +1636,7 @@ function getClientDateTimeInfo() {
             new Intl.DateTimeFormat(
                 language,
                 {
+
                     dateStyle:
                         "full",
 
@@ -1435,11 +1671,13 @@ function getClientDateTimeInfo() {
 
 /* =====================================================
    SEND MESSAGE
+   IMPORTANT: USE CHAT_API
 ===================================================== */
 
 async function sendMessage() {
 
     if (!message) {
+
         return;
     }
 
@@ -1449,6 +1687,7 @@ async function sendMessage() {
 
 
     if (!text) {
+
         return;
     }
 
@@ -1462,11 +1701,14 @@ async function sendMessage() {
     );
 
 
-    message.value = "";
+    message.value =
+        "";
 
 
     if (send) {
-        send.disabled = true;
+
+        send.disabled =
+            true;
     }
 
 
@@ -1475,8 +1717,10 @@ async function sendMessage() {
             "div"
         );
 
+
     typing.className =
         "message ai typing-message";
+
 
     typing.innerHTML =
         `
@@ -1517,15 +1761,20 @@ async function sendMessage() {
         );
 
 
-        /*
-           IMPORTANT:
-           API_URL already contains /chat.
-           DO NOT add another slash.
-        */
+        console.log(
+            "POST:",
+            CHAT_API
+        );
+
+
+        /* =========================================
+           FIX:
+           MUST CALL /chat
+        ========================================== */
 
         const response =
             await fetch(
-                API_URL,
+                CHAT_API,
                 {
 
                     method:
@@ -1627,6 +1876,7 @@ async function sendMessage() {
                 false;
         }
 
+
         message?.focus();
     }
 }
@@ -1644,6 +1894,7 @@ function readFileAsDataURL(file) {
             const reader =
                 new FileReader();
 
+
             reader.onload =
                 () => {
 
@@ -1651,6 +1902,7 @@ function readFileAsDataURL(file) {
                         reader.result
                     );
                 };
+
 
             reader.onerror =
                 () => {
@@ -1662,7 +1914,10 @@ function readFileAsDataURL(file) {
                     );
                 };
 
-            reader.readAsDataURL(file);
+
+            reader.readAsDataURL(
+                file
+            );
         }
     );
 }
@@ -1678,6 +1933,7 @@ async function sendUploadedFile(
 ) {
 
     if (!file) {
+
         return;
     }
 
@@ -1685,12 +1941,16 @@ async function sendUploadedFile(
     ensureChat();
 
 
-    let mediaData = "";
+    let mediaData =
+        "";
+
 
     try {
 
         mediaData =
-            await readFileAsDataURL(file);
+            await readFileAsDataURL(
+                file
+            );
 
     } catch (error) {
 
@@ -1699,9 +1959,11 @@ async function sendUploadedFile(
             error
         );
 
+
         alert(
             "Unable to read this file."
         );
+
 
         return;
     }
@@ -1737,8 +1999,10 @@ async function sendUploadedFile(
             "div"
         );
 
+
     typing.className =
         "message ai typing-message";
+
 
     typing.innerHTML =
         `
@@ -1761,9 +2025,15 @@ async function sendUploadedFile(
             getClientDateTimeInfo();
 
 
+        console.log(
+            "Upload POST:",
+            CHAT_API
+        );
+
+
         const response =
             await fetch(
-                API_URL,
+                CHAT_API,
                 {
 
                     method:
@@ -1830,6 +2100,7 @@ async function sendUploadedFile(
 
             throw new Error(
                 data.error ||
+                data.message ||
                 `Server error: ${response.status}`
             );
         }
@@ -1880,6 +2151,7 @@ openSidebar?.addEventListener(
     event => {
 
         event.preventDefault();
+
         event.stopPropagation();
 
         sidebar?.classList.add(
@@ -1894,6 +2166,7 @@ closeSidebar?.addEventListener(
     event => {
 
         event.preventDefault();
+
         event.stopPropagation();
 
         sidebar?.classList.remove(
@@ -1919,7 +2192,7 @@ newChat?.addEventListener(
 
 
 /* =====================================================
-   SEND BUTTON
+   SEND
 ===================================================== */
 
 send?.addEventListener(
@@ -1934,7 +2207,7 @@ send?.addEventListener(
 
 
 /* =====================================================
-   ENTER KEY
+   ENTER
 ===================================================== */
 
 message?.addEventListener(
@@ -1970,7 +2243,7 @@ searchChat?.addEventListener(
 
 
 /* =====================================================
-   PLUS BUTTON
+   PLUS
 ===================================================== */
 
 plusBtn?.addEventListener(
@@ -1978,17 +2251,21 @@ plusBtn?.addEventListener(
     event => {
 
         event.preventDefault();
+
         event.stopPropagation();
+
 
         const open =
             plusMenu?.classList.contains(
                 "show"
             );
 
+
         plusMenu?.classList.toggle(
             "show",
             !open
         );
+
 
         plusMenu?.classList.toggle(
             "open",
@@ -1999,7 +2276,7 @@ plusBtn?.addEventListener(
 
 
 /* =====================================================
-   MORE BUTTON
+   MORE
 ===================================================== */
 
 moreBtn?.addEventListener(
@@ -2007,17 +2284,21 @@ moreBtn?.addEventListener(
     event => {
 
         event.preventDefault();
+
         event.stopPropagation();
+
 
         const open =
             moreMenu?.classList.contains(
                 "show"
             );
 
+
         moreMenu?.classList.toggle(
             "show",
             !open
         );
+
 
         moreMenu?.classList.toggle(
             "open",
@@ -2090,9 +2371,12 @@ photoInput.addEventListener(
         const file =
             photoInput.files[0];
 
+
         if (!file) {
+
             return;
         }
+
 
         try {
 
@@ -2103,7 +2387,8 @@ photoInput.addEventListener(
 
         } finally {
 
-            photoInput.value = "";
+            photoInput.value =
+                "";
         }
     }
 );
@@ -2120,9 +2405,12 @@ videoInput.addEventListener(
         const file =
             videoInput.files[0];
 
+
         if (!file) {
+
             return;
         }
+
 
         try {
 
@@ -2133,7 +2421,8 @@ videoInput.addEventListener(
 
         } finally {
 
-            videoInput.value = "";
+            videoInput.value =
+                "";
         }
     }
 );
@@ -2150,9 +2439,12 @@ fileInput.addEventListener(
         const file =
             fileInput.files[0];
 
+
         if (!file) {
+
             return;
         }
+
 
         try {
 
@@ -2163,7 +2455,8 @@ fileInput.addEventListener(
 
         } finally {
 
-            fileInput.value = "";
+            fileInput.value =
+                "";
         }
     }
 );
@@ -2182,7 +2475,9 @@ document.addEventListener(
                 "[data-action]"
             );
 
+
         if (!target) {
+
             return;
         }
 
@@ -2209,23 +2504,10 @@ document.addEventListener(
         }
 
 
-        if (action === "voice") {
-
-            openVoiceSelectionMenu(
-                target
-            );
-        }
-
-
-        if (action === "new-chat") {
-
-            createChat();
-        }
-
-
         plusMenu?.classList.remove(
             "show"
         );
+
 
         plusMenu?.classList.remove(
             "open"
@@ -2238,7 +2520,8 @@ document.addEventListener(
    MICROPHONE
 ===================================================== */
 
-let recognition = null;
+let recognition =
+    null;
 
 
 function startVoiceRecognition() {
@@ -2261,7 +2544,9 @@ function startVoiceRecognition() {
     if (recognition) {
 
         try {
+
             recognition.stop();
+
         } catch {}
     }
 
@@ -2278,6 +2563,7 @@ function startVoiceRecognition() {
 
     recognition.interimResults =
         false;
+
 
     recognition.continuous =
         false;
@@ -2298,6 +2584,7 @@ function startVoiceRecognition() {
             const result =
                 event.results[0][0]
                     .transcript;
+
 
             if (message) {
 
@@ -2377,6 +2664,7 @@ function openVoiceSelectionMenu(
             "div"
         );
 
+
     menu.id =
         "viggoVoiceMenu";
 
@@ -2414,20 +2702,26 @@ function openVoiceSelectionMenu(
             "div"
         );
 
+
     title.textContent =
         "🎙️ Select Voice";
+
 
     title.style.color =
         "#fff";
 
+
     title.style.fontWeight =
         "600";
+
 
     title.style.padding =
         "8px";
 
 
-    menu.appendChild(title);
+    menu.appendChild(
+        title
+    );
 
 
     const voices = [
@@ -2464,8 +2758,10 @@ function openVoiceSelectionMenu(
                     "button"
                 );
 
+
             button.type =
                 "button";
+
 
             button.textContent =
                 voice.name;
@@ -2515,24 +2811,31 @@ function openVoiceSelectionMenu(
                 event => {
 
                     event.preventDefault();
+
                     event.stopPropagation();
+
 
                     localStorage.setItem(
                         "viggoVoice",
                         voice.id
                     );
 
+
                     menu.remove();
                 }
             );
 
 
-            menu.appendChild(button);
+            menu.appendChild(
+                button
+            );
         }
     );
 
 
-    document.body.appendChild(menu);
+    document.body.appendChild(
+        menu
+    );
 
 
     const rect =
@@ -2541,6 +2844,7 @@ function openVoiceSelectionMenu(
 
     let left =
         rect.left;
+
 
     let top =
         rect.bottom + 8;
@@ -2569,13 +2873,14 @@ function openVoiceSelectionMenu(
     menu.style.left =
         `${left}px`;
 
+
     menu.style.top =
         `${top}px`;
 }
 
 
 /* =====================================================
-   VOICE BUTTONS
+   VOICE MENU BUTTON
 ===================================================== */
 
 voiceMenuBtn?.addEventListener(
@@ -2583,11 +2888,14 @@ voiceMenuBtn?.addEventListener(
     event => {
 
         event.preventDefault();
+
         event.stopPropagation();
+
 
         openVoiceSelectionMenu(
             voiceMenuBtn
         );
+
 
         moreMenu?.classList.remove(
             "show"
@@ -2596,315 +2904,215 @@ voiceMenuBtn?.addEventListener(
 );
 
 
-plusVoiceBtn?.addEventListener(
-    "click",
-    event => {
-
-        event.preventDefault();
-        event.stopPropagation();
-
-        openVoiceSelectionMenu(
-            plusVoiceBtn
-        );
-
-        plusMenu?.classList.remove(
-            "show"
-        );
-    }
-);
-
-
 /* =====================================================
-   LANGUAGE LIST
+   LANGUAGES
 ===================================================== */
 
 const languages = [
 
     {
-        code:
-            "en-IN",
-        name:
-            "🇬🇧 English"
+        code: "en-IN",
+        name: "🇬🇧 English"
     },
 
     {
-        code:
-            "ta-IN",
-        name:
-            "🇮🇳 தமிழ்"
+        code: "ta-IN",
+        name: "🇮🇳 தமிழ்"
     },
 
     {
-        code:
-            "hi-IN",
-        name:
-            "🇮🇳 हिन्दी"
+        code: "hi-IN",
+        name: "🇮🇳 हिन्दी"
     },
 
     {
-        code:
-            "te-IN",
-        name:
-            "🇮🇳 తెలుగు"
+        code: "te-IN",
+        name: "🇮🇳 తెలుగు"
     },
 
     {
-        code:
-            "kn-IN",
-        name:
-            "🇮🇳 ಕನ್ನಡ"
+        code: "kn-IN",
+        name: "🇮🇳 ಕನ್ನಡ"
     },
 
     {
-        code:
-            "ml-IN",
-        name:
-            "🇮🇳 മലയാളം"
+        code: "ml-IN",
+        name: "🇮🇳 മലയാളം"
     },
 
     {
-        code:
-            "bn-IN",
-        name:
-            "🇮🇳 বাংলা"
+        code: "bn-IN",
+        name: "🇮🇳 বাংলা"
     },
 
     {
-        code:
-            "mr-IN",
-        name:
-            "🇮🇳 मराठी"
+        code: "mr-IN",
+        name: "🇮🇳 मराठी"
     },
 
     {
-        code:
-            "gu-IN",
-        name:
-            "🇮🇳 ગુજરાતી"
+        code: "gu-IN",
+        name: "🇮🇳 ગુજરાતી"
     },
 
     {
-        code:
-            "pa-IN",
-        name:
-            "🇮🇳 ਪੰਜਾਬੀ"
+        code: "pa-IN",
+        name: "🇮🇳 ਪੰਜਾਬੀ"
     },
 
     {
-        code:
-            "ur-IN",
-        name:
-            "🇮🇳 اردو"
+        code: "ur-IN",
+        name: "🇮🇳 اردو"
     },
 
     {
-        code:
-            "or-IN",
-        name:
-            "🇮🇳 ଓଡ଼ିଆ"
+        code: "or-IN",
+        name: "🇮🇳 ଓଡ଼ିଆ"
     },
 
     {
-        code:
-            "as-IN",
-        name:
-            "🇮🇳 অসমীয়া"
+        code: "as-IN",
+        name: "🇮🇳 অসমীয়া"
     },
 
     {
-        code:
-            "fr-FR",
-        name:
-            "🇫🇷 Français"
+        code: "fr-FR",
+        name: "🇫🇷 Français"
     },
 
     {
-        code:
-            "de-DE",
-        name:
-            "🇩🇪 Deutsch"
+        code: "de-DE",
+        name: "🇩🇪 Deutsch"
     },
 
     {
-        code:
-            "es-ES",
-        name:
-            "🇪🇸 Español"
+        code: "es-ES",
+        name: "🇪🇸 Español"
     },
 
     {
-        code:
-            "it-IT",
-        name:
-            "🇮🇹 Italiano"
+        code: "it-IT",
+        name: "🇮🇹 Italiano"
     },
 
     {
-        code:
-            "pt-BR",
-        name:
-            "🇧🇷 Português"
+        code: "pt-BR",
+        name: "🇧🇷 Português"
     },
 
     {
-        code:
-            "ru-RU",
-        name:
-            "🇷🇺 Русский"
+        code: "ru-RU",
+        name: "🇷🇺 Русский"
     },
 
     {
-        code:
-            "ja-JP",
-        name:
-            "🇯🇵 日本語"
+        code: "ja-JP",
+        name: "🇯🇵 日本語"
     },
 
     {
-        code:
-            "ko-KR",
-        name:
-            "🇰🇷 한국어"
+        code: "ko-KR",
+        name: "🇰🇷 한국어"
     },
 
     {
-        code:
-            "zh-CN",
-        name:
-            "🇨🇳 中文"
+        code: "zh-CN",
+        name: "🇨🇳 中文"
     },
 
     {
-        code:
-            "ar-SA",
-        name:
-            "🇸🇦 العربية"
+        code: "ar-SA",
+        name: "🇸🇦 العربية"
     },
 
     {
-        code:
-            "tr-TR",
-        name:
-            "🇹🇷 Türkçe"
+        code: "tr-TR",
+        name: "🇹🇷 Türkçe"
     },
 
     {
-        code:
-            "nl-NL",
-        name:
-            "🇳🇱 Nederlands"
+        code: "nl-NL",
+        name: "🇳🇱 Nederlands"
     },
 
     {
-        code:
-            "pl-PL",
-        name:
-            "🇵🇱 Polski"
+        code: "pl-PL",
+        name: "🇵🇱 Polski"
     },
 
     {
-        code:
-            "sv-SE",
-        name:
-            "🇸🇪 Svenska"
+        code: "sv-SE",
+        name: "🇸🇪 Svenska"
     },
 
     {
-        code:
-            "da-DK",
-        name:
-            "🇩🇰 Dansk"
+        code: "da-DK",
+        name: "🇩🇰 Dansk"
     },
 
     {
-        code:
-            "fi-FI",
-        name:
-            "🇫🇮 Suomi"
+        code: "fi-FI",
+        name: "🇫🇮 Suomi"
     },
 
     {
-        code:
-            "no-NO",
-        name:
-            "🇳🇴 Norsk"
+        code: "no-NO",
+        name: "🇳🇴 Norsk"
     },
 
     {
-        code:
-            "el-GR",
-        name:
-            "🇬🇷 Ελληνικά"
+        code: "el-GR",
+        name: "🇬🇷 Ελληνικά"
     },
 
     {
-        code:
-            "he-IL",
-        name:
-            "🇮🇱 עברית"
+        code: "he-IL",
+        name: "🇮🇱 עברית"
     },
 
     {
-        code:
-            "th-TH",
-        name:
-            "🇹🇭 ไทย"
+        code: "th-TH",
+        name: "🇹🇭 ไทย"
     },
 
     {
-        code:
-            "vi-VN",
-        name:
-            "🇻🇳 Tiếng Việt"
+        code: "vi-VN",
+        name: "🇻🇳 Tiếng Việt"
     },
 
     {
-        code:
-            "id-ID",
-        name:
-            "🇮🇩 Bahasa Indonesia"
+        code: "id-ID",
+        name: "🇮🇩 Bahasa Indonesia"
     },
 
     {
-        code:
-            "ms-MY",
-        name:
-            "🇲🇾 Bahasa Melayu"
+        code: "ms-MY",
+        name: "🇲🇾 Bahasa Melayu"
     },
 
     {
-        code:
-            "sw-KE",
-        name:
-            "🌍 Swahili"
+        code: "sw-KE",
+        name: "🌍 Swahili"
     },
 
     {
-        code:
-            "cs-CZ",
-        name:
-            "🇨🇿 Czech"
+        code: "cs-CZ",
+        name: "🇨🇿 Czech"
     },
 
     {
-        code:
-            "hu-HU",
-        name:
-            "🇭🇺 Hungarian"
+        code: "hu-HU",
+        name: "🇭🇺 Hungarian"
     },
 
     {
-        code:
-            "ro-RO",
-        name:
-            "🇷🇴 Romanian"
+        code: "ro-RO",
+        name: "🇷🇴 Romanian"
     },
 
     {
-        code:
-            "uk-UA",
-        name:
-            "🇺🇦 Ukrainian"
+        code: "uk-UA",
+        name: "🇺🇦 Ukrainian"
     }
 ];
 
@@ -2926,6 +3134,7 @@ function openLanguageSelectionMenu(
         document.createElement(
             "div"
         );
+
 
     menu.id =
         "viggoLanguageMenu";
@@ -2973,8 +3182,10 @@ function openLanguageSelectionMenu(
             "div"
         );
 
+
     title.textContent =
         "🌐 Select Language";
+
 
     Object.assign(
         title.style,
@@ -3001,7 +3212,9 @@ function openLanguageSelectionMenu(
     );
 
 
-    menu.appendChild(title);
+    menu.appendChild(
+        title
+    );
 
 
     const current =
@@ -3018,8 +3231,10 @@ function openLanguageSelectionMenu(
                     "button"
                 );
 
+
             button.type =
                 "button";
+
 
             button.textContent =
                 language.name;
@@ -3069,29 +3284,37 @@ function openLanguageSelectionMenu(
                 event => {
 
                     event.preventDefault();
+
                     event.stopPropagation();
+
 
                     localStorage.setItem(
                         "viggoLanguage",
                         language.code
                     );
 
+
                     console.log(
                         "Language changed:",
                         language.code
                     );
+
 
                     menu.remove();
                 }
             );
 
 
-            menu.appendChild(button);
+            menu.appendChild(
+                button
+            );
         }
     );
 
 
-    document.body.appendChild(menu);
+    document.body.appendChild(
+        menu
+    );
 
 
     const rect =
@@ -3100,6 +3323,7 @@ function openLanguageSelectionMenu(
 
     let left =
         rect.left;
+
 
     let top =
         rect.bottom + 8;
@@ -3131,6 +3355,7 @@ function openLanguageSelectionMenu(
             left
         );
 
+
     top =
         Math.max(
             5,
@@ -3140,6 +3365,7 @@ function openLanguageSelectionMenu(
 
     menu.style.left =
         `${left}px`;
+
 
     menu.style.top =
         `${top}px`;
@@ -3155,10 +3381,17 @@ languageBtn?.addEventListener(
     event => {
 
         event.preventDefault();
+
         event.stopPropagation();
+
 
         openLanguageSelectionMenu(
             languageBtn
+        );
+
+
+        moreMenu?.classList.remove(
+            "show"
         );
     }
 );
@@ -3175,18 +3408,22 @@ clearChatBtn?.addEventListener(
         const chat =
             getCurrentChat();
 
+
         if (!chat) {
+
             return;
         }
 
 
         chat.messages = [];
 
+
         chat.title =
             "New Chat";
 
 
         saveChats();
+
 
         renderHistory();
 
@@ -3196,6 +3433,7 @@ clearChatBtn?.addEventListener(
         moreMenu?.classList.remove(
             "show"
         );
+
 
         moreMenu?.classList.remove(
             "open"
@@ -3239,9 +3477,11 @@ showHistoryBtn?.addEventListener(
             "open"
         );
 
+
         moreMenu?.classList.remove(
             "show"
         );
+
 
         moreMenu?.classList.remove(
             "open"
@@ -3261,11 +3501,14 @@ selectChatsBtn?.addEventListener(
         selectingChats =
             !selectingChats;
 
+
         renderHistory();
+
 
         moreMenu?.classList.remove(
             "show"
         );
+
 
         moreMenu?.classList.remove(
             "open"
@@ -3294,6 +3537,7 @@ deleteSelectedBtn?.addEventListener(
             alert(
                 "No chats selected."
             );
+
 
             return;
         }
@@ -3381,6 +3625,7 @@ shareBtn?.addEventListener(
                 "There are no messages to share."
             );
 
+
             return;
         }
 
@@ -3413,7 +3658,8 @@ shareBtn?.addEventListener(
                         chat.title ||
                         "Viggo AI",
 
-                    text
+                    text:
+                        text
                 });
 
             } else {
@@ -3421,6 +3667,7 @@ shareBtn?.addEventListener(
                 await navigator.clipboard.writeText(
                     text
                 );
+
 
                 alert(
                     "Chat copied. You can share it now."
@@ -3461,6 +3708,7 @@ function initializeViggo() {
             currentChatId =
                 chats[0].id;
 
+
             saveChats();
         }
 
@@ -3497,12 +3745,17 @@ console.log(
 );
 
 console.log(
-    "VIGGO AI SCRIPT LOADED - v9"
+    "VIGGO AI SCRIPT LOADED - v10"
 );
 
 console.log(
     "API:",
     API_URL
+);
+
+console.log(
+    "CHAT API:",
+    CHAT_API
 );
 
 console.log(
@@ -3546,4 +3799,5 @@ console.log(
 );
 
 console.log(
-    "==========================
+    "================================="
+);
