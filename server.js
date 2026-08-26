@@ -3,6 +3,7 @@
 /* =====================================================
    VIGGO AI - SERVER.JS
    FULL VERSION
+   ACCURACY FIXED
 ===================================================== */
 
 const express = require("express");
@@ -66,6 +67,73 @@ app.use(
         limit: "50mb"
     })
 );
+
+
+/* =====================================================
+   VIGGO AI SYSTEM INSTRUCTION
+===================================================== */
+
+const VIGGO_SYSTEM_INSTRUCTION = `
+You are Viggo AI, a helpful and accurate AI assistant.
+
+IMPORTANT RULES:
+
+1. Always understand the user's question before answering.
+
+2. Give accurate, useful, and direct answers.
+
+3. NEVER invent facts, names, numbers, dates, links, sources,
+   or technical information.
+
+4. If you are not certain about something, clearly say that
+   you are not certain instead of making up an answer.
+
+5. For mathematics, calculations, conversions, and numerical
+   problems, carefully verify the calculation before answering.
+
+6. For technical questions, explain the answer clearly and
+   step-by-step when useful.
+
+7. If the user asks a simple question, do not unnecessarily
+   give a very long answer.
+
+8. If the user asks for a detailed explanation, provide a
+   structured and detailed explanation.
+
+9. If the user asks in Tamil, answer primarily in Tamil.
+
+10. If the user asks in English, answer primarily in English.
+
+11. If the user mixes Tamil and English, you may naturally
+    use Tamil + English in the same style.
+
+12. Do not claim that you performed an action that you did not
+    actually perform.
+
+13. Do not pretend to have live internet access unless live
+    information is actually available to you.
+
+14. When information may have changed over time, clearly mention
+    that the information may need verification.
+
+15. For educational questions, give correct definitions,
+    formulas, examples, and steps when appropriate.
+
+16. For multiple-choice questions, identify the correct option
+    and briefly explain why.
+
+17. If the user's question is ambiguous, ask a short
+    clarification instead of guessing.
+
+18. Always prioritize correctness over creativity.
+
+19. Do not change the meaning of the user's question.
+
+20. Be friendly, natural, and respectful.
+
+Your main goal is:
+ACCURACY + CLARITY + HELPFULNESS.
+`;
 
 
 /* =====================================================
@@ -362,6 +430,74 @@ app.post(
                GEMINI REQUEST
             ================================================= */
 
+            const requestBody = {
+
+                systemInstruction: {
+
+                    parts: [
+
+                        {
+                            text:
+                                VIGGO_SYSTEM_INSTRUCTION
+                        }
+
+                    ]
+
+                },
+
+                contents: [
+
+                    {
+
+                        role:
+                            "user",
+
+                        parts:
+                            parts
+
+                    }
+
+                ],
+
+                generationConfig: {
+
+                    /*
+                     * Lower temperature helps reduce
+                     * random / inaccurate answers.
+                     */
+
+                    temperature:
+                        0.25,
+
+                    /*
+                     * Keep enough room for detailed answers.
+                     */
+
+                    maxOutputTokens:
+                        2048,
+
+                    /*
+                     * More stable generation.
+                     */
+
+                    topP:
+                        0.8
+
+                }
+
+            };
+
+
+            console.log(
+                "Sending request to Gemini..."
+            );
+
+            console.log(
+                "Model:",
+                MODEL
+            );
+
+
             const geminiResponse =
                 await fetch(
                     geminiURL,
@@ -381,33 +517,9 @@ app.post(
                         },
 
                         body:
-                            JSON.stringify({
-
-                                contents: [
-
-                                    {
-
-                                        role:
-                                            "user",
-
-                                        parts:
-                                            parts
-
-                                    }
-
-                                ],
-
-                                generationConfig: {
-
-                                    temperature:
-                                        0.7,
-
-                                    maxOutputTokens:
-                                        2048
-
-                                }
-
-                            })
+                            JSON.stringify(
+                                requestBody
+                            )
 
                     }
                 );
@@ -434,8 +546,10 @@ app.post(
             } catch {
 
                 geminiData = {
+
                     raw:
                         rawText
+
                 };
 
             }
@@ -597,13 +711,16 @@ app.post(
                 "================================="
             );
 
+
             console.error(
                 "VIGGO SERVER ERROR"
             );
 
+
             console.error(
                 error
             );
+
 
             console.error(
                 "================================="
@@ -713,19 +830,23 @@ app.listen(
             "================================="
         );
 
+
         console.log(
             "VIGGO AI SERVER ONLINE"
         );
+
 
         console.log(
             "PORT:",
             PORT
         );
 
+
         console.log(
             "MODEL:",
             MODEL
         );
+
 
         console.log(
             "API KEY:",
@@ -734,21 +855,31 @@ app.listen(
                 : "MISSING"
         );
 
+
         console.log(
             "CHAT ENDPOINT:"
         );
+
 
         console.log(
             "/chat"
         );
 
+
         console.log(
             "HEALTH ENDPOINT:"
         );
 
+
         console.log(
             "/health"
         );
+
+
+        console.log(
+            "ACCURACY MODE: ENABLED"
+        );
+
 
         console.log(
             "================================="
