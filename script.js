@@ -9,9 +9,8 @@
    API
 ===================================================== */
 
-const API_URL = "https://ai-tool-2-zpul.onrender.com/chat";
+const API_URL = "https://ai-tool-2-zpul.onrender.com";
 
-const HEALTH_URL = "https://ai-tool-2-zpul.onrender.com/health";
 
 
 /* =====================================================
