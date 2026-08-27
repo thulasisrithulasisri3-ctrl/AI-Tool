@@ -6,21 +6,32 @@ const { GoogleGenAI } = require("@google/genai");
 
 /* =====================================================
    VIGGO AI SERVER
+   FULL SERVER.JS
+   CHAT + MEMORY + IMAGE + VIDEO + FILE
 ===================================================== */
 
 const app = express();
 
 const PORT = process.env.PORT || 10000;
+
 const API_KEY =
     process.env.GEMINI_API_KEY ||
     process.env.GOOGLE_API_KEY;
 
+const MODEL =
+    process.env.GEMINI_MODEL ||
+    "gemini-3.6-flash";
+
 /* =====================================================
-   MODEL
+   GEMINI CLIENT
 ===================================================== */
 
-const MODEL = "gemini-3.5-flash-lite";
-const DEFAULT_TIMEZONE = "Asia/Kolkata";
+const ai = API_KEY
+    ? new GoogleGenAI({
+        apiKey: API_KEY
+      })
+    : null;
+
 
 /* =====================================================
    MIDDLEWARE
@@ -32,82 +43,73 @@ app.use(
         methods: ["GET", "POST", "OPTIONS"],
         allowedHeaders: [
             "Content-Type",
-            "Authorization"
+            "Accept"
         ]
     })
 );
 
 app.use(
     express.json({
-        limit: "25mb"
+        limit: "50mb"
     })
 );
 
 app.use(
     express.urlencoded({
         extended: true,
-        limit: "25mb"
+        limit: "50mb"
     })
 );
 
+
 /* =====================================================
-   GEMINI
+   BASIC ROUTE
 ===================================================== */
 
-let ai = null;
+app.get("/", (req, res) => {
 
-if (API_KEY) {
-    ai = new GoogleGenAI({
-        apiKey: API_KEY
+    res.json({
+        success: true,
+        service: "Viggo AI",
+        status: "online",
+        model: MODEL
     });
-}
+});
+
 
 /* =====================================================
-   DATE / TIME
+   HEALTH
 ===================================================== */
 
-function getDateTime(
-    timeZone = DEFAULT_TIMEZONE
-) {
-    const now = new Date();
+app.get("/health", (req, res) => {
 
-    const dateFormatter =
-        new Intl.DateTimeFormat(
-            "en-US",
-            {
-                timeZone,
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric"
-            }
-        );
+    res.json({
+        success: true,
+        status: "healthy",
+        server: "Viggo AI",
+        model: MODEL,
+        apiConfigured: Boolean(API_KEY),
+        time: new Date().toISOString()
+    });
+});
 
-    const timeFormatter =
-        new Intl.DateTimeFormat(
-            "en-US",
-            {
-                timeZone,
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-                hour12: true
-            }
-        );
-
-    return {
-        date: dateFormatter.format(now),
-        time: timeFormatter.format(now),
-        dateTime:
-            dateFormatter.format(now) +
-            " at " +
-            timeFormatter.format(now)
-    };
-}
 
 /* =====================================================
-   LANGUAGE
+   HELPERS
 ===================================================== */
+
+function cleanText(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+        return "";
+    }
+
+    return String(value).trim();
+}
+
 
 function getLanguageName(language) {
 
@@ -126,7 +128,6 @@ function getLanguageName(language) {
         "ur-IN": "Urdu",
         "or-IN": "Odia",
         "as-IN": "Assamese",
-
         "fr-FR": "French",
         "de-DE": "German",
         "es-ES": "Spanish",
@@ -149,486 +150,940 @@ function getLanguageName(language) {
         "th-TH": "Thai",
         "vi-VN": "Vietnamese",
         "id-ID": "Indonesian",
-        "ms-MY": "Malay"
-
+        "ms-MY": "Malay",
+        "sw-KE": "Swahili",
+        "cs-CZ": "Czech",
+        "hu-HU": "Hungarian",
+        "ro-RO": "Romanian",
+        "uk-UA": "Ukrainian"
     };
 
-    return languages[language] || "English";
+    return (
+        languages[language] ||
+        "English"
+    );
 }
 
-/* =====================================================
-   ROOT
-===================================================== */
-
-app.get("/", (req, res) => {
-
-    const dt =
-        getDateTime(DEFAULT_TIMEZONE);
-
-    res.json({
-        status: "online",
-        service: "Viggo AI Server",
-        model: MODEL,
-        apiConfigured: Boolean(API_KEY),
-        timezone: DEFAULT_TIMEZONE,
-        currentDate: dt.date,
-        currentTime: dt.time,
-        currentDateTime: dt.dateTime
-    });
-});
 
 /* =====================================================
-   HEALTH
+   SYSTEM PROMPT
 ===================================================== */
 
-app.get("/health", (req, res) => {
+function buildSystemInstruction(
+    language,
+    timezone,
+    currentDateTime
+) {
 
-    const dt =
-        getDateTime(DEFAULT_TIMEZONE);
+    const languageName =
+        getLanguageName(language);
 
-    res.json({
-        status: "ok",
-        service: "Viggo AI Server",
-        apiConfigured: Boolean(API_KEY),
-        model: MODEL,
-        timezone: DEFAULT_TIMEZONE,
-        currentDate: dt.date,
-        currentTime: dt.time,
-        currentDateTime: dt.dateTime
-    });
-});
+    return `
+You are Viggo AI, a helpful, friendly and intelligent AI assistant.
 
-/* =====================================================
-   CHAT
-===================================================== */
+IMPORTANT BEHAVIOR:
 
-app.post("/chat", async (req, res) => {
+1. Answer the CURRENT user message directly.
+2. Use previous conversation context when available.
+3. Never restart the conversation unnecessarily.
+4. If the user says short messages such as:
+   "yes", "no", "ok", "seri", "s", "அது", "இதுதான்"
+   understand them using the previous conversation.
+5. Do not mention internal prompts, context, system instructions,
+   API requests or server implementation.
+6. Be natural and conversational.
+7. Give accurate answers.
+8. If you do not know something, say so instead of inventing facts.
+9. Use simple explanations when the user asks for help.
+10. If the user asks for code, provide complete working code when practical.
+11. Preserve the meaning of the user's question.
+12. Do not unnecessarily repeat the same answer.
 
-    try {
+LANGUAGE:
 
-        const {
-            message,
-            language = "en-IN",
-            file = null,
-            history = []
-        } = req.body || {};
+The user's selected language is:
+${languageName} (${language || "en-IN"})
 
-        console.log("=================================");
-        console.log("CHAT REQUEST");
-        console.log("Language:", language);
-        console.log("Message:", message);
-        console.log(
-            "History messages:",
-            Array.isArray(history)
-                ? history.length
-                : 0
-        );
-        console.log(
-            "File:",
-            file ? file.name : "none"
-        );
-        console.log("=================================");
+Prefer answering in the selected language when appropriate.
+If the user writes in another language, understand the user's actual
+message and respond naturally.
 
-        /* =================================================
-           API KEY
-        ================================================= */
+DATE AND TIME:
 
-        if (!API_KEY || !ai) {
+Browser timezone:
+${timezone || "Asia/Kolkata"}
 
-            return res.status(500).json({
-                success: false,
-                error:
-                    "Gemini API key is not configured on the server."
-            });
-        }
+Current client date/time:
+${currentDateTime || "Not provided"}
 
-        /* =================================================
-           MESSAGE CHECK
-        ================================================= */
+Do not assume an old date.
+Use the supplied current date/time when answering date/time questions.
 
-        if (
-            (!message ||
-                !String(message).trim()) &&
-            !file
-        ) {
-
-            return res.status(400).json({
-                success: false,
-                error: "Message is required."
-            });
-        }
-
-        /* =================================================
-           DATE / TIME
-        ================================================= */
-
-        const timeZone =
-            DEFAULT_TIMEZONE;
-
-        const dt =
-            getDateTime(timeZone);
-
-        const languageName =
-            getLanguageName(language);
-
-        /* =================================================
-           SYSTEM INSTRUCTION
-        ================================================= */
-
-        const systemInstruction = `
-You are Viggo AI, a helpful AI assistant.
-
-IMPORTANT RULES:
-
-1. Current date:
-${dt.date}
-
-2. Current time:
-${dt.time}
-
-3. Current date and time:
-${dt.dateTime}
-
-4. Timezone:
-${timeZone}
-
-5. User selected language:
-${languageName} (${language})
-
-6. Always use the current date and time information above
-when answering date/time questions.
-
-7. If the user asks "today", answer using the current date.
-
-8. If the user asks "tomorrow", calculate tomorrow correctly
-from the current date.
-
-9. If the user asks "yesterday", calculate yesterday correctly
-from the current date.
-
-10. If the user asks for the current time, answer using the
-current time above.
-
-11. If the user asks about a country, state, city, or timezone,
-use the appropriate local date/time when you can determine it.
-
-12. Reply in the user's selected language when practical.
-
-13. Do not claim that the current date is 2024 or another old date.
-
-14. IMPORTANT:
-Use the previous conversation provided below to understand
-the user's current question.
-
-15. Do NOT restart the conversation for every new message.
-
-16. Do NOT automatically say:
-"Hello! How can I help you today?"
-unless the user is actually greeting you or starting
-a completely new conversation.
-
-17. If the user asks a follow-up question, answer it based
-on the previous conversation.
-
-18. Be accurate, friendly and concise.
-
-19. You can naturally call the user "friend" when appropriate.
+You are Viggo AI.
 `;
+}
 
-        /* =================================================
-           BUILD CONVERSATION CONTEXT
-================================================= */
 
-        let conversationContext = "";
+/* =====================================================
+   BUILD CONTENT
+===================================================== */
 
-        if (Array.isArray(history)) {
+function buildTextPrompt(
+    message,
+    conversationHistory,
+    language,
+    timezone,
+    currentDateTime
+) {
 
-            conversationContext =
-                history
-                    .slice(-30)
-                    .map(item => {
+    const systemInstruction =
+        buildSystemInstruction(
+            language,
+            timezone,
+            currentDateTime
+        );
 
-                        const role =
-                            item.role === "assistant"
-                                ? "Viggo"
-                                : "User";
+    const history =
+        Array.isArray(conversationHistory)
+            ? conversationHistory
+            : [];
 
-                        /*
-                         * FIX:
-                         * Accept text, content, or message
-                         * so conversation history continues.
-                         */
 
-                        const text =
-                            String(
-                                item.text ||
-                                item.content ||
-                                item.message ||
-                                ""
-                            ).trim();
+    /*
+       Limit history so requests remain manageable.
+    */
 
-                        if (!text) {
-                            return "";
-                        }
+    const recentHistory =
+        history
+            .slice(-30)
+            .map(item => {
 
-                        return (
-                            role +
-                            ": " +
-                            text
-                        );
-                    })
-                    .filter(Boolean)
-                    .join("\n\n");
-        }
+                const role =
+                    item.role === "assistant"
+                        ? "Viggo"
+                        : "User";
 
-        /* =================================================
-           CONTENT
-        ================================================= */
+                const text =
+                    cleanText(
+                        item.text
+                    );
 
-        let contents = "";
+                if (!text) {
+                    return "";
+                }
 
-        if (conversationContext) {
+                return `${role}: ${text}`;
+            })
+            .filter(Boolean);
 
-            contents += `
-${systemInstruction}
+
+    let prompt =
+        systemInstruction;
+
+
+    if (recentHistory.length) {
+
+        prompt += `
 
 PREVIOUS CONVERSATION:
 
-${conversationContext}
+${recentHistory.join("\n")}
+
+END PREVIOUS CONVERSATION.
+`;
+    }
+
+
+    prompt += `
 
 CURRENT USER MESSAGE:
 
-${String(message || "").trim()}
+${cleanText(message)}
+
+Respond naturally to the CURRENT USER MESSAGE.
 `;
 
-        } else {
 
-            contents = `
-${systemInstruction}
+    return prompt;
+}
 
-CURRENT USER MESSAGE:
 
-${String(message || "").trim()}
-`;
-        }
+/* =====================================================
+   FILE VALIDATION
+===================================================== */
 
-        /* =================================================
-           FILE
-        ================================================= */
+function validateFile(file) {
 
-        if (file) {
+    if (!file) {
+        return null;
+    }
 
-            contents += `
+    const name =
+        cleanText(file.name);
 
-The user uploaded a file.
+    const type =
+        cleanText(file.type);
 
-File name:
-${file.name || "unknown"}
+    const data =
+        cleanText(file.data);
 
-File type:
-${file.type || "unknown"}
+    if (!data) {
 
-File size:
-${file.size || 0} bytes
+        throw new Error(
+            "Uploaded file data is missing."
+        );
+    }
 
-USER REQUEST:
-${String(message || "").trim()}
+    if (!type) {
 
-If the uploaded file content is not directly available
-to you, clearly explain that instead of pretending
-that you analyzed it.
-`;
-        }
+        throw new Error(
+            "Uploaded file type is missing."
+        );
+    }
 
-        /* =================================================
-           GEMINI REQUEST
-        ================================================= */
+    /*
+       Basic protection against accidentally
+       sending an enormous base64 request.
+    */
 
-        console.log(
-            "Sending request to Gemini..."
+    const MAX_BASE64_LENGTH =
+        45 * 1024 * 1024;
+
+    if (
+        data.length >
+        MAX_BASE64_LENGTH
+    ) {
+
+        throw new Error(
+            "Uploaded file is too large."
+        );
+    }
+
+    return {
+        name,
+        type,
+        data
+    };
+}
+
+
+/* =====================================================
+   CONVERT DATA URL
+===================================================== */
+
+function parseDataUrl(dataUrl) {
+
+    const match =
+        String(dataUrl).match(
+            /^data:([^;]+);base64,(.+)$/s
         );
 
-        console.log(
-            "Model:",
-            MODEL
+    if (!match) {
+
+        throw new Error(
+            "Invalid uploaded file data."
         );
+    }
 
-        const response =
-            await ai.models.generateContent({
-                model: MODEL,
-                contents: contents
-            });
+    return {
+        mimeType: match[1],
+        data: match[2]
+    };
+}
 
-        /* =================================================
-           RESPONSE
-        ================================================= */
 
-        let reply = "";
+/* =====================================================
+   CREATE GEMINI CONTENT
+===================================================== */
 
-        if (response) {
+function createGeminiContents(
+    prompt,
+    file
+) {
+
+    const parts = [
+
+        {
+            text: prompt
+        }
+    ];
+
+
+    if (file) {
+
+        const parsed =
+            parseDataUrl(
+                file.data
+            );
+
+
+        parts.push({
+
+            inlineData: {
+
+                mimeType:
+                    parsed.mimeType,
+
+                data:
+                    parsed.data
+            }
+        });
+    }
+
+
+    return [
+        {
+            role: "user",
+            parts
+        }
+    ];
+}
+
+
+/* =====================================================
+   EXTRACT RESPONSE TEXT
+===================================================== */
+
+function extractResponseText(
+    response
+) {
+
+    if (!response) {
+        return "";
+    }
+
+
+    if (
+        typeof response.text ===
+        "string"
+    ) {
+
+        return response.text.trim();
+    }
+
+
+    try {
+
+        if (
+            typeof response.text ===
+            "function"
+        ) {
+
+            const value =
+                response.text();
 
             if (
-                typeof response.text ===
+                typeof value ===
                 "string"
             ) {
 
-                reply =
-                    response.text;
-
-            } else if (
-                response.text &&
-                typeof response.text ===
-                "function"
-            ) {
-
-                reply =
-                    response.text();
+                return value.trim();
             }
         }
 
+    } catch (error) {
+
+        console.error(
+            "Response text function error:",
+            error
+        );
+    }
+
+
+    try {
+
+        const candidates =
+            response.candidates;
+
         if (
-            !reply &&
-            response?.candidates?.length
+            Array.isArray(candidates) &&
+            candidates.length
         ) {
 
-            const candidate =
-                response.candidates[0];
-
             const parts =
-                candidate?.content?.parts ||
-                [];
+                candidates[0]
+                    ?.content
+                    ?.parts;
 
-            reply =
-                parts
-                    .map(
-                        part =>
-                            part.text || ""
+            if (
+                Array.isArray(parts)
+            ) {
+
+                return parts
+                    .map(part =>
+                        part?.text || ""
                     )
                     .join("")
                     .trim();
+            }
         }
-
-        if (!reply) {
-
-            console.error(
-                "Gemini returned an empty response:",
-                response
-            );
-
-            return res.status(500).json({
-                success: false,
-                error:
-                    "Gemini returned an empty response."
-            });
-        }
-
-        console.log(
-            "Gemini response received."
-        );
-
-        return res.json({
-
-            success: true,
-
-            reply:
-                String(reply),
-
-            language,
-
-            timezone:
-                timeZone,
-
-            currentDate:
-                dt.date,
-
-            currentTime:
-                dt.time,
-
-            currentDateTime:
-                dt.dateTime,
-
-            model:
-                MODEL
-        });
 
     } catch (error) {
 
-        console.error("=================================");
-        console.error("VIGGO AI CHAT ERROR");
-        console.error(error);
-        console.error("=================================");
-
-        const status =
-            error?.status ||
-            error?.code ||
-            500;
-
-        let errorMessage =
-            error?.message ||
-            "Viggo AI server error.";
-
-        if (Number(status) === 429) {
-
-            errorMessage =
-                "Gemini API quota exceeded. Please try again later.";
-        }
-
-        if (Number(status) === 503) {
-
-            errorMessage =
-                "Gemini is temporarily busy. Please try again in a few seconds.";
-        }
-
-        return res.status(500).json({
-
-            success: false,
-
-            error:
-                errorMessage
-        });
+        console.error(
+            "Candidate parsing error:",
+            error
+        );
     }
-});
+
+
+    return "";
+}
+
+
+/* =====================================================
+   GEMINI REQUEST
+===================================================== */
+
+async function generateViggoResponse({
+    message,
+    conversationHistory,
+    language,
+    browserTimezone,
+    currentDateTime,
+    file
+}) {
+
+    if (!ai) {
+
+        throw new Error(
+            "GEMINI_API_KEY is not configured on the server."
+        );
+    }
+
+
+    const prompt =
+        buildTextPrompt(
+            message,
+            conversationHistory,
+            language,
+            browserTimezone,
+            currentDateTime
+        );
+
+
+    const contents =
+        createGeminiContents(
+            prompt,
+            file
+        );
+
+
+    console.log(
+        "Sending request to Gemini:",
+        MODEL
+    );
+
+
+    const response =
+        await ai.models.generateContent({
+
+            model: MODEL,
+
+            contents: contents
+        });
+
+
+    const reply =
+        extractResponseText(
+            response
+        );
+
+
+    if (!reply) {
+
+        throw new Error(
+            "Gemini returned an empty response."
+        );
+    }
+
+
+    return reply;
+}
+
+
+/* =====================================================
+   CHAT API
+===================================================== */
+
+app.post(
+    "/chat",
+    async (req, res) => {
+
+        const requestId =
+            `${Date.now()}-${Math.random()
+                .toString(36)
+                .slice(2, 8)}`;
+
+
+        console.log(
+            "================================="
+        );
+
+        console.log(
+            "VIGGO CHAT REQUEST:",
+            requestId
+        );
+
+        console.log(
+            "================================="
+        );
+
+
+        try {
+
+            if (!API_KEY) {
+
+                return res.status(500).json({
+
+                    success: false,
+
+                    error:
+                        "Gemini API key is not configured on Render.",
+
+                    code:
+                        "API_KEY_MISSING"
+                });
+            }
+
+
+            const body =
+                req.body || {};
+
+
+            const originalMessage =
+                cleanText(
+                    body.originalMessage
+                );
+
+
+            const message =
+                cleanText(
+                    body.message
+                ) ||
+                originalMessage;
+
+
+            if (!message && !body.file) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    error:
+                        "Message is required.",
+
+                    code:
+                        "MESSAGE_MISSING"
+                });
+            }
+
+
+            const language =
+                cleanText(
+                    body.language
+                ) ||
+                "en-IN";
+
+
+            const browserTimezone =
+                cleanText(
+                    body.browserTimezone
+                ) ||
+                "Asia/Kolkata";
+
+
+            const languageTimezone =
+                cleanText(
+                    body.languageTimezone
+                ) ||
+                browserTimezone;
+
+
+            const currentDateTime =
+                cleanText(
+                    body.currentDateTime
+                );
+
+
+            let conversationHistory =
+                Array.isArray(
+                    body.conversationHistory
+                )
+                    ? body.conversationHistory
+                    : [];
+
+
+            conversationHistory =
+                conversationHistory
+                    .slice(-30)
+                    .map(item => ({
+
+                        role:
+                            item?.role ===
+                            "assistant"
+                                ? "assistant"
+                                : "user",
+
+                        text:
+                            cleanText(
+                                item?.text
+                            )
+                    }))
+                    .filter(
+                        item =>
+                            item.text.length > 0
+                    );
+
+
+            let file = null;
+
+
+            if (body.file) {
+
+                file =
+                    validateFile(
+                        body.file
+                    );
+            }
+
+
+            console.log(
+                "Message:",
+                originalMessage ||
+                message
+            );
+
+            console.log(
+                "Language:",
+                language
+            );
+
+            console.log(
+                "Timezone:",
+                languageTimezone
+            );
+
+            console.log(
+                "History:",
+                conversationHistory.length
+            );
+
+            console.log(
+                "File:",
+                file
+                    ? `${file.name} (${file.type})`
+                    : "none"
+            );
+
+
+            const reply =
+                await generateViggoResponse({
+
+                    message:
+                        originalMessage ||
+                        message,
+
+                    conversationHistory,
+
+                    language,
+
+                    browserTimezone:
+                        browserTimezone,
+
+                    currentDateTime,
+
+                    file
+                });
+
+
+            console.log(
+                "Viggo response generated successfully."
+            );
+
+
+            return res.status(200).json({
+
+                success: true,
+
+                reply:
+
+                    reply,
+
+                response:
+
+                    reply,
+
+                model:
+
+                    MODEL,
+
+                language:
+
+                    language,
+
+                requestId:
+
+                    requestId
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                "================================="
+            );
+
+            console.error(
+                "VIGGO SERVER ERROR:",
+                requestId
+            );
+
+            console.error(
+                error
+            );
+
+            console.error(
+                "================================="
+            );
+
+
+            const errorString =
+                String(
+                    error?.message ||
+                    error ||
+                    ""
+                );
+
+
+            /*
+               QUOTA
+            */
+
+            if (
+                errorString.includes(
+                    "429"
+                ) ||
+                errorString.includes(
+                    "RESOURCE_EXHAUSTED"
+                ) ||
+                errorString.toLowerCase()
+                    .includes("quota")
+            ) {
+
+                return res.status(429).json({
+
+                    success: false,
+
+                    error:
+                        "Gemini API quota is temporarily exhausted. Please try again later.",
+
+                    code:
+                        "GEMINI_QUOTA",
+
+                    requestId:
+                        requestId
+                });
+            }
+
+
+            /*
+               MODEL NOT FOUND
+            */
+
+            if (
+                errorString.includes(
+                    "404"
+                ) ||
+                errorString
+                    .toLowerCase()
+                    .includes("not found")
+            ) {
+
+                return res.status(500).json({
+
+                    success: false,
+
+                    error:
+                        `Gemini model "${MODEL}" was not found. Check GEMINI_MODEL in Render.`,
+
+                    code:
+                        "MODEL_NOT_FOUND",
+
+                    model:
+                        MODEL,
+
+                    requestId:
+                        requestId
+                });
+            }
+
+
+            /*
+               SERVER BUSY
+            */
+
+            if (
+                errorString.includes(
+                    "503"
+                ) ||
+                errorString.includes(
+                    "UNAVAILABLE"
+                )
+            ) {
+
+                return res.status(503).json({
+
+                    success: false,
+
+                    error:
+                        "Gemini is temporarily busy. Please try again shortly.",
+
+                    code:
+                        "GEMINI_UNAVAILABLE",
+
+                    requestId:
+                        requestId
+                });
+            }
+
+
+            /*
+               INVALID API KEY
+            */
+
+            if (
+                errorString
+                    .toLowerCase()
+                    .includes("api key")
+            ) {
+
+                return res.status(500).json({
+
+                    success: false,
+
+                    error:
+                        "Gemini API key is invalid or unavailable.",
+
+                    code:
+                        "API_KEY_ERROR",
+
+                    requestId:
+                        requestId
+                });
+            }
+
+
+            /*
+               GENERIC ERROR
+            */
+
+            return res.status(500).json({
+
+                success: false,
+
+                error:
+                    "Viggo AI could not generate a response.",
+
+                details:
+                    errorString.substring(
+                        0,
+                        500
+                    ),
+
+                requestId:
+                    requestId
+            });
+        }
+    }
+);
+
 
 /* =====================================================
    404
 ===================================================== */
 
-app.use((req, res) => {
+app.use(
+    (req, res) => {
 
-    res.status(404).json({
+        res.status(404).json({
 
-        status: "error",
+            success: false,
 
-        error:
-            "Endpoint not found.",
+            error:
+                "Route not found.",
 
-        path:
-            req.path,
+            path:
+                req.path
+        });
+    }
+);
 
-        method:
-            req.method
-    });
-});
 
 /* =====================================================
-   SERVER
+   GLOBAL ERROR HANDLER
+===================================================== */
+
+app.use(
+    (
+        error,
+        req,
+        res,
+        next
+    ) => {
+
+        console.error(
+            "GLOBAL EXPRESS ERROR:",
+            error
+        );
+
+
+        if (res.headersSent) {
+
+            return next(error);
+        }
+
+
+        res.status(500).json({
+
+            success: false,
+
+            error:
+                "Internal server error."
+        });
+    }
+);
+
+
+/* =====================================================
+   START SERVER
 ===================================================== */
 
 app.listen(
     PORT,
-    "0.0.0.0",
     () => {
 
-        const dt =
-            getDateTime(
-                DEFAULT_TIMEZONE
-            );
+        console.log(
+            "================================="
+        );
 
-        console.log("");
-        console.log("=================================");
-        console.log("VIGGO AI SERVER ONLINE");
-        console.log("PORT:", PORT);
-        console.log("MODEL:", MODEL);
+        console.log(
+            "VIGGO AI SERVER ONLINE"
+        );
+
+        console.log(
+            "================================="
+        );
+
+        console.log(
+            "PORT:",
+            PORT
+        );
+
+        console.log(
+            "MODEL:",
+            MODEL
+        );
 
         console.log(
             "API KEY:",
@@ -638,37 +1093,18 @@ app.listen(
         );
 
         console.log(
-            "TIMEZONE:",
-            DEFAULT_TIMEZONE
+            "CHAT:",
+            `/chat`
         );
 
         console.log(
-            "CURRENT DATE:",
-            dt.date
-        );
-
-        console.log(
-            "CURRENT TIME:",
-            dt.time
-        );
-
-        console.log(
-            "CURRENT DATE/TIME:",
-            dt.dateTime
-        );
-
-        console.log(
-            "CHAT ENDPOINT: /chat"
-        );
-
-        console.log(
-            "HEALTH ENDPOINT: /health"
+            "HEALTH:",
+            `/health`
         );
 
         console.log(
             "================================="
         );
-
-        console.log("");
     }
 );
+```0
