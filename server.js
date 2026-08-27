@@ -13,7 +13,7 @@ const app = express();
 const PORT = process.env.PORT || 10000;
 const API_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
 
-const MODEL = "gemini-3.7-flash";
+const MODEL = "gemini-3.5-flash-lite";
 const DEFAULT_TIMEZONE = "Asia/Kolkata";
 
 /* =====================================================
