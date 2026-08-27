@@ -11,7 +11,13 @@ const { GoogleGenAI } = require("@google/genai");
 const app = express();
 
 const PORT = process.env.PORT || 10000;
-const API_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+const API_KEY =
+    process.env.GEMINI_API_KEY ||
+    process.env.GOOGLE_API_KEY;
+
+/* =====================================================
+   MODEL
+===================================================== */
 
 const MODEL = "gemini-3.5-flash-lite";
 const DEFAULT_TIMEZONE = "Asia/Kolkata";
@@ -24,7 +30,10 @@ app.use(
     cors({
         origin: "*",
         methods: ["GET", "POST", "OPTIONS"],
-        allowedHeaders: ["Content-Type", "Authorization"]
+        allowedHeaders: [
+            "Content-Type",
+            "Authorization"
+        ]
     })
 );
 
@@ -57,24 +66,34 @@ if (API_KEY) {
    DATE / TIME
 ===================================================== */
 
-function getDateTime(timeZone = DEFAULT_TIMEZONE) {
+function getDateTime(
+    timeZone = DEFAULT_TIMEZONE
+) {
     const now = new Date();
 
-    const dateFormatter = new Intl.DateTimeFormat("en-US", {
-        timeZone,
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric"
-    });
+    const dateFormatter =
+        new Intl.DateTimeFormat(
+            "en-US",
+            {
+                timeZone,
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+            }
+        );
 
-    const timeFormatter = new Intl.DateTimeFormat("en-US", {
-        timeZone,
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: true
-    });
+    const timeFormatter =
+        new Intl.DateTimeFormat(
+            "en-US",
+            {
+                timeZone,
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: true
+            }
+        );
 
     return {
         date: dateFormatter.format(now),
@@ -87,11 +106,13 @@ function getDateTime(timeZone = DEFAULT_TIMEZONE) {
 }
 
 /* =====================================================
-   LANGUAGE NAME
+   LANGUAGE
 ===================================================== */
 
 function getLanguageName(language) {
+
     const languages = {
+
         "en-IN": "English",
         "ta-IN": "Tamil",
         "hi-IN": "Hindi",
@@ -105,6 +126,7 @@ function getLanguageName(language) {
         "ur-IN": "Urdu",
         "or-IN": "Odia",
         "as-IN": "Assamese",
+
         "fr-FR": "French",
         "de-DE": "German",
         "es-ES": "Spanish",
@@ -128,6 +150,7 @@ function getLanguageName(language) {
         "vi-VN": "Vietnamese",
         "id-ID": "Indonesian",
         "ms-MY": "Malay"
+
     };
 
     return languages[language] || "English";
@@ -138,7 +161,9 @@ function getLanguageName(language) {
 ===================================================== */
 
 app.get("/", (req, res) => {
-    const dt = getDateTime(DEFAULT_TIMEZONE);
+
+    const dt =
+        getDateTime(DEFAULT_TIMEZONE);
 
     res.json({
         status: "online",
@@ -157,7 +182,9 @@ app.get("/", (req, res) => {
 ===================================================== */
 
 app.get("/health", (req, res) => {
-    const dt = getDateTime(DEFAULT_TIMEZONE);
+
+    const dt =
+        getDateTime(DEFAULT_TIMEZONE);
 
     res.json({
         status: "ok",
@@ -176,44 +203,73 @@ app.get("/health", (req, res) => {
 ===================================================== */
 
 app.post("/chat", async (req, res) => {
+
     try {
+
         const {
             message,
             language = "en-IN",
-            file = null
+            file = null,
+            history = []
         } = req.body || {};
 
         console.log("=================================");
         console.log("CHAT REQUEST");
         console.log("Language:", language);
         console.log("Message:", message);
-        console.log("File:", file ? file.name : "none");
+        console.log(
+            "History messages:",
+            Array.isArray(history)
+                ? history.length
+                : 0
+        );
+        console.log(
+            "File:",
+            file ? file.name : "none"
+        );
         console.log("=================================");
 
-        /* API KEY CHECK */
+        /* =================================================
+           API KEY
+        ================================================= */
 
         if (!API_KEY || !ai) {
-            console.error("Gemini API key is missing.");
 
             return res.status(500).json({
-                error: "Gemini API key is not configured on the server."
+                success: false,
+                error:
+                    "Gemini API key is not configured on the server."
             });
         }
 
-        /* MESSAGE CHECK */
+        /* =================================================
+           MESSAGE CHECK
+        ================================================= */
 
         if (
-            (!message || !String(message).trim()) &&
+            (!message ||
+                !String(message).trim()) &&
             !file
         ) {
+
             return res.status(400).json({
+                success: false,
                 error: "Message is required."
             });
         }
 
-        const timeZone = DEFAULT_TIMEZONE;
-        const dt = getDateTime(timeZone);
-        const languageName = getLanguageName(language);
+        /* =================================================
+           DATE / TIME
+        ================================================= */
+
+        const timeZone =
+            DEFAULT_TIMEZONE;
+
+        const dt =
+            getDateTime(timeZone);
+
+        const languageName =
+            getLanguageName(language);
 
         /* =================================================
            SYSTEM INSTRUCTION
@@ -259,30 +315,110 @@ use the appropriate local date/time when you can determine it.
 12. Reply in the user's selected language when practical.
 
 13. Do not claim that the current date is 2024 or another old date.
-The server date above is authoritative for current-date questions.
 
-14. Be accurate, friendly and concise.
+14. IMPORTANT:
+Use the previous conversation provided below to understand
+the user's current question.
+
+15. Do NOT restart the conversation for every new message.
+
+16. Do NOT automatically say:
+"Hello! How can I help you today?"
+unless the user is actually greeting you or starting
+a completely new conversation.
+
+17. If the user asks a follow-up question, answer it based
+on the previous conversation.
+
+18. Be accurate, friendly and concise.
+
+19. You can naturally call the user "friend" when appropriate.
 `;
 
         /* =================================================
-           NORMAL TEXT REQUEST
+           BUILD CONVERSATION CONTEXT
+================================================= */
+
+        let conversationContext = "";
+
+        if (Array.isArray(history)) {
+
+            conversationContext =
+                history
+                    .slice(-30)
+                    .map(item => {
+
+                        const role =
+                            item.role === "assistant"
+                                ? "Viggo"
+                                : "User";
+
+                        /*
+                         * FIX:
+                         * Accept text, content, or message
+                         * so conversation history continues.
+                         */
+
+                        const text =
+                            String(
+                                item.text ||
+                                item.content ||
+                                item.message ||
+                                ""
+                            ).trim();
+
+                        if (!text) {
+                            return "";
+                        }
+
+                        return (
+                            role +
+                            ": " +
+                            text
+                        );
+                    })
+                    .filter(Boolean)
+                    .join("\n\n");
+        }
+
+        /* =================================================
+           CONTENT
         ================================================= */
 
-        let contents;
+        let contents = "";
 
-        if (!file) {
-            contents = `${systemInstruction}
+        if (conversationContext) {
 
-USER:
-${String(message || "").trim()}`;
+            contents += `
+${systemInstruction}
+
+PREVIOUS CONVERSATION:
+
+${conversationContext}
+
+CURRENT USER MESSAGE:
+
+${String(message || "").trim()}
+`;
+
         } else {
-            /*
-             * The frontend currently sends files as base64 data.
-             * Keep the text request safe even if the model cannot
-             * directly process that particular file type.
-             */
 
-            contents = `${systemInstruction}
+            contents = `
+${systemInstruction}
+
+CURRENT USER MESSAGE:
+
+${String(message || "").trim()}
+`;
+        }
+
+        /* =================================================
+           FILE
+        ================================================= */
+
+        if (file) {
+
+            contents += `
 
 The user uploaded a file.
 
@@ -298,8 +434,9 @@ ${file.size || 0} bytes
 USER REQUEST:
 ${String(message || "").trim()}
 
-If the uploaded file content is not directly available to you,
-clearly explain that instead of pretending that you analyzed it.
+If the uploaded file content is not directly available
+to you, clearly explain that instead of pretending
+that you analyzed it.
 `;
         }
 
@@ -307,13 +444,20 @@ clearly explain that instead of pretending that you analyzed it.
            GEMINI REQUEST
         ================================================= */
 
-        console.log("Sending request to Gemini...");
-        console.log("Model:", MODEL);
+        console.log(
+            "Sending request to Gemini..."
+        );
 
-        const response = await ai.models.generateContent({
-            model: MODEL,
-            contents: contents
-        });
+        console.log(
+            "Model:",
+            MODEL
+        );
+
+        const response =
+            await ai.models.generateContent({
+                model: MODEL,
+                contents: contents
+            });
 
         /* =================================================
            RESPONSE
@@ -322,64 +466,125 @@ clearly explain that instead of pretending that you analyzed it.
         let reply = "";
 
         if (response) {
-            if (typeof response.text === "string") {
-                reply = response.text;
+
+            if (
+                typeof response.text ===
+                "string"
+            ) {
+
+                reply =
+                    response.text;
+
             } else if (
                 response.text &&
-                typeof response.text === "function"
+                typeof response.text ===
+                "function"
             ) {
-                reply = response.text();
+
+                reply =
+                    response.text();
             }
         }
 
-        if (!reply && response?.candidates?.length) {
+        if (
+            !reply &&
+            response?.candidates?.length
+        ) {
+
             const candidate =
                 response.candidates[0];
 
             const parts =
-                candidate?.content?.parts || [];
+                candidate?.content?.parts ||
+                [];
 
-            reply = parts
-                .map(part => part.text || "")
-                .join("")
-                .trim();
+            reply =
+                parts
+                    .map(
+                        part =>
+                            part.text || ""
+                    )
+                    .join("")
+                    .trim();
         }
 
         if (!reply) {
+
             console.error(
                 "Gemini returned an empty response:",
                 response
             );
 
             return res.status(500).json({
-                error: "Gemini returned an empty response."
+                success: false,
+                error:
+                    "Gemini returned an empty response."
             });
         }
 
-        console.log("Gemini response received.");
+        console.log(
+            "Gemini response received."
+        );
 
         return res.json({
+
             success: true,
-            reply: String(reply),
+
+            reply:
+                String(reply),
+
             language,
-            timezone: timeZone,
-            currentDate: dt.date,
-            currentTime: dt.time,
-            currentDateTime: dt.dateTime,
-            model: MODEL
+
+            timezone:
+                timeZone,
+
+            currentDate:
+                dt.date,
+
+            currentTime:
+                dt.time,
+
+            currentDateTime:
+                dt.dateTime,
+
+            model:
+                MODEL
         });
 
     } catch (error) {
+
         console.error("=================================");
         console.error("VIGGO AI CHAT ERROR");
         console.error(error);
         console.error("=================================");
 
+        const status =
+            error?.status ||
+            error?.code ||
+            500;
+
+        let errorMessage =
+            error?.message ||
+            "Viggo AI server error.";
+
+        if (Number(status) === 429) {
+
+            errorMessage =
+                "Gemini API quota exceeded. Please try again later.";
+        }
+
+        if (Number(status) === 503) {
+
+            errorMessage =
+                "Gemini is temporarily busy. Please try again in a few seconds.";
+        }
+
         return res.status(500).json({
+
             success: false,
+
             error:
-                error?.message ||
-                "Viggo AI server error."
+                errorMessage
         });
     }
 });
@@ -389,11 +594,19 @@ clearly explain that instead of pretending that you analyzed it.
 ===================================================== */
 
 app.use((req, res) => {
+
     res.status(404).json({
+
         status: "error",
-        error: "Endpoint not found.",
-        path: req.path,
-        method: req.method
+
+        error:
+            "Endpoint not found.",
+
+        path:
+            req.path,
+
+        method:
+            req.method
     });
 });
 
@@ -401,27 +614,61 @@ app.use((req, res) => {
    SERVER
 ===================================================== */
 
-app.listen(PORT, "0.0.0.0", () => {
-    const dt = getDateTime(DEFAULT_TIMEZONE);
+app.listen(
+    PORT,
+    "0.0.0.0",
+    () => {
 
-    console.log("");
-    console.log("=================================");
-    console.log("VIGGO AI SERVER ONLINE");
-    console.log("PORT:", PORT);
-    console.log("MODEL:", MODEL);
-    console.log(
-        "API KEY:",
-        API_KEY ? "CONFIGURED" : "MISSING"
-    );
-    console.log("TIMEZONE:", DEFAULT_TIMEZONE);
-    console.log("CURRENT DATE:", dt.date);
-    console.log("CURRENT TIME:", dt.time);
-    console.log(
-        "CURRENT DATE/TIME:",
-        dt.dateTime
-    );
-    console.log("CHAT ENDPOINT: /chat");
-    console.log("HEALTH ENDPOINT: /health");
-    console.log("=================================");
-    console.log("");
-});
+        const dt =
+            getDateTime(
+                DEFAULT_TIMEZONE
+            );
+
+        console.log("");
+        console.log("=================================");
+        console.log("VIGGO AI SERVER ONLINE");
+        console.log("PORT:", PORT);
+        console.log("MODEL:", MODEL);
+
+        console.log(
+            "API KEY:",
+            API_KEY
+                ? "CONFIGURED"
+                : "MISSING"
+        );
+
+        console.log(
+            "TIMEZONE:",
+            DEFAULT_TIMEZONE
+        );
+
+        console.log(
+            "CURRENT DATE:",
+            dt.date
+        );
+
+        console.log(
+            "CURRENT TIME:",
+            dt.time
+        );
+
+        console.log(
+            "CURRENT DATE/TIME:",
+            dt.dateTime
+        );
+
+        console.log(
+            "CHAT ENDPOINT: /chat"
+        );
+
+        console.log(
+            "HEALTH ENDPOINT: /health"
+        );
+
+        console.log(
+            "================================="
+        );
+
+        console.log("");
+    }
+);
