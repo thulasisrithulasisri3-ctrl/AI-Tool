@@ -1,26 +1,32 @@
 "use strict";
 
+require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
 const { GoogleGenAI } = require("@google/genai");
 
 /* =====================================================
    VIGGO AI SERVER
-   FULL SERVER.JS
    CHAT + MEMORY + IMAGE + VIDEO + FILE
 ===================================================== */
 
 const app = express();
 
+/* =====================================================
+   CONFIG
+===================================================== */
+
 const PORT = process.env.PORT || 10000;
 
 const API_KEY =
     process.env.GEMINI_API_KEY ||
-    process.env.GOOGLE_API_KEY;
+    process.env.GOOGLE_API_KEY ||
+    "";
 
 const MODEL =
     process.env.GEMINI_MODEL ||
-    "gemini-3.6-flash";
+    "gemini-2.5-flash";
 
 /* =====================================================
    GEMINI CLIENT
@@ -29,12 +35,11 @@ const MODEL =
 const ai = API_KEY
     ? new GoogleGenAI({
         apiKey: API_KEY
-      })
+    })
     : null;
 
-
 /* =====================================================
-   MIDDLEWARE
+   CORS
 ===================================================== */
 
 app.use(
@@ -43,10 +48,15 @@ app.use(
         methods: ["GET", "POST", "OPTIONS"],
         allowedHeaders: [
             "Content-Type",
-            "Accept"
+            "Accept",
+            "Authorization"
         ]
     })
 );
+
+/* =====================================================
+   BODY PARSER
+===================================================== */
 
 app.use(
     express.json({
@@ -61,29 +71,32 @@ app.use(
     })
 );
 
-
 /* =====================================================
-   BASIC ROUTE
+   ROOT
 ===================================================== */
 
 app.get("/", (req, res) => {
-
-    res.json({
+    res.status(200).json({
         success: true,
         service: "Viggo AI",
         status: "online",
-        model: MODEL
+        model: MODEL,
+        apiConfigured: Boolean(API_KEY),
+        endpoints: [
+            "/",
+            "/health",
+            "/status",
+            "/chat"
+        ]
     });
 });
-
 
 /* =====================================================
    HEALTH
 ===================================================== */
 
 app.get("/health", (req, res) => {
-
-    res.json({
+    res.status(200).json({
         success: true,
         status: "healthy",
         server: "Viggo AI",
@@ -93,13 +106,26 @@ app.get("/health", (req, res) => {
     });
 });
 
+/* =====================================================
+   STATUS
+===================================================== */
+
+app.get("/status", (req, res) => {
+    res.status(200).json({
+        success: true,
+        server: "Viggo AI",
+        status: "online",
+        model: MODEL,
+        apiConfigured: Boolean(API_KEY),
+        time: new Date().toISOString()
+    });
+});
 
 /* =====================================================
    HELPERS
 ===================================================== */
 
 function cleanText(value) {
-
     if (
         value === null ||
         value === undefined
@@ -107,14 +133,18 @@ function cleanText(value) {
         return "";
     }
 
-    return String(value).trim();
+    return String(value)
+        .replace(/\u0000/g, "")
+        .trim();
 }
 
+/* =====================================================
+   LANGUAGE
+===================================================== */
 
 function getLanguageName(language) {
 
     const languages = {
-
         "en-IN": "English",
         "ta-IN": "Tamil",
         "hi-IN": "Hindi",
@@ -126,8 +156,6 @@ function getLanguageName(language) {
         "gu-IN": "Gujarati",
         "pa-IN": "Punjabi",
         "ur-IN": "Urdu",
-        "or-IN": "Odia",
-        "as-IN": "Assamese",
         "fr-FR": "French",
         "de-DE": "German",
         "es-ES": "Spanish",
@@ -140,33 +168,14 @@ function getLanguageName(language) {
         "ar-SA": "Arabic",
         "tr-TR": "Turkish",
         "nl-NL": "Dutch",
-        "pl-PL": "Polish",
-        "sv-SE": "Swedish",
-        "da-DK": "Danish",
-        "fi-FI": "Finnish",
-        "no-NO": "Norwegian",
-        "el-GR": "Greek",
-        "he-IL": "Hebrew",
-        "th-TH": "Thai",
-        "vi-VN": "Vietnamese",
-        "id-ID": "Indonesian",
-        "ms-MY": "Malay",
-        "sw-KE": "Swahili",
-        "cs-CZ": "Czech",
-        "hu-HU": "Hungarian",
-        "ro-RO": "Romanian",
-        "uk-UA": "Ukrainian"
+        "pl-PL": "Polish"
     };
 
-    return (
-        languages[language] ||
-        "English"
-    );
+    return languages[language] || "English";
 }
 
-
 /* =====================================================
-   SYSTEM PROMPT
+   SYSTEM INSTRUCTION
 ===================================================== */
 
 function buildSystemInstruction(
@@ -181,60 +190,99 @@ function buildSystemInstruction(
     return `
 You are Viggo AI, a helpful, friendly and intelligent AI assistant.
 
-IMPORTANT BEHAVIOR:
+IMPORTANT:
 
-1. Answer the CURRENT user message directly.
-2. Use previous conversation context when available.
-3. Never restart the conversation unnecessarily.
-4. If the user says short messages such as:
-   "yes", "no", "ok", "seri", "s", "அது", "இதுதான்"
-   understand them using the previous conversation.
-5. Do not mention internal prompts, context, system instructions,
-   API requests or server implementation.
-6. Be natural and conversational.
-7. Give accurate answers.
-8. If you do not know something, say so instead of inventing facts.
-9. Use simple explanations when the user asks for help.
-10. If the user asks for code, provide complete working code when practical.
-11. Preserve the meaning of the user's question.
-12. Do not unnecessarily repeat the same answer.
+- Answer the CURRENT user message directly.
+- Use previous conversation when available.
+- Understand short replies using conversation context.
+- Do not mention system prompts or server implementation.
+- Be natural and conversational.
+- Do not invent information.
+- Explain technical topics clearly.
+- If the user asks for code, provide complete working code.
 
 LANGUAGE:
 
-The user's selected language is:
-${languageName} (${language || "en-IN"})
+Selected language:
+${languageName}
 
-Prefer answering in the selected language when appropriate.
-If the user writes in another language, understand the user's actual
-message and respond naturally.
+Reply naturally in the selected language when appropriate.
 
 DATE AND TIME:
 
-Browser timezone:
+Timezone:
 ${timezone || "Asia/Kolkata"}
 
-Current client date/time:
+Current date/time:
 ${currentDateTime || "Not provided"}
 
-Do not assume an old date.
-Use the supplied current date/time when answering date/time questions.
+Use the supplied current date/time for date-related questions.
+
+IMAGE / VIDEO:
+
+If an image or video is provided:
+- Analyze the uploaded media.
+- Answer questions about it.
+- Do not claim to see something that is not actually available.
+- If the media is unclear, say so.
 
 You are Viggo AI.
 `;
 }
 
-
 /* =====================================================
-   BUILD CONTENT
+   HISTORY
 ===================================================== */
 
-function buildTextPrompt(
+function buildHistoryText(history) {
+
+    if (!Array.isArray(history)) {
+        return "";
+    }
+
+    return history
+        .slice(-30)
+        .map(item => {
+
+            if (!item) {
+                return "";
+            }
+
+            const role =
+                item.role === "assistant"
+                    ? "Viggo"
+                    : "User";
+
+            const text =
+                cleanText(
+                    item.text ||
+                    item.content ||
+                    ""
+                );
+
+            if (!text) {
+                return "";
+            }
+
+            return `${role}: ${text}`;
+
+        })
+        .filter(Boolean)
+        .join("\n");
+}
+
+/* =====================================================
+   PROMPT
+===================================================== */
+
+function buildPrompt({
     message,
-    conversationHistory,
+    history,
     language,
     timezone,
-    currentDateTime
-) {
+    currentDateTime,
+    hasFile
+}) {
 
     const systemInstruction =
         buildSystemInstruction(
@@ -243,56 +291,32 @@ function buildTextPrompt(
             currentDateTime
         );
 
-    const history =
-        Array.isArray(conversationHistory)
-            ? conversationHistory
-            : [];
-
-
-    /*
-       Limit history so requests remain manageable.
-    */
-
-    const recentHistory =
-        history
-            .slice(-30)
-            .map(item => {
-
-                const role =
-                    item.role === "assistant"
-                        ? "Viggo"
-                        : "User";
-
-                const text =
-                    cleanText(
-                        item.text
-                    );
-
-                if (!text) {
-                    return "";
-                }
-
-                return `${role}: ${text}`;
-            })
-            .filter(Boolean);
-
-
     let prompt =
         systemInstruction;
 
+    const historyText =
+        buildHistoryText(history);
 
-    if (recentHistory.length) {
+    if (historyText) {
 
         prompt += `
 
 PREVIOUS CONVERSATION:
 
-${recentHistory.join("\n")}
+${historyText}
 
 END PREVIOUS CONVERSATION.
 `;
     }
 
+    if (hasFile) {
+
+        prompt += `
+
+The user has uploaded a file/media item.
+Analyze it together with the user's request.
+`;
+    }
 
     prompt += `
 
@@ -300,13 +324,11 @@ CURRENT USER MESSAGE:
 
 ${cleanText(message)}
 
-Respond naturally to the CURRENT USER MESSAGE.
+Respond directly to the current user.
 `;
-
 
     return prompt;
 }
-
 
 /* =====================================================
    FILE VALIDATION
@@ -319,41 +341,39 @@ function validateFile(file) {
     }
 
     const name =
-        cleanText(file.name);
+        cleanText(file.name) ||
+        "uploaded-file";
 
     const type =
-        cleanText(file.type);
+        cleanText(file.type).toLowerCase();
 
     const data =
         cleanText(file.data);
 
     if (!data) {
-
         throw new Error(
             "Uploaded file data is missing."
         );
     }
 
     if (!type) {
-
         throw new Error(
             "Uploaded file type is missing."
         );
     }
 
     /*
-       Basic protection against accidentally
-       sending an enormous base64 request.
+       Maximum request size.
+       express.json is already limited to 50 MB.
     */
 
-    const MAX_BASE64_LENGTH =
+    const MAX_DATA_LENGTH =
         45 * 1024 * 1024;
 
     if (
         data.length >
-        MAX_BASE64_LENGTH
+        MAX_DATA_LENGTH
     ) {
-
         throw new Error(
             "Uploaded file is too large."
         );
@@ -366,19 +386,49 @@ function validateFile(file) {
     };
 }
 
-
 /* =====================================================
-   CONVERT DATA URL
+   PARSE DATA URL
 ===================================================== */
 
-function parseDataUrl(dataUrl) {
+function parseDataUrl(dataUrl, fallbackMime) {
+
+    const value =
+        cleanText(dataUrl);
+
+    /*
+       Normal format:
+
+       data:image/jpeg;base64,AAAA
+    */
 
     const match =
-        String(dataUrl).match(
+        value.match(
             /^data:([^;]+);base64,(.+)$/s
         );
 
-    if (!match) {
+    if (match) {
+
+        return {
+            mimeType:
+                match[1].toLowerCase(),
+
+            data:
+                match[2]
+        };
+    }
+
+    /*
+       If frontend sends raw base64,
+       use file.type.
+    */
+
+    const rawBase64 =
+        value.replace(
+            /^base64,/i,
+            ""
+        );
+
+    if (!rawBase64) {
 
         throw new Error(
             "Invalid uploaded file data."
@@ -386,14 +436,35 @@ function parseDataUrl(dataUrl) {
     }
 
     return {
-        mimeType: match[1],
-        data: match[2]
+        mimeType:
+            fallbackMime ||
+            "application/octet-stream",
+
+        data:
+            rawBase64
     };
 }
 
+/* =====================================================
+   SUPPORTED FILE TYPES
+===================================================== */
+
+function isSupportedMimeType(mimeType) {
+
+    if (!mimeType) {
+        return false;
+    }
+
+    return (
+        mimeType.startsWith("image/") ||
+        mimeType.startsWith("video/") ||
+        mimeType === "application/pdf" ||
+        mimeType === "text/plain"
+    );
+}
 
 /* =====================================================
-   CREATE GEMINI CONTENT
+   GEMINI CONTENT
 ===================================================== */
 
 function createGeminiContents(
@@ -401,26 +472,41 @@ function createGeminiContents(
     file
 ) {
 
-    const parts = [
+    const parts = [];
 
-        {
-            text: prompt
-        }
-    ];
+    /* TEXT */
 
+    parts.push({
+        text: prompt
+    });
+
+    /* FILE */
 
     if (file) {
 
         const parsed =
             parseDataUrl(
-                file.data
+                file.data,
+                file.type
             );
 
+        if (
+            !isSupportedMimeType(
+                parsed.mimeType
+            )
+        ) {
+
+            throw new Error(
+                `Unsupported file type: ${parsed.mimeType}`
+            );
+        }
+
+        /*
+           Image / video / supported media
+        */
 
         parts.push({
-
             inlineData: {
-
                 mimeType:
                     parsed.mimeType,
 
@@ -430,65 +516,68 @@ function createGeminiContents(
         });
     }
 
-
     return [
         {
             role: "user",
-            parts
+            parts: parts
         }
     ];
 }
 
-
 /* =====================================================
-   EXTRACT RESPONSE TEXT
+   RESPONSE TEXT
 ===================================================== */
 
-function extractResponseText(
-    response
-) {
+function extractResponseText(response) {
 
     if (!response) {
         return "";
     }
 
+    /*
+       @google/genai commonly exposes
+       response.text
+    */
 
     if (
-        typeof response.text ===
-        "string"
+        typeof response.text === "string"
     ) {
 
         return response.text.trim();
     }
 
+    /*
+       Some versions expose text()
+    */
 
-    try {
+    if (
+        typeof response.text === "function"
+    ) {
 
-        if (
-            typeof response.text ===
-            "function"
-        ) {
+        try {
 
             const value =
                 response.text();
 
             if (
-                typeof value ===
-                "string"
+                typeof value === "string"
             ) {
 
                 return value.trim();
             }
+
+        } catch (error) {
+
+            console.error(
+                "response.text() error:",
+                error.message
+            );
         }
-
-    } catch (error) {
-
-        console.error(
-            "Response text function error:",
-            error
-        );
     }
 
+    /*
+       Fallback
+    */
 
     try {
 
@@ -503,36 +592,29 @@ function extractResponseText(
             const parts =
                 candidates[0]
                     ?.content
-                    ?.parts;
+                    ?.parts || [];
 
-            if (
-                Array.isArray(parts)
-            ) {
-
-                return parts
-                    .map(part =>
-                        part?.text || ""
-                    )
-                    .join("")
-                    .trim();
-            }
+            return parts
+                .map(part =>
+                    part?.text || ""
+                )
+                .join("")
+                .trim();
         }
 
     } catch (error) {
 
         console.error(
-            "Candidate parsing error:",
-            error
+            "Candidate extraction error:",
+            error.message
         );
     }
-
 
     return "";
 }
 
-
 /* =====================================================
-   GEMINI REQUEST
+   GENERATE RESPONSE
 ===================================================== */
 
 async function generateViggoResponse({
@@ -544,23 +626,25 @@ async function generateViggoResponse({
     file
 }) {
 
-    if (!ai) {
+    if (!API_KEY || !ai) {
 
         throw new Error(
-            "GEMINI_API_KEY is not configured on the server."
+            "GEMINI_API_KEY is not configured."
         );
     }
 
-
     const prompt =
-        buildTextPrompt(
+        buildPrompt({
             message,
-            conversationHistory,
+            history:
+                conversationHistory,
             language,
-            browserTimezone,
-            currentDateTime
-        );
-
+            timezone:
+                browserTimezone,
+            currentDateTime,
+            hasFile:
+                Boolean(file)
+        });
 
     const contents =
         createGeminiContents(
@@ -568,27 +652,25 @@ async function generateViggoResponse({
             file
         );
 
+    console.log(
+        "Sending request to Gemini..."
+    );
 
     console.log(
-        "Sending request to Gemini:",
+        "MODEL:",
         MODEL
     );
 
-
     const response =
         await ai.models.generateContent({
-
             model: MODEL,
-
             contents: contents
         });
-
 
     const reply =
         extractResponseText(
             response
         );
-
 
     if (!reply) {
 
@@ -597,13 +679,11 @@ async function generateViggoResponse({
         );
     }
 
-
     return reply;
 }
 
-
 /* =====================================================
-   CHAT API
+   CHAT ROUTE
 ===================================================== */
 
 app.post(
@@ -613,49 +693,45 @@ app.post(
         const requestId =
             `${Date.now()}-${Math.random()
                 .toString(36)
-                .slice(2, 8)}`;
+                .substring(2, 8)}`;
 
-
+        console.log("");
         console.log(
             "================================="
         );
-
         console.log(
             "VIGGO CHAT REQUEST:",
             requestId
         );
-
         console.log(
             "================================="
         );
 
-
         try {
+
+            /* API KEY */
 
             if (!API_KEY) {
 
                 return res.status(500).json({
-
                     success: false,
-
                     error:
-                        "Gemini API key is not configured on Render.",
-
+                        "Gemini API key is missing.",
                     code:
-                        "API_KEY_MISSING"
+                        "API_KEY_MISSING",
+                    requestId
                 });
             }
-
 
             const body =
                 req.body || {};
 
+            /* MESSAGE */
 
             const originalMessage =
                 cleanText(
                     body.originalMessage
                 );
-
 
             const message =
                 cleanText(
@@ -663,81 +739,9 @@ app.post(
                 ) ||
                 originalMessage;
 
-
-            if (!message && !body.file) {
-
-                return res.status(400).json({
-
-                    success: false,
-
-                    error:
-                        "Message is required.",
-
-                    code:
-                        "MESSAGE_MISSING"
-                });
-            }
-
-
-            const language =
-                cleanText(
-                    body.language
-                ) ||
-                "en-IN";
-
-
-            const browserTimezone =
-                cleanText(
-                    body.browserTimezone
-                ) ||
-                "Asia/Kolkata";
-
-
-            const languageTimezone =
-                cleanText(
-                    body.languageTimezone
-                ) ||
-                browserTimezone;
-
-
-            const currentDateTime =
-                cleanText(
-                    body.currentDateTime
-                );
-
-
-            let conversationHistory =
-                Array.isArray(
-                    body.conversationHistory
-                )
-                    ? body.conversationHistory
-                    : [];
-
-
-            conversationHistory =
-                conversationHistory
-                    .slice(-30)
-                    .map(item => ({
-
-                        role:
-                            item?.role ===
-                            "assistant"
-                                ? "assistant"
-                                : "user",
-
-                        text:
-                            cleanText(
-                                item?.text
-                            )
-                    }))
-                    .filter(
-                        item =>
-                            item.text.length > 0
-                    );
-
+            /* FILE */
 
             let file = null;
-
 
             if (body.file) {
 
@@ -747,106 +751,182 @@ app.post(
                     );
             }
 
+            /*
+               Message is not required if
+               an upload exists.
+            */
+
+            if (
+                !message &&
+                !file
+            ) {
+
+                return res.status(400).json({
+                    success: false,
+                    error:
+                        "Message or file is required.",
+                    code:
+                        "MESSAGE_MISSING",
+                    requestId
+                });
+            }
+
+            /* LANGUAGE */
+
+            const language =
+                cleanText(
+                    body.language
+                ) ||
+                "en-IN";
+
+            /* TIMEZONE */
+
+            const browserTimezone =
+                cleanText(
+                    body.browserTimezone
+                ) ||
+                "Asia/Kolkata";
+
+            /* DATE TIME */
+
+            const currentDateTime =
+                cleanText(
+                    body.currentDateTime
+                );
+
+            /* HISTORY */
+
+            let conversationHistory =
+                Array.isArray(
+                    body.conversationHistory
+                )
+                    ? body.conversationHistory
+                    : [];
+
+            conversationHistory =
+                conversationHistory
+                    .slice(-30)
+                    .map(item => {
+
+                        return {
+                            role:
+                                item?.role ===
+                                "assistant"
+                                    ? "assistant"
+                                    : "user",
+
+                            text:
+                                cleanText(
+                                    item?.text ||
+                                    item?.content ||
+                                    ""
+                                )
+                        };
+
+                    })
+                    .filter(
+                        item =>
+                            item.text
+                    );
 
             console.log(
-                "Message:",
-                originalMessage ||
-                message
+                "MESSAGE:",
+                message || "(file only)"
             );
 
             console.log(
-                "Language:",
+                "LANGUAGE:",
                 language
             );
 
             console.log(
-                "Timezone:",
-                languageTimezone
+                "TIMEZONE:",
+                browserTimezone
             );
 
             console.log(
-                "History:",
+                "HISTORY:",
                 conversationHistory.length
             );
 
             console.log(
-                "File:",
+                "FILE:",
                 file
-                    ? `${file.name} (${file.type})`
+                    ? `${file.name} | ${file.type}`
                     : "none"
             );
 
+            /* GENERATE */
 
             const reply =
                 await generateViggoResponse({
 
                     message:
-                        originalMessage ||
                         message,
 
-                    conversationHistory,
+                    conversationHistory:
+                        conversationHistory,
 
-                    language,
+                    language:
+                        language,
 
                     browserTimezone:
                         browserTimezone,
 
-                    currentDateTime,
+                    currentDateTime:
+                        currentDateTime,
 
-                    file
+                    file:
+                        file
                 });
 
-
             console.log(
-                "Viggo response generated successfully."
+                "✓ VIGGO RESPONSE SUCCESS"
             );
-
 
             return res.status(200).json({
 
                 success: true,
 
                 reply:
-
                     reply,
 
                 response:
-
                     reply,
 
                 model:
-
                     MODEL,
 
                 language:
-
                     language,
 
-                requestId:
+                hasFile:
+                    Boolean(file),
 
+                requestId:
                     requestId
             });
 
-
         } catch (error) {
 
+            console.error("");
             console.error(
                 "================================="
             );
-
             console.error(
-                "VIGGO SERVER ERROR:",
+                "❌ VIGGO SERVER ERROR"
+            );
+            console.error(
+                "REQUEST:",
                 requestId
+            );
+            console.error(
+                "================================="
             );
 
             console.error(
                 error
             );
-
-            console.error(
-                "================================="
-            );
-
 
             const errorString =
                 String(
@@ -855,20 +935,17 @@ app.post(
                     ""
                 );
 
+            const lower =
+                errorString.toLowerCase();
 
-            /*
-               QUOTA
-            */
+            /* QUOTA */
 
             if (
-                errorString.includes(
-                    "429"
+                lower.includes("429") ||
+                lower.includes(
+                    "resource_exhausted"
                 ) ||
-                errorString.includes(
-                    "RESOURCE_EXHAUSTED"
-                ) ||
-                errorString.toLowerCase()
-                    .includes("quota")
+                lower.includes("quota")
             ) {
 
                 return res.status(429).json({
@@ -876,28 +953,26 @@ app.post(
                     success: false,
 
                     error:
-                        "Gemini API quota is temporarily exhausted. Please try again later.",
+                        "Gemini API quota exceeded.",
 
                     code:
                         "GEMINI_QUOTA",
 
-                    requestId:
-                        requestId
+                    requestId
                 });
             }
 
-
-            /*
-               MODEL NOT FOUND
-            */
+            /* MODEL */
 
             if (
-                errorString.includes(
-                    "404"
-                ) ||
-                errorString
-                    .toLowerCase()
-                    .includes("not found")
+                lower.includes("404") ||
+                lower.includes("not found") ||
+                lower.includes(
+                    "model"
+                ) &&
+                lower.includes(
+                    "unsupported"
+                )
             ) {
 
                 return res.status(500).json({
@@ -905,60 +980,33 @@ app.post(
                     success: false,
 
                     error:
-                        `Gemini model "${MODEL}" was not found. Check GEMINI_MODEL in Render.`,
+                        `Gemini model "${MODEL}" is unavailable.`,
 
                     code:
-                        "MODEL_NOT_FOUND",
+                        "MODEL_ERROR",
 
                     model:
                         MODEL,
 
-                    requestId:
-                        requestId
+                    requestId
                 });
             }
 
-
-            /*
-               SERVER BUSY
-            */
+            /* API KEY */
 
             if (
-                errorString.includes(
-                    "503"
+                lower.includes(
+                    "api key"
                 ) ||
-                errorString.includes(
-                    "UNAVAILABLE"
+                lower.includes(
+                    "unauthenticated"
+                ) ||
+                lower.includes(
+                    "permission denied"
                 )
             ) {
 
-                return res.status(503).json({
-
-                    success: false,
-
-                    error:
-                        "Gemini is temporarily busy. Please try again shortly.",
-
-                    code:
-                        "GEMINI_UNAVAILABLE",
-
-                    requestId:
-                        requestId
-                });
-            }
-
-
-            /*
-               INVALID API KEY
-            */
-
-            if (
-                errorString
-                    .toLowerCase()
-                    .includes("api key")
-            ) {
-
-                return res.status(500).json({
+                return res.status(401).json({
 
                     success: false,
 
@@ -968,15 +1016,90 @@ app.post(
                     code:
                         "API_KEY_ERROR",
 
-                    requestId:
-                        requestId
+                    requestId
                 });
             }
 
+            /* FILE SIZE */
 
-            /*
-               GENERIC ERROR
-            */
+            if (
+                lower.includes(
+                    "too large"
+                ) ||
+                lower.includes(
+                    "payload"
+                ) ||
+                lower.includes(
+                    "entity too large"
+                )
+            ) {
+
+                return res.status(413).json({
+
+                    success: false,
+
+                    error:
+                        "Uploaded file is too large.",
+
+                    code:
+                        "FILE_TOO_LARGE",
+
+                    requestId
+                });
+            }
+
+            /* INVALID FILE */
+
+            if (
+                lower.includes(
+                    "uploaded file"
+                ) ||
+                lower.includes(
+                    "invalid uploaded"
+                ) ||
+                lower.includes(
+                    "unsupported file"
+                )
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    error:
+                        errorString,
+
+                    code:
+                        "FILE_ERROR",
+
+                    requestId
+                });
+            }
+
+            /* SERVICE UNAVAILABLE */
+
+            if (
+                lower.includes("503") ||
+                lower.includes(
+                    "unavailable"
+                )
+            ) {
+
+                return res.status(503).json({
+
+                    success: false,
+
+                    error:
+                        "Gemini is temporarily unavailable. Please try again.",
+
+                    code:
+                        "GEMINI_UNAVAILABLE",
+
+                    requestId
+                });
+            }
+
+            /* GENERIC */
 
             return res.status(500).json({
 
@@ -991,13 +1114,11 @@ app.post(
                         500
                     ),
 
-                requestId:
-                    requestId
+                requestId
             });
         }
     }
 );
-
 
 /* =====================================================
    404
@@ -1019,9 +1140,8 @@ app.use(
     }
 );
 
-
 /* =====================================================
-   GLOBAL ERROR HANDLER
+   GLOBAL ERROR
 ===================================================== */
 
 app.use(
@@ -1033,16 +1153,16 @@ app.use(
     ) => {
 
         console.error(
-            "GLOBAL EXPRESS ERROR:",
+            "GLOBAL ERROR:",
             error
         );
 
-
-        if (res.headersSent) {
+        if (
+            res.headersSent
+        ) {
 
             return next(error);
         }
-
 
         res.status(500).json({
 
@@ -1054,23 +1174,22 @@ app.use(
     }
 );
 
-
 /* =====================================================
    START SERVER
 ===================================================== */
 
 app.listen(
     PORT,
+    "0.0.0.0",
     () => {
 
+        console.log("");
         console.log(
             "================================="
         );
-
         console.log(
-            "VIGGO AI SERVER ONLINE"
+            "       VIGGO AI SERVER ONLINE"
         );
-
         console.log(
             "================================="
         );
@@ -1094,12 +1213,12 @@ app.listen(
 
         console.log(
             "CHAT:",
-            `/chat`
+            "/chat"
         );
 
         console.log(
             "HEALTH:",
-            `/health`
+            "/health"
         );
 
         console.log(
@@ -1107,4 +1226,3 @@ app.listen(
         );
     }
 );
-```0
