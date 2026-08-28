@@ -1,618 +1,487 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+    <meta charset="UTF-8">
 
-  <link rel="icon" type="image/png" href="icon.png?v=4">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-  <meta charset="UTF-8">
+    <title>Viggo AI</title>
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-  <title>Viggo AI</title>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background: #050b14;
+            color: white;
+        }
 
-  <link
-    rel="stylesheet"
-    href="style.css?v=9"
-  >
+        body {
+            overflow: hidden;
+        }
 
+        .app {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===============================
+           HEADER
+        =============================== */
+
+        .header {
+            height: 65px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 18px;
+            background: #08111f;
+            border-bottom: 1px solid #18304d;
+        }
+
+        .logo {
+            font-size: 23px;
+            font-weight: bold;
+            color: #4da3ff;
+        }
+
+        .status {
+            font-size: 12px;
+            color: #65e6a8;
+        }
+
+        /* ===============================
+           CHAT AREA
+        =============================== */
+
+        #chatContainer {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            scroll-behavior: smooth;
+        }
+
+        .welcome {
+            text-align: center;
+            margin-top: 18vh;
+            color: #a9b8ca;
+        }
+
+        .welcome h1 {
+            color: #4da3ff;
+            margin-bottom: 10px;
+        }
+
+        .message {
+            max-width: 85%;
+            margin: 12px 0;
+            padding: 12px 15px;
+            border-radius: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            margin-left: auto;
+            background: #12528a;
+        }
+
+        .assistant-message {
+            margin-right: auto;
+            background: #111d2d;
+            border: 1px solid #213b59;
+        }
+
+        .message img,
+        .message video {
+            max-width: 100%;
+            max-height: 320px;
+            margin-top: 8px;
+            border-radius: 12px;
+            object-fit: contain;
+        }
+
+        /* ===============================
+           INPUT AREA
+        =============================== */
+
+        .bottom-area {
+            flex-shrink: 0;
+            background: #08111f;
+            border-top: 1px solid #18304d;
+            padding: 10px;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        #messageInput {
+            flex: 1;
+            min-height: 46px;
+            max-height: 130px;
+            resize: none;
+            border: 1px solid #294968;
+            outline: none;
+            border-radius: 14px;
+            background: #0d1928;
+            color: white;
+            padding: 13px;
+            font-size: 15px;
+        }
+
+        #messageInput::placeholder {
+            color: #71839a;
+        }
+
+        /* ===============================
+           BUTTONS
+        =============================== */
+
+        .action-button,
+        #sendButton {
+            width: 46px;
+            height: 46px;
+            flex-shrink: 0;
+            border: none;
+            border-radius: 12px;
+            background: #102a45;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-button:hover,
+        #sendButton:hover {
+            background: #174a78;
+        }
+
+        #sendButton {
+            background: #1267a8;
+        }
+
+        #sendButton:hover {
+            background: #1886d4;
+        }
+
+        /* ===============================
+           UPLOAD MENU
+        =============================== */
+
+        .upload-buttons {
+            display: flex;
+            gap: 8px;
+            max-width: 1000px;
+            margin: 8px auto 0;
+            overflow-x: auto;
+        }
+
+        .upload-buttons button {
+            border: 1px solid #294968;
+            background: #0c1b2c;
+            color: white;
+            border-radius: 10px;
+            padding: 8px 13px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .upload-buttons button:hover {
+            background: #143c60;
+        }
+
+        /* ===============================
+           HIDDEN FILE INPUTS
+        =============================== */
+
+        .hidden-input {
+            display: none !important;
+        }
+
+        /* ===============================
+           MOBILE
+        =============================== */
+
+        @media (max-width: 600px) {
+
+            .header {
+                height: 58px;
+                padding: 0 12px;
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+
+            #chatContainer {
+                padding: 12px;
+            }
+
+            .message {
+                max-width: 92%;
+            }
+
+            .input-row {
+                gap: 5px;
+            }
+
+            #messageInput {
+                min-height: 44px;
+                font-size: 14px;
+            }
+
+            .action-button,
+            #sendButton {
+                width: 42px;
+                height: 42px;
+                font-size: 18px;
+            }
+
+            .upload-buttons {
+                gap: 5px;
+            }
+
+            .upload-buttons button {
+                font-size: 12px;
+                padding: 7px 10px;
+            }
+        }
+    </style>
 </head>
-
 
 <body>
 
+<div class="app">
 
-  <!-- =========================================
-       SIDEBAR
-  ========================================== -->
+    <!-- =========================================
+         HEADER
+    ========================================== -->
 
-  <aside
-    class="sidebar"
-    id="sidebar"
-  >
+    <header class="header">
 
-    <div class="sidebar-header">
-
-      <h2>
-        Viggo AI
-      </h2>
-
-      <button
-        id="closeSidebar"
-        class="icon-btn"
-        type="button"
-      >
-        ✕
-      </button>
-
-    </div>
-
-
-    <!-- NEW CHAT -->
-
-    <button
-      id="newChat"
-      class="new-chat"
-      type="button"
-    >
-      ＋ New Chat
-    </button>
-
-
-    <!-- SEARCH -->
-
-    <div class="search-box">
-
-      🔎
-
-      <input
-        id="searchChat"
-        type="text"
-        placeholder="Search Chat"
-        autocomplete="off"
-      >
-
-    </div>
-
-
-    <!-- HISTORY TITLE -->
-
-    <div class="history-title">
-      CHAT HISTORY
-    </div>
-
-
-    <!-- CHAT HISTORY -->
-
-    <div
-      id="chatHistory"
-      class="chat-history"
-    ></div>
-
-
-    <!-- MORE -->
-
-    <div class="sidebar-more">
-
-      <button
-        id="moreBtn"
-        class="more-button"
-        type="button"
-      >
-
-        <span class="more-dots">
-          ⋮
-        </span>
-
-        <span>
-          More
-        </span>
-
-      </button>
-
-
-      <!-- MORE MENU -->
-
-      <div
-        id="moreMenu"
-        class="more-menu"
-      >
-
-        <!-- VOICE OPTIONS -->
-
-        <button
-          id="voiceMenuBtn"
-          type="button"
-        >
-          🎤 Voice Options
-        </button>
-
-
-        <!-- LANGUAGE -->
-
-        <button
-          id="languageBtn"
-          type="button"
-        >
-          🌐 Language
-        </button>
-
-
-        <!-- CLEAR CHAT -->
-
-        <button
-          id="clearChatBtn"
-          type="button"
-        >
-          🗑 Clear Chat
-        </button>
-
-
-        <!-- SHOW HISTORY -->
-
-        <button
-          id="showHistoryBtn"
-          type="button"
-        >
-          🕘 Show History
-        </button>
-
-
-        <!-- SAVED CHATS -->
-
-        <button
-          id="savedChatsBtn"
-          type="button"
-        >
-          💾 Saved Chats
-        </button>
-
-
-        <!-- SELECT CHATS -->
-
-        <button
-          id="selectChatsBtn"
-          type="button"
-        >
-          ☑ Select Chats
-        </button>
-
-
-        <!-- DELETE SELECTED -->
-
-        <button
-          id="deleteSelectedBtn"
-          type="button"
-        >
-          🗑 Delete Selected
-        </button>
-
-      </div>
-
-    </div>
-
-  </aside>
-
-
-
-  <!-- =========================================
-       MAIN
-  ========================================== -->
-
-  <main class="main">
-
-
-    <!-- TOP BAR -->
-
-    <header class="topbar">
-
-      <div class="top-left">
-
-        <button
-          id="openSidebar"
-          class="menu-btn"
-          type="button"
-        >
-          ☰
-        </button>
-
-
-        <div class="brand">
-          Viggo AI
+        <div class="logo">
+            Viggo AI
         </div>
 
-      </div>
-
-
-      <!-- SHARE -->
-
-      <button
-        id="shareBtn"
-        class="share-btn"
-        type="button"
-      >
-        🔗 Share
-      </button>
+        <div class="status">
+            ● Online
+        </div>
 
     </header>
 
 
+    <!-- =========================================
+         CHAT
+    ========================================== -->
 
-    <!-- =====================================
-         CHAT AREA
-    ====================================== -->
+    <main id="chatContainer">
 
-    <section class="chat-area">
+        <div
+            id="welcomeMessage"
+            class="welcome"
+        >
+            <h1>Viggo AI</h1>
 
-      <div
-        id="conversation"
-        class="conversation"
-      ></div>
+            <p>
+                How can I help you?
+            </p>
+        </div>
+
+    </main>
+
+
+    <!-- =========================================
+         BOTTOM
+    ========================================== -->
+
+    <section class="bottom-area">
+
+        <!-- INPUT ROW -->
+
+        <div class="input-row">
+
+            <!-- CAMERA -->
+
+            <button
+                type="button"
+                id="cameraButton"
+                class="action-button"
+                title="Camera"
+                aria-label="Camera"
+            >
+                📷
+            </button>
+
+
+            <!-- PHOTO -->
+
+            <button
+                type="button"
+                id="photoButton"
+                class="action-button"
+                title="Photo"
+                aria-label="Photo"
+            >
+                🖼️
+            </button>
+
+
+            <!-- VIDEO -->
+
+            <button
+                type="button"
+                id="videoButton"
+                class="action-button"
+                title="Video"
+                aria-label="Video"
+            >
+                🎥
+            </button>
+
+
+            <!-- FILE -->
+
+            <button
+                type="button"
+                id="fileButton"
+                class="action-button"
+                title="File"
+                aria-label="File"
+            >
+                📁
+            </button>
+
+
+            <!-- MESSAGE -->
+
+            <textarea
+                id="messageInput"
+                placeholder="Message Viggo..."
+                rows="1"
+                autocomplete="off"
+            ></textarea>
+
+
+            <!-- SEND -->
+
+            <button
+                type="button"
+                id="sendButton"
+                title="Send"
+                aria-label="Send"
+            >
+                ➤
+            </button>
+
+        </div>
+
+
+        <!-- =====================================
+             UPLOAD OPTIONS
+        ====================================== -->
+
+        <div class="upload-buttons">
+
+            <button
+                type="button"
+                id="cameraButton2"
+                onclick="document.getElementById('cameraInput').click()"
+            >
+                📷 Camera
+            </button>
+
+            <button
+                type="button"
+                id="photoButton2"
+                onclick="document.getElementById('photoInput').click()"
+            >
+                🖼️ Photo
+            </button>
+
+            <button
+                type="button"
+                id="videoButton2"
+                onclick="document.getElementById('videoInput').click()"
+            >
+                🎥 Video
+            </button>
+
+            <button
+                type="button"
+                id="fileButton2"
+                onclick="document.getElementById('fileInput').click()"
+            >
+                📁 File
+            </button>
+
+        </div>
 
     </section>
 
-
-
-    <!-- =====================================
-         INPUT AREA
-    ====================================== -->
-
-    <div class="input-area">
-
-
-      <!-- PLUS -->
-
-      <button
-        id="plusBtn"
-        class="input-plus"
-        type="button"
-      >
-        ＋
-      </button>
-
-
-      <!-- MESSAGE -->
-
-      <textarea
-        id="message"
-        rows="1"
-        placeholder="Message Viggo AI..."
-        autocomplete="off"
-      ></textarea>
-
-
-      <!-- MICROPHONE -->
-
-      <button
-        id="mic"
-        class="input-icon"
-        type="button"
-        title="Voice input"
-      >
-        🎤
-      </button>
-
-
-      <!-- SEND -->
-
-      <button
-        id="send"
-        class="send-btn"
-        type="button"
-        title="Send"
-      >
-        ➤
-      </button>
-
-    </div>
-
-  </main>
-
-
-
-  <!-- =========================================
-       PLUS MENU
-  ========================================== -->
-
-  <div
-    id="plusMenu"
-    class="plus-menu"
-  >
-
-    <!-- PHOTO -->
-
-    <button
-      type="button"
-      data-action="photo"
-    >
-      📷 Photo
-    </button>
-
-
-    <!-- VIDEO -->
-
-    <button
-      type="button"
-      data-action="video"
-    >
-      🎥 Video
-    </button>
-
-
-    <!-- FILE -->
-
-    <button
-      type="button"
-      data-action="file"
-    >
-      📎 File
-    </button>
-
-  </div>
-
-
-
-  <!-- =========================================
-       VOICE OPTIONS MODAL
-  ========================================== -->
-
-  <div
-    id="voiceModal"
-    class="modal"
-  >
-
-    <div class="modal-box">
-
-      <button
-        id="closeVoice"
-        class="modal-close"
-        type="button"
-      >
-        ✕
-      </button>
-
-
-      <h3>
-        🎤 Voice Options
-      </h3>
-
-
-      <select id="voiceSelect">
-
-        <option value="female">
-          👩 Female
-        </option>
-
-        <option value="male">
-          👨 Male
-        </option>
-
-      </select>
-
-    </div>
-
-  </div>
-
-
-
-  <!-- =========================================
-       LANGUAGE MODAL
-  ========================================== -->
-
-  <div
-    id="languageModal"
-    class="modal"
-  >
-
-    <div class="modal-box">
-
-      <button
-        id="closeLanguage"
-        class="modal-close"
-        type="button"
-      >
-        ✕
-      </button>
-
-
-      <h3>
-        🌐 Select Language
-      </h3>
-
-
-      <select id="languageSelect">
-
-        <option value="en-IN">
-          🇬🇧 English
-        </option>
-
-        <option value="ta-IN">
-          🇮🇳 தமிழ்
-        </option>
-
-        <option value="hi-IN">
-          🇮🇳 हिन्दी
-        </option>
-
-        <option value="ml-IN">
-          🇮🇳 മലയാളം
-        </option>
-
-        <option value="te-IN">
-          🇮🇳 తెలుగు
-        </option>
-
-        <option value="kn-IN">
-          🇮🇳 ಕನ್ನಡ
-        </option>
-
-        <option value="bn-IN">
-          🇮🇳 বাংলা
-        </option>
-
-        <option value="mr-IN">
-          🇮🇳 मराठी
-        </option>
-
-        <option value="gu-IN">
-          🇮🇳 ગુજરાતી
-        </option>
-
-        <option value="pa-IN">
-          🇮🇳 ਪੰਜਾਬੀ
-        </option>
-
-        <option value="ur-IN">
-          🇮🇳 اردو
-        </option>
-
-        <option value="or-IN">
-          🇮🇳 ଓଡ଼ିଆ
-        </option>
-
-        <option value="as-IN">
-          🇮🇳 অসমীয়া
-        </option>
-
-        <option value="es-ES">
-          🇪🇸 Spanish
-        </option>
-
-        <option value="fr-FR">
-          🇫🇷 French
-        </option>
-
-        <option value="de-DE">
-          🇩🇪 German
-        </option>
-
-        <option value="it-IT">
-          🇮🇹 Italian
-        </option>
-
-        <option value="pt-BR">
-          🇧🇷 Portuguese
-        </option>
-
-        <option value="ja-JP">
-          🇯🇵 Japanese
-        </option>
-
-        <option value="ko-KR">
-          🇰🇷 Korean
-        </option>
-
-        <option value="zh-CN">
-          🇨🇳 Chinese
-        </option>
-
-        <option value="ar-SA">
-          🇸🇦 Arabic
-        </option>
-
-        <option value="ru-RU">
-          🇷🇺 Russian
-        </option>
-
-        <option value="tr-TR">
-          🇹🇷 Turkish
-        </option>
-
-        <option value="nl-NL">
-          🇳🇱 Dutch
-        </option>
-
-        <option value="pl-PL">
-          🇵🇱 Polish
-        </option>
-
-        <option value="sv-SE">
-          🇸🇪 Swedish
-        </option>
-
-        <option value="da-DK">
-          🇩🇰 Danish
-        </option>
-
-        <option value="no-NO">
-          🇳🇴 Norwegian
-        </option>
-
-        <option value="fi-FI">
-          🇫🇮 Finnish
-        </option>
-
-        <option value="el-GR">
-          🇬🇷 Greek
-        </option>
-
-        <option value="he-IL">
-          🇮🇱 Hebrew
-        </option>
-
-        <option value="th-TH">
-          🇹🇭 Thai
-        </option>
-
-        <option value="vi-VN">
-          🇻🇳 Vietnamese
-        </option>
-
-        <option value="id-ID">
-          🇮🇩 Indonesian
-        </option>
-
-        <option value="ms-MY">
-          🇲🇾 Malay
-        </option>
-
-        <option value="sw-KE">
-          Swahili
-        </option>
-
-        <option value="cs-CZ">
-          🇨🇿 Czech
-        </option>
-
-        <option value="hu-HU">
-          🇭🇺 Hungarian
-        </option>
-
-        <option value="ro-RO">
-          🇷🇴 Romanian
-        </option>
-
-        <option value="uk-UA">
-          🇺🇦 Ukrainian
-        </option>
-
-      </select>
-
-
-      <button
-        id="saveLanguage"
-        class="modal-button"
-        type="button"
-      >
-        ✓ Save Language
-      </button>
-
-    </div>
-
-  </div>
-
-
-
-  <!-- =========================================
-       JAVASCRIPT
-  ========================================== -->
-
-  <script src="script.js?v=9"></script>
-
+</div>
+
+
+<!-- =========================================
+     HIDDEN INPUTS
+========================================== -->
+
+<input
+    type="file"
+    id="cameraInput"
+    class="hidden-input"
+    accept="image/*"
+    capture="environment"
+>
+
+<input
+    type="file"
+    id="photoInput"
+    class="hidden-input"
+    accept="image/*"
+>
+
+<input
+    type="file"
+    id="videoInput"
+    class="hidden-input"
+    accept="video/*"
+>
+
+<input
+    type="file"
+    id="fileInput"
+    class="hidden-input"
+    accept=".pdf,.txt,.doc,.docx,.xls,.xlsx,.ppt,.pptx,image/*,video/*"
+>
+
+
+<!-- =========================================
+     JAVASCRIPT
+========================================== -->
+
+<script src="script.js"></script>
 
 </body>
-
 </html>
+```
