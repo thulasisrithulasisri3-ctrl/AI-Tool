@@ -1,7 +1,9 @@
-```html
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -9,9 +11,15 @@
         content="width=device-width, initial-scale=1.0"
     >
 
+    <meta
+        name="theme-color"
+        content="#050b14"
+    >
+
     <title>Viggo AI</title>
 
     <style>
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -22,261 +30,513 @@
         body {
             width: 100%;
             height: 100%;
-            font-family: Arial, sans-serif;
-            background: #050b14;
-            color: white;
         }
 
         body {
-            overflow: hidden;
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background:
+                #050b14;
+
+            color:
+                #ffffff;
+
+            overflow:
+                hidden;
         }
 
-        .app {
+        /* =================================================
+           APP
+        ================================================= */
+
+        #app {
             width: 100%;
             height: 100vh;
+
             display: flex;
             flex-direction: column;
+
+            background:
+                #050b14;
         }
 
-        /* ===============================
+        /* =================================================
            HEADER
-        =============================== */
+        ================================================= */
 
         .header {
-            height: 65px;
+            width: 100%;
+            height: 64px;
+
             flex-shrink: 0;
+
             display: flex;
             align-items: center;
             justify-content: space-between;
+
             padding: 0 18px;
-            background: #08111f;
-            border-bottom: 1px solid #18304d;
+
+            background:
+                #081321;
+
+            border-bottom:
+                1px solid #18304b;
         }
 
         .logo {
-            font-size: 23px;
-            font-weight: bold;
-            color: #4da3ff;
+            font-size: 22px;
+            font-weight: 700;
+
+            color:
+                #4da3ff;
         }
 
-        .status {
+        .online-status {
             font-size: 12px;
-            color: #65e6a8;
+
+            color:
+                #62e6a4;
         }
 
-        /* ===============================
+        /* =================================================
            CHAT AREA
-        =============================== */
+        ================================================= */
 
         #chatContainer {
             flex: 1;
+
+            width: 100%;
+
             overflow-y: auto;
-            padding: 20px;
-            scroll-behavior: smooth;
+            overflow-x: hidden;
+
+            padding:
+                20px;
+
+            scroll-behavior:
+                smooth;
         }
 
-        .welcome {
+        #messages {
+            width: 100%;
+            max-width: 1000px;
+
+            margin:
+                0 auto;
+        }
+
+        /* =================================================
+           WELCOME
+        ================================================= */
+
+        #welcomeMessage {
+            min-height:
+                55vh;
+
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+            justify-content: center;
+
             text-align: center;
-            margin-top: 18vh;
-            color: #a9b8ca;
+
+            color:
+                #8ea1b7;
         }
 
-        .welcome h1 {
-            color: #4da3ff;
-            margin-bottom: 10px;
+        #welcomeMessage h1 {
+            font-size: 34px;
+
+            margin-bottom:
+                10px;
+
+            color:
+                #4da3ff;
         }
+
+        #welcomeMessage p {
+            font-size:
+                15px;
+        }
+
+        /* =================================================
+           MESSAGE
+        ================================================= */
 
         .message {
+            width: fit-content;
             max-width: 85%;
-            margin: 12px 0;
-            padding: 12px 15px;
-            border-radius: 14px;
-            line-height: 1.5;
-            word-wrap: break-word;
+
+            margin:
+                12px 0;
+
+            padding:
+                12px 15px;
+
+            border-radius:
+                14px;
+
+            line-height:
+                1.55;
+
+            word-break:
+                break-word;
         }
 
         .user-message {
-            margin-left: auto;
-            background: #12528a;
+            margin-left:
+                auto;
+
+            background:
+                #12548c;
         }
 
         .assistant-message {
-            margin-right: auto;
-            background: #111d2d;
-            border: 1px solid #213b59;
+            margin-right:
+                auto;
+
+            background:
+                #101d2d;
+
+            border:
+                1px solid #213d5a;
         }
 
         .message img,
         .message video {
-            max-width: 100%;
-            max-height: 320px;
-            margin-top: 8px;
-            border-radius: 12px;
-            object-fit: contain;
+            display:
+                block;
+
+            max-width:
+                100%;
+
+            max-height:
+                320px;
+
+            margin-top:
+                8px;
+
+            border-radius:
+                12px;
+
+            object-fit:
+                contain;
         }
 
-        /* ===============================
-           INPUT AREA
-        =============================== */
+        /* =================================================
+           BOTTOM AREA
+        ================================================= */
 
         .bottom-area {
+            width: 100%;
+
             flex-shrink: 0;
-            background: #08111f;
-            border-top: 1px solid #18304d;
-            padding: 10px;
+
+            padding:
+                10px;
+
+            background:
+                #081321;
+
+            border-top:
+                1px solid #18304b;
         }
 
+        /* =================================================
+           INPUT ROW
+        ================================================= */
+
         .input-row {
+            width: 100%;
+            max-width: 1000px;
+
+            margin:
+                0 auto;
+
             display: flex;
             align-items: center;
-            gap: 8px;
-            max-width: 1000px;
-            margin: auto;
+
+            gap:
+                7px;
         }
+
+        /* =================================================
+           TEXT INPUT
+        ================================================= */
 
         #messageInput {
             flex: 1;
-            min-height: 46px;
-            max-height: 130px;
-            resize: none;
-            border: 1px solid #294968;
-            outline: none;
-            border-radius: 14px;
-            background: #0d1928;
-            color: white;
-            padding: 13px;
-            font-size: 15px;
+
+            min-width:
+                0;
+
+            min-height:
+                46px;
+
+            max-height:
+                130px;
+
+            resize:
+                none;
+
+            outline:
+                none;
+
+            border:
+                1px solid #294967;
+
+            border-radius:
+                14px;
+
+            padding:
+                13px;
+
+            background:
+                #0d1928;
+
+            color:
+                #ffffff;
+
+            font-size:
+                15px;
         }
 
         #messageInput::placeholder {
-            color: #71839a;
+            color:
+                #70849b;
         }
 
-        /* ===============================
+        /* =================================================
            BUTTONS
-        =============================== */
+        ================================================= */
 
-        .action-button,
+        .action-button {
+            width:
+                46px;
+
+            height:
+                46px;
+
+            flex-shrink:
+                0;
+
+            border:
+                none;
+
+            border-radius:
+                12px;
+
+            background:
+                #102a45;
+
+            color:
+                #ffffff;
+
+            font-size:
+                19px;
+
+            cursor:
+                pointer;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            user-select:
+                none;
+        }
+
+        .action-button:hover {
+            background:
+                #174b77;
+        }
+
+        .action-button:active {
+            transform:
+                scale(0.96);
+        }
+
+        /* =================================================
+           SEND
+        ================================================= */
+
         #sendButton {
-            width: 46px;
-            height: 46px;
-            flex-shrink: 0;
-            border: none;
-            border-radius: 12px;
-            background: #102a45;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width:
+                46px;
+
+            height:
+                46px;
+
+            flex-shrink:
+                0;
+
+            border:
+                none;
+
+            border-radius:
+                12px;
+
+            background:
+                #1267a8;
+
+            color:
+                #ffffff;
+
+            font-size:
+                20px;
+
+            cursor:
+                pointer;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
         }
 
-        .action-button:hover,
         #sendButton:hover {
-            background: #174a78;
+            background:
+                #1886d4;
         }
 
-        #sendButton {
-            background: #1267a8;
-        }
-
-        #sendButton:hover {
-            background: #1886d4;
-        }
-
-        /* ===============================
-           UPLOAD MENU
-        =============================== */
-
-        .upload-buttons {
-            display: flex;
-            gap: 8px;
-            max-width: 1000px;
-            margin: 8px auto 0;
-            overflow-x: auto;
-        }
-
-        .upload-buttons button {
-            border: 1px solid #294968;
-            background: #0c1b2c;
-            color: white;
-            border-radius: 10px;
-            padding: 8px 13px;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        .upload-buttons button:hover {
-            background: #143c60;
-        }
-
-        /* ===============================
+        /* =================================================
            HIDDEN FILE INPUTS
-        =============================== */
+        ================================================= */
 
-        .hidden-input {
-            display: none !important;
+        #cameraInput,
+        #photoInput,
+        #videoInput,
+        #fileInput {
+            display:
+                none !important;
         }
 
-        /* ===============================
+        /* =================================================
+           UPLOAD PREVIEW
+        ================================================= */
+
+        #viggoUploadPreview {
+            max-width:
+                500px;
+
+            margin:
+                10px auto 0;
+        }
+
+        /* =================================================
+           SCROLLBAR
+        ================================================= */
+
+        #chatContainer::-webkit-scrollbar {
+            width:
+                7px;
+        }
+
+        #chatContainer::-webkit-scrollbar-track {
+            background:
+                #07101c;
+        }
+
+        #chatContainer::-webkit-scrollbar-thumb {
+            background:
+                #21405e;
+
+            border-radius:
+                10px;
+        }
+
+        /* =================================================
            MOBILE
-        =============================== */
+        ================================================= */
 
         @media (max-width: 600px) {
 
             .header {
-                height: 58px;
-                padding: 0 12px;
+                height:
+                    58px;
+
+                padding:
+                    0 12px;
             }
 
             .logo {
-                font-size: 20px;
+                font-size:
+                    20px;
             }
 
             #chatContainer {
-                padding: 12px;
+                padding:
+                    12px;
             }
 
             .message {
-                max-width: 92%;
+                max-width:
+                    92%;
+            }
+
+            .bottom-area {
+                padding:
+                    7px;
             }
 
             .input-row {
-                gap: 5px;
-            }
-
-            #messageInput {
-                min-height: 44px;
-                font-size: 14px;
+                gap:
+                    5px;
             }
 
             .action-button,
             #sendButton {
-                width: 42px;
-                height: 42px;
-                font-size: 18px;
+                width:
+                    42px;
+
+                height:
+                    42px;
+
+                border-radius:
+                    10px;
+
+                font-size:
+                    17px;
             }
 
-            .upload-buttons {
-                gap: 5px;
-            }
+            #messageInput {
+                min-height:
+                    42px;
 
-            .upload-buttons button {
-                font-size: 12px;
-                padding: 7px 10px;
+                font-size:
+                    14px;
+
+                padding:
+                    11px;
             }
         }
+
     </style>
+
 </head>
+
 
 <body>
 
-<div class="app">
+<div id="app">
 
-    <!-- =========================================
+
+    <!-- =================================================
          HEADER
-    ========================================== -->
+    ================================================= -->
 
     <header class="header">
 
@@ -284,155 +544,134 @@
             Viggo AI
         </div>
 
-        <div class="status">
+        <div class="online-status">
             ● Online
         </div>
 
     </header>
 
 
-    <!-- =========================================
+    <!-- =================================================
          CHAT
-    ========================================== -->
+    ================================================= -->
 
     <main id="chatContainer">
 
-        <div
-            id="welcomeMessage"
-            class="welcome"
-        >
-            <h1>Viggo AI</h1>
+        <div id="messages">
 
-            <p>
-                How can I help you?
-            </p>
+            <div
+                id="welcomeMessage"
+                class="welcome"
+            >
+
+                <h1>
+                    Viggo AI
+                </h1>
+
+                <p>
+                    How can I help you?
+                </p>
+
+            </div>
+
         </div>
 
     </main>
 
 
-    <!-- =========================================
+    <!-- =================================================
          BOTTOM
-    ========================================== -->
+    ================================================= -->
 
     <section class="bottom-area">
 
-        <!-- INPUT ROW -->
-
         <div class="input-row">
 
-            <!-- CAMERA -->
+
+            <!-- =================================================
+                 CAMERA BUTTON
+            ================================================= -->
 
             <button
                 type="button"
                 id="cameraButton"
                 class="action-button"
-                title="Camera"
                 aria-label="Camera"
+                title="Camera"
             >
                 📷
             </button>
 
 
-            <!-- PHOTO -->
+            <!-- =================================================
+                 PHOTO BUTTON
+            ================================================= -->
 
             <button
                 type="button"
                 id="photoButton"
                 class="action-button"
-                title="Photo"
                 aria-label="Photo"
+                title="Photo"
             >
                 🖼️
             </button>
 
 
-            <!-- VIDEO -->
+            <!-- =================================================
+                 VIDEO BUTTON
+            ================================================= -->
 
             <button
                 type="button"
                 id="videoButton"
                 class="action-button"
-                title="Video"
                 aria-label="Video"
+                title="Video"
             >
                 🎥
             </button>
 
 
-            <!-- FILE -->
+            <!-- =================================================
+                 FILE BUTTON
+            ================================================= -->
 
             <button
                 type="button"
                 id="fileButton"
                 class="action-button"
-                title="File"
                 aria-label="File"
+                title="File"
             >
                 📁
             </button>
 
 
-            <!-- MESSAGE -->
+            <!-- =================================================
+                 MESSAGE INPUT
+            ================================================= -->
 
             <textarea
                 id="messageInput"
-                placeholder="Message Viggo..."
                 rows="1"
+                placeholder="Message Viggo..."
                 autocomplete="off"
+                spellcheck="true"
             ></textarea>
 
 
-            <!-- SEND -->
+            <!-- =================================================
+                 SEND BUTTON
+            ================================================= -->
 
             <button
                 type="button"
                 id="sendButton"
-                title="Send"
                 aria-label="Send"
+                title="Send"
             >
                 ➤
-            </button>
-
-        </div>
-
-
-        <!-- =====================================
-             UPLOAD OPTIONS
-        ====================================== -->
-
-        <div class="upload-buttons">
-
-            <button
-                type="button"
-                id="cameraButton2"
-                onclick="document.getElementById('cameraInput').click()"
-            >
-                📷 Camera
-            </button>
-
-            <button
-                type="button"
-                id="photoButton2"
-                onclick="document.getElementById('photoInput').click()"
-            >
-                🖼️ Photo
-            </button>
-
-            <button
-                type="button"
-                id="videoButton2"
-                onclick="document.getElementById('videoInput').click()"
-            >
-                🎥 Video
-            </button>
-
-            <button
-                type="button"
-                id="fileButton2"
-                onclick="document.getElementById('fileInput').click()"
-            >
-                📁 File
             </button>
 
         </div>
@@ -442,46 +681,66 @@
 </div>
 
 
-<!-- =========================================
-     HIDDEN INPUTS
-========================================== -->
+<!-- =====================================================
+     CAMERA INPUT
+===================================================== -->
 
 <input
     type="file"
     id="cameraInput"
-    class="hidden-input"
     accept="image/*"
     capture="environment"
 >
 
+
+<!-- =====================================================
+     PHOTO INPUT
+===================================================== -->
+
 <input
     type="file"
     id="photoInput"
-    class="hidden-input"
     accept="image/*"
 >
+
+
+<!-- =====================================================
+     VIDEO INPUT
+===================================================== -->
 
 <input
     type="file"
     id="videoInput"
-    class="hidden-input"
     accept="video/*"
 >
+
+
+<!-- =====================================================
+     FILE INPUT
+===================================================== -->
 
 <input
     type="file"
     id="fileInput"
-    class="hidden-input"
     accept=".pdf,.txt,.doc,.docx,.xls,.xlsx,.ppt,.pptx,image/*,video/*"
 >
 
 
-<!-- =========================================
-     JAVASCRIPT
-========================================== -->
+<!-- =====================================================
+     MAIN SCRIPT
+===================================================== -->
 
 <script src="script.js"></script>
 
+
+<!-- =====================================================
+     BUTTON / UPLOAD SCRIPT
+===================================================== -->
+
+<script src="button.js"></script>
+
+
 </body>
+
 </html>
-```
+
