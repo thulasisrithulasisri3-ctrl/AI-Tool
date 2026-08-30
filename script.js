@@ -2,8 +2,10 @@
 
 /* =====================================================
    VIGGO AI - FULL SCRIPT.JS
-   BUTTON + CHAT + HISTORY + UPLOAD + VOICE
-   + DATE & TIME
+   CHAT + HISTORY + PIN + DELETE + UPLOAD + VOICE
+   USER = RIGHT
+   AI   = LEFT
+   NO DATE/TIME DISPLAY BELOW MESSAGES
 ===================================================== */
 
 (function () {
@@ -107,94 +109,6 @@
 
 
     /* =================================================
-       DATE & TIME
-    ================================================= */
-
-    function formatDateTime(timestamp) {
-
-        if (!timestamp) {
-            timestamp = Date.now();
-        }
-
-        const date =
-            new Date(timestamp);
-
-
-        if (isNaN(date.getTime())) {
-            return "";
-        }
-
-
-        return date.toLocaleString(
-            undefined,
-            {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: true
-            }
-        );
-
-    }
-
-
-    function formatTime(timestamp) {
-
-        if (!timestamp) {
-            timestamp = Date.now();
-        }
-
-        const date =
-            new Date(timestamp);
-
-
-        if (isNaN(date.getTime())) {
-            return "";
-        }
-
-
-        return date.toLocaleTimeString(
-            undefined,
-            {
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: true
-            }
-        );
-
-    }
-
-
-    function formatFullDate(timestamp) {
-
-        if (!timestamp) {
-            timestamp = Date.now();
-        }
-
-        const date =
-            new Date(timestamp);
-
-
-        if (isNaN(date.getTime())) {
-            return "";
-        }
-
-
-        return date.toLocaleDateString(
-            undefined,
-            {
-                day: "2-digit",
-                month: "short",
-                year: "numeric"
-            }
-        );
-
-    }
-
-
-    /* =================================================
        MOBILE VIEWPORT
     ================================================= */
 
@@ -205,23 +119,19 @@
                 ? window.visualViewport.height
                 : window.innerHeight;
 
-        document.documentElement
-            .style
-            .setProperty(
-                "--app-height",
-                `${height}px`
-            );
+        document.documentElement.style.setProperty(
+            "--app-height",
+            `${height}px`
+        );
     }
 
 
     fixViewportHeight();
 
-
     window.addEventListener(
         "resize",
         fixViewportHeight
     );
-
 
     window.addEventListener(
         "orientationchange",
@@ -262,11 +172,20 @@
                     "viggoChats"
                 );
 
-
             if (saved) {
 
-                chats =
+                const parsed =
                     JSON.parse(saved);
+
+                if (Array.isArray(parsed)) {
+
+                    chats = parsed;
+
+                } else {
+
+                    chats = [];
+
+                }
 
             }
 
@@ -285,37 +204,26 @@
 
 
     /* =================================================
-       CHAT OBJECT
+       CREATE CHAT
     ================================================= */
 
     function createChat() {
 
-        const now =
-            Date.now();
-
-
         return {
 
             id:
-                now.toString() +
+                Date.now().toString() +
                 Math.random()
                     .toString(36)
                     .slice(2),
 
-            title:
-                "New Chat",
+            title: "New Chat",
 
-            pinned:
-                false,
+            pinned: false,
 
-            createdAt:
-                now,
+            createdAt: Date.now(),
 
-            updatedAt:
-                now,
-
-            messages:
-                []
+            messages: []
 
         };
 
@@ -326,8 +234,7 @@
 
         return chats.find(
             chat =>
-                chat.id ===
-                currentChatId
+                chat.id === currentChatId
         );
 
     }
@@ -342,13 +249,10 @@
         const chat =
             createChat();
 
-
         chats.unshift(chat);
-
 
         currentChatId =
             chat.id;
-
 
         saveChats();
 
@@ -357,7 +261,6 @@
         renderConversation();
 
         closeSidebarMobile();
-
 
         if (messageInput) {
 
@@ -369,14 +272,22 @@
 
 
     /* =================================================
-       INIT CHAT
+       ENSURE CHAT
     ================================================= */
 
     function ensureChat() {
 
         if (!chats.length) {
 
-            createNewChat();
+            const chat =
+                createChat();
+
+            chats.push(chat);
+
+            currentChatId =
+                chat.id;
+
+            saveChats();
 
             return;
 
@@ -401,7 +312,6 @@
 
         if (!chatHistory) return;
 
-
         chatHistory.innerHTML = "";
 
 
@@ -424,7 +334,7 @@
                     chat =>
                         (
                             chat.title ||
-                            ""
+                            "New Chat"
                         )
                         .toLowerCase()
                         .includes(search)
@@ -442,25 +352,23 @@
                     a.pinned &&
                     !b.pinned
                 ) {
-                    return -1;
-                }
 
+                    return -1;
+
+                }
 
                 if (
                     !a.pinned &&
                     b.pinned
                 ) {
+
                     return 1;
+
                 }
 
-
                 return (
-                    (b.updatedAt ||
-                        b.createdAt ||
-                        0) -
-                    (a.updatedAt ||
-                        a.createdAt ||
-                        0)
+                    (b.createdAt || 0) -
+                    (a.createdAt || 0)
                 );
 
             }
@@ -474,7 +382,6 @@
                     document.createElement(
                         "div"
                     );
-
 
                 item.className =
                     "history-item";
@@ -525,14 +432,11 @@
                             "input"
                         );
 
-
                     checkbox.type =
                         "checkbox";
 
-
                     checkbox.className =
                         "select-checkbox";
-
 
                     checkbox.checked =
                         selectedChats.has(
@@ -570,24 +474,13 @@
 
 
                 /* =================================================
-                   TITLE AREA
+                   TITLE
                 ================================================= */
-
-                const titleBox =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                titleBox.className =
-                    "history-title-box";
-
 
                 const title =
                     document.createElement(
                         "div"
                     );
-
 
                 title.className =
                     "history-chat-title";
@@ -596,55 +489,19 @@
                 title.textContent =
                     chat.pinned
                         ? "📌 " +
-                            (
-                                chat.title ||
-                                "New Chat"
-                            )
-                        :
-                            (
-                                chat.title ||
-                                "New Chat"
-                            );
+                          (
+                              chat.title ||
+                              "New Chat"
+                          )
+                        : (
+                              chat.title ||
+                              "New Chat"
+                          );
 
 
                 title.title =
                     chat.title ||
                     "New Chat";
-
-
-                /* =================================================
-                   HISTORY DATE & TIME
-                ================================================= */
-
-                const dateTime =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                dateTime.className =
-                    "history-date-time";
-
-
-                const historyTimestamp =
-                    chat.updatedAt ||
-                    chat.createdAt;
-
-
-                dateTime.textContent =
-                    formatDateTime(
-                        historyTimestamp
-                    );
-
-
-                titleBox.appendChild(
-                    title
-                );
-
-
-                titleBox.appendChild(
-                    dateTime
-                );
 
 
                 /* =================================================
@@ -656,32 +513,29 @@
                         "div"
                     );
 
-
                 actions.className =
                     "history-actions";
 
 
-                /* PIN */
+                /* =================================================
+                   PIN
+                ================================================= */
 
                 const pinBtn =
                     document.createElement(
                         "button"
                     );
 
-
                 pinBtn.type =
                     "button";
-
 
                 pinBtn.className =
                     "history-action-btn pin-btn";
 
-
-                pinBtn.innerHTML =
+                pinBtn.textContent =
                     chat.pinned
                         ? "📌"
                         : "📍";
-
 
                 pinBtn.title =
                     chat.pinned
@@ -695,14 +549,8 @@
 
                         event.stopPropagation();
 
-
                         chat.pinned =
                             !chat.pinned;
-
-
-                        chat.updatedAt =
-                            Date.now();
-
 
                         saveChats();
 
@@ -712,25 +560,23 @@
                 );
 
 
-                /* DELETE */
+                /* =================================================
+                   DELETE
+                ================================================= */
 
                 const deleteBtn =
                     document.createElement(
                         "button"
                     );
 
-
                 deleteBtn.type =
                     "button";
-
 
                 deleteBtn.className =
                     "history-action-btn delete-btn";
 
-
-                deleteBtn.innerHTML =
+                deleteBtn.textContent =
                     "🗑️";
-
 
                 deleteBtn.title =
                     "Delete";
@@ -754,16 +600,14 @@
                     pinBtn
                 );
 
-
                 actions.appendChild(
                     deleteBtn
                 );
 
 
                 item.appendChild(
-                    titleBox
+                    title
                 );
-
 
                 item.appendChild(
                     actions
@@ -791,7 +635,6 @@
 
                         currentChatId =
                             chat.id;
-
 
                         saveChats();
 
@@ -842,17 +685,15 @@
 
             } else {
 
-                const newOne =
+                const newChatObject =
                     createChat();
 
-
                 chats.push(
-                    newOne
+                    newChatObject
                 );
 
-
                 currentChatId =
-                    newOne.id;
+                    newChatObject.id;
 
             }
 
@@ -901,9 +742,7 @@
         selectMode =
             !selectMode;
 
-
         selectedChats.clear();
-
 
         renderHistory();
 
@@ -941,12 +780,11 @@
 
         if (!chats.length) {
 
-            const newOne =
+            const newChatObject =
                 createChat();
 
-
             chats.push(
-                newOne
+                newChatObject
             );
 
         }
@@ -986,7 +824,6 @@
         const chat =
             getCurrentChat();
 
-
         if (!chat) return;
 
 
@@ -994,10 +831,6 @@
 
         chat.title =
             "New Chat";
-
-
-        chat.updatedAt =
-            Date.now();
 
 
         saveChats();
@@ -1011,15 +844,16 @@
 
     /* =================================================
        MESSAGE RENDER
+       
+       IMPORTANT:
+       NO DATE/TIME IS DISPLAYED HERE.
     ================================================= */
 
     function renderConversation() {
 
         if (!conversation) return;
 
-
-        conversation.innerHTML =
-            "";
+        conversation.innerHTML = "";
 
 
         const chat =
@@ -1029,6 +863,13 @@
         if (!chat) return;
 
 
+        if (!Array.isArray(chat.messages)) {
+
+            chat.messages = [];
+
+        }
+
+
         chat.messages.forEach(
             msg => {
 
@@ -1036,8 +877,7 @@
                     msg.role,
                     msg.text,
                     msg.media,
-                    false,
-                    msg.timestamp
+                    false
                 );
 
             }
@@ -1051,14 +891,20 @@
 
     /* =================================================
        ADD MESSAGE UI
+       
+       USER = RIGHT
+       AI   = LEFT
+
+       NO DATE
+       NO TIME
+       NO TIMESTAMP
     ================================================= */
 
     function addMessageToUI(
         role,
         text,
         media = null,
-        shouldScroll = true,
-        timestamp = Date.now()
+        shouldScroll = true
     ) {
 
         const wrapper =
@@ -1066,11 +912,6 @@
                 "div"
             );
 
-
-        /*
-           USER = RIGHT
-           AI = LEFT
-        */
 
         wrapper.className =
             "message " +
@@ -1086,7 +927,6 @@
                 "div"
             );
 
-
         content.className =
             "message-content";
 
@@ -1095,7 +935,6 @@
             document.createElement(
                 "div"
             );
-
 
         bubble.className =
             "message-bubble";
@@ -1121,14 +960,24 @@
                         "img"
                     );
 
-
                 img.src =
                     media.data;
-
 
                 img.alt =
                     media.name ||
                     "Uploaded image";
+
+                img.style.maxWidth =
+                    "100%";
+
+                img.style.maxHeight =
+                    "320px";
+
+                img.style.objectFit =
+                    "contain";
+
+                img.style.borderRadius =
+                    "12px";
 
 
                 bubble.appendChild(
@@ -1143,14 +992,11 @@
                             "div"
                         );
 
-
                     caption.textContent =
                         text;
 
-
                     caption.style.marginTop =
                         "8px";
-
 
                     bubble.appendChild(
                         caption
@@ -1169,17 +1015,23 @@
                         "video"
                     );
 
-
                 video.src =
                     media.data;
-
 
                 video.controls =
                     true;
 
-
                 video.playsInline =
                     true;
+
+                video.style.maxWidth =
+                    "100%";
+
+                video.style.maxHeight =
+                    "320px";
+
+                video.style.borderRadius =
+                    "12px";
 
 
                 bubble.appendChild(
@@ -1194,14 +1046,11 @@
                             "div"
                         );
 
-
                     caption.textContent =
                         text;
 
-
                     caption.style.marginTop =
                         "8px";
-
 
                     bubble.appendChild(
                         caption
@@ -1231,33 +1080,9 @@
 
 
         /* =================================================
-           MESSAGE DATE & TIME
-        ================================================= */
-
-        const messageDateTime =
-            document.createElement(
-                "div"
-            );
-
-
-        messageDateTime.className =
-            "message-date-time";
-
-
-        messageDateTime.textContent =
-            formatDateTime(
-                timestamp
-            );
-
-
-        content.appendChild(
-            messageDateTime
-        );
-
-
-        /* =================================================
-           ACTIONS
-           AI ONLY
+           AI MESSAGE ACTIONS
+           
+           COPY / SAVE / LIKE / SPEAKER
         ================================================= */
 
         if (
@@ -1269,7 +1094,6 @@
                 document.createElement(
                     "div"
                 );
-
 
             actions.className =
                 "message-actions";
@@ -1296,13 +1120,11 @@
                                 text
                             );
 
-
                         copyBtn.textContent =
                             "✓ Copied";
 
-
                         setTimeout(
-                            () => {
+                            function () {
 
                                 copyBtn.textContent =
                                     "📋 Copy";
@@ -1314,6 +1136,7 @@
                     } catch (error) {
 
                         console.error(
+                            "Copy error:",
                             error
                         );
 
@@ -1357,10 +1180,8 @@
                             "a"
                         );
 
-
                     a.href =
                         url;
-
 
                     a.download =
                         "viggo-ai-reply.txt";
@@ -1369,7 +1190,6 @@
                     document.body.appendChild(
                         a
                     );
-
 
                     a.click();
 
@@ -1397,12 +1217,20 @@
                 "click",
                 function () {
 
-                    likeBtn.textContent =
-                        likeBtn.textContent.includes(
-                            "Liked"
-                        )
-                            ? "👍 Like"
-                            : "👍 Liked";
+                    if (
+                        likeBtn.textContent
+                            .includes("Liked")
+                    ) {
+
+                        likeBtn.textContent =
+                            "👍 Like";
+
+                    } else {
+
+                        likeBtn.textContent =
+                            "👍 Liked";
+
+                    }
 
                 }
             );
@@ -1431,16 +1259,13 @@
                 copyBtn
             );
 
-
             actions.appendChild(
                 saveBtn
             );
 
-
             actions.appendChild(
                 likeBtn
             );
-
 
             actions.appendChild(
                 speakerBtn
@@ -1490,18 +1315,14 @@
                 "button"
             );
 
-
         button.type =
             "button";
-
 
         button.textContent =
             text;
 
-
         button.title =
             title;
-
 
         return button;
 
@@ -1512,13 +1333,14 @@
        TYPING
     ================================================= */
 
-    function showTyping() {
+    function showTyping(
+        text = "Thinking..."
+    ) {
 
         const wrapper =
             document.createElement(
                 "div"
             );
-
 
         wrapper.className =
             "message ai typing-message";
@@ -1529,7 +1351,6 @@
                 "div"
             );
 
-
         content.className =
             "message-content";
 
@@ -1539,24 +1360,20 @@
                 "div"
             );
 
-
         bubble.className =
             "message-bubble";
 
-
         bubble.textContent =
-            "Thinking...";
+            text;
 
 
         content.appendChild(
             bubble
         );
 
-
         wrapper.appendChild(
             content
         );
-
 
         conversation.appendChild(
             wrapper
@@ -1598,6 +1415,9 @@
 
     async function sendMessage() {
 
+        if (!messageInput) return;
+
+
         const text =
             messageInput.value.trim();
 
@@ -1612,10 +1432,6 @@
         if (!chat) return;
 
 
-        const now =
-            Date.now();
-
-
         /* USER MESSAGE */
 
         chat.messages.push({
@@ -1627,10 +1443,12 @@
                 text,
 
             timestamp:
-                now
+                Date.now()
 
         });
 
+
+        /* CHAT TITLE */
 
         if (
             chat.title ===
@@ -1640,29 +1458,21 @@
             chat.title =
                 text.length > 35
                     ? text.slice(0, 35) +
-                        "..."
+                      "..."
                     : text;
 
         }
 
 
-        chat.updatedAt =
-            now;
-
-
         messageInput.value =
             "";
-
 
         autoResizeTextarea();
 
 
         addMessageToUI(
             "user",
-            text,
-            null,
-            true,
-            now
+            text
         );
 
 
@@ -1674,11 +1484,17 @@
         /* TYPING */
 
         const typing =
-            showTyping();
+            showTyping(
+                "Thinking..."
+            );
 
 
-        sendBtn.disabled =
-            true;
+        if (sendBtn) {
+
+            sendBtn.disabled =
+                true;
+
+        }
 
 
         try {
@@ -1753,11 +1569,7 @@
             typing.remove();
 
 
-            const aiTime =
-                Date.now();
-
-
-            /* AI = LEFT */
+            /* AI MESSAGE */
 
             chat.messages.push({
 
@@ -1768,21 +1580,14 @@
                     reply,
 
                 timestamp:
-                    aiTime
+                    Date.now()
 
             });
 
 
-            chat.updatedAt =
-                aiTime;
-
-
             addMessageToUI(
                 "ai",
-                reply,
-                null,
-                true,
-                aiTime
+                reply
             );
 
 
@@ -1799,15 +1604,15 @@
             );
 
 
-            typing.remove();
+            if (typing) {
+
+                typing.remove();
+
+            }
 
 
             const errorText =
                 "Sorry friend, I couldn't connect to Viggo AI right now.";
-
-
-            const errorTime =
-                Date.now();
 
 
             chat.messages.push({
@@ -1819,35 +1624,34 @@
                     errorText,
 
                 timestamp:
-                    errorTime
+                    Date.now()
 
             });
 
 
-            chat.updatedAt =
-                errorTime;
-
-
             addMessageToUI(
                 "ai",
-                errorText,
-                null,
-                true,
-                errorTime
+                errorText
             );
 
 
             saveChats();
 
-            renderHistory();
-
         } finally {
 
-            sendBtn.disabled =
-                false;
+            if (sendBtn) {
+
+                sendBtn.disabled =
+                    false;
+
+            }
 
 
-            messageInput.focus();
+            if (messageInput) {
+
+                messageInput.focus();
+
+            }
 
         }
 
@@ -1858,7 +1662,9 @@
        UPLOAD FILE
     ================================================= */
 
-    async function sendUploadedFile(file) {
+    async function sendUploadedFile(
+        file
+    ) {
 
         if (!file) return;
 
@@ -1879,10 +1685,6 @@
 
                 const dataURL =
                     reader.result;
-
-
-                const now =
-                    Date.now();
 
 
                 const media = {
@@ -1916,21 +1718,15 @@
                         media,
 
                     timestamp:
-                        now
+                        Date.now()
 
                 });
-
-
-                chat.updatedAt =
-                    now;
 
 
                 addMessageToUI(
                     "user",
                     text,
-                    media,
-                    true,
-                    now
+                    media
                 );
 
 
@@ -1940,7 +1736,9 @@
 
 
                 const typing =
-                    showTyping();
+                    showTyping(
+                        "Analyzing your upload..."
+                    );
 
 
                 try {
@@ -2017,10 +1815,6 @@
                     typing.remove();
 
 
-                    const aiTime =
-                        Date.now();
-
-
                     chat.messages.push({
 
                         role:
@@ -2030,27 +1824,21 @@
                             String(reply),
 
                         timestamp:
-                            aiTime
+                            Date.now()
 
                     });
 
 
-                    chat.updatedAt =
-                        aiTime;
-
-
                     addMessageToUI(
                         "ai",
-                        String(reply),
-                        null,
-                        true,
-                        aiTime
+                        String(reply)
                     );
 
 
                     saveChats();
 
                     renderHistory();
+
 
                 } catch (error) {
 
@@ -2060,15 +1848,15 @@
                     );
 
 
-                    typing.remove();
+                    if (typing) {
+
+                        typing.remove();
+
+                    }
 
 
                     const reply =
                         "I received the upload, but I couldn't analyze it right now.";
-
-
-                    const errorTime =
-                        Date.now();
 
 
                     chat.messages.push({
@@ -2080,34 +1868,38 @@
                             reply,
 
                         timestamp:
-                            errorTime
+                            Date.now()
 
                     });
 
 
-                    chat.updatedAt =
-                        errorTime;
-
-
                     addMessageToUI(
                         "ai",
-                        reply,
-                        null,
-                        true,
-                        errorTime
+                        reply
                     );
 
 
                     saveChats();
-
-                    renderHistory();
 
                 }
 
             };
 
 
-        reader.readAsDataURL(file);
+        reader.onerror =
+            function (error) {
+
+                console.error(
+                    "FileReader error:",
+                    error
+                );
+
+            };
+
+
+        reader.readAsDataURL(
+            file
+        );
 
     }
 
@@ -2116,7 +1908,9 @@
        FILE INPUT
     ================================================= */
 
-    function handleFileInput(input) {
+    function handleFileInput(
+        input
+    ) {
 
         if (!input) return;
 
@@ -2238,9 +2032,13 @@
             "click",
             function () {
 
-                plusMenu.classList.remove(
-                    "show"
-                );
+                if (plusMenu) {
+
+                    plusMenu.classList.remove(
+                        "show"
+                    );
+
+                }
 
 
                 if (cameraInput) {
@@ -2265,9 +2063,13 @@
             "click",
             function () {
 
-                plusMenu.classList.remove(
-                    "show"
-                );
+                if (plusMenu) {
+
+                    plusMenu.classList.remove(
+                        "show"
+                    );
+
+                }
 
 
                 if (photoInput) {
@@ -2292,9 +2094,13 @@
             "click",
             function () {
 
-                plusMenu.classList.remove(
-                    "show"
-                );
+                if (plusMenu) {
+
+                    plusMenu.classList.remove(
+                        "show"
+                    );
+
+                }
 
 
                 if (videoInput) {
@@ -2319,9 +2125,13 @@
             "click",
             function () {
 
-                plusMenu.classList.remove(
-                    "show"
-                );
+                if (plusMenu) {
+
+                    plusMenu.classList.remove(
+                        "show"
+                    );
+
+                }
 
 
                 if (fileInput) {
@@ -2361,8 +2171,7 @@
             function (event) {
 
                 if (
-                    event.key ===
-                    "Enter" &&
+                    event.key === "Enter" &&
                     !event.shiftKey
                 ) {
 
@@ -2385,7 +2194,7 @@
 
 
     /* =================================================
-       TEXTAREA RESIZE
+       TEXTAREA
     ================================================= */
 
     function autoResizeTextarea() {
@@ -2461,11 +2270,7 @@
 
         newChat.addEventListener(
             "click",
-            function () {
-
-                createNewChat();
-
-            }
+            createNewChat
         );
 
     }
@@ -2486,7 +2291,7 @@
 
 
     /* =================================================
-       MORE MENU
+       MORE
     ================================================= */
 
     if (moreBtn) {
@@ -2659,7 +2464,6 @@
             "show"
         );
 
-
         voiceModal.classList.add(
             "open"
         );
@@ -2675,7 +2479,6 @@
         voiceModal.classList.remove(
             "show"
         );
-
 
         voiceModal.classList.remove(
             "open"
@@ -2743,7 +2546,6 @@
             "show"
         );
 
-
         languageModal.classList.add(
             "open"
         );
@@ -2759,7 +2561,6 @@
         languageModal.classList.remove(
             "show"
         );
-
 
         languageModal.classList.remove(
             "open"
@@ -2798,6 +2599,14 @@
                 }
 
 
+                if (recognition) {
+
+                    recognition.lang =
+                        selectedLanguage;
+
+                }
+
+
                 closeLanguageModal();
 
             }
@@ -2807,7 +2616,7 @@
 
 
     /* =================================================
-       CLOSE MODALS BY BACKDROP
+       MODAL BACKDROP
     ================================================= */
 
     if (voiceModal) {
@@ -2853,7 +2662,7 @@
 
 
     /* =================================================
-       MICROPHONE
+       SPEECH RECOGNITION
     ================================================= */
 
     function setupSpeechRecognition() {
@@ -2869,7 +2678,6 @@
                 "Speech Recognition is not supported."
             );
 
-
             return null;
 
         }
@@ -2882,10 +2690,8 @@
         rec.continuous =
             false;
 
-
         rec.interimResults =
             false;
-
 
         rec.lang =
             selectedLanguage;
@@ -2921,7 +2727,6 @@
 
                     messageInput.value =
                         result;
-
 
                     autoResizeTextarea();
 
@@ -2966,6 +2771,10 @@
     }
 
 
+    /* =================================================
+       MICROPHONE
+    ================================================= */
+
     function toggleMicrophone() {
 
         if (isListening) {
@@ -2994,7 +2803,6 @@
             alert(
                 "Voice input is not supported in this browser."
             );
-
 
             return;
 
@@ -3038,11 +2846,12 @@
     function speakText(text) {
 
         if (
-            !(
-                "speechSynthesis"
-                in window
-            )
+            !("speechSynthesis" in window)
         ) {
+
+            alert(
+                "Speech output is not supported in this browser."
+            );
 
             return;
 
@@ -3062,42 +2871,38 @@
             selectedLanguage;
 
 
-        if (voiceGender) {
-
-            const voices =
-                window.speechSynthesis
-                    .getVoices();
+        const voices =
+            window.speechSynthesis
+                .getVoices();
 
 
-            let voice =
+        let voice =
+            voices.find(
+                v =>
+                    v.lang ===
+                    selectedLanguage
+            );
+
+
+        if (!voice) {
+
+            voice =
                 voices.find(
                     v =>
-                        v.lang ===
-                        selectedLanguage
+                        v.lang &&
+                        v.lang.startsWith(
+                            selectedLanguage
+                                .split("-")[0]
+                        )
                 );
 
-
-            if (!voice) {
-
-                voice =
-                    voices.find(
-                        v =>
-                            v.lang &&
-                            v.lang.startsWith(
-                                selectedLanguage
-                                    .split("-")[0]
-                            )
-                    );
-
-            }
+        }
 
 
-            if (voice) {
+        if (voice) {
 
-                utterance.voice =
-                    voice;
-
-            }
+            utterance.voice =
+                voice;
 
         }
 
@@ -3136,15 +2941,12 @@
                                         ? "You: "
                                         : "Viggo AI: "
                                 ) +
-                                msg.text +
-                                "\n" +
-                                formatDateTime(
-                                    msg.timestamp
+                                (
+                                    msg.text ||
+                                    ""
                                 )
                         )
-                        .join(
-                            "\n\n"
-                        );
+                        .join("\n\n");
 
 
                 if (
@@ -3181,7 +2983,6 @@
                                 text
                             );
 
-
                         alert(
                             "Chat copied to clipboard."
                         );
@@ -3203,7 +3004,7 @@
 
 
     /* =================================================
-       KEYBOARD ESC
+       ESCAPE
     ================================================= */
 
     document.addEventListener(
@@ -3262,7 +3063,7 @@
 
 
     /* =================================================
-       LOAD SAVED LANGUAGE
+       LANGUAGE
     ================================================= */
 
     if (voiceSelect) {
