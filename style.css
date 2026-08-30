@@ -283,7 +283,6 @@ body {
     text-overflow: ellipsis;
 }
 
-
 /* =====================================================
    HISTORY ACTIONS
    PIN + DELETE
@@ -291,44 +290,69 @@ body {
 
 .history-actions {
     display: flex;
-
     align-items: center;
-
     gap: 5px;
 }
 
 .history-action-btn {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
 
     border: 1px solid #24527a;
-
     border-radius: 8px;
 
-    background: #0d1c2b;
-
+    background: #0d1c2b !important;
     color: #ffffff;
-
-    cursor: pointer;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
+    padding: 0;
+    margin: 0;
+
+    cursor: pointer;
+
     font-size: 14px;
+
+    box-shadow: none;
 
     transition:
         background 0.2s ease,
         border-color 0.2s ease,
-        transform 0.2s ease;
+        transform 0.15s ease;
 }
 
+/* PIN */
+.history-action-btn.pin-btn {
+    background: #0d1c2b !important;
+    color: #3da0ff;
+    border-color: #24527a;
+}
+
+/* DELETE */
+.history-action-btn.delete-btn {
+    background: #0d1c2b !important;
+    color: #ff6b6b;
+    border-color: #24527a;
+}
+
+/* HOVER */
 .history-action-btn:hover {
-    background: #12395a;
-
+    background: #12395a !important;
     border-color: #1683ff;
+}
 
-    color: #ffffff;
+.history-action-btn.pin-btn:hover {
+    background: #12395a !important;
+    color: #3da0ff;
+    border-color: #1683ff;
+}
+
+.history-action-btn.delete-btn:hover {
+    background: #291414 !important;
+    color: #ff6b6b;
+    border-color: #ff5555;
 }
 
 .history-action-btn:active {
