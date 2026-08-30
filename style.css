@@ -14,9 +14,7 @@ body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-
     font-family: Arial, Helvetica, sans-serif;
-
     background: #050505;
     color: #ffffff;
 }
@@ -27,7 +25,7 @@ body {
 
 
 /* =====================================================
-   ROOT
+   APP HEIGHT
 ===================================================== */
 
 :root {
@@ -38,7 +36,6 @@ body {
     --blue-light: #3da0ff;
 
     --black: #050505;
-
     --panel: #0d0d0d;
     --panel-2: #111111;
 
@@ -103,7 +100,7 @@ body {
     border: none;
     border-radius: 10px;
 
-    background: transparent !important;
+    background: transparent;
     color: #ffffff;
 
     font-size: 20px;
@@ -112,7 +109,7 @@ body {
 }
 
 .icon-btn:hover {
-    background: #1a1a1a !important;
+    background: #1a1a1a;
 }
 
 
@@ -177,7 +174,7 @@ body {
     border: none;
     outline: none;
 
-    background: transparent !important;
+    background: transparent;
     color: #ffffff;
 
     font-size: 14px;
@@ -249,20 +246,17 @@ body {
 
     cursor: pointer;
 
-    background: transparent !important;
-
-    border: 1px solid transparent;
+    background: transparent;
 
     transition: 0.2s;
 }
 
 .history-item:hover {
-    background: #151515 !important;
+    background: #151515;
 }
 
 .history-item.active {
-    background: #102b49 !important;
-
+    background: #102b49;
     border: 1px solid #174d7d;
 }
 
@@ -298,143 +292,91 @@ body {
 
     align-items: center;
 
-    justify-content: center;
-
     gap: 5px;
 
     flex: 0 0 auto;
 }
 
-
-/* =====================================================
-   PIN + DELETE BUTTON
-   FORCE BLACK/BLUE THEME
-===================================================== */
-
-.history-actions button,
-.history-action-btn,
-.history-action-btn.pin-btn,
-.history-action-btn.delete-btn {
+.history-action-btn {
     width: 32px;
     height: 32px;
 
-    min-width: 32px;
-    min-height: 32px;
+    border: 1px solid #24527a;
 
-    padding: 0 !important;
-    margin: 0 !important;
+    border-radius: 8px;
+
+    background: #0d1c2b !important;
+
+    color: #ffffff;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    border: 1px solid #24527a !important;
-
-    border-radius: 8px;
-
-    background-color: #0d1c2b !important;
-    background-image: none !important;
-
-    color: #ffffff !important;
-
-    box-shadow: none !important;
-
-    outline: none;
+    padding: 0;
+    margin: 0;
 
     cursor: pointer;
 
     font-size: 14px;
 
-    appearance: none;
-    -webkit-appearance: none;
+    box-shadow: none;
 
     transition:
-        background-color 0.2s ease,
+        background 0.2s ease,
         border-color 0.2s ease,
         transform 0.15s ease;
 }
 
 
-/* =====================================================
-   REMOVE WHITE BACKGROUND FROM PIN
-===================================================== */
+/* PIN */
 
-.history-actions .pin-btn,
-.history-actions button.pin-btn {
+.history-action-btn.pin-btn {
     background: #0d1c2b !important;
-    background-color: #0d1c2b !important;
-    background-image: none !important;
 
-    color: #3da0ff !important;
+    color: #3da0ff;
 
-    border: 1px solid #24527a !important;
+    border-color: #24527a;
 }
 
 
-/* =====================================================
-   REMOVE WHITE BACKGROUND FROM DELETE
-===================================================== */
+/* DELETE */
 
-.history-actions .delete-btn,
-.history-actions button.delete-btn {
+.history-action-btn.delete-btn {
     background: #0d1c2b !important;
-    background-color: #0d1c2b !important;
-    background-image: none !important;
 
-    color: #ff6b6b !important;
+    color: #ff6b6b;
 
-    border: 1px solid #24527a !important;
+    border-color: #24527a;
 }
 
 
-/* =====================================================
-   PIN HOVER
-===================================================== */
+/* HOVER */
 
-.history-actions .pin-btn:hover,
-.history-actions button.pin-btn:hover {
+.history-action-btn:hover {
     background: #12395a !important;
-    background-color: #12395a !important;
 
-    border-color: #1683ff !important;
-
-    color: #3da0ff !important;
+    border-color: #1683ff;
 }
 
+.history-action-btn.pin-btn:hover {
+    background: #12395a !important;
 
-/* =====================================================
-   DELETE HOVER
-===================================================== */
+    color: #3da0ff;
 
-.history-actions .delete-btn:hover,
-.history-actions button.delete-btn:hover {
+    border-color: #1683ff;
+}
+
+.history-action-btn.delete-btn:hover {
     background: #291414 !important;
-    background-color: #291414 !important;
 
-    border-color: #ff5555 !important;
+    color: #ff6b6b;
 
-    color: #ff6b6b !important;
+    border-color: #ff5555;
 }
 
-
-/* =====================================================
-   BUTTON ACTIVE
-===================================================== */
-
-.history-actions .history-action-btn:active,
-.history-actions button:active {
+.history-action-btn:active {
     transform: scale(0.94);
-}
-
-
-/* =====================================================
-   REMOVE POSSIBLE WHITE BUTTON STYLING
-===================================================== */
-
-.history-actions button::before,
-.history-actions button::after {
-    background: transparent !important;
-    background-color: transparent !important;
 }
 
 
@@ -447,9 +389,9 @@ body {
 }
 
 .history-item.selected {
-    background: #102b49 !important;
+    background: #102b49;
 
-    border: 1px solid #1683ff !important;
+    border: 1px solid #1683ff;
 
     box-shadow:
         0 0 0 1px rgba(22, 131, 255, 0.15);
@@ -487,7 +429,7 @@ body {
 
     border-radius: 10px;
 
-    background: #111111 !important;
+    background: #111111;
 
     color: #ffffff;
 
@@ -504,7 +446,7 @@ body {
 }
 
 .more-button:hover {
-    background: #181818 !important;
+    background: #181818;
 }
 
 .more-dots {
@@ -530,7 +472,7 @@ body {
 
     padding: 7px;
 
-    background: #111111 !important;
+    background: #111111;
 
     border: 1px solid #292929;
 
@@ -556,7 +498,7 @@ body {
 
     border-radius: 8px;
 
-    background: transparent !important;
+    background: transparent;
 
     color: #ffffff;
 
@@ -570,7 +512,7 @@ body {
 }
 
 .more-menu button:hover {
-    background: #1d1d1d !important;
+    background: #1d1d1d;
 }
 
 
@@ -630,7 +572,7 @@ body {
 
     border-radius: 10px;
 
-    background: #111111 !important;
+    background: #111111;
 
     color: #ffffff;
 
@@ -642,7 +584,7 @@ body {
 }
 
 .menu-btn:hover {
-    background: #1b1b1b !important;
+    background: #1b1b1b;
 }
 
 .brand {
@@ -667,7 +609,7 @@ body {
 
     border-radius: 10px;
 
-    background: #0d1c2b !important;
+    background: #0d1c2b;
 
     color: #ffffff;
 
@@ -679,7 +621,7 @@ body {
 }
 
 .share-btn:hover {
-    background: #12395a !important;
+    background: #12395a;
 
     border-color: #278fff;
 }
@@ -733,19 +675,78 @@ body {
     margin-bottom: 18px;
 }
 
+
+/* =====================================================
+   USER MESSAGE = RIGHT
+===================================================== */
+
 .message.user {
     justify-content: flex-end;
 }
 
-.message.ai {
+
+/* =====================================================
+   AI MESSAGE = LEFT
+===================================================== */
+
+.message.ai,
+.message.assistant {
     justify-content: flex-start;
 }
+
+
+/* =====================================================
+   SUPPORT message-wrapper
+   USER = RIGHT
+   AI = LEFT
+===================================================== */
+
+.message-wrapper {
+    width: 100%;
+
+    display: flex;
+
+    margin-bottom: 18px;
+}
+
+.message-wrapper.user {
+    justify-content: flex-end;
+}
+
+.message-wrapper.ai,
+.message-wrapper.assistant {
+    justify-content: flex-start;
+}
+
+
+/* =====================================================
+   MESSAGE CONTENT
+===================================================== */
 
 .message-content {
     max-width: min(820px, 85%);
 
     display: flex;
+
     flex-direction: column;
+}
+
+
+/* USER CONTENT = RIGHT */
+
+.message.user .message-content,
+.message-wrapper.user .message-content {
+    margin-left: auto;
+}
+
+
+/* AI CONTENT = LEFT */
+
+.message.ai .message-content,
+.message.assistant .message-content,
+.message-wrapper.ai .message-content,
+.message-wrapper.assistant .message-content {
+    margin-right: auto;
 }
 
 
@@ -767,7 +768,13 @@ body {
     white-space: pre-wrap;
 }
 
-.message.user .message-bubble {
+
+/* =====================================================
+   USER BUBBLE
+===================================================== */
+
+.message.user .message-bubble,
+.message-wrapper.user .message-bubble {
     background: #0868d8;
 
     color: #ffffff;
@@ -775,7 +782,15 @@ body {
     border-bottom-right-radius: 5px;
 }
 
-.message.ai .message-bubble {
+
+/* =====================================================
+   AI BUBBLE
+===================================================== */
+
+.message.ai .message-bubble,
+.message.assistant .message-bubble,
+.message-wrapper.ai .message-bubble,
+.message-wrapper.assistant .message-bubble {
     background: #151515;
 
     color: #eeeeee;
@@ -805,7 +820,7 @@ body {
 
     border-radius: 7px;
 
-    background: #0d0d0d !important;
+    background: #0d0d0d;
 
     color: #aaaaaa;
 
@@ -823,7 +838,7 @@ body {
 
     border-color: #167de8;
 
-    background: #101d2b !important;
+    background: #101d2b;
 }
 
 
@@ -878,7 +893,7 @@ body {
 
     padding: 8px 9px;
 
-    background: #111111 !important;
+    background: #111111;
 
     border: 1px solid #292929;
 
@@ -905,7 +920,7 @@ body {
 
     border-radius: 11px;
 
-    background: #1b1b1b !important;
+    background: #1b1b1b;
 
     color: #ffffff;
 
@@ -915,7 +930,7 @@ body {
 }
 
 .input-plus:hover {
-    background: #252525 !important;
+    background: #252525;
 }
 
 
@@ -929,6 +944,7 @@ body {
     min-width: 0;
 
     min-height: 40px;
+
     max-height: 130px;
 
     resize: none;
@@ -937,7 +953,7 @@ body {
 
     outline: none;
 
-    background: transparent !important;
+    background: transparent;
 
     color: #ffffff;
 
@@ -969,7 +985,7 @@ body {
 
     border-radius: 11px;
 
-    background: #1a1a1a !important;
+    background: #1a1a1a;
 
     color: #ffffff;
 
@@ -979,11 +995,11 @@ body {
 }
 
 .input-icon:hover {
-    background: #242424 !important;
+    background: #242424;
 }
 
 .input-icon.active {
-    background: #0a70e8 !important;
+    background: #0a70e8;
 
     box-shadow:
         0 0 12px rgba(22, 131, 255, 0.55);
@@ -1004,7 +1020,7 @@ body {
 
     border-radius: 12px;
 
-    background: #0878ef !important;
+    background: #0878ef;
 
     color: #ffffff;
 
@@ -1016,7 +1032,7 @@ body {
 }
 
 .send-btn:hover {
-    background: #1688ff !important;
+    background: #1688ff;
 
     transform: scale(1.03);
 }
@@ -1049,7 +1065,7 @@ body {
 
     padding: 7px;
 
-    background: #111111 !important;
+    background: #111111;
 
     border: 1px solid #292929;
 
@@ -1075,7 +1091,7 @@ body {
 
     border-radius: 8px;
 
-    background: transparent !important;
+    background: transparent;
 
     color: #ffffff;
 
@@ -1089,7 +1105,7 @@ body {
 }
 
 .plus-menu button:hover {
-    background: #1d1d1d !important;
+    background: #1d1d1d;
 }
 
 
@@ -1105,6 +1121,7 @@ body {
     display: none;
 
     align-items: center;
+
     justify-content: center;
 
     background: rgba(0, 0, 0, 0.72);
@@ -1124,7 +1141,7 @@ body {
 
     padding: 25px;
 
-    background: #111111 !important;
+    background: #111111;
 
     border: 1px solid #292929;
 
@@ -1144,16 +1161,18 @@ body {
     position: absolute;
 
     top: 12px;
+
     right: 12px;
 
     width: 34px;
+
     height: 34px;
 
     border: none;
 
     border-radius: 8px;
 
-    background: transparent !important;
+    background: transparent;
 
     color: #ffffff;
 
@@ -1163,7 +1182,7 @@ body {
 }
 
 .modal-close:hover {
-    background: #222222 !important;
+    background: #222222;
 }
 
 .modal-box select {
@@ -1179,7 +1198,7 @@ body {
 
     border-radius: 9px;
 
-    background: #080808 !important;
+    background: #080808;
 
     color: #ffffff;
 
@@ -1195,7 +1214,7 @@ body {
 
     border-radius: 9px;
 
-    background: #0878ef !important;
+    background: #0878ef;
 
     color: #ffffff;
 
@@ -1205,7 +1224,7 @@ body {
 }
 
 .modal-button:hover {
-    background: #1688ff !important;
+    background: #1688ff;
 }
 
 
@@ -1320,21 +1339,6 @@ body {
         bottom: 75px;
     }
 
-    /* MOBILE PIN + DELETE */
-
-    .history-actions button,
-    .history-action-btn,
-    .history-action-btn.pin-btn,
-    .history-action-btn.delete-btn {
-        width: 32px;
-        height: 32px;
-
-        min-width: 32px;
-        min-height: 32px;
-
-        background-color: #0d1c2b !important;
-        background-image: none !important;
-    }
 }
 
 
@@ -1388,21 +1392,6 @@ body {
         height: 38px;
     }
 
-    .history-actions {
-        gap: 4px;
-    }
-
-    .history-actions button,
-    .history-action-btn {
-        width: 30px;
-        height: 30px;
-
-        min-width: 30px;
-        min-height: 30px;
-
-        background-color: #0d1c2b !important;
-        background-image: none !important;
-    }
 }
 
 
@@ -1436,7 +1425,7 @@ select {
 
 
 /* =====================================================
-   SAFE AREA
+   SAFE AREA FOR MOBILE
 ===================================================== */
 
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
@@ -1453,51 +1442,37 @@ select {
 
 
 /* =====================================================
-   FINAL FORCE - HISTORY PIN / DELETE
-   NO WHITE BACKGROUND
+   FINAL MESSAGE ALIGNMENT
 ===================================================== */
 
-.history-actions > button {
-    appearance: none !important;
-    -webkit-appearance: none !important;
-
-    background: #0d1c2b !important;
-    background-color: #0d1c2b !important;
-    background-image: none !important;
-
-    border: 1px solid #24527a !important;
-
-    color: #ffffff !important;
-
-    box-shadow: none !important;
+/* USER → RIGHT */
+.message.user,
+.message-wrapper.user {
+    justify-content: flex-end !important;
 }
 
-.history-actions > button.pin-btn {
-    background: #0d1c2b !important;
-    background-color: #0d1c2b !important;
-
-    color: #3da0ff !important;
+/* AI → LEFT */
+.message.ai,
+.message.assistant,
+.message-wrapper.ai,
+.message-wrapper.assistant {
+    justify-content: flex-start !important;
 }
 
-.history-actions > button.delete-btn {
-    background: #0d1c2b !important;
-    background-color: #0d1c2b !important;
-
-    color: #ff6b6b !important;
+/* USER content */
+.message.user .message-content,
+.message-wrapper.user .message-content {
+    margin-left: auto;
+    margin-right: 0;
 }
 
-.history-actions > button.pin-btn:hover {
-    background: #12395a !important;
-    background-color: #12395a !important;
-
-    border-color: #1683ff !important;
-}
-
-.history-actions > button.delete-btn:hover {
-    background: #291414 !important;
-    background-color: #291414 !important;
-
-    border-color: #ff5555 !important;
+/* AI content */
+.message.ai .message-content,
+.message.assistant .message-content,
+.message-wrapper.ai .message-content,
+.message-wrapper.assistant .message-content {
+    margin-left: 0;
+    margin-right: auto;
 }
 
 
