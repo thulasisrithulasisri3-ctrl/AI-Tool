@@ -1,1115 +1,1830 @@
 "use strict";
 
 /* =====================================================
-VIGGO AI
-COMPLETE BUTTON + MOBILE + UPLOAD SYSTEM
+   VIGGO AI - FULL SCRIPT.JS
+   BUTTONS + CHAT + MOBILE + UPLOAD + VOICE
 ===================================================== */
 
 (function () {
 
-```
-console.log("=================================");
-console.log("VIGGO AI SYSTEM STARTING...");
-console.log("=================================");
-
-
-/* =================================================
-   GET ELEMENT
-================================================= */
-
-function get(id) {
-    return document.getElementById(id);
-}
-
-
-/* =================================================
-   ELEMENTS
-================================================= */
-
-let plusBtn;
-let plusMenu;
-
-let cameraBtn;
-let photoBtn;
-let videoBtn;
-let fileBtn;
-
-let plusVoiceBtn;
-
-let cameraInput;
-let photoInput;
-let videoInput;
-let fileInput;
-
-let message;
-let send;
-let mic;
-
-let sidebar;
-let openSidebar;
-let closeSidebar;
-
-let moreBtn;
-let moreMenu;
-
-let voiceModal;
-let languageModal;
-
-
-/* =================================================
-   SAFE CLICK
-================================================= */
-
-function clickElement(element) {
-
-    if (!element) {
-        console.warn("Element not found");
-        return;
-    }
-
-    element.click();
-}
-
-
-/* =================================================
-   PLUS MENU CLOSE
-================================================= */
-
-function closePlusMenu() {
-
-    if (!plusMenu) {
-        return;
-    }
-
-    plusMenu.classList.remove("show");
-
-    plusMenu.style.display = "none";
-}
-
-
-/* =================================================
-   PLUS MENU OPEN
-================================================= */
-
-function openPlusMenu() {
-
-    if (!plusMenu) {
-        return;
-    }
-
-    plusMenu.classList.add("show");
-
-    plusMenu.style.display = "flex";
-}
-
-
-/* =================================================
-   TOGGLE PLUS
-================================================= */
-
-function togglePlusMenu() {
-
-    if (!plusMenu) {
-        return;
-    }
-
-    const visible =
-        plusMenu.classList.contains("show") ||
-        plusMenu.style.display === "flex" ||
-        plusMenu.style.display === "block";
-
-    if (visible) {
-
-        closePlusMenu();
-
-    } else {
-
-        openPlusMenu();
-
-    }
-}
-
-
-/* =================================================
-   OPEN CAMERA
-================================================= */
-
-function openCamera() {
-
-    console.log("📷 Camera button clicked");
-
-    closePlusMenu();
-
-    if (!cameraInput) {
-        console.error("cameraInput missing");
-        return;
-    }
-
-    cameraInput.value = "";
-
-    clickElement(cameraInput);
-}
-
-
-/* =================================================
-   OPEN PHOTO
-================================================= */
-
-function openPhoto() {
-
-    console.log("🖼️ Photo button clicked");
-
-    closePlusMenu();
-
-    if (!photoInput) {
-        console.error("photoInput missing");
-        return;
-    }
-
-    photoInput.value = "";
-
-    clickElement(photoInput);
-}
-
-
-/* =================================================
-   OPEN VIDEO
-================================================= */
-
-function openVideo() {
-
-    console.log("🎥 Video button clicked");
-
-    closePlusMenu();
-
-    if (!videoInput) {
-        console.error("videoInput missing");
-        return;
-    }
-
-    videoInput.value = "";
-
-    clickElement(videoInput);
-}
-
-
-/* =================================================
-   OPEN FILE
-================================================= */
-
-function openFile() {
-
-    console.log("📎 File button clicked");
-
-    closePlusMenu();
-
-    if (!fileInput) {
-        console.error("fileInput missing");
-        return;
-    }
-
-    fileInput.value = "";
-
-    clickElement(fileInput);
-}
-
-
-/* =================================================
-   HANDLE SELECTED FILE
-================================================= */
-
-function handleSelectedFile(file, source) {
-
-    if (!file) {
-        return;
-    }
-
-    console.log(
-        "================================="
-    );
-
-    console.log(
-        "UPLOAD:",
-        source
-    );
-
-    console.log(
-        "NAME:",
-        file.name
-    );
-
-    console.log(
-        "TYPE:",
-        file.type
-    );
-
-    console.log(
-        "SIZE:",
-        file.size
-    );
-
-    console.log(
-        "================================="
-    );
-
-
-    /* 20 MB */
-
-    const maxSize =
-        20 * 1024 * 1024;
-
-    if (file.size > maxSize) {
-
-        alert(
-            "File is too large.\nMaximum size is 20 MB."
-        );
-
-        return;
-    }
-
-
-    /* PREVIEW */
-
-    showPreview(file);
+    console.log("=================================");
+    console.log("VIGGO AI STARTING...");
+    console.log("=================================");
 
 
     /* =================================================
-       EXISTING UPLOAD FUNCTION
+       CONFIG
     ================================================= */
 
-    if (
-        typeof window.sendUploadedFile ===
-        "function"
-    ) {
+    const API_URL =
+        "https://ai-tool-2-zpul.onrender.com/chat";
 
-        console.log(
-            "Using existing sendUploadedFile()"
+
+    /* =================================================
+       STATE
+    ================================================= */
+
+    let chats =
+        JSON.parse(
+            localStorage.getItem("viggoChats") || "[]"
         );
 
-        try {
+    let currentChatId =
+        localStorage.getItem("viggoCurrentChatId");
 
-            window.sendUploadedFile(file);
 
-        } catch (error) {
+    let selectedLanguage =
+        localStorage.getItem("viggoLanguage") ||
+        "en-IN";
 
-            console.error(
-                "sendUploadedFile error:",
-                error
-            );
 
-        }
+    let speakerEnabled = true;
 
-        return;
+
+    /* =================================================
+       GET ELEMENT
+    ================================================= */
+
+    function get(id) {
+        return document.getElementById(id);
     }
 
 
     /* =================================================
-       OTHER EXISTING FUNCTION
+       ELEMENTS
     ================================================= */
 
-    if (
-        typeof window.uploadFile ===
-        "function"
-    ) {
+    const sidebar =
+        get("sidebar");
 
-        console.log(
-            "Using existing uploadFile()"
-        );
+    const openSidebar =
+        get("openSidebar");
 
-        try {
+    const closeSidebar =
+        get("closeSidebar");
 
-            window.uploadFile(file);
+    const newChatBtn =
+        get("newChat");
 
-        } catch (error) {
+    const searchChat =
+        get("searchChat");
 
-            console.error(
-                "uploadFile error:",
-                error
-            );
-
-        }
-
-        return;
-    }
-
-
-    if (
-        typeof window.handleFileUpload ===
-        "function"
-    ) {
-
-        console.log(
-            "Using existing handleFileUpload()"
-        );
-
-        try {
-
-            window.handleFileUpload(file);
-
-        } catch (error) {
-
-            console.error(
-                "handleFileUpload error:",
-                error
-            );
-
-        }
-
-        return;
-    }
-
-
-    console.warn(
-        "No existing upload function found."
-    );
-
-}
-
-
-/* =================================================
-   FILE PREVIEW
-================================================= */
-
-function showPreview(file) {
-
-    const oldPreview =
-        get("viggoUploadPreview");
-
-    if (oldPreview) {
-        oldPreview.remove();
-    }
-
-
-    const preview =
-        document.createElement("div");
-
-    preview.id =
-        "viggoUploadPreview";
-
-
-    preview.style.cssText = `
-        position:fixed;
-        left:12px;
-        right:12px;
-        bottom:80px;
-        z-index:999999;
-        background:#101722;
-        border:1px solid #26364d;
-        border-radius:14px;
-        padding:12px;
-        box-sizing:border-box;
-        color:white;
-        max-width:700px;
-        margin:auto;
-    `;
-
-
-    const title =
-        document.createElement("div");
-
-    title.textContent =
-        "Selected: " + file.name;
-
-    title.style.cssText = `
-        font-size:14px;
-        margin-bottom:8px;
-        word-break:break-word;
-    `;
-
-    preview.appendChild(title);
-
-
-    /* IMAGE */
-
-    if (
-        file.type &&
-        file.type.startsWith("image/")
-    ) {
-
-        const image =
-            document.createElement("img");
-
-        image.src =
-            URL.createObjectURL(file);
-
-        image.alt =
-            file.name;
-
-        image.style.cssText = `
-            display:block;
-            width:100%;
-            max-height:280px;
-            object-fit:contain;
-            border-radius:10px;
-        `;
-
-        preview.appendChild(image);
-    }
-
-
-    /* VIDEO */
-
-    if (
-        file.type &&
-        file.type.startsWith("video/")
-    ) {
-
-        const video =
-            document.createElement("video");
-
-        video.src =
-            URL.createObjectURL(file);
-
-        video.controls = true;
-
-        video.playsInline = true;
-
-        video.style.cssText = `
-            display:block;
-            width:100%;
-            max-height:280px;
-            border-radius:10px;
-        `;
-
-        preview.appendChild(video);
-    }
-
-
-    document.body.appendChild(preview);
-
-
-    /* REMOVE AFTER 5 SEC */
-
-    setTimeout(function () {
-
-        if (preview.parentNode) {
-            preview.remove();
-        }
-
-    }, 5000);
-
-}
-
-
-/* =================================================
-   SEND MESSAGE
-================================================= */
-
-function sendCurrentMessage() {
-
-    if (!message) {
-        return;
-    }
-
-    const text =
-        message.value.trim();
-
-    if (!text) {
-        return;
-    }
-
-
-    console.log(
-        "Sending message:",
-        text
-    );
-
-
-    /* USE EXISTING FUNCTION */
-
-    if (
-        typeof window.sendMessage ===
-        "function"
-    ) {
-
-        try {
-
-            /*
-               If existing sendMessage()
-               expects no argument,
-               it will still work.
-            */
-
-            window.sendMessage(text);
-
-        } catch (error) {
-
-            console.error(
-                "sendMessage error:",
-                error
-            );
-
-        }
-
-        return;
-    }
-
-
-    console.warn(
-        "sendMessage() not found in current project."
-    );
-
-}
-
-
-/* =================================================
-   VOICE MODAL
-================================================= */
-
-function openVoiceModal() {
-
-    if (!voiceModal) {
-        return;
-    }
-
-    voiceModal.style.display =
-        "flex";
-
-}
-
-
-function closeVoiceModal() {
-
-    if (!voiceModal) {
-        return;
-    }
-
-    voiceModal.style.display =
-        "none";
-
-}
-
-
-/* =================================================
-   LANGUAGE MODAL
-================================================= */
-
-function openLanguageModal() {
-
-    if (!languageModal) {
-        return;
-    }
-
-    languageModal.style.display =
-        "flex";
-
-}
-
-
-function closeLanguageModal() {
-
-    if (!languageModal) {
-        return;
-    }
-
-    languageModal.style.display =
-        "none";
-
-}
-
-
-/* =================================================
-   MICROPHONE
-================================================= */
-
-function startMicrophone() {
-
-    console.log(
-        "🎤 Microphone clicked"
-    );
-
-
-    /*
-       Existing voice function
-    */
-
-    if (
-        typeof window.startVoiceRecognition ===
-        "function"
-    ) {
-
-        window.startVoiceRecognition();
-
-        return;
-    }
-
-
-    if (
-        typeof window.startVoice ===
-        "function"
-    ) {
-
-        window.startVoice();
-
-        return;
-    }
-
-
-    /*
-       Browser Speech Recognition
-    */
-
-    const Recognition =
-        window.SpeechRecognition ||
-        window.webkitSpeechRecognition;
-
-
-    if (!Recognition) {
-
-        openVoiceModal();
-
-        return;
-    }
-
-
-    const recognition =
-        new Recognition();
-
-    recognition.lang =
-        localStorage.getItem(
-            "viggoLanguage"
-        ) || "en-IN";
-
-    recognition.interimResults =
-        false;
-
-    recognition.continuous =
-        false;
-
-
-    recognition.onstart =
-        function () {
-
-            console.log(
-                "🎤 Listening..."
-            );
-
-        };
-
-
-    recognition.onresult =
-        function (event) {
-
-            const result =
-                event.results[0][0].transcript;
-
-            console.log(
-                "Voice result:",
-                result
-            );
-
-
-            if (message) {
-
-                message.value =
-                    result;
-
-            }
-
-        };
-
-
-    recognition.onerror =
-        function (error) {
-
-            console.error(
-                "Speech recognition error:",
-                error
-            );
-
-        };
-
-
-    recognition.onend =
-        function () {
-
-            console.log(
-                "🎤 Voice ended"
-            );
-
-        };
-
-
-    try {
-
-        recognition.start();
-
-    } catch (error) {
-
-        console.error(
-            "Could not start microphone:",
-            error
-        );
-
-    }
-
-}
-
-
-/* =================================================
-   SPEAK
-================================================= */
-
-function speakText(text) {
-
-    if (
-        !text ||
-        !("speechSynthesis" in window)
-    ) {
-        return;
-    }
-
-
-    window.speechSynthesis.cancel();
-
-
-    const utterance =
-        new SpeechSynthesisUtterance(
-            text
-        );
-
-
-    utterance.lang =
-        localStorage.getItem(
-            "viggoLanguage"
-        ) || "en-IN";
-
-
-    window.speechSynthesis.speak(
-        utterance
-    );
-
-}
-
-
-/* =================================================
-   SIDEBAR
-================================================= */
-
-function openSideBar() {
-
-    if (!sidebar) {
-        return;
-    }
-
-    sidebar.classList.add("open");
-
-    sidebar.style.transform =
-        "translateX(0)";
-
-}
-
-
-function closeSideBar() {
-
-    if (!sidebar) {
-        return;
-    }
-
-    sidebar.classList.remove("open");
-
-    /*
-       Let existing CSS control it
-       when possible.
-    */
-
-    if (
-        window.innerWidth <= 768
-    ) {
-
-        sidebar.style.transform =
-            "translateX(-100%)";
-
-    }
-
-}
-
-
-/* =================================================
-   MORE MENU
-================================================= */
-
-function toggleMoreMenu() {
-
-    if (!moreMenu) {
-        return;
-    }
-
-    const visible =
-        moreMenu.classList.contains("show") ||
-        moreMenu.style.display === "block" ||
-        moreMenu.style.display === "flex";
-
-
-    if (visible) {
-
-        moreMenu.classList.remove("show");
-
-        moreMenu.style.display =
-            "none";
-
-    } else {
-
-        moreMenu.classList.add("show");
-
-        moreMenu.style.display =
-            "block";
-
-    }
-
-}
-
-
-/* =================================================
-   SHARE
-================================================= */
-
-async function shareViggo() {
-
-    const text =
-        "Viggo AI";
-
-
-    if (
-        navigator.share
-    ) {
-
-        try {
-
-            await navigator.share({
-                title: "Viggo AI",
-                text: text,
-                url: window.location.href
-            });
-
-        } catch (error) {
-
-            console.log(
-                "Share cancelled"
-            );
-
-        }
-
-        return;
-    }
-
-
-    try {
-
-        await navigator.clipboard.writeText(
-            window.location.href
-        );
-
-        alert(
-            "Viggo AI link copied."
-        );
-
-    } catch (error) {
-
-        alert(
-            "Share is not supported on this device."
-        );
-
-    }
-
-}
-
-
-/* =================================================
-   NEW CHAT
-================================================= */
-
-function newChat() {
-
-    console.log(
-        "＋ New Chat clicked"
-    );
-
-
-    /*
-       Use existing function if available.
-    */
-
-    if (
-        typeof window.createNewChat ===
-        "function"
-    ) {
-
-        window.createNewChat();
-
-        return;
-    }
-
-
-    if (
-        typeof window.newChat ===
-        "function"
-    ) {
-
-        window.newChat();
-
-        return;
-    }
-
-
-    /*
-       Basic fallback
-    */
-
-    if (message) {
-        message.value = "";
-    }
+    const chatHistory =
+        get("chatHistory");
 
     const conversation =
         get("conversation");
 
-    if (conversation) {
-        conversation.innerHTML = "";
-    }
+    const message =
+        get("message");
 
-}
+    const sendBtn =
+        get("send");
 
+    const micBtn =
+        get("mic");
 
-/* =================================================
-   SEARCH
-================================================= */
-
-function searchChats() {
-
-    const input =
-        get("searchChat");
-
-    if (!input) {
-        return;
-    }
-
-    const query =
-        input.value
-            .trim()
-            .toLowerCase();
-
-
-    const history =
-        get("chatHistory");
-
-    if (!history) {
-        return;
-    }
-
-
-    const items =
-        history.children;
-
-
-    for (
-        let i = 0;
-        i < items.length;
-        i++
-    ) {
-
-        const item =
-            items[i];
-
-        const text =
-            item.textContent
-                .toLowerCase();
-
-
-        item.style.display =
-            !query ||
-            text.includes(query)
-                ? ""
-                : "none";
-
-    }
-
-}
-
-
-/* =================================================
-   INITIALIZE
-================================================= */
-
-function initialize() {
-
-    console.log(
-        "Initializing all Viggo buttons..."
-    );
-
-
-    /* ELEMENTS */
-
-    plusBtn =
+    const plusBtn =
         get("plusBtn");
 
-    plusMenu =
+    const plusMenu =
         get("plusMenu");
 
-    cameraBtn =
-        get("cameraBtn");
+    const moreBtn =
+        get("moreBtn");
 
-    photoBtn =
-        get("photoBtn");
+    const moreMenu =
+        get("moreMenu");
 
-    videoBtn =
-        get("videoBtn");
-
-    fileBtn =
-        get("fileBtn");
-
-    plusVoiceBtn =
-        get("plusVoiceBtn");
+    const shareBtn =
+        get("shareBtn");
 
 
-    cameraInput =
+    /* =================================================
+       FILE INPUTS
+    ================================================= */
+
+    const cameraInput =
         get("cameraInput");
 
-    photoInput =
+    const photoInput =
         get("photoInput");
 
-    videoInput =
+    const videoInput =
         get("videoInput");
 
-    fileInput =
+    const fileInput =
         get("fileInput");
 
 
-    message =
-        get("message");
+    /* =================================================
+       MODALS
+    ================================================= */
 
-    send =
-        get("send");
-
-    mic =
-        get("mic");
-
-
-    sidebar =
-        get("sidebar");
-
-    openSidebar =
-        get("openSidebar");
-
-    closeSidebar =
-        get("closeSidebar");
-
-
-    moreBtn =
-        get("moreBtn");
-
-    moreMenu =
-        get("moreMenu");
-
-
-    voiceModal =
+    const voiceModal =
         get("voiceModal");
 
-    languageModal =
+    const languageModal =
         get("languageModal");
 
 
     /* =================================================
-       PLUS
+       MOBILE VIEWPORT FIX
+    ================================================= */
+
+    function fixViewportHeight() {
+
+        const height =
+            window.visualViewport
+                ? window.visualViewport.height
+                : window.innerHeight;
+
+        document.documentElement
+            .style
+            .setProperty(
+                "--app-height",
+                height + "px"
+            );
+
+    }
+
+
+    fixViewportHeight();
+
+    window.addEventListener(
+        "resize",
+        fixViewportHeight
+    );
+
+    window.addEventListener(
+        "orientationchange",
+        fixViewportHeight
+    );
+
+
+    if (window.visualViewport) {
+
+        window.visualViewport.addEventListener(
+            "resize",
+            fixViewportHeight
+        );
+
+    }
+
+
+    /* =================================================
+       SAVE CHATS
+    ================================================= */
+
+    function saveChats() {
+
+        localStorage.setItem(
+            "viggoChats",
+            JSON.stringify(chats)
+        );
+
+        localStorage.setItem(
+            "viggoCurrentChatId",
+            currentChatId || ""
+        );
+
+    }
+
+
+    /* =================================================
+       CREATE CHAT
+    ================================================= */
+
+    function createChat() {
+
+        const chat = {
+
+            id:
+                Date.now().toString(),
+
+            title:
+                "New Chat",
+
+            messages:
+                [],
+
+            createdAt:
+                Date.now()
+
+        };
+
+
+        chats.unshift(chat);
+
+        currentChatId =
+            chat.id;
+
+
+        saveChats();
+
+        renderHistory();
+
+        renderConversation();
+
+    }
+
+
+    /* =================================================
+       GET CURRENT CHAT
+    ================================================= */
+
+    function getCurrentChat() {
+
+        if (!currentChatId) {
+            return null;
+        }
+
+        return chats.find(
+            function (chat) {
+                return chat.id === currentChatId;
+            }
+        ) || null;
+
+    }
+
+
+    /* =================================================
+       ENSURE CHAT
+    ================================================= */
+
+    function ensureChat() {
+
+        let chat =
+            getCurrentChat();
+
+        if (!chat) {
+
+            createChat();
+
+            chat =
+                getCurrentChat();
+
+        }
+
+        return chat;
+
+    }
+
+
+    /* =================================================
+       NEW CHAT
+    ================================================= */
+
+    function newChat() {
+
+        createChat();
+
+        if (message) {
+            message.value = "";
+            message.focus();
+        }
+
+        closeSidebarMobile();
+
+    }
+
+
+    window.createNewChat =
+        newChat;
+
+    window.newChat =
+        newChat;
+
+
+    /* =================================================
+       RENDER HISTORY
+    ================================================= */
+
+    function renderHistory(
+        search = ""
+    ) {
+
+        if (!chatHistory) {
+            return;
+        }
+
+
+        chatHistory.innerHTML = "";
+
+
+        const query =
+            search
+                .trim()
+                .toLowerCase();
+
+
+        chats
+            .filter(
+                function (chat) {
+
+                    return !query ||
+                        chat.title
+                            .toLowerCase()
+                            .includes(query);
+
+                }
+            )
+            .forEach(
+                function (chat) {
+
+                    const item =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    item.className =
+                        "history-item";
+
+
+                    item.dataset.id =
+                        chat.id;
+
+
+                    const title =
+                        document.createElement(
+                            "span"
+                        );
+
+
+                    title.className =
+                        "history-text";
+
+
+                    title.textContent =
+                        chat.title ||
+                        "New Chat";
+
+
+                    item.appendChild(title);
+
+
+                    const actions =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    actions.className =
+                        "history-actions";
+
+
+                    const pin =
+                        document.createElement(
+                            "button"
+                        );
+
+
+                    pin.type =
+                        "button";
+
+                    pin.className =
+                        "history-pin";
+
+                    pin.textContent =
+                        "📌";
+
+                    pin.title =
+                        "Pin";
+
+
+                    const del =
+                        document.createElement(
+                            "button"
+                        );
+
+
+                    del.type =
+                        "button";
+
+                    del.className =
+                        "history-delete";
+
+                    del.textContent =
+                        "🗑️";
+
+                    del.title =
+                        "Delete";
+
+
+                    actions.appendChild(
+                        pin
+                    );
+
+                    actions.appendChild(
+                        del
+                    );
+
+
+                    item.appendChild(
+                        actions
+                    );
+
+
+                    item.addEventListener(
+                        "click",
+                        function (event) {
+
+                            if (
+                                event.target ===
+                                pin ||
+                                event.target ===
+                                del
+                            ) {
+                                return;
+                            }
+
+                            openChat(
+                                chat.id
+                            );
+
+                        }
+                    );
+
+
+                    pin.addEventListener(
+                        "click",
+                        function (event) {
+
+                            event.stopPropagation();
+
+                            chat.pinned =
+                                !chat.pinned;
+
+                            chats.sort(
+                                function (a, b) {
+
+                                    if (
+                                        a.pinned ===
+                                        b.pinned
+                                    ) {
+                                        return 0;
+                                    }
+
+                                    return a.pinned
+                                        ? -1
+                                        : 1;
+
+                                }
+                            );
+
+                            saveChats();
+
+                            renderHistory(
+                                search
+                            );
+
+                        }
+                    );
+
+
+                    del.addEventListener(
+                        "click",
+                        function (event) {
+
+                            event.stopPropagation();
+
+                            deleteChat(
+                                chat.id
+                            );
+
+                        }
+                    );
+
+
+                    if (
+                        chat.id ===
+                        currentChatId
+                    ) {
+
+                        item.classList.add(
+                            "active"
+                        );
+
+                    }
+
+
+                    chatHistory.appendChild(
+                        item
+                    );
+
+                }
+            );
+
+    }
+
+
+    /* =================================================
+       OPEN CHAT
+    ================================================= */
+
+    function openChat(id) {
+
+        currentChatId =
+            id;
+
+        saveChats();
+
+        renderHistory();
+
+        renderConversation();
+
+        closeSidebarMobile();
+
+    }
+
+
+    /* =================================================
+       DELETE CHAT
+    ================================================= */
+
+    function deleteChat(id) {
+
+        const index =
+            chats.findIndex(
+                function (chat) {
+                    return chat.id === id;
+                }
+            );
+
+
+        if (index === -1) {
+            return;
+        }
+
+
+        chats.splice(
+            index,
+            1
+        );
+
+
+        if (
+            currentChatId === id
+        ) {
+
+            if (chats.length) {
+
+                currentChatId =
+                    chats[0].id;
+
+            } else {
+
+                currentChatId =
+                    null;
+
+                createChat();
+
+                return;
+
+            }
+
+        }
+
+
+        saveChats();
+
+        renderHistory();
+
+        renderConversation();
+
+    }
+
+
+    /* =================================================
+       CLEAR CURRENT CHAT
+    ================================================= */
+
+    function clearChat() {
+
+        const chat =
+            getCurrentChat();
+
+        if (!chat) {
+            return;
+        }
+
+
+        chat.messages =
+            [];
+
+
+        chat.title =
+            "New Chat";
+
+
+        saveChats();
+
+        renderHistory();
+
+        renderConversation();
+
+    }
+
+
+    window.clearChat =
+        clearChat;
+
+
+    /* =================================================
+       SELECT CHATS
+    ================================================= */
+
+    function selectChats() {
+
+        if (!chatHistory) {
+            return;
+        }
+
+
+        const items =
+            chatHistory.querySelectorAll(
+                ".history-item"
+            );
+
+
+        items.forEach(
+            function (item) {
+
+                item.classList.toggle(
+                    "select-mode"
+                );
+
+
+                if (
+                    !item.querySelector(
+                        "input[type='checkbox']"
+                    )
+                ) {
+
+                    const checkbox =
+                        document.createElement(
+                            "input"
+                        );
+
+
+                    checkbox.type =
+                        "checkbox";
+
+
+                    checkbox.className =
+                        "chat-select";
+
+
+                    checkbox.dataset.id =
+                        item.dataset.id;
+
+
+                    item.prepend(
+                        checkbox
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+
+    window.selectChats =
+        selectChats;
+
+
+    /* =================================================
+       DELETE SELECTED
+    ================================================= */
+
+    function deleteSelectedChats() {
+
+        if (!chatHistory) {
+            return;
+        }
+
+
+        const checked =
+            chatHistory.querySelectorAll(
+                ".chat-select:checked"
+            );
+
+
+        if (!checked.length) {
+
+            alert(
+                "Select chats first."
+            );
+
+            return;
+
+        }
+
+
+        const ids =
+            Array.from(
+                checked
+            ).map(
+                function (checkbox) {
+                    return checkbox.dataset.id;
+                }
+            );
+
+
+        chats =
+            chats.filter(
+                function (chat) {
+
+                    return !ids.includes(
+                        chat.id
+                    );
+
+                }
+            );
+
+
+        if (
+            !getCurrentChat() &&
+            chats.length
+        ) {
+
+            currentChatId =
+                chats[0].id;
+
+        }
+
+
+        saveChats();
+
+        renderHistory();
+
+        renderConversation();
+
+    }
+
+
+    window.deleteSelectedChats =
+        deleteSelectedChats;
+
+
+    /* =================================================
+       RENDER CONVERSATION
+    ================================================= */
+
+    function renderConversation() {
+
+        if (!conversation) {
+            return;
+        }
+
+
+        conversation.innerHTML = "";
+
+
+        const chat =
+            getCurrentChat();
+
+
+        if (!chat) {
+            return;
+        }
+
+
+        chat.messages.forEach(
+            function (msg) {
+
+                addMessageToUI(
+                    msg.role,
+                    msg.text,
+                    false,
+                    msg.media
+                );
+
+            }
+        );
+
+
+        scrollToBottom();
+
+    }
+
+
+    /* =================================================
+       ADD MESSAGE UI
+    ================================================= */
+
+    function addMessageToUI(
+        role,
+        text,
+        save = true,
+        media = null
+    ) {
+
+        if (!conversation) {
+            return;
+        }
+
+
+        const wrapper =
+            document.createElement(
+                "div"
+            );
+
+
+        wrapper.className =
+            "message-wrapper " +
+            role;
+
+
+        const bubble =
+            document.createElement(
+                "div"
+            );
+
+
+        bubble.className =
+            "message-bubble";
+
+
+        if (text) {
+
+            const textElement =
+                document.createElement(
+                    "div"
+                );
+
+
+            textElement.className =
+                "message-text";
+
+
+            textElement.textContent =
+                text;
+
+
+            bubble.appendChild(
+                textElement
+            );
+
+        }
+
+
+        /* MEDIA */
+
+        if (media) {
+
+            if (
+                media.type &&
+                media.type.startsWith(
+                    "image/"
+                )
+            ) {
+
+                const img =
+                    document.createElement(
+                        "img"
+                    );
+
+
+                img.src =
+                    media.data;
+
+
+                img.alt =
+                    media.name || "Image";
+
+
+                img.style.maxWidth =
+                    "100%";
+
+                img.style.maxHeight =
+                    "320px";
+
+                img.style.borderRadius =
+                    "12px";
+
+
+                bubble.appendChild(
+                    img
+                );
+
+            }
+
+
+            if (
+                media.type &&
+                media.type.startsWith(
+                    "video/"
+                )
+            ) {
+
+                const video =
+                    document.createElement(
+                        "video"
+                    );
+
+
+                video.src =
+                    media.data;
+
+
+                video.controls =
+                    true;
+
+
+                video.playsInline =
+                    true;
+
+
+                video.style.maxWidth =
+                    "100%";
+
+                video.style.maxHeight =
+                    "320px";
+
+                video.style.borderRadius =
+                    "12px";
+
+
+                bubble.appendChild(
+                    video
+                );
+
+            }
+
+        }
+
+
+        wrapper.appendChild(
+            bubble
+        );
+
+
+        /* =================================================
+           ACTIONS
+        ================================================= */
+
+        const actions =
+            document.createElement(
+                "div"
+            );
+
+
+        actions.className =
+            "message-actions";
+
+
+        /* SAVE */
+
+        const saveBtn =
+            document.createElement(
+                "button"
+            );
+
+
+        saveBtn.type =
+            "button";
+
+        saveBtn.textContent =
+            "💾";
+
+        saveBtn.title =
+            "Save";
+
+
+        saveBtn.addEventListener(
+            "click",
+            function () {
+
+                saveMessage(
+                    text
+                );
+
+            }
+        );
+
+
+        /* COPY */
+
+        const copyBtn =
+            document.createElement(
+                "button"
+            );
+
+
+        copyBtn.type =
+            "button";
+
+        copyBtn.textContent =
+            "📋";
+
+        copyBtn.title =
+            "Copy";
+
+
+        copyBtn.addEventListener(
+            "click",
+            function () {
+
+                copyText(
+                    text
+                );
+
+            }
+        );
+
+
+        /* LIKE */
+
+        const likeBtn =
+            document.createElement(
+                "button"
+            );
+
+
+        likeBtn.type =
+            "button";
+
+        likeBtn.textContent =
+            "👍";
+
+        likeBtn.title =
+            "Like";
+
+
+        likeBtn.addEventListener(
+            "click",
+            function () {
+
+                likeBtn.classList.toggle(
+                    "liked"
+                );
+
+            }
+        );
+
+
+        /* SPEAKER */
+
+        const speakerBtn =
+            document.createElement(
+                "button"
+            );
+
+
+        speakerBtn.type =
+            "button";
+
+        speakerBtn.textContent =
+            "🔊";
+
+        speakerBtn.title =
+            "Speak";
+
+
+        speakerBtn.addEventListener(
+            "click",
+            function () {
+
+                speakText(
+                    text
+                );
+
+            }
+        );
+
+
+        actions.appendChild(
+            saveBtn
+        );
+
+        actions.appendChild(
+            copyBtn
+        );
+
+        actions.appendChild(
+            likeBtn
+        );
+
+        actions.appendChild(
+            speakerBtn
+        );
+
+
+        wrapper.appendChild(
+            actions
+        );
+
+
+        conversation.appendChild(
+            wrapper
+        );
+
+
+        if (save) {
+
+            const chat =
+                ensureChat();
+
+
+            chat.messages.push({
+
+                role:
+                    role,
+
+                text:
+                    text || "",
+
+                media:
+                    media || null,
+
+                time:
+                    Date.now()
+
+            });
+
+
+            if (
+                role === "user" &&
+                chat.title === "New Chat" &&
+                text
+            ) {
+
+                chat.title =
+                    text.substring(
+                        0,
+                        35
+                    );
+
+            }
+
+
+            saveChats();
+
+            renderHistory();
+
+        }
+
+
+        scrollToBottom();
+
+    }
+
+
+    /* =================================================
+       COPY
+    ================================================= */
+
+    async function copyText(text) {
+
+        if (!text) {
+            return;
+        }
+
+
+        try {
+
+            await navigator.clipboard.writeText(
+                text
+            );
+
+            console.log(
+                "Copied"
+            );
+
+        } catch (error) {
+
+            const area =
+                document.createElement(
+                    "textarea"
+                );
+
+
+            area.value =
+                text;
+
+
+            document.body.appendChild(
+                area
+            );
+
+
+            area.select();
+
+            document.execCommand(
+                "copy"
+            );
+
+
+            area.remove();
+
+        }
+
+    }
+
+
+    /* =================================================
+       SAVE MESSAGE
+    ================================================= */
+
+    function saveMessage(text) {
+
+        if (!text) {
+            return;
+        }
+
+
+        const saved =
+            JSON.parse(
+                localStorage.getItem(
+                    "viggoSavedMessages"
+                ) || "[]"
+            );
+
+
+        saved.push({
+
+            text:
+                text,
+
+            time:
+                Date.now()
+
+        });
+
+
+        localStorage.setItem(
+            "viggoSavedMessages",
+            JSON.stringify(saved)
+        );
+
+
+        alert(
+            "Message saved."
+        );
+
+    }
+
+
+    /* =================================================
+       SPEAKER
+    ================================================= */
+
+    function speakText(text) {
+
+        if (
+            !speakerEnabled ||
+            !text ||
+            !window.speechSynthesis
+        ) {
+            return;
+        }
+
+
+        window.speechSynthesis.cancel();
+
+
+        const utterance =
+            new SpeechSynthesisUtterance(
+                text
+            );
+
+
+        utterance.lang =
+            selectedLanguage;
+
+
+        window.speechSynthesis.speak(
+            utterance
+        );
+
+    }
+
+
+    /* =================================================
+       SCROLL
+    ================================================= */
+
+    function scrollToBottom() {
+
+        if (!conversation) {
+            return;
+        }
+
+
+        requestAnimationFrame(
+            function () {
+
+                conversation.scrollTop =
+                    conversation.scrollHeight;
+
+            }
+        );
+
+    }
+
+
+    /* =================================================
+       TYPING BUBBLE
+    ================================================= */
+
+    function showTyping() {
+
+        if (!conversation) {
+            return null;
+        }
+
+
+        const wrapper =
+            document.createElement(
+                "div"
+            );
+
+
+        wrapper.className =
+            "message-wrapper assistant";
+
+
+        wrapper.id =
+            "viggoTyping";
+
+
+        const bubble =
+            document.createElement(
+                "div"
+            );
+
+
+        bubble.className =
+            "message-bubble";
+
+
+        bubble.textContent =
+            "Thinking...";
+
+
+        wrapper.appendChild(
+            bubble
+        );
+
+
+        conversation.appendChild(
+            wrapper
+        );
+
+
+        scrollToBottom();
+
+
+        return wrapper;
+
+    }
+
+
+    function removeTyping() {
+
+        const typing =
+            get("viggoTyping");
+
+
+        if (typing) {
+            typing.remove();
+        }
+
+    }
+
+
+    /* =================================================
+       SEND MESSAGE
+    ================================================= */
+
+    async function sendMessage(text) {
+
+        if (!text) {
+
+            if (message) {
+                text =
+                    message.value.trim();
+            }
+
+        }
+
+
+        if (!text) {
+            return;
+        }
+
+
+        const chat =
+            ensureChat();
+
+
+        if (message) {
+            message.value = "";
+            message.style.height = "auto";
+        }
+
+
+        addMessageToUI(
+            "user",
+            text,
+            true
+        );
+
+
+        const typing =
+            showTyping();
+
+
+        try {
+
+            const response =
+                await fetch(
+                    API_URL,
+                    {
+
+                        method:
+                            "POST",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/json"
+
+                        },
+
+                        body:
+                            JSON.stringify({
+
+                                message:
+                                    text,
+
+                                language:
+                                    selectedLanguage
+
+                            })
+
+                    }
+                );
+
+
+            const data =
+                await response.json()
+                    .catch(
+                        function () {
+                            return {};
+                        }
+                    );
+
+
+            if (typing) {
+                typing.remove();
+            }
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error ||
+                    data.message ||
+                    "Server error " +
+                    response.status
+                );
+
+            }
+
+
+            const reply =
+                data.reply ||
+                data.response ||
+                data.text ||
+                data.message ||
+                "Sorry, I couldn't get a response.";
+
+
+            addMessageToUI(
+                "assistant",
+                reply,
+                true
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Viggo API Error:",
+                error
+            );
+
+
+            if (typing) {
+                typing.remove();
+            }
+
+
+            addMessageToUI(
+                "assistant",
+                "Sorry friend, I couldn't connect to Viggo AI right now.",
+                true
+            );
+
+        }
+
+    }
+
+
+    window.sendMessage =
+        sendMessage;
+
+
+    /* =================================================
+       FILE TO DATA URL
+    ================================================= */
+
+    function fileToDataURL(file) {
+
+        return new Promise(
+            function (resolve, reject) {
+
+                const reader =
+                    new FileReader();
+
+
+                reader.onload =
+                    function () {
+
+                        resolve(
+                            reader.result
+                        );
+
+                    };
+
+
+                reader.onerror =
+                    reject;
+
+
+                reader.readAsDataURL(
+                    file
+                );
+
+            }
+        );
+
+    }
+
+
+    /* =================================================
+       SEND UPLOADED FILE
+    ================================================= */
+
+    async function sendUploadedFile(file) {
+
+        if (!file) {
+            return;
+        }
+
+
+        console.log(
+            "Uploading:",
+            file.name
+        );
+
+
+        try {
+
+            const dataURL =
+                await fileToDataURL(
+                    file
+                );
+
+
+            const media = {
+
+                name:
+                    file.name,
+
+                type:
+                    file.type,
+
+                data:
+                    dataURL
+
+            };
+
+
+            const chat =
+                ensureChat();
+
+
+            addMessageToUI(
+                "user",
+                "Uploaded: " +
+                file.name,
+                true,
+                media
+            );
+
+
+            const typing =
+                showTyping();
+
+
+            /*
+               Send file metadata to server.
+               Existing server can decide how
+               to process it.
+            */
+
+            const response =
+                await fetch(
+                    API_URL,
+                    {
+
+                        method:
+                            "POST",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/json"
+
+                        },
+
+                        body:
+                            JSON.stringify({
+
+                                message:
+                                    "Please analyze this uploaded file: " +
+                                    file.name,
+
+                                file: {
+
+                                    name:
+                                        file.name,
+
+                                    type:
+                                        file.type,
+
+                                    size:
+                                        file.size,
+
+                                    data:
+                                        dataURL
+
+                                },
+
+                                language:
+                                    selectedLanguage
+
+                            })
+
+                    }
+                );
+
+
+            const data =
+                await response.json()
+                    .catch(
+                        function () {
+                            return {};
+                        }
+                    );
+
+
+            if (typing) {
+                typing.remove();
+            }
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error ||
+                    "Upload server error"
+                );
+
+            }
+
+
+            const reply =
+                data.reply ||
+                data.response ||
+                data.text ||
+                data.message ||
+                "File uploaded successfully.";
+
+
+            addMessageToUI(
+                "assistant",
+                reply,
+                true
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Upload error:",
+                error
+            );
+
+
+            const typing =
+                get("viggoTyping");
+
+
+            if (typing) {
+                typing.remove();
+            }
+
+
+            addMessageToUI(
+                "assistant",
+                "The file was selected, but I couldn't analyze it right now.",
+                true
+            );
+
+        }
+
+    }
+
+
+    window.sendUploadedFile =
+        sendUploadedFile;
+
+
+    /* =================================================
+       PLUS MENU
+    ================================================= */
+
+    function openPlusMenu() {
+
+        if (!plusMenu) {
+            return;
+        }
+
+
+        plusMenu.classList.add(
+            "show"
+        );
+
+
+        plusMenu.style.display =
+            "flex";
+
+    }
+
+
+    function closePlusMenu() {
+
+        if (!plusMenu) {
+            return;
+        }
+
+
+        plusMenu.classList.remove(
+            "show"
+        );
+
+
+        plusMenu.style.display =
+            "none";
+
+    }
+
+
+    function togglePlusMenu() {
+
+        if (!plusMenu) {
+            return;
+        }
+
+
+        const isOpen =
+            plusMenu.classList.contains(
+                "show"
+            );
+
+
+        if (isOpen) {
+
+            closePlusMenu();
+
+        } else {
+
+            openPlusMenu();
+
+        }
+
+    }
+
+
+    /* =================================================
+       PLUS BUTTON
     ================================================= */
 
     if (plusBtn) {
@@ -1119,6 +1834,7 @@ function initialize() {
             function (event) {
 
                 event.preventDefault();
+
                 event.stopPropagation();
 
                 togglePlusMenu();
@@ -1130,8 +1846,12 @@ function initialize() {
 
 
     /* =================================================
-       CAMERA
+       CAMERA BUTTON
     ================================================= */
+
+    const cameraBtn =
+        get("cameraBtn");
+
 
     if (cameraBtn) {
 
@@ -1140,9 +1860,20 @@ function initialize() {
             function (event) {
 
                 event.preventDefault();
+
                 event.stopPropagation();
 
-                openCamera();
+                closePlusMenu();
+
+
+                if (cameraInput) {
+
+                    cameraInput.value =
+                        "";
+
+                    cameraInput.click();
+
+                }
 
             }
         );
@@ -1151,8 +1882,12 @@ function initialize() {
 
 
     /* =================================================
-       PHOTO
+       PHOTO BUTTON
     ================================================= */
+
+    const photoBtn =
+        get("photoBtn");
+
 
     if (photoBtn) {
 
@@ -1161,9 +1896,20 @@ function initialize() {
             function (event) {
 
                 event.preventDefault();
+
                 event.stopPropagation();
 
-                openPhoto();
+                closePlusMenu();
+
+
+                if (photoInput) {
+
+                    photoInput.value =
+                        "";
+
+                    photoInput.click();
+
+                }
 
             }
         );
@@ -1172,8 +1918,12 @@ function initialize() {
 
 
     /* =================================================
-       VIDEO
+       VIDEO BUTTON
     ================================================= */
+
+    const videoBtn =
+        get("videoBtn");
+
 
     if (videoBtn) {
 
@@ -1182,9 +1932,20 @@ function initialize() {
             function (event) {
 
                 event.preventDefault();
+
                 event.stopPropagation();
 
-                openVideo();
+                closePlusMenu();
+
+
+                if (videoInput) {
+
+                    videoInput.value =
+                        "";
+
+                    videoInput.click();
+
+                }
 
             }
         );
@@ -1193,8 +1954,12 @@ function initialize() {
 
 
     /* =================================================
-       FILE
+       FILE BUTTON
     ================================================= */
+
+    const fileBtn =
+        get("fileBtn");
+
 
     if (fileBtn) {
 
@@ -1203,9 +1968,20 @@ function initialize() {
             function (event) {
 
                 event.preventDefault();
+
                 event.stopPropagation();
 
-                openFile();
+                closePlusMenu();
+
+
+                if (fileInput) {
+
+                    fileInput.value =
+                        "";
+
+                    fileInput.click();
+
+                }
 
             }
         );
@@ -1214,8 +1990,60 @@ function initialize() {
 
 
     /* =================================================
-       CAMERA INPUT
+       FILE EVENTS
     ================================================= */
+
+    function processFile(
+        input,
+        source
+    ) {
+
+        if (
+            !input ||
+            !input.files ||
+            !input.files.length
+        ) {
+            return;
+        }
+
+
+        const file =
+            input.files[0];
+
+
+        console.log(
+            source,
+            file.name
+        );
+
+
+        const maxSize =
+            20 * 1024 * 1024;
+
+
+        if (
+            file.size >
+            maxSize
+        ) {
+
+            alert(
+                "Maximum file size is 20 MB."
+            );
+
+            input.value =
+                "";
+
+            return;
+
+        }
+
+
+        sendUploadedFile(
+            file
+        );
+
+    }
+
 
     if (cameraInput) {
 
@@ -1223,27 +2051,16 @@ function initialize() {
             "change",
             function () {
 
-                if (
-                    this.files &&
-                    this.files.length
-                ) {
-
-                    handleSelectedFile(
-                        this.files[0],
-                        "camera"
-                    );
-
-                }
+                processFile(
+                    cameraInput,
+                    "camera"
+                );
 
             }
         );
 
     }
 
-
-    /* =================================================
-       PHOTO INPUT
-    ================================================= */
 
     if (photoInput) {
 
@@ -1251,27 +2068,16 @@ function initialize() {
             "change",
             function () {
 
-                if (
-                    this.files &&
-                    this.files.length
-                ) {
-
-                    handleSelectedFile(
-                        this.files[0],
-                        "photo"
-                    );
-
-                }
+                processFile(
+                    photoInput,
+                    "photo"
+                );
 
             }
         );
 
     }
 
-
-    /* =================================================
-       VIDEO INPUT
-    ================================================= */
 
     if (videoInput) {
 
@@ -1279,27 +2085,16 @@ function initialize() {
             "change",
             function () {
 
-                if (
-                    this.files &&
-                    this.files.length
-                ) {
-
-                    handleSelectedFile(
-                        this.files[0],
-                        "video"
-                    );
-
-                }
+                processFile(
+                    videoInput,
+                    "video"
+                );
 
             }
         );
 
     }
 
-
-    /* =================================================
-       FILE INPUT
-    ================================================= */
 
     if (fileInput) {
 
@@ -1307,17 +2102,10 @@ function initialize() {
             "change",
             function () {
 
-                if (
-                    this.files &&
-                    this.files.length
-                ) {
-
-                    handleSelectedFile(
-                        this.files[0],
-                        "file"
-                    );
-
-                }
+                processFile(
+                    fileInput,
+                    "file"
+                );
 
             }
         );
@@ -1326,17 +2114,18 @@ function initialize() {
 
 
     /* =================================================
-       VOICE MENU
+       PLUS VOICE
     ================================================= */
+
+    const plusVoiceBtn =
+        get("plusVoiceBtn");
+
 
     if (plusVoiceBtn) {
 
         plusVoiceBtn.addEventListener(
             "click",
-            function (event) {
-
-                event.preventDefault();
-                event.stopPropagation();
+            function () {
 
                 closePlusMenu();
 
@@ -1349,143 +2138,168 @@ function initialize() {
 
 
     /* =================================================
+       VOICE MODAL
+    ================================================= */
+
+    function openVoiceModal() {
+
+        if (voiceModal) {
+
+            voiceModal.style.display =
+                "flex";
+
+        }
+
+    }
+
+
+    function closeVoiceModal() {
+
+        if (voiceModal) {
+
+            voiceModal.style.display =
+                "none";
+
+        }
+
+    }
+
+
+    const closeVoice =
+        get("closeVoice");
+
+
+    if (closeVoice) {
+
+        closeVoice.addEventListener(
+            "click",
+            closeVoiceModal
+        );
+
+    }
+
+
+    const startVoice =
+        get("startVoice");
+
+
+    if (startVoice) {
+
+        startVoice.addEventListener(
+            "click",
+            function () {
+
+                closeVoiceModal();
+
+                startRecognition();
+
+            }
+        );
+
+    }
+
+
+    /* =================================================
        MICROPHONE
     ================================================= */
 
-    if (mic) {
+    function startRecognition() {
 
-        mic.addEventListener(
-            "click",
+        const Recognition =
+            window.SpeechRecognition ||
+            window.webkitSpeechRecognition;
+
+
+        if (!Recognition) {
+
+            alert(
+                "Voice recognition is not supported in this browser."
+            );
+
+            return;
+
+        }
+
+
+        const recognition =
+            new Recognition();
+
+
+        recognition.lang =
+            selectedLanguage;
+
+
+        recognition.continuous =
+            false;
+
+
+        recognition.interimResults =
+            false;
+
+
+        recognition.onstart =
+            function () {
+
+                console.log(
+                    "🎤 Listening..."
+                );
+
+            };
+
+
+        recognition.onresult =
             function (event) {
 
-                event.preventDefault();
-
-                startMicrophone();
-
-            }
-        );
-
-    }
+                const result =
+                    event.results[0][0]
+                        .transcript;
 
 
-    /* =================================================
-       SEND
-    ================================================= */
+                if (message) {
 
-    if (send) {
+                    message.value =
+                        result;
 
-        send.addEventListener(
-            "click",
-            function (event) {
-
-                event.preventDefault();
-
-                sendCurrentMessage();
-
-            }
-        );
-
-    }
-
-
-    /* =================================================
-       ENTER SEND
-    ================================================= */
-
-    if (message) {
-
-        message.addEventListener(
-            "keydown",
-            function (event) {
-
-                if (
-                    event.key === "Enter" &&
-                    !event.shiftKey
-                ) {
-
-                    event.preventDefault();
-
-                    sendCurrentMessage();
+                    message.focus();
 
                 }
 
-            }
-        );
+            };
 
 
-        /*
-           Auto height
-        */
-
-        message.addEventListener(
-            "input",
-            function () {
-
-                this.style.height =
-                    "auto";
-
-                this.style.height =
-                    Math.min(
-                        this.scrollHeight,
-                        140
-                    ) + "px";
-
-            }
-        );
-
-    }
-
-
-    /* =================================================
-       OPEN SIDEBAR
-    ================================================= */
-
-    if (openSidebar) {
-
-        openSidebar.addEventListener(
-            "click",
-            function () {
-
-                openSideBar();
-
-            }
-        );
-
-    }
-
-
-    /* =================================================
-       CLOSE SIDEBAR
-    ================================================= */
-
-    if (closeSidebar) {
-
-        closeSidebar.addEventListener(
-            "click",
-            function () {
-
-                closeSideBar();
-
-            }
-        );
-
-    }
-
-
-    /* =================================================
-       MORE
-    ================================================= */
-
-    if (moreBtn) {
-
-        moreBtn.addEventListener(
-            "click",
+        recognition.onerror =
             function (event) {
 
-                event.preventDefault();
-                event.stopPropagation();
+                console.error(
+                    "Voice error:",
+                    event.error
+                );
 
-                toggleMoreMenu();
+            };
+
+
+        try {
+
+            recognition.start();
+
+        } catch (error) {
+
+            console.error(
+                error
+            );
+
+        }
+
+    }
+
+
+    if (micBtn) {
+
+        micBtn.addEventListener(
+            "click",
+            function () {
+
+                startRecognition();
 
             }
         );
@@ -1500,18 +2314,14 @@ function initialize() {
     const voiceMenuBtn =
         get("voiceMenuBtn");
 
+
     if (voiceMenuBtn) {
 
         voiceMenuBtn.addEventListener(
             "click",
             function () {
 
-                if (moreMenu) {
-
-                    moreMenu.style.display =
-                        "none";
-
-                }
+                closeMoreMenu();
 
                 openVoiceModal();
 
@@ -1528,18 +2338,51 @@ function initialize() {
     const languageBtn =
         get("languageBtn");
 
+
+    function openLanguageModal() {
+
+        if (!languageModal) {
+            return;
+        }
+
+
+        const select =
+            get("languageSelect");
+
+
+        if (select) {
+
+            select.value =
+                selectedLanguage;
+
+        }
+
+
+        languageModal.style.display =
+            "flex";
+
+    }
+
+
+    function closeLanguageModal() {
+
+        if (languageModal) {
+
+            languageModal.style.display =
+                "none";
+
+        }
+
+    }
+
+
     if (languageBtn) {
 
         languageBtn.addEventListener(
             "click",
             function () {
 
-                if (moreMenu) {
-
-                    moreMenu.style.display =
-                        "none";
-
-                }
+                closeMoreMenu();
 
                 openLanguageModal();
 
@@ -1549,107 +2392,49 @@ function initialize() {
     }
 
 
-    /* =================================================
-       CLOSE VOICE
-    ================================================= */
-
-    const closeVoice =
-        get("closeVoice");
-
-    if (closeVoice) {
-
-        closeVoice.addEventListener(
-            "click",
-            function () {
-
-                closeVoiceModal();
-
-            }
-        );
-
-    }
-
-
-    /* =================================================
-       START VOICE
-    ================================================= */
-
-    const startVoice =
-        get("startVoice");
-
-    if (startVoice) {
-
-        startVoice.addEventListener(
-            "click",
-            function () {
-
-                closeVoiceModal();
-
-                startMicrophone();
-
-            }
-        );
-
-    }
-
-
-    /* =================================================
-       CLOSE LANGUAGE
-    ================================================= */
-
     const closeLanguage =
         get("closeLanguage");
+
 
     if (closeLanguage) {
 
         closeLanguage.addEventListener(
             "click",
-            function () {
-
-                closeLanguageModal();
-
-            }
+            closeLanguageModal
         );
 
     }
 
 
-    /* =================================================
-       SAVE LANGUAGE
-    ================================================= */
-
     const saveLanguage =
         get("saveLanguage");
 
-    const languageSelect =
-        get("languageSelect");
 
-    if (
-        saveLanguage &&
-        languageSelect
-    ) {
+    if (saveLanguage) {
 
         saveLanguage.addEventListener(
             "click",
             function () {
 
-                const language =
-                    languageSelect.value;
+                const select =
+                    get("languageSelect");
 
 
-                localStorage.setItem(
-                    "viggoLanguage",
-                    language
-                );
+                if (select) {
+
+                    selectedLanguage =
+                        select.value;
+
+
+                    localStorage.setItem(
+                        "viggoLanguage",
+                        selectedLanguage
+                    );
+
+                }
 
 
                 closeLanguageModal();
-
-
-                console.log(
-                    "Language saved:",
-                    language
-                );
 
             }
         );
@@ -1658,11 +2443,238 @@ function initialize() {
 
 
     /* =================================================
-       NEW CHAT
+       MORE MENU
     ================================================= */
 
-    const newChatBtn =
-        get("newChat");
+    function openMoreMenu() {
+
+        if (!moreMenu) {
+            return;
+        }
+
+
+        moreMenu.classList.add(
+            "show"
+        );
+
+
+        moreMenu.style.display =
+            "block";
+
+    }
+
+
+    function closeMoreMenu() {
+
+        if (!moreMenu) {
+            return;
+        }
+
+
+        moreMenu.classList.remove(
+            "show"
+        );
+
+
+        moreMenu.style.display =
+            "none";
+
+    }
+
+
+    function toggleMoreMenu() {
+
+        if (!moreMenu) {
+            return;
+        }
+
+
+        const open =
+            moreMenu.classList.contains(
+                "show"
+            );
+
+
+        if (open) {
+
+            closeMoreMenu();
+
+        } else {
+
+            openMoreMenu();
+
+        }
+
+    }
+
+
+    if (moreBtn) {
+
+        moreBtn.addEventListener(
+            "click",
+            function (event) {
+
+                event.preventDefault();
+
+                event.stopPropagation();
+
+                toggleMoreMenu();
+
+            }
+        );
+
+    }
+
+
+    /* =================================================
+       SHARE
+    ================================================= */
+
+    if (shareBtn) {
+
+        shareBtn.addEventListener(
+            "click",
+            async function () {
+
+                const url =
+                    window.location.href;
+
+
+                if (
+                    navigator.share
+                ) {
+
+                    try {
+
+                        await navigator.share({
+
+                            title:
+                                "Viggo AI",
+
+                            text:
+                                "Check out Viggo AI",
+
+                            url:
+                                url
+
+                        });
+
+                    } catch (error) {
+
+                        console.log(
+                            "Share cancelled"
+                        );
+
+                    }
+
+                } else {
+
+                    try {
+
+                        await navigator.clipboard
+                            .writeText(
+                                url
+                            );
+
+
+                        alert(
+                            "Viggo AI link copied."
+                        );
+
+                    } catch (error) {
+
+                        alert(
+                            "Share is not supported."
+                        );
+
+                    }
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* =================================================
+       SIDEBAR
+    ================================================= */
+
+    function openSidebarMobile() {
+
+        if (!sidebar) {
+            return;
+        }
+
+
+        sidebar.classList.add(
+            "open"
+        );
+
+
+        sidebar.style.transform =
+            "translateX(0)";
+
+    }
+
+
+    function closeSidebarMobile() {
+
+        if (!sidebar) {
+            return;
+        }
+
+
+        sidebar.classList.remove(
+            "open"
+        );
+
+
+        if (
+            window.innerWidth <=
+            768
+        ) {
+
+            sidebar.style.transform =
+                "translateX(-100%)";
+
+        }
+
+    }
+
+
+    if (openSidebar) {
+
+        openSidebar.addEventListener(
+            "click",
+            function () {
+
+                openSidebarMobile();
+
+            }
+        );
+
+    }
+
+
+    if (closeSidebar) {
+
+        closeSidebar.addEventListener(
+            "click",
+            function () {
+
+                closeSidebarMobile();
+
+            }
+        );
+
+    }
+
+
+    /* =================================================
+       NEW CHAT BUTTON
+    ================================================= */
 
     if (newChatBtn) {
 
@@ -1682,33 +2694,15 @@ function initialize() {
        SEARCH
     ================================================= */
 
-    const searchChat =
-        get("searchChat");
-
     if (searchChat) {
 
         searchChat.addEventListener(
             "input",
-            searchChats
-        );
-
-    }
-
-
-    /* =================================================
-       SHARE
-    ================================================= */
-
-    const shareBtn =
-        get("shareBtn");
-
-    if (shareBtn) {
-
-        shareBtn.addEventListener(
-            "click",
             function () {
 
-                shareViggo();
+                renderHistory(
+                    searchChat.value
+                );
 
             }
         );
@@ -1717,11 +2711,12 @@ function initialize() {
 
 
     /* =================================================
-       SELECT CHATS
+       SELECT CHAT
     ================================================= */
 
     const selectChatsBtn =
         get("selectChatsBtn");
+
 
     if (selectChatsBtn) {
 
@@ -1729,20 +2724,7 @@ function initialize() {
             "click",
             function () {
 
-                if (
-                    typeof window.selectChats ===
-                    "function"
-                ) {
-
-                    window.selectChats();
-
-                } else {
-
-                    alert(
-                        "Chat selection mode"
-                    );
-
-                }
+                selectChats();
 
             }
         );
@@ -1757,26 +2739,14 @@ function initialize() {
     const deleteSelectedBtn =
         get("deleteSelectedBtn");
 
+
     if (deleteSelectedBtn) {
 
         deleteSelectedBtn.addEventListener(
             "click",
             function () {
 
-                if (
-                    typeof window.deleteSelectedChats ===
-                    "function"
-                ) {
-
-                    window.deleteSelectedChats();
-
-                } else {
-
-                    console.warn(
-                        "deleteSelectedChats() not found"
-                    );
-
-                }
+                deleteSelectedChats();
 
             }
         );
@@ -1785,11 +2755,12 @@ function initialize() {
 
 
     /* =================================================
-       CLEAR CHAT
+       CLEAR CHAT BUTTON
     ================================================= */
 
     const clearChatBtn =
         get("clearChatBtn");
+
 
     if (clearChatBtn) {
 
@@ -1797,26 +2768,9 @@ function initialize() {
             "click",
             function () {
 
-                if (
-                    typeof window.clearChat ===
-                    "function"
-                ) {
+                closeMoreMenu();
 
-                    window.clearChat();
-
-                } else {
-
-                    const conversation =
-                        get("conversation");
-
-                    if (conversation) {
-
-                        conversation.innerHTML =
-                            "";
-
-                    }
-
-                }
+                clearChat();
 
             }
         );
@@ -1825,7 +2779,7 @@ function initialize() {
 
 
     /* =================================================
-       CLOSE MENUS WHEN CLICK OUTSIDE
+       CLICK OUTSIDE
     ================================================= */
 
     document.addEventListener(
@@ -1855,12 +2809,7 @@ function initialize() {
                 event.target !== moreBtn
             ) {
 
-                moreMenu.classList.remove(
-                    "show"
-                );
-
-                moreMenu.style.display =
-                    "none";
+                closeMoreMenu();
 
             }
 
@@ -1869,25 +2818,49 @@ function initialize() {
 
 
     /* =================================================
-       MOBILE SIDEBAR
+       MODAL CLICK OUTSIDE
     ================================================= */
 
-    window.addEventListener(
-        "resize",
-        function () {
+    if (voiceModal) {
 
-            if (
-                window.innerWidth > 768 &&
-                sidebar
-            ) {
+        voiceModal.addEventListener(
+            "click",
+            function (event) {
 
-                sidebar.style.transform =
-                    "";
+                if (
+                    event.target ===
+                    voiceModal
+                ) {
+
+                    closeVoiceModal();
+
+                }
 
             }
+        );
 
-        }
-    );
+    }
+
+
+    if (languageModal) {
+
+        languageModal.addEventListener(
+            "click",
+            function (event) {
+
+                if (
+                    event.target ===
+                    languageModal
+                ) {
+
+                    closeLanguageModal();
+
+                }
+
+            }
+        );
+
+    }
 
 
     /* =================================================
@@ -1898,20 +2871,20 @@ function initialize() {
         "keydown",
         function (event) {
 
-            if (event.key === "Escape") {
+            if (
+                event.key ===
+                "Escape"
+            ) {
 
                 closePlusMenu();
+
+                closeMoreMenu();
 
                 closeVoiceModal();
 
                 closeLanguageModal();
 
-                if (moreMenu) {
-
-                    moreMenu.style.display =
-                        "none";
-
-                }
+                closeSidebarMobile();
 
             }
 
@@ -1920,7 +2893,84 @@ function initialize() {
 
 
     /* =================================================
-       READY
+       INITIAL CHAT
+    ================================================= */
+
+    if (!chats.length) {
+
+        createChat();
+
+    } else {
+
+        if (
+            !currentChatId ||
+            !getCurrentChat()
+        ) {
+
+            currentChatId =
+                chats[0].id;
+
+            saveChats();
+
+        }
+
+
+        renderHistory();
+
+        renderConversation();
+
+    }
+
+
+    /* =================================================
+       SEND BUTTON
+    ================================================= */
+
+    if (sendBtn) {
+
+        sendBtn.addEventListener(
+            "click",
+            function (event) {
+
+                event.preventDefault();
+
+                sendMessage();
+
+            }
+        );
+
+    }
+
+
+    /* =================================================
+       ENTER SEND
+    ================================================= */
+
+    if (message) {
+
+        message.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Enter" &&
+                    !event.shiftKey
+                ) {
+
+                    event.preventDefault();
+
+                    sendMessage();
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* =================================================
+       FINAL
     ================================================= */
 
     console.log(
@@ -1928,59 +2978,64 @@ function initialize() {
     );
 
     console.log(
-        "✓ ALL VIGGO BUTTONS CONNECTED"
+        "✓ VIGGO AI READY"
     );
 
     console.log(
-        "✓ MOBILE CAMERA READY"
+        "✓ SEND"
     );
 
     console.log(
-        "✓ PHOTO READY"
+        "✓ NEW CHAT"
     );
 
     console.log(
-        "✓ VIDEO READY"
+        "✓ SIDEBAR"
     );
 
     console.log(
-        "✓ FILE READY"
+        "✓ MORE"
     );
 
     console.log(
-        "✓ VOICE READY"
+        "✓ SHARE"
     );
 
     console.log(
-        "✓ SEND READY"
+        "✓ CAMERA"
+    );
+
+    console.log(
+        "✓ PHOTO"
+    );
+
+    console.log(
+        "✓ VIDEO"
+    );
+
+    console.log(
+        "✓ FILE"
+    );
+
+    console.log(
+        "✓ MICROPHONE"
+    );
+
+    console.log(
+        "✓ VOICE"
+    );
+
+    console.log(
+        "✓ LANGUAGE"
+    );
+
+    console.log(
+        "✓ MOBILE VIEW"
     );
 
     console.log(
         "================================="
     );
-
-}
-
-
-/* =====================================================
-   DOM READY
-===================================================== */
-
-if (
-    document.readyState ===
-    "loading"
-) {
-
-    document.addEventListener(
-        "DOMContentLoaded",
-        initialize
-    );
-
-} else {
-
-    initialize();
-
-}
 
 
 })();
