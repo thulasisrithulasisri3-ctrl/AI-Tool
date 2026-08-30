@@ -1,4 +1,3 @@
-
 /* =====================================================
    VIGGO AI - FULL CSS
    BLACK + BLUE THEME
@@ -15,7 +14,9 @@ body {
     width: 100%;
     height: 100%;
     overflow: hidden;
+
     font-family: Arial, Helvetica, sans-serif;
+
     background: #050505;
     color: #ffffff;
 }
@@ -24,8 +25,9 @@ body {
     min-height: 100vh;
 }
 
+
 /* =====================================================
-   APP HEIGHT
+   ROOT
 ===================================================== */
 
 :root {
@@ -36,6 +38,7 @@ body {
     --blue-light: #3da0ff;
 
     --black: #050505;
+
     --panel: #0d0d0d;
     --panel-2: #111111;
 
@@ -45,12 +48,14 @@ body {
     --muted: #999999;
 }
 
+
 /* =====================================================
    SIDEBAR
 ===================================================== */
 
 .sidebar {
     position: fixed;
+
     left: 0;
     top: 0;
 
@@ -68,6 +73,7 @@ body {
 
     transition: transform 0.25s ease;
 }
+
 
 /* =====================================================
    SIDEBAR HEADER
@@ -109,6 +115,7 @@ body {
     background: #1a1a1a !important;
 }
 
+
 /* =====================================================
    NEW CHAT
 ===================================================== */
@@ -135,6 +142,7 @@ body {
 .new-chat:hover {
     background: #0872f9;
 }
+
 
 /* =====================================================
    SEARCH
@@ -179,6 +187,7 @@ body {
     color: #777777;
 }
 
+
 /* =====================================================
    HISTORY TITLE
 ===================================================== */
@@ -193,6 +202,7 @@ body {
 
     letter-spacing: 1px;
 }
+
 
 /* =====================================================
    CHAT HISTORY
@@ -214,6 +224,7 @@ body {
     background: #333333;
     border-radius: 10px;
 }
+
 
 /* =====================================================
    HISTORY ITEM
@@ -240,6 +251,8 @@ body {
 
     background: transparent !important;
 
+    border: 1px solid transparent;
+
     transition: 0.2s;
 }
 
@@ -252,6 +265,7 @@ body {
 
     border: 1px solid #174d7d;
 }
+
 
 /* =====================================================
    HISTORY CHAT TITLE
@@ -273,77 +287,80 @@ body {
     text-overflow: ellipsis;
 }
 
+
 /* =====================================================
    HISTORY ACTIONS
    PIN + DELETE
 ===================================================== */
 
 .history-actions {
-    display: flex !important;
+    display: flex;
 
-    align-items: center !important;
+    align-items: center;
 
-    gap: 5px !important;
+    justify-content: center;
 
-    flex-shrink: 0;
+    gap: 5px;
+
+    flex: 0 0 auto;
 }
 
+
 /* =====================================================
-   PIN + DELETE BUTTON BASE
+   PIN + DELETE BUTTON
+   FORCE BLACK/BLUE THEME
 ===================================================== */
 
-.history-action-btn {
-    width: 32px !important;
-    height: 32px !important;
+.history-actions button,
+.history-action-btn,
+.history-action-btn.pin-btn,
+.history-action-btn.delete-btn {
+    width: 32px;
+    height: 32px;
 
-    min-width: 32px !important;
-    min-height: 32px !important;
-
-    display: flex !important;
-
-    align-items: center !important;
-    justify-content: center !important;
+    min-width: 32px;
+    min-height: 32px;
 
     padding: 0 !important;
     margin: 0 !important;
 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     border: 1px solid #24527a !important;
 
-    border-radius: 8px !important;
+    border-radius: 8px;
 
-    /*
-       REMOVE WHITE BACKGROUND
-    */
-
-    background: #0d1c2b !important;
     background-color: #0d1c2b !important;
     background-image: none !important;
 
     color: #ffffff !important;
 
-    outline: none !important;
-
     box-shadow: none !important;
 
-    appearance: none !important;
-    -webkit-appearance: none !important;
+    outline: none;
 
-    cursor: pointer !important;
+    cursor: pointer;
 
-    font-size: 14px !important;
+    font-size: 14px;
+
+    appearance: none;
+    -webkit-appearance: none;
 
     transition:
         background-color 0.2s ease,
         border-color 0.2s ease,
-        color 0.2s ease,
         transform 0.15s ease;
 }
 
+
 /* =====================================================
-   PIN
+   REMOVE WHITE BACKGROUND FROM PIN
 ===================================================== */
 
-.history-action-btn.pin-btn {
+.history-actions .pin-btn,
+.history-actions button.pin-btn {
     background: #0d1c2b !important;
     background-color: #0d1c2b !important;
     background-image: none !important;
@@ -353,51 +370,73 @@ body {
     border: 1px solid #24527a !important;
 }
 
-.history-action-btn.pin-btn:hover {
+
+/* =====================================================
+   REMOVE WHITE BACKGROUND FROM DELETE
+===================================================== */
+
+.history-actions .delete-btn,
+.history-actions button.delete-btn {
+    background: #0d1c2b !important;
+    background-color: #0d1c2b !important;
+    background-image: none !important;
+
+    color: #ff6b6b !important;
+
+    border: 1px solid #24527a !important;
+}
+
+
+/* =====================================================
+   PIN HOVER
+===================================================== */
+
+.history-actions .pin-btn:hover,
+.history-actions button.pin-btn:hover {
     background: #12395a !important;
     background-color: #12395a !important;
-    background-image: none !important;
-
-    color: #3da0ff !important;
 
     border-color: #1683ff !important;
+
+    color: #3da0ff !important;
 }
+
 
 /* =====================================================
-   DELETE
+   DELETE HOVER
 ===================================================== */
 
-.history-action-btn.delete-btn {
-    background: #0d1c2b !important;
-    background-color: #0d1c2b !important;
-    background-image: none !important;
-
-    color: #ff6b6b !important;
-
-    border: 1px solid #24527a !important;
-}
-
-.history-action-btn.delete-btn:hover {
+.history-actions .delete-btn:hover,
+.history-actions button.delete-btn:hover {
     background: #291414 !important;
     background-color: #291414 !important;
-    background-image: none !important;
-
-    color: #ff6b6b !important;
 
     border-color: #ff5555 !important;
+
+    color: #ff6b6b !important;
 }
+
 
 /* =====================================================
-   ACTION CLICK
+   BUTTON ACTIVE
 ===================================================== */
 
-.history-action-btn:active {
-    transform: scale(0.94) !important;
+.history-actions .history-action-btn:active,
+.history-actions button:active {
+    transform: scale(0.94);
 }
 
-.history-action-btn:focus {
-    outline: none !important;
+
+/* =====================================================
+   REMOVE POSSIBLE WHITE BUTTON STYLING
+===================================================== */
+
+.history-actions button::before,
+.history-actions button::after {
+    background: transparent !important;
+    background-color: transparent !important;
 }
+
 
 /* =====================================================
    SELECT CHAT MODE
@@ -410,7 +449,7 @@ body {
 .history-item.selected {
     background: #102b49 !important;
 
-    border: 1px solid #1683ff;
+    border: 1px solid #1683ff !important;
 
     box-shadow:
         0 0 0 1px rgba(22, 131, 255, 0.15);
@@ -426,6 +465,7 @@ body {
 
     cursor: pointer;
 }
+
 
 /* =====================================================
    SIDEBAR MORE
@@ -470,6 +510,7 @@ body {
 .more-dots {
     font-size: 22px;
 }
+
 
 /* =====================================================
    MORE MENU
@@ -532,6 +573,7 @@ body {
     background: #1d1d1d !important;
 }
 
+
 /* =====================================================
    MAIN
 ===================================================== */
@@ -550,6 +592,7 @@ body {
 
     background: #050505;
 }
+
 
 /* =====================================================
    TOPBAR
@@ -604,10 +647,12 @@ body {
 
 .brand {
     font-size: 20px;
+
     font-weight: 700;
 
     color: #ffffff;
 }
+
 
 /* =====================================================
    SHARE
@@ -638,6 +683,7 @@ body {
 
     border-color: #278fff;
 }
+
 
 /* =====================================================
    CHAT AREA
@@ -670,8 +716,10 @@ body {
 
 .conversation::-webkit-scrollbar-thumb {
     background: #292929;
+
     border-radius: 10px;
 }
+
 
 /* =====================================================
    MESSAGE
@@ -699,6 +747,7 @@ body {
     display: flex;
     flex-direction: column;
 }
+
 
 /* =====================================================
    MESSAGE BUBBLE
@@ -735,6 +784,7 @@ body {
 
     border-bottom-left-radius: 5px;
 }
+
 
 /* =====================================================
    MESSAGE ACTIONS
@@ -776,6 +826,7 @@ body {
     background: #101d2b !important;
 }
 
+
 /* =====================================================
    TYPING
 ===================================================== */
@@ -787,6 +838,7 @@ body {
 }
 
 @keyframes typingPulse {
+
     0% {
         opacity: 0.45;
     }
@@ -799,6 +851,7 @@ body {
         opacity: 0.45;
     }
 }
+
 
 /* =====================================================
    INPUT AREA
@@ -837,6 +890,7 @@ body {
     z-index: 500;
 }
 
+
 /* =====================================================
    PLUS
 ===================================================== */
@@ -863,6 +917,7 @@ body {
 .input-plus:hover {
     background: #252525 !important;
 }
+
 
 /* =====================================================
    TEXTAREA
@@ -899,6 +954,7 @@ body {
     color: #777777;
 }
 
+
 /* =====================================================
    MIC
 ===================================================== */
@@ -932,6 +988,7 @@ body {
     box-shadow:
         0 0 12px rgba(22, 131, 255, 0.55);
 }
+
 
 /* =====================================================
    SEND
@@ -971,6 +1028,7 @@ body {
 
     transform: none;
 }
+
 
 /* =====================================================
    PLUS MENU
@@ -1033,6 +1091,7 @@ body {
 .plus-menu button:hover {
     background: #1d1d1d !important;
 }
+
 
 /* =====================================================
    MODAL
@@ -1149,6 +1208,7 @@ body {
     background: #1688ff !important;
 }
 
+
 /* =====================================================
    MOBILE
 ===================================================== */
@@ -1259,7 +1319,24 @@ body {
 
         bottom: 75px;
     }
+
+    /* MOBILE PIN + DELETE */
+
+    .history-actions button,
+    .history-action-btn,
+    .history-action-btn.pin-btn,
+    .history-action-btn.delete-btn {
+        width: 32px;
+        height: 32px;
+
+        min-width: 32px;
+        min-height: 32px;
+
+        background-color: #0d1c2b !important;
+        background-image: none !important;
+    }
 }
+
 
 /* =====================================================
    SMALL MOBILE
@@ -1311,13 +1388,23 @@ body {
         height: 38px;
     }
 
+    .history-actions {
+        gap: 4px;
+    }
+
+    .history-actions button,
     .history-action-btn {
-        width: 30px !important;
-        height: 30px !important;
-        min-width: 30px !important;
-        min-height: 30px !important;
+        width: 30px;
+        height: 30px;
+
+        min-width: 30px;
+        min-height: 30px;
+
+        background-color: #0d1c2b !important;
+        background-image: none !important;
     }
 }
+
 
 /* =====================================================
    TOUCH DEVICES
@@ -1333,6 +1420,7 @@ select {
     -webkit-tap-highlight-color: transparent;
 }
 
+
 /* =====================================================
    IMAGE / VIDEO
 ===================================================== */
@@ -1345,6 +1433,7 @@ select {
 
     object-fit: contain;
 }
+
 
 /* =====================================================
    SAFE AREA
@@ -1359,30 +1448,59 @@ select {
                 env(safe-area-inset-bottom)
             );
     }
+
 }
+
 
 /* =====================================================
-   FINAL WHITE BACKGROUND KILL
-   PIN + DELETE ONLY
+   FINAL FORCE - HISTORY PIN / DELETE
+   NO WHITE BACKGROUND
 ===================================================== */
 
-.history-action-btn,
-.history-action-btn.pin-btn,
-.history-action-btn.delete-btn {
+.history-actions > button {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+
+    background: #0d1c2b !important;
     background-color: #0d1c2b !important;
     background-image: none !important;
+
+    border: 1px solid #24527a !important;
+
     color: #ffffff !important;
+
+    box-shadow: none !important;
 }
 
-.history-action-btn.pin-btn {
+.history-actions > button.pin-btn {
+    background: #0d1c2b !important;
+    background-color: #0d1c2b !important;
+
     color: #3da0ff !important;
 }
 
-.history-action-btn.delete-btn {
+.history-actions > button.delete-btn {
+    background: #0d1c2b !important;
+    background-color: #0d1c2b !important;
+
     color: #ff6b6b !important;
 }
+
+.history-actions > button.pin-btn:hover {
+    background: #12395a !important;
+    background-color: #12395a !important;
+
+    border-color: #1683ff !important;
+}
+
+.history-actions > button.delete-btn:hover {
+    background: #291414 !important;
+    background-color: #291414 !important;
+
+    border-color: #ff5555 !important;
+}
+
 
 /* =====================================================
    END
 ===================================================== */
-
