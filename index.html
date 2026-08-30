@@ -1,123 +1,126 @@
+```html
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta
- name="viewport"
- content="width=device-width,
- initial-scale=1.0,
- maximum-scale=1.0,
- user-scalable=no,
- viewport-fit=cover">
+    <meta
+        name="viewport"
+        content="width=device-width,
+        initial-scale=1.0,
+        maximum-scale=1.0,
+        user-scalable=no,
+        viewport-fit=cover">
 
-<meta
- name="theme-color"
- content="#05070b">
+    <meta
+        name="theme-color"
+        content="#05070b">
 
-<meta
- name="mobile-web-app-capable"
- content="yes">
+    <meta
+        name="mobile-web-app-capable"
+        content="yes">
 
-<meta
- name="apple-mobile-web-app-capable"
- content="yes">
+    <meta
+        name="apple-mobile-web-app-capable"
+        content="yes">
 
-<title>Viggo AI</title>
+    <title>Viggo AI</title>
 
-<link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
 
-<!-- =================================================
-     MOBILE SAFETY
-================================================= -->
 
-<style>
+    <!-- =================================================
+         MOBILE SAFETY
+    ================================================= -->
 
-    html,
-    body {
-        width: 100%;
-        min-height: 100%;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-    }
-
-    body {
-        min-height: 100dvh;
-        -webkit-tap-highlight-color: transparent;
-    }
-
-    button,
-    input,
-    textarea,
-    select {
-        font: inherit;
-    }
-
-    button {
-        touch-action: manipulation;
-    }
-
-    textarea {
-        -webkit-appearance: none;
-    }
-
-    @media (max-width: 768px) {
+    <style>
 
         html,
         body {
             width: 100%;
-            height: 100%;
-            height: 100dvh;
+            min-height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
         }
 
-        .main {
-            width: 100%;
-            min-width: 0;
+        body {
+            min-height: 100dvh;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .chat-area {
-            min-width: 0;
-            width: 100%;
+        button,
+        input,
+        textarea,
+        select {
+            font: inherit;
         }
 
-        .conversation {
-            width: 100%;
-            max-width: 100%;
+        button {
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
-        .input-area {
-            width: 100%;
-            max-width: 100%;
-            padding-bottom:
-                max(
-                    8px,
-                    env(safe-area-inset-bottom)
-                );
+        textarea {
+            -webkit-appearance: none;
         }
 
-        #message {
-            min-width: 0;
+
+        @media (max-width: 768px) {
+
+            html,
+            body {
+                width: 100%;
+                height: 100%;
+                height: 100dvh;
+            }
+
+            .main {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .chat-area {
+                min-width: 0;
+                width: 100%;
+            }
+
+            .conversation {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .input-area {
+                width: 100%;
+                max-width: 100%;
+
+                padding-bottom:
+                    max(
+                        8px,
+                        env(safe-area-inset-bottom)
+                    );
+            }
+
+            #message {
+                min-width: 0;
+            }
+
+            .plus-menu {
+                max-width: calc(100vw - 20px);
+            }
+
         }
 
-        .plus-menu {
-            max-width: calc(100vw - 20px);
-        }
-    }
-
-    button {
-        user-select: none;
-        -webkit-user-select: none;
-    }
-
-</style>
+    </style>
 
 </head>
 
+
 <body>
+
 
 <!-- =====================================================
      SIDEBAR
@@ -128,153 +131,169 @@
     id="sidebar">
 
 
-<div class="sidebar-header">
+    <!-- SIDEBAR HEADER -->
 
-    <h2>
-        Viggo AI
-    </h2>
+    <div class="sidebar-header">
 
-    <button
-        class="icon-btn"
-        id="closeSidebar"
-        type="button"
-        aria-label="Close sidebar">
-
-        ✕
-
-    </button>
-
-</div>
-
-
-<!-- NEW CHAT -->
-
-<button
-    class="new-chat"
-    id="newChat"
-    type="button">
-
-    ＋ New Chat
-
-</button>
-
-
-<!-- SEARCH -->
-
-<div class="search-box">
-
-    <span>
-        🔍
-    </span>
-
-    <input
-        type="text"
-        id="searchChat"
-        placeholder="Search chats..."
-        autocomplete="off">
-
-</div>
-
-
-<!-- HISTORY TITLE -->
-
-<div class="history-title">
-    CHAT HISTORY
-</div>
-
-
-<!-- CHAT HISTORY -->
-
-<div
-    class="chat-history"
-    id="chatHistory">
-</div>
-
-
-<!-- MORE -->
-
-<div class="sidebar-more">
-
-    <div
-        class="more-menu"
-        id="moreMenu">
-
-        <!-- VOICE -->
+        <h2>
+            Viggo AI
+        </h2>
 
         <button
-            id="voiceMenuBtn"
-            type="button">
+            class="icon-btn"
+            id="closeSidebar"
+            type="button"
+            aria-label="Close sidebar">
 
-            🎤 Voice
-
-        </button>
-
-
-        <!-- LANGUAGE -->
-
-        <button
-            id="languageBtn"
-            type="button">
-
-            🌐 Language
-
-        </button>
-
-
-        <!-- SELECT -->
-
-        <button
-            id="selectChatsBtn"
-            type="button">
-
-            ☑️ Select Chat
-
-        </button>
-
-
-        <!-- DELETE SELECTED -->
-
-        <button
-            id="deleteSelectedBtn"
-            type="button">
-
-            🗑️ Delete Selected
-
-        </button>
-
-
-        <!-- CLEAR CURRENT CHAT -->
-
-        <button
-            id="clearChatBtn"
-            type="button">
-
-            🧹 Clear Chat
+            ✕
 
         </button>
 
     </div>
 
 
+    <!-- =================================================
+         NEW CHAT
+    ================================================= -->
+
     <button
-        class="more-button"
-        id="moreBtn"
+        class="new-chat"
+        id="newChat"
         type="button">
 
-        <span class="more-dots">
-            ⋯
-        </span>
-
-        <span>
-            More
-        </span>
+        ＋ New Chat
 
     </button>
 
-</div>
-```
+
+    <!-- =================================================
+         SEARCH
+    ================================================= -->
+
+    <div class="search-box">
+
+        <span>
+            🔍
+        </span>
+
+        <input
+            type="text"
+            id="searchChat"
+            placeholder="Search chats..."
+            autocomplete="off">
+
+    </div>
+
+
+    <!-- =================================================
+         HISTORY TITLE
+    ================================================= -->
+
+    <div class="history-title">
+        CHAT HISTORY
+    </div>
+
+
+    <!-- =================================================
+         CHAT HISTORY
+    ================================================= -->
+
+    <div
+        class="chat-history"
+        id="chatHistory">
+    </div>
+
+
+    <!-- =================================================
+         MORE
+    ================================================= -->
+
+    <div class="sidebar-more">
+
+        <div
+            class="more-menu"
+            id="moreMenu">
+
+
+            <!-- VOICE -->
+
+            <button
+                id="voiceMenuBtn"
+                type="button">
+
+                🎤 Voice
+
+            </button>
+
+
+            <!-- LANGUAGE -->
+
+            <button
+                id="languageBtn"
+                type="button">
+
+                🌐 Language
+
+            </button>
+
+
+            <!-- SELECT CHAT -->
+
+            <button
+                id="selectChatsBtn"
+                type="button">
+
+                ☑️ Select Chat
+
+            </button>
+
+
+            <!-- DELETE SELECTED -->
+
+            <button
+                id="deleteSelectedBtn"
+                type="button">
+
+                🗑️ Delete Selected
+
+            </button>
+
+
+            <!-- CLEAR CHAT -->
+
+            <button
+                id="clearChatBtn"
+                type="button">
+
+                🧹 Clear Chat
+
+            </button>
+
+        </div>
+
+
+        <!-- MORE BUTTON -->
+
+        <button
+            class="more-button"
+            id="moreBtn"
+            type="button">
+
+            <span class="more-dots">
+                ⋯
+            </span>
+
+            <span>
+                More
+            </span>
+
+        </button>
+
+    </div>
 
 </aside>
+
+
 
 <!-- =====================================================
      MAIN
@@ -282,222 +301,227 @@
 
 <main class="main">
 
-```
-<!-- =================================================
-     TOP BAR
-================================================= -->
 
-<header class="topbar">
+    <!-- =================================================
+         TOP BAR
+    ================================================= -->
 
-    <div class="top-left">
+    <header class="topbar">
+
+        <div class="top-left">
+
+            <button
+                class="menu-btn"
+                id="openSidebar"
+                type="button"
+                aria-label="Open sidebar">
+
+                ☰
+
+            </button>
+
+
+            <div class="brand">
+                Viggo AI
+            </div>
+
+        </div>
+
+
+        <!-- SHARE -->
 
         <button
-            class="menu-btn"
-            id="openSidebar"
-            type="button"
-            aria-label="Open sidebar">
+            class="share-btn"
+            id="shareBtn"
+            type="button">
 
-            ☰
+            ↗ Share
 
         </button>
 
+    </header>
 
-        <div class="brand">
-            Viggo AI
-        </div>
-
-    </div>
-
-
-    <!-- SHARE -->
-
-    <button
-        class="share-btn"
-        id="shareBtn"
-        type="button"
-        aria-label="Share chat">
-
-        ↗ Share
-
-    </button>
-
-</header>
-
-
-<!-- =================================================
-     CHAT AREA
-================================================= -->
-
-<section class="chat-area">
-
-    <div
-        class="conversation"
-        id="conversation">
-    </div>
-
-</section>
-
-
-<!-- =================================================
-     INPUT AREA
-================================================= -->
-
-<div class="input-area">
-
-    <!-- PLUS -->
-
-    <button
-        class="input-plus"
-        id="plusBtn"
-        type="button"
-        aria-label="Add">
-
-        ＋
-
-    </button>
 
 
     <!-- =================================================
-         PLUS MENU
+         CHAT AREA
     ================================================= -->
 
-    <div
-        class="plus-menu"
-        id="plusMenu">
+    <section class="chat-area">
 
-        <!-- CAMERA -->
+        <div
+            class="conversation"
+            id="conversation">
+        </div>
+
+    </section>
+
+
+
+    <!-- =================================================
+         INPUT AREA
+    ================================================= -->
+
+    <div class="input-area">
+
+
+        <!-- PLUS -->
 
         <button
-            id="cameraBtn"
-            type="button">
+            class="input-plus"
+            id="plusBtn"
+            type="button"
+            aria-label="Add">
 
-            📷 Camera
+            ＋
 
         </button>
 
 
-        <!-- PHOTO -->
+        <!-- =================================================
+             PLUS MENU
+        ================================================= -->
+
+        <div
+            class="plus-menu"
+            id="plusMenu">
+
+
+            <!-- CAMERA -->
+
+            <button
+                id="cameraBtn"
+                type="button">
+
+                📷 Camera
+
+            </button>
+
+
+            <!-- PHOTO -->
+
+            <button
+                id="photoBtn"
+                type="button">
+
+                🖼️ Photo
+
+            </button>
+
+
+            <!-- VIDEO -->
+
+            <button
+                id="videoBtn"
+                type="button">
+
+                🎥 Video
+
+            </button>
+
+
+            <!-- FILE -->
+
+            <button
+                id="fileBtn"
+                type="button">
+
+                📎 File
+
+            </button>
+
+        </div>
+
+
+        <!-- =================================================
+             MESSAGE
+        ================================================= -->
+
+        <textarea
+            id="message"
+            placeholder="Message Viggo AI..."
+            rows="1"
+            autocomplete="off">
+        </textarea>
+
+
+        <!-- =================================================
+             MICROPHONE
+        ================================================= -->
 
         <button
-            id="photoBtn"
-            type="button">
+            class="input-icon"
+            id="mic"
+            type="button"
+            aria-label="Voice input">
 
-            🖼️ Photo
+            🎤
 
         </button>
 
 
-        <!-- VIDEO -->
+        <!-- =================================================
+             SEND
+        ================================================= -->
 
         <button
-            id="videoBtn"
-            type="button">
+            class="send-btn"
+            id="send"
+            type="button"
+            aria-label="Send">
 
-            🎥 Video
-
-        </button>
-
-
-        <!-- FILE -->
-
-        <button
-            id="fileBtn"
-            type="button">
-
-            📎 File
-
-        </button>
-
-
-        <!-- VOICE -->
-
-        <button
-            id="plusVoiceBtn"
-            type="button">
-
-            🎤 Voice
+            ➤
 
         </button>
 
     </div>
 
-
-    <!-- MESSAGE -->
-
-    <textarea
-        id="message"
-        placeholder="Message Viggo AI..."
-        rows="1"
-        autocomplete="off"></textarea>
-
-
-    <!-- MICROPHONE -->
-
-    <button
-        class="input-icon"
-        id="mic"
-        type="button"
-        aria-label="Voice input">
-
-        🎤
-
-    </button>
-
-
-    <!-- SEND -->
-
-    <button
-        class="send-btn"
-        id="send"
-        type="button"
-        aria-label="Send">
-
-        ➤
-
-    </button>
-
-</div>
-
-
 </main>
 
+
+
 <!-- =====================================================
-     MOBILE CAMERA / PHOTO / VIDEO / FILE INPUTS
+     CAMERA / PHOTO / VIDEO / FILE INPUTS
 ===================================================== -->
 
 <!-- CAMERA -->
 
 <input
- type="file"
- id="cameraInput"
- accept="image/*"
- capture="environment"
- hidden>
+    type="file"
+    id="cameraInput"
+    accept="image/*"
+    capture="environment"
+    hidden>
 
-<!-- PHOTO / GALLERY -->
+
+<!-- PHOTO -->
 
 <input
- type="file"
- id="photoInput"
- accept="image/*"
- hidden>
+    type="file"
+    id="photoInput"
+    accept="image/*"
+    hidden>
+
 
 <!-- VIDEO -->
 
 <input
- type="file"
- id="videoInput"
- accept="video/*"
- capture="environment"
- hidden>
+    type="file"
+    id="videoInput"
+    accept="video/*"
+    capture="environment"
+    hidden>
+
 
 <!-- FILE -->
 
 <input
- type="file"
- id="fileInput"
- accept=".pdf,.txt,.doc,.docx,.xls,.xlsx,.ppt,.pptx,image/*,video/*"
- hidden>
+    type="file"
+    id="fileInput"
+    accept=".pdf,.txt,.doc,.docx,.xls,.xlsx,.ppt,.pptx,image/*,video/*"
+    hidden>
+
+
 
 <!-- =====================================================
      VOICE MODAL
@@ -507,98 +531,146 @@
     class="modal"
     id="voiceModal">
 
-<div class="modal-box">
-
-    <button
-        class="modal-close"
-        id="closeVoice"
-        type="button">
-
-        ✕
-
-    </button>
+    <div class="modal-box">
 
 
-    <h3>
-        🎤 Voice Settings
-    </h3>
+        <!-- CLOSE -->
+
+        <button
+            class="modal-close"
+            id="closeVoice"
+            type="button">
+
+            ✕
+
+        </button>
 
 
-    <!-- VOICE LANGUAGE -->
-
-    <select id="voiceSelect">
-
-        <option value="en-IN">
-            English
-        </option>
-
-        <option value="ta-IN">
-            தமிழ்
-        </option>
-
-        <option value="hi-IN">
-            हिन्दी
-        </option>
-
-        <option value="te-IN">
-            తెలుగు
-        </option>
-
-        <option value="ml-IN">
-            മലയാളം
-        </option>
-
-        <option value="kn-IN">
-            ಕನ್ನಡ
-        </option>
-
-        <option value="bn-IN">
-            বাংলা
-        </option>
-
-        <option value="mr-IN">
-            मराठी
-        </option>
-
-        <option value="gu-IN">
-            ગુજરાતી
-        </option>
-
-        <option value="pa-IN">
-            ਪੰਜਾਬੀ
-        </option>
-
-    </select>
+        <h3>
+            🎤 Voice Settings
+        </h3>
 
 
-    <!-- VOICE GENDER -->
+        <!-- VOICE LANGUAGE -->
 
-    <select id="voiceGender">
+        <select id="voiceSelect">
 
-        <option value="female">
-            Female Voice
-        </option>
+            <option value="en-IN">
+                English
+            </option>
 
-        <option value="male">
-            Male Voice
-        </option>
+            <option value="ta-IN">
+                தமிழ்
+            </option>
 
-    </select>
+            <option value="hi-IN">
+                हिन्दी
+            </option>
+
+            <option value="ml-IN">
+                മലയാളം
+            </option>
+
+            <option value="te-IN">
+                తెలుగు
+            </option>
+
+            <option value="kn-IN">
+                ಕನ್ನಡ
+            </option>
+
+            <option value="bn-IN">
+                বাংলা
+            </option>
+
+            <option value="mr-IN">
+                मराठी
+            </option>
+
+            <option value="gu-IN">
+                ગુજરાતી
+            </option>
+
+            <option value="pa-IN">
+                ਪੰਜਾਬੀ
+            </option>
+
+            <option value="ur-IN">
+                اردو
+            </option>
+
+            <option value="fr-FR">
+                Français
+            </option>
+
+            <option value="de-DE">
+                Deutsch
+            </option>
+
+            <option value="es-ES">
+                Español
+            </option>
+
+            <option value="it-IT">
+                Italiano
+            </option>
+
+            <option value="pt-BR">
+                Português
+            </option>
+
+            <option value="ja-JP">
+                日本語
+            </option>
+
+            <option value="ko-KR">
+                한국어
+            </option>
+
+            <option value="zh-CN">
+                中文
+            </option>
+
+            <option value="ar-SA">
+                العربية
+            </option>
+
+            <option value="ru-RU">
+                Русский
+            </option>
+
+        </select>
 
 
-    <button
-        class="modal-button"
-        id="startVoice"
-        type="button">
+        <!-- VOICE TYPE -->
 
-        Start Voice
+        <select id="voiceGender">
 
-    </button>
+            <option value="female">
+                Female Voice
+            </option>
+
+            <option value="male">
+                Male Voice
+            </option>
+
+        </select>
+
+
+        <button
+            class="modal-button"
+            id="startVoice"
+            type="button">
+
+            Start Voice
+
+        </button>
+
+    </div>
 
 </div>
 
 
-</div>
 
 <!-- =====================================================
      LANGUAGE MODAL
@@ -608,171 +680,131 @@
     class="modal"
     id="languageModal">
 
-<div class="modal-box">
-
-    <button
-        class="modal-close"
-        id="closeLanguage"
-        type="button">
-
-        ✕
-
-    </button>
+    <div class="modal-box">
 
 
-    <h3>
-        🌐 Select Language
-    </h3>
+        <!-- CLOSE -->
+
+        <button
+            class="modal-close"
+            id="closeLanguage"
+            type="button">
+
+            ✕
+
+        </button>
 
 
-    <select id="languageSelect">
-
-        <option value="en-IN">
-            English
-        </option>
-
-        <option value="ta-IN">
-            தமிழ்
-        </option>
-
-        <option value="hi-IN">
-            हिन्दी
-        </option>
-
-        <option value="te-IN">
-            తెలుగు
-        </option>
-
-        <option value="ml-IN">
-            മലയാളം
-        </option>
-
-        <option value="kn-IN">
-            ಕನ್ನಡ
-        </option>
-
-        <option value="bn-IN">
-            বাংলা
-        </option>
-
-        <option value="mr-IN">
-            मराठी
-        </option>
-
-        <option value="gu-IN">
-            ગુજરાતી
-        </option>
-
-        <option value="pa-IN">
-            ਪੰਜਾਬੀ
-        </option>
-
-        <option value="ur-IN">
-            اردو
-        </option>
-
-        <option value="fr-FR">
-            Français
-        </option>
-
-        <option value="de-DE">
-            Deutsch
-        </option>
-
-        <option value="es-ES">
-            Español
-        </option>
-
-        <option value="it-IT">
-            Italiano
-        </option>
-
-        <option value="pt-BR">
-            Português
-        </option>
-
-        <option value="ja-JP">
-            日本語
-        </option>
-
-        <option value="ko-KR">
-            한국어
-        </option>
-
-        <option value="zh-CN">
-            中文
-        </option>
-
-        <option value="ar-SA">
-            العربية
-        </option>
-
-        <option value="ru-RU">
-            Русский
-        </option>
-
-    </select>
+        <h3>
+            🌐 Select Language
+        </h3>
 
 
-    <button
-        class="modal-button"
-        id="saveLanguage"
-        type="button">
+        <!-- LANGUAGE -->
 
-        Save Language
+        <select id="languageSelect">
 
-    </button>
+            <option value="en-IN">
+                English
+            </option>
 
-</div>
+            <option value="ta-IN">
+                தமிழ்
+            </option>
+
+            <option value="hi-IN">
+                हिन्दी
+            </option>
+
+            <option value="ml-IN">
+                മലയാളം
+            </option>
+
+            <option value="te-IN">
+                తెలుగు
+            </option>
+
+            <option value="kn-IN">
+                ಕನ್ನಡ
+            </option>
+
+            <option value="bn-IN">
+                বাংলা
+            </option>
+
+            <option value="mr-IN">
+                मराठी
+            </option>
+
+            <option value="gu-IN">
+                ગુજરાતી
+            </option>
+
+            <option value="pa-IN">
+                ਪੰਜਾਬੀ
+            </option>
+
+            <option value="ur-IN">
+                اردو
+            </option>
+
+            <option value="fr-FR">
+                Français
+            </option>
+
+            <option value="de-DE">
+                Deutsch
+            </option>
+
+            <option value="es-ES">
+                Español
+            </option>
+
+            <option value="it-IT">
+                Italiano
+            </option>
+
+            <option value="pt-BR">
+                Português
+            </option>
+
+            <option value="ja-JP">
+                日本語
+            </option>
+
+            <option value="ko-KR">
+                한국어
+            </option>
+
+            <option value="zh-CN">
+                中文
+            </option>
+
+            <option value="ar-SA">
+                العربية
+            </option>
+
+            <option value="ru-RU">
+                Русский
+            </option>
+
+        </select>
 
 
-</div>
+        <button
+            class="modal-button"
+            id="saveLanguage"
+            type="button">
 
-<!-- =====================================================
-     SHARE MODAL
-===================================================== -->
+            Save Language
 
-<div
-    class="modal"
-    id="shareModal">
-
-<div class="modal-box">
-
-    <button
-        class="modal-close"
-        id="closeShare"
-        type="button">
-
-        ✕
-
-    </button>
-
-
-    <h3>
-        ↗ Share Chat
-    </h3>
-
-
-    <div
-        id="shareLink"
-        class="share-link">
+        </button>
 
     </div>
 
-
-    <button
-        class="modal-button"
-        id="copyShareLink"
-        type="button">
-
-        📋 Copy Link
-
-    </button>
-
 </div>
 
 
-</div>
 
 <!-- =====================================================
      JAVASCRIPT
@@ -782,3 +814,4 @@
 
 </body>
 </html>
+```
