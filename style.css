@@ -24,7 +24,6 @@ body {
     min-height: 100vh;
 }
 
-
 /* =====================================================
    APP HEIGHT
 ===================================================== */
@@ -46,14 +45,12 @@ body {
     --muted: #999999;
 }
 
-
 /* =====================================================
    SIDEBAR
 ===================================================== */
 
 .sidebar {
     position: fixed;
-
     left: 0;
     top: 0;
 
@@ -69,10 +66,8 @@ body {
 
     z-index: 1000;
 
-    transition:
-        transform 0.25s ease;
+    transition: transform 0.25s ease;
 }
-
 
 /* =====================================================
    SIDEBAR HEADER
@@ -102,7 +97,7 @@ body {
     border: none;
     border-radius: 10px;
 
-    background: transparent;
+    background: transparent !important;
     color: #ffffff;
 
     font-size: 20px;
@@ -111,9 +106,8 @@ body {
 }
 
 .icon-btn:hover {
-    background: #1a1a1a;
+    background: #1a1a1a !important;
 }
-
 
 /* =====================================================
    NEW CHAT
@@ -141,7 +135,6 @@ body {
 .new-chat:hover {
     background: #0872f9;
 }
-
 
 /* =====================================================
    SEARCH
@@ -176,7 +169,7 @@ body {
     border: none;
     outline: none;
 
-    background: transparent;
+    background: transparent !important;
     color: #ffffff;
 
     font-size: 14px;
@@ -185,7 +178,6 @@ body {
 .search-box input::placeholder {
     color: #777777;
 }
-
 
 /* =====================================================
    HISTORY TITLE
@@ -201,7 +193,6 @@ body {
 
     letter-spacing: 1px;
 }
-
 
 /* =====================================================
    CHAT HISTORY
@@ -223,7 +214,6 @@ body {
     background: #333333;
     border-radius: 10px;
 }
-
 
 /* =====================================================
    HISTORY ITEM
@@ -248,20 +238,20 @@ body {
 
     cursor: pointer;
 
-    background: transparent;
+    background: transparent !important;
 
     transition: 0.2s;
 }
 
 .history-item:hover {
-    background: #151515;
+    background: #151515 !important;
 }
 
 .history-item.active {
-    background: #102b49;
+    background: #102b49 !important;
+
     border: 1px solid #174d7d;
 }
-
 
 /* =====================================================
    HISTORY CHAT TITLE
@@ -283,72 +273,80 @@ body {
     text-overflow: ellipsis;
 }
 
-
 /* =====================================================
    HISTORY ACTIONS
    PIN + DELETE
 ===================================================== */
 
 .history-actions {
-    display: flex;
+    display: flex !important;
 
-    align-items: center;
+    align-items: center !important;
 
-    gap: 5px;
+    gap: 5px !important;
 
     flex-shrink: 0;
 }
 
-.history-action-btn {
-    width: 32px;
-    height: 32px;
+/* =====================================================
+   PIN + DELETE BUTTON BASE
+===================================================== */
 
-    min-width: 32px;
-    min-height: 32px;
+.history-action-btn {
+    width: 32px !important;
+    height: 32px !important;
+
+    min-width: 32px !important;
+    min-height: 32px !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
 
     padding: 0 !important;
     margin: 0 !important;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
 
     border: 1px solid #24527a !important;
 
     border-radius: 8px !important;
 
+    /*
+       REMOVE WHITE BACKGROUND
+    */
+
     background: #0d1c2b !important;
     background-color: #0d1c2b !important;
+    background-image: none !important;
 
     color: #ffffff !important;
 
-    cursor: pointer;
-
-    font-size: 14px;
+    outline: none !important;
 
     box-shadow: none !important;
 
-    outline: none;
+    appearance: none !important;
+    -webkit-appearance: none !important;
 
-    appearance: none;
-    -webkit-appearance: none;
+    cursor: pointer !important;
+
+    font-size: 14px !important;
 
     transition:
-        background 0.2s ease,
+        background-color 0.2s ease,
         border-color 0.2s ease,
         color 0.2s ease,
         transform 0.15s ease;
 }
 
-
 /* =====================================================
-   PIN BUTTON
+   PIN
 ===================================================== */
 
 .history-action-btn.pin-btn {
     background: #0d1c2b !important;
     background-color: #0d1c2b !important;
+    background-image: none !important;
 
     color: #3da0ff !important;
 
@@ -356,22 +354,23 @@ body {
 }
 
 .history-action-btn.pin-btn:hover {
-    background: #102b49 !important;
-    background-color: #102b49 !important;
+    background: #12395a !important;
+    background-color: #12395a !important;
+    background-image: none !important;
 
     color: #3da0ff !important;
 
     border-color: #1683ff !important;
 }
 
-
 /* =====================================================
-   DELETE BUTTON
+   DELETE
 ===================================================== */
 
 .history-action-btn.delete-btn {
     background: #0d1c2b !important;
     background-color: #0d1c2b !important;
+    background-image: none !important;
 
     color: #ff6b6b !important;
 
@@ -381,42 +380,24 @@ body {
 .history-action-btn.delete-btn:hover {
     background: #291414 !important;
     background-color: #291414 !important;
+    background-image: none !important;
 
     color: #ff6b6b !important;
 
     border-color: #ff5555 !important;
 }
 
-
 /* =====================================================
-   ACTION BUTTON CLICK
+   ACTION CLICK
 ===================================================== */
 
 .history-action-btn:active {
-    transform: scale(0.94);
-
-    background: #102b49 !important;
-    background-color: #102b49 !important;
+    transform: scale(0.94) !important;
 }
 
-
-/* =====================================================
-   FORCE REMOVE BROWSER WHITE
-===================================================== */
-
-.chat-history button.history-action-btn,
-.chat-history button.history-action-btn.pin-btn,
-.chat-history button.history-action-btn.delete-btn {
-    background-color: #0d1c2b !important;
-
-    -webkit-appearance: none !important;
-    appearance: none !important;
+.history-action-btn:focus {
+    outline: none !important;
 }
-
-.chat-history button.history-action-btn:hover {
-    background-color: #12395a !important;
-}
-
 
 /* =====================================================
    SELECT CHAT MODE
@@ -427,7 +408,7 @@ body {
 }
 
 .history-item.selected {
-    background: #102b49;
+    background: #102b49 !important;
 
     border: 1px solid #1683ff;
 
@@ -445,7 +426,6 @@ body {
 
     cursor: pointer;
 }
-
 
 /* =====================================================
    SIDEBAR MORE
@@ -467,7 +447,7 @@ body {
 
     border-radius: 10px;
 
-    background: #111111;
+    background: #111111 !important;
 
     color: #ffffff;
 
@@ -484,13 +464,12 @@ body {
 }
 
 .more-button:hover {
-    background: #181818;
+    background: #181818 !important;
 }
 
 .more-dots {
     font-size: 22px;
 }
-
 
 /* =====================================================
    MORE MENU
@@ -510,7 +489,7 @@ body {
 
     padding: 7px;
 
-    background: #111111;
+    background: #111111 !important;
 
     border: 1px solid #292929;
 
@@ -536,7 +515,7 @@ body {
 
     border-radius: 8px;
 
-    background: transparent;
+    background: transparent !important;
 
     color: #ffffff;
 
@@ -550,9 +529,8 @@ body {
 }
 
 .more-menu button:hover {
-    background: #1d1d1d;
+    background: #1d1d1d !important;
 }
-
 
 /* =====================================================
    MAIN
@@ -572,7 +550,6 @@ body {
 
     background: #050505;
 }
-
 
 /* =====================================================
    TOPBAR
@@ -610,7 +587,7 @@ body {
 
     border-radius: 10px;
 
-    background: #111111;
+    background: #111111 !important;
 
     color: #ffffff;
 
@@ -622,7 +599,7 @@ body {
 }
 
 .menu-btn:hover {
-    background: #1b1b1b;
+    background: #1b1b1b !important;
 }
 
 .brand {
@@ -631,7 +608,6 @@ body {
 
     color: #ffffff;
 }
-
 
 /* =====================================================
    SHARE
@@ -646,7 +622,7 @@ body {
 
     border-radius: 10px;
 
-    background: #0d1c2b;
+    background: #0d1c2b !important;
 
     color: #ffffff;
 
@@ -658,11 +634,10 @@ body {
 }
 
 .share-btn:hover {
-    background: #12395a;
+    background: #12395a !important;
 
     border-color: #278fff;
 }
-
 
 /* =====================================================
    CHAT AREA
@@ -698,7 +673,6 @@ body {
     border-radius: 10px;
 }
 
-
 /* =====================================================
    MESSAGE
 ===================================================== */
@@ -725,7 +699,6 @@ body {
     display: flex;
     flex-direction: column;
 }
-
 
 /* =====================================================
    MESSAGE BUBBLE
@@ -763,7 +736,6 @@ body {
     border-bottom-left-radius: 5px;
 }
 
-
 /* =====================================================
    MESSAGE ACTIONS
 ===================================================== */
@@ -783,7 +755,7 @@ body {
 
     border-radius: 7px;
 
-    background: #0d0d0d;
+    background: #0d0d0d !important;
 
     color: #aaaaaa;
 
@@ -801,9 +773,8 @@ body {
 
     border-color: #167de8;
 
-    background: #101d2b;
+    background: #101d2b !important;
 }
-
 
 /* =====================================================
    TYPING
@@ -816,7 +787,6 @@ body {
 }
 
 @keyframes typingPulse {
-
     0% {
         opacity: 0.45;
     }
@@ -829,7 +799,6 @@ body {
         opacity: 0.45;
     }
 }
-
 
 /* =====================================================
    INPUT AREA
@@ -856,7 +825,7 @@ body {
 
     padding: 8px 9px;
 
-    background: #111111;
+    background: #111111 !important;
 
     border: 1px solid #292929;
 
@@ -867,7 +836,6 @@ body {
 
     z-index: 500;
 }
-
 
 /* =====================================================
    PLUS
@@ -883,7 +851,7 @@ body {
 
     border-radius: 11px;
 
-    background: #1b1b1b;
+    background: #1b1b1b !important;
 
     color: #ffffff;
 
@@ -893,9 +861,8 @@ body {
 }
 
 .input-plus:hover {
-    background: #252525;
+    background: #252525 !important;
 }
-
 
 /* =====================================================
    TEXTAREA
@@ -915,7 +882,7 @@ body {
 
     outline: none;
 
-    background: transparent;
+    background: transparent !important;
 
     color: #ffffff;
 
@@ -932,7 +899,6 @@ body {
     color: #777777;
 }
 
-
 /* =====================================================
    MIC
 ===================================================== */
@@ -947,7 +913,7 @@ body {
 
     border-radius: 11px;
 
-    background: #1a1a1a;
+    background: #1a1a1a !important;
 
     color: #ffffff;
 
@@ -957,16 +923,15 @@ body {
 }
 
 .input-icon:hover {
-    background: #242424;
+    background: #242424 !important;
 }
 
 .input-icon.active {
-    background: #0a70e8;
+    background: #0a70e8 !important;
 
     box-shadow:
         0 0 12px rgba(22, 131, 255, 0.55);
 }
-
 
 /* =====================================================
    SEND
@@ -982,7 +947,7 @@ body {
 
     border-radius: 12px;
 
-    background: #0878ef;
+    background: #0878ef !important;
 
     color: #ffffff;
 
@@ -994,7 +959,7 @@ body {
 }
 
 .send-btn:hover {
-    background: #1688ff;
+    background: #1688ff !important;
 
     transform: scale(1.03);
 }
@@ -1006,7 +971,6 @@ body {
 
     transform: none;
 }
-
 
 /* =====================================================
    PLUS MENU
@@ -1027,7 +991,7 @@ body {
 
     padding: 7px;
 
-    background: #111111;
+    background: #111111 !important;
 
     border: 1px solid #292929;
 
@@ -1053,7 +1017,7 @@ body {
 
     border-radius: 8px;
 
-    background: transparent;
+    background: transparent !important;
 
     color: #ffffff;
 
@@ -1067,9 +1031,8 @@ body {
 }
 
 .plus-menu button:hover {
-    background: #1d1d1d;
+    background: #1d1d1d !important;
 }
-
 
 /* =====================================================
    MODAL
@@ -1102,7 +1065,7 @@ body {
 
     padding: 25px;
 
-    background: #111111;
+    background: #111111 !important;
 
     border: 1px solid #292929;
 
@@ -1131,7 +1094,7 @@ body {
 
     border-radius: 8px;
 
-    background: transparent;
+    background: transparent !important;
 
     color: #ffffff;
 
@@ -1141,7 +1104,7 @@ body {
 }
 
 .modal-close:hover {
-    background: #222222;
+    background: #222222 !important;
 }
 
 .modal-box select {
@@ -1157,7 +1120,7 @@ body {
 
     border-radius: 9px;
 
-    background: #080808;
+    background: #080808 !important;
 
     color: #ffffff;
 
@@ -1173,7 +1136,7 @@ body {
 
     border-radius: 9px;
 
-    background: #0878ef;
+    background: #0878ef !important;
 
     color: #ffffff;
 
@@ -1183,9 +1146,8 @@ body {
 }
 
 .modal-button:hover {
-    background: #1688ff;
+    background: #1688ff !important;
 }
-
 
 /* =====================================================
    MOBILE
@@ -1297,9 +1259,7 @@ body {
 
         bottom: 75px;
     }
-
 }
-
 
 /* =====================================================
    SMALL MOBILE
@@ -1351,8 +1311,13 @@ body {
         height: 38px;
     }
 
+    .history-action-btn {
+        width: 30px !important;
+        height: 30px !important;
+        min-width: 30px !important;
+        min-height: 30px !important;
+    }
 }
-
 
 /* =====================================================
    TOUCH DEVICES
@@ -1368,7 +1333,6 @@ select {
     -webkit-tap-highlight-color: transparent;
 }
 
-
 /* =====================================================
    IMAGE / VIDEO
 ===================================================== */
@@ -1382,9 +1346,8 @@ select {
     object-fit: contain;
 }
 
-
 /* =====================================================
-   SAFE AREA FOR MOBILE
+   SAFE AREA
 ===================================================== */
 
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
@@ -1396,10 +1359,30 @@ select {
                 env(safe-area-inset-bottom)
             );
     }
-
 }
 
+/* =====================================================
+   FINAL WHITE BACKGROUND KILL
+   PIN + DELETE ONLY
+===================================================== */
+
+.history-action-btn,
+.history-action-btn.pin-btn,
+.history-action-btn.delete-btn {
+    background-color: #0d1c2b !important;
+    background-image: none !important;
+    color: #ffffff !important;
+}
+
+.history-action-btn.pin-btn {
+    color: #3da0ff !important;
+}
+
+.history-action-btn.delete-btn {
+    color: #ff6b6b !important;
+}
 
 /* =====================================================
    END
 ===================================================== */
+
