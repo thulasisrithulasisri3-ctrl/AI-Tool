@@ -1,15 +1,13 @@
 "use strict";
 
-require("dotenv").config();
+/* =====================================================
+   VIGGO AI SERVER
+   Express + Google Gemini
+===================================================== */
 
 const express = require("express");
 const cors = require("cors");
 const { GoogleGenAI } = require("@google/genai");
-
-/* =====================================================
-   VIGGO AI SERVER
-   CHAT + MEMORY + IMAGE + VIDEO + FILE
-===================================================== */
 
 const app = express();
 
@@ -19,44 +17,45 @@ const app = express();
 
 const PORT = process.env.PORT || 10000;
 
-const API_KEY =
-    process.env.GEMINI_API_KEY ||
-    process.env.GOOGLE_API_KEY ||
-    "";
+const API_KEY = process.env.GEMINI_API_KEY;
 
 const MODEL =
     process.env.GEMINI_MODEL ||
-    "gemini-2.5-flash";
+    "gemini-3.6-flash";
+
 
 /* =====================================================
-   GEMINI CLIENT
+   GEMINI
 ===================================================== */
 
-const ai = API_KEY
-    ? new GoogleGenAI({
+let ai = null;
+
+if (API_KEY) {
+
+    ai = new GoogleGenAI({
         apiKey: API_KEY
-    })
-    : null;
+    });
+
+    console.log("Gemini API: CONFIGURED");
+
+} else {
+
+    console.log("Gemini API: NOT CONFIGURED");
+
+}
+
 
 /* =====================================================
-   CORS
+   MIDDLEWARE
 ===================================================== */
 
 app.use(
     cors({
         origin: "*",
         methods: ["GET", "POST", "OPTIONS"],
-        allowedHeaders: [
-            "Content-Type",
-            "Accept",
-            "Authorization"
-        ]
+        allowedHeaders: ["Content-Type"]
     })
 );
-
-/* =====================================================
-   BODY PARSER
-===================================================== */
 
 app.use(
     express.json({
@@ -64,1061 +63,650 @@ app.use(
     })
 );
 
-app.use(
-    express.urlencoded({
-        extended: true,
-        limit: "50mb"
-    })
-);
 
 /* =====================================================
-   ROOT
+   HOME
 ===================================================== */
 
 app.get("/", (req, res) => {
-    res.status(200).json({
-        success: true,
-        service: "Viggo AI",
+
+    res.json({
+
         status: "online",
-        model: MODEL,
-        apiConfigured: Boolean(API_KEY),
-        endpoints: [
-            "/",
-            "/health",
-            "/status",
-            "/chat"
-        ]
+
+        message:
+            "Viggo AI Server is running.",
+
+        model:
+            MODEL,
+
+        apiConfigured:
+            Boolean(API_KEY)
+
     });
+
 });
 
+
 /* =====================================================
-   HEALTH
+   HEALTH CHECK
 ===================================================== */
 
 app.get("/health", (req, res) => {
-    res.status(200).json({
-        success: true,
+
+    res.json({
+
         status: "healthy",
+
         server: "Viggo AI",
+
         model: MODEL,
-        apiConfigured: Boolean(API_KEY),
-        time: new Date().toISOString()
+
+        apiConfigured:
+            Boolean(API_KEY),
+
+        time:
+            new Date().toISOString()
+
     });
+
 });
 
-/* =====================================================
-   STATUS
-===================================================== */
-
-app.get("/status", (req, res) => {
-    res.status(200).json({
-        success: true,
-        server: "Viggo AI",
-        status: "online",
-        model: MODEL,
-        apiConfigured: Boolean(API_KEY),
-        time: new Date().toISOString()
-    });
-});
 
 /* =====================================================
-   HELPERS
+   CURRENT DATE / TIME
 ===================================================== */
 
-function cleanText(value) {
-    if (
-        value === null ||
-        value === undefined
-    ) {
-        return "";
-    }
+function getCurrentDateTime() {
 
-    return String(value)
-        .replace(/\u0000/g, "")
-        .trim();
-}
+    const now =
+        new Date();
 
-/* =====================================================
-   LANGUAGE
-===================================================== */
 
-function getLanguageName(language) {
+    const date =
+        now.toLocaleDateString(
+            "en-IN",
+            {
+                timeZone:
+                    "Asia/Kolkata",
 
-    const languages = {
-        "en-IN": "English",
-        "ta-IN": "Tamil",
-        "hi-IN": "Hindi",
-        "te-IN": "Telugu",
-        "kn-IN": "Kannada",
-        "ml-IN": "Malayalam",
-        "bn-IN": "Bengali",
-        "mr-IN": "Marathi",
-        "gu-IN": "Gujarati",
-        "pa-IN": "Punjabi",
-        "ur-IN": "Urdu",
-        "fr-FR": "French",
-        "de-DE": "German",
-        "es-ES": "Spanish",
-        "it-IT": "Italian",
-        "pt-BR": "Portuguese",
-        "ru-RU": "Russian",
-        "ja-JP": "Japanese",
-        "ko-KR": "Korean",
-        "zh-CN": "Chinese",
-        "ar-SA": "Arabic",
-        "tr-TR": "Turkish",
-        "nl-NL": "Dutch",
-        "pl-PL": "Polish"
+                day:
+                    "2-digit",
+
+                month:
+                    "2-digit",
+
+                year:
+                    "numeric"
+            }
+        );
+
+
+    const time =
+        now.toLocaleTimeString(
+            "en-IN",
+            {
+                timeZone:
+                    "Asia/Kolkata",
+
+                hour:
+                    "2-digit",
+
+                minute:
+                    "2-digit",
+
+                second:
+                    "2-digit",
+
+                hour12:
+                    true
+            }
+        );
+
+
+    return {
+        date,
+        time
     };
 
-    return languages[language] || "English";
 }
 
+
 /* =====================================================
-   SYSTEM INSTRUCTION
+   DETECT DATE / TIME QUESTIONS
 ===================================================== */
 
-function buildSystemInstruction(
-    language,
-    timezone,
-    currentDateTime
-) {
+function detectDateTimeQuestion(message) {
 
-    const languageName =
-        getLanguageName(language);
+    const text =
+        String(message || "")
+            .toLowerCase()
+            .trim();
+
+
+    const dateWords = [
+        "date",
+        "today date",
+        "todays date",
+        "today's date",
+        "what date",
+        "which date",
+        "தேதி",
+        "இன்றைய தேதி",
+        "இன்று என்ன தேதி"
+    ];
+
+
+    const timeWords = [
+        "time",
+        "current time",
+        "what time",
+        "what's the time",
+        "what is the time",
+        "now time",
+        "நேரம்",
+        "இப்போ நேரம்",
+        "இப்போது நேரம்",
+        "என்ன நேரம்"
+    ];
+
+
+    const asksDate =
+        dateWords.some(
+            word =>
+                text.includes(word)
+        );
+
+
+    const asksTime =
+        timeWords.some(
+            word =>
+                text.includes(word)
+        );
+
+
+    return {
+        asksDate,
+        asksTime
+    };
+
+}
+
+
+/* =====================================================
+   DATE / TIME RESPONSE
+===================================================== */
+
+function dateTimeReply(message) {
+
+    const {
+        asksDate,
+        asksTime
+    } =
+        detectDateTimeQuestion(
+            message
+        );
+
+
+    if (!asksDate && !asksTime) {
+
+        return null;
+
+    }
+
+
+    const {
+        date,
+        time
+    } =
+        getCurrentDateTime();
+
+
+    /*
+       IMPORTANT:
+       User wants ONLY the requested
+       date OR time.
+
+       No extra date/time information
+       below the reply.
+    */
+
+
+    if (asksDate && !asksTime) {
+
+        return date;
+
+    }
+
+
+    if (asksTime && !asksDate) {
+
+        return time;
+
+    }
+
+
+    return `Date: ${date}\nTime: ${time}`;
+
+}
+
+
+/* =====================================================
+   SYSTEM PROMPT
+===================================================== */
+
+function getSystemPrompt(language) {
 
     return `
-You are Viggo AI, a helpful, friendly and intelligent AI assistant.
+You are Viggo AI, a helpful AI assistant.
 
-IMPORTANT:
+Rules:
 
-- Answer the CURRENT user message directly.
-- Use previous conversation when available.
-- Understand short replies using conversation context.
-- Do not mention system prompts or server implementation.
-- Be natural and conversational.
-- Do not invent information.
-- Explain technical topics clearly.
-- If the user asks for code, provide complete working code.
-
-LANGUAGE:
+1. Answer the user's question directly.
+2. Keep answers clear and useful.
+3. Do not add unnecessary information.
+4. Do not display a separate date or time below your answer.
+5. If the user asks specifically for the date, return only the date.
+6. If the user asks specifically for the time, return only the time.
+7. Use the requested language when appropriate.
+8. Do not invent information.
+9. Be friendly and concise.
 
 Selected language:
-${languageName}
-
-Reply naturally in the selected language when appropriate.
-
-DATE AND TIME:
-
-Timezone:
-${timezone || "Asia/Kolkata"}
-
-Current date/time:
-${currentDateTime || "Not provided"}
-
-Use the supplied current date/time for date-related questions.
-
-IMAGE / VIDEO:
-
-If an image or video is provided:
-- Analyze the uploaded media.
-- Answer questions about it.
-- Do not claim to see something that is not actually available.
-- If the media is unclear, say so.
-
-You are Viggo AI.
-`;
-}
-
-/* =====================================================
-   HISTORY
-===================================================== */
-
-function buildHistoryText(history) {
-
-    if (!Array.isArray(history)) {
-        return "";
-    }
-
-    return history
-        .slice(-30)
-        .map(item => {
-
-            if (!item) {
-                return "";
-            }
-
-            const role =
-                item.role === "assistant"
-                    ? "Viggo"
-                    : "User";
-
-            const text =
-                cleanText(
-                    item.text ||
-                    item.content ||
-                    ""
-                );
-
-            if (!text) {
-                return "";
-            }
-
-            return `${role}: ${text}`;
-
-        })
-        .filter(Boolean)
-        .join("\n");
-}
-
-/* =====================================================
-   PROMPT
-===================================================== */
-
-function buildPrompt({
-    message,
-    history,
-    language,
-    timezone,
-    currentDateTime,
-    hasFile
-}) {
-
-    const systemInstruction =
-        buildSystemInstruction(
-            language,
-            timezone,
-            currentDateTime
-        );
-
-    let prompt =
-        systemInstruction;
-
-    const historyText =
-        buildHistoryText(history);
-
-    if (historyText) {
-
-        prompt += `
-
-PREVIOUS CONVERSATION:
-
-${historyText}
-
-END PREVIOUS CONVERSATION.
-`;
-    }
-
-    if (hasFile) {
-
-        prompt += `
-
-The user has uploaded a file/media item.
-Analyze it together with the user's request.
-`;
-    }
-
-    prompt += `
-
-CURRENT USER MESSAGE:
-
-${cleanText(message)}
-
-Respond directly to the current user.
+${language || "en-IN"}
 `;
 
-    return prompt;
 }
 
-/* =====================================================
-   FILE VALIDATION
-===================================================== */
-
-function validateFile(file) {
-
-    if (!file) {
-        return null;
-    }
-
-    const name =
-        cleanText(file.name) ||
-        "uploaded-file";
-
-    const type =
-        cleanText(file.type).toLowerCase();
-
-    const data =
-        cleanText(file.data);
-
-    if (!data) {
-        throw new Error(
-            "Uploaded file data is missing."
-        );
-    }
-
-    if (!type) {
-        throw new Error(
-            "Uploaded file type is missing."
-        );
-    }
-
-    /*
-       Maximum request size.
-       express.json is already limited to 50 MB.
-    */
-
-    const MAX_DATA_LENGTH =
-        45 * 1024 * 1024;
-
-    if (
-        data.length >
-        MAX_DATA_LENGTH
-    ) {
-        throw new Error(
-            "Uploaded file is too large."
-        );
-    }
-
-    return {
-        name,
-        type,
-        data
-    };
-}
 
 /* =====================================================
-   PARSE DATA URL
+   EXTRACT GEMINI TEXT
 ===================================================== */
 
-function parseDataUrl(dataUrl, fallbackMime) {
-
-    const value =
-        cleanText(dataUrl);
-
-    /*
-       Normal format:
-
-       data:image/jpeg;base64,AAAA
-    */
-
-    const match =
-        value.match(
-            /^data:([^;]+);base64,(.+)$/s
-        );
-
-    if (match) {
-
-        return {
-            mimeType:
-                match[1].toLowerCase(),
-
-            data:
-                match[2]
-        };
-    }
-
-    /*
-       If frontend sends raw base64,
-       use file.type.
-    */
-
-    const rawBase64 =
-        value.replace(
-            /^base64,/i,
-            ""
-        );
-
-    if (!rawBase64) {
-
-        throw new Error(
-            "Invalid uploaded file data."
-        );
-    }
-
-    return {
-        mimeType:
-            fallbackMime ||
-            "application/octet-stream",
-
-        data:
-            rawBase64
-    };
-}
-
-/* =====================================================
-   SUPPORTED FILE TYPES
-===================================================== */
-
-function isSupportedMimeType(mimeType) {
-
-    if (!mimeType) {
-        return false;
-    }
-
-    return (
-        mimeType.startsWith("image/") ||
-        mimeType.startsWith("video/") ||
-        mimeType === "application/pdf" ||
-        mimeType === "text/plain"
-    );
-}
-
-/* =====================================================
-   GEMINI CONTENT
-===================================================== */
-
-function createGeminiContents(
-    prompt,
-    file
-) {
-
-    const parts = [];
-
-    /* TEXT */
-
-    parts.push({
-        text: prompt
-    });
-
-    /* FILE */
-
-    if (file) {
-
-        const parsed =
-            parseDataUrl(
-                file.data,
-                file.type
-            );
-
-        if (
-            !isSupportedMimeType(
-                parsed.mimeType
-            )
-        ) {
-
-            throw new Error(
-                `Unsupported file type: ${parsed.mimeType}`
-            );
-        }
-
-        /*
-           Image / video / supported media
-        */
-
-        parts.push({
-            inlineData: {
-                mimeType:
-                    parsed.mimeType,
-
-                data:
-                    parsed.data
-            }
-        });
-    }
-
-    return [
-        {
-            role: "user",
-            parts: parts
-        }
-    ];
-}
-
-/* =====================================================
-   RESPONSE TEXT
-===================================================== */
-
-function extractResponseText(response) {
+function extractText(response) {
 
     if (!response) {
+
         return "";
+
     }
 
-    /*
-       @google/genai commonly exposes
-       response.text
-    */
 
     if (
-        typeof response.text === "string"
+        typeof response.text ===
+        "string"
     ) {
 
-        return response.text.trim();
+        return response.text;
+
     }
 
-    /*
-       Some versions expose text()
-    */
 
     if (
+        response.text &&
         typeof response.text === "function"
     ) {
 
         try {
 
-            const value =
-                response.text();
-
-            if (
-                typeof value === "string"
-            ) {
-
-                return value.trim();
-            }
+            return response.text();
 
         } catch (error) {
 
             console.error(
-                "response.text() error:",
-                error.message
+                "Response text error:",
+                error
             );
+
         }
+
     }
 
-    /*
-       Fallback
-    */
 
     try {
 
-        const candidates =
-            response.candidates;
-
         if (
-            Array.isArray(candidates) &&
-            candidates.length
+            response.candidates &&
+            response.candidates.length
         ) {
 
-            const parts =
-                candidates[0]
-                    ?.content
-                    ?.parts || [];
+            const candidate =
+                response.candidates[0];
 
-            return parts
-                .map(part =>
-                    part?.text || ""
-                )
-                .join("")
-                .trim();
+
+            if (
+                candidate.content &&
+                candidate.content.parts
+            ) {
+
+                return candidate.content.parts
+                    .map(
+                        part =>
+                            part.text || ""
+                    )
+                    .join("");
+
+            }
+
         }
 
     } catch (error) {
 
         console.error(
-            "Candidate extraction error:",
-            error.message
+            "Extract text error:",
+            error
         );
+
     }
+
 
     return "";
+
 }
 
-/* =====================================================
-   GENERATE RESPONSE
-===================================================== */
-
-async function generateViggoResponse({
-    message,
-    conversationHistory,
-    language,
-    browserTimezone,
-    currentDateTime,
-    file
-}) {
-
-    if (!API_KEY || !ai) {
-
-        throw new Error(
-            "GEMINI_API_KEY is not configured."
-        );
-    }
-
-    const prompt =
-        buildPrompt({
-            message,
-            history:
-                conversationHistory,
-            language,
-            timezone:
-                browserTimezone,
-            currentDateTime,
-            hasFile:
-                Boolean(file)
-        });
-
-    const contents =
-        createGeminiContents(
-            prompt,
-            file
-        );
-
-    console.log(
-        "Sending request to Gemini..."
-    );
-
-    console.log(
-        "MODEL:",
-        MODEL
-    );
-
-    const response =
-        await ai.models.generateContent({
-            model: MODEL,
-            contents: contents
-        });
-
-    const reply =
-        extractResponseText(
-            response
-        );
-
-    if (!reply) {
-
-        throw new Error(
-            "Gemini returned an empty response."
-        );
-    }
-
-    return reply;
-}
 
 /* =====================================================
    CHAT ROUTE
 ===================================================== */
 
-app.post(
-    "/chat",
-    async (req, res) => {
+app.post("/chat", async (req, res) => {
 
-        const requestId =
-            `${Date.now()}-${Math.random()
-                .toString(36)
-                .substring(2, 8)}`;
+    try {
 
-        console.log("");
-        console.log(
-            "================================="
-        );
-        console.log(
-            "VIGGO CHAT REQUEST:",
-            requestId
-        );
-        console.log(
-            "================================="
-        );
+        const {
+            message,
+            language,
+            file
+        } = req.body || {};
 
-        try {
 
-            /* API KEY */
+        /* ---------------------------------------------
+           VALIDATION
+        --------------------------------------------- */
 
-            if (!API_KEY) {
+        if (
+            !message &&
+            !file
+        ) {
 
-                return res.status(500).json({
-                    success: false,
-                    error:
-                        "Gemini API key is missing.",
-                    code:
-                        "API_KEY_MISSING",
-                    requestId
-                });
-            }
+            return res.status(400).json({
 
-            const body =
-                req.body || {};
+                error:
+                    "Message is required."
 
-            /* MESSAGE */
-
-            const originalMessage =
-                cleanText(
-                    body.originalMessage
-                );
-
-            const message =
-                cleanText(
-                    body.message
-                ) ||
-                originalMessage;
-
-            /* FILE */
-
-            let file = null;
-
-            if (body.file) {
-
-                file =
-                    validateFile(
-                        body.file
-                    );
-            }
-
-            /*
-               Message is not required if
-               an upload exists.
-            */
-
-            if (
-                !message &&
-                !file
-            ) {
-
-                return res.status(400).json({
-                    success: false,
-                    error:
-                        "Message or file is required.",
-                    code:
-                        "MESSAGE_MISSING",
-                    requestId
-                });
-            }
-
-            /* LANGUAGE */
-
-            const language =
-                cleanText(
-                    body.language
-                ) ||
-                "en-IN";
-
-            /* TIMEZONE */
-
-            const browserTimezone =
-                cleanText(
-                    body.browserTimezone
-                ) ||
-                "Asia/Kolkata";
-
-            /* DATE TIME */
-
-            const currentDateTime =
-                cleanText(
-                    body.currentDateTime
-                );
-
-            /* HISTORY */
-
-            let conversationHistory =
-                Array.isArray(
-                    body.conversationHistory
-                )
-                    ? body.conversationHistory
-                    : [];
-
-            conversationHistory =
-                conversationHistory
-                    .slice(-30)
-                    .map(item => {
-
-                        return {
-                            role:
-                                item?.role ===
-                                "assistant"
-                                    ? "assistant"
-                                    : "user",
-
-                            text:
-                                cleanText(
-                                    item?.text ||
-                                    item?.content ||
-                                    ""
-                                )
-                        };
-
-                    })
-                    .filter(
-                        item =>
-                            item.text
-                    );
-
-            console.log(
-                "MESSAGE:",
-                message || "(file only)"
-            );
-
-            console.log(
-                "LANGUAGE:",
-                language
-            );
-
-            console.log(
-                "TIMEZONE:",
-                browserTimezone
-            );
-
-            console.log(
-                "HISTORY:",
-                conversationHistory.length
-            );
-
-            console.log(
-                "FILE:",
-                file
-                    ? `${file.name} | ${file.type}`
-                    : "none"
-            );
-
-            /* GENERATE */
-
-            const reply =
-                await generateViggoResponse({
-
-                    message:
-                        message,
-
-                    conversationHistory:
-                        conversationHistory,
-
-                    language:
-                        language,
-
-                    browserTimezone:
-                        browserTimezone,
-
-                    currentDateTime:
-                        currentDateTime,
-
-                    file:
-                        file
-                });
-
-            console.log(
-                "✓ VIGGO RESPONSE SUCCESS"
-            );
-
-            return res.status(200).json({
-
-                success: true,
-
-                reply:
-                    reply,
-
-                response:
-                    reply,
-
-                model:
-                    MODEL,
-
-                language:
-                    language,
-
-                hasFile:
-                    Boolean(file),
-
-                requestId:
-                    requestId
             });
 
-        } catch (error) {
+        }
 
-            console.error("");
-            console.error(
-                "================================="
-            );
-            console.error(
-                "❌ VIGGO SERVER ERROR"
-            );
-            console.error(
-                "REQUEST:",
-                requestId
-            );
-            console.error(
-                "================================="
-            );
 
-            console.error(
-                error
-            );
+        /* ---------------------------------------------
+           DATE / TIME
+           
+           Handle locally so it always works.
+        --------------------------------------------- */
 
-            const errorString =
-                String(
-                    error?.message ||
-                    error ||
-                    ""
+        if (message) {
+
+            const specialReply =
+                dateTimeReply(
+                    message
                 );
 
-            const lower =
-                errorString.toLowerCase();
 
-            /* QUOTA */
+            if (specialReply) {
 
-            if (
-                lower.includes("429") ||
-                lower.includes(
-                    "resource_exhausted"
-                ) ||
-                lower.includes("quota")
-            ) {
+                return res.json({
 
-                return res.status(429).json({
+                    reply:
+                        specialReply
 
-                    success: false,
-
-                    error:
-                        "Gemini API quota exceeded.",
-
-                    code:
-                        "GEMINI_QUOTA",
-
-                    requestId
                 });
+
             }
 
-            /* MODEL */
+        }
 
-            if (
-                lower.includes("404") ||
-                lower.includes("not found") ||
-                lower.includes(
-                    "model"
-                ) &&
-                lower.includes(
-                    "unsupported"
-                )
-            ) {
 
-                return res.status(500).json({
+        /* ---------------------------------------------
+           API KEY
+        --------------------------------------------- */
 
-                    success: false,
+        if (!ai) {
 
-                    error:
-                        `Gemini model "${MODEL}" is unavailable.`,
+            return res.status(500).json({
 
-                    code:
-                        "MODEL_ERROR",
+                error:
+                    "Gemini API key is not configured."
+
+            });
+
+        }
+
+
+        /* ---------------------------------------------
+           USER MESSAGE
+        --------------------------------------------- */
+
+        const userMessage =
+            String(
+                message ||
+                "Please analyze the uploaded file."
+            );
+
+
+        /* ---------------------------------------------
+           NORMAL TEXT CHAT
+        --------------------------------------------- */
+
+        if (!file) {
+
+            const prompt =
+
+                getSystemPrompt(
+                    language
+                ) +
+
+                "\n\nUser message:\n" +
+
+                userMessage;
+
+
+            const response =
+                await ai.models.generateContent({
 
                     model:
                         MODEL,
 
-                    requestId
+                    contents:
+                        prompt
+
                 });
-            }
 
-            /* API KEY */
 
-            if (
-                lower.includes(
-                    "api key"
-                ) ||
-                lower.includes(
-                    "unauthenticated"
-                ) ||
-                lower.includes(
-                    "permission denied"
-                )
-            ) {
+            const reply =
+                extractText(
+                    response
+                );
 
-                return res.status(401).json({
 
-                    success: false,
+            if (!reply) {
+
+                return res.status(500).json({
 
                     error:
-                        "Gemini API key is invalid or unavailable.",
+                        "Gemini returned an empty response."
 
-                    code:
-                        "API_KEY_ERROR",
-
-                    requestId
                 });
+
             }
 
-            /* FILE SIZE */
 
-            if (
-                lower.includes(
-                    "too large"
-                ) ||
-                lower.includes(
-                    "payload"
-                ) ||
-                lower.includes(
-                    "entity too large"
-                )
-            ) {
+            return res.json({
 
-                return res.status(413).json({
+                reply:
+                    reply.trim()
 
-                    success: false,
-
-                    error:
-                        "Uploaded file is too large.",
-
-                    code:
-                        "FILE_TOO_LARGE",
-
-                    requestId
-                });
-            }
-
-            /* INVALID FILE */
-
-            if (
-                lower.includes(
-                    "uploaded file"
-                ) ||
-                lower.includes(
-                    "invalid uploaded"
-                ) ||
-                lower.includes(
-                    "unsupported file"
-                )
-            ) {
-
-                return res.status(400).json({
-
-                    success: false,
-
-                    error:
-                        errorString,
-
-                    code:
-                        "FILE_ERROR",
-
-                    requestId
-                });
-            }
-
-            /* SERVICE UNAVAILABLE */
-
-            if (
-                lower.includes("503") ||
-                lower.includes(
-                    "unavailable"
-                )
-            ) {
-
-                return res.status(503).json({
-
-                    success: false,
-
-                    error:
-                        "Gemini is temporarily unavailable. Please try again.",
-
-                    code:
-                        "GEMINI_UNAVAILABLE",
-
-                    requestId
-                });
-            }
-
-            /* GENERIC */
-
-            return res.status(500).json({
-
-                success: false,
-
-                error:
-                    "Viggo AI could not generate a response.",
-
-                details:
-                    errorString.substring(
-                        0,
-                        500
-                    ),
-
-                requestId
             });
+
         }
+
+
+        /* ---------------------------------------------
+           FILE / IMAGE
+        --------------------------------------------- */
+
+        if (
+            file.data &&
+            file.type
+        ) {
+
+            const base64Data =
+                String(
+                    file.data
+                ).replace(
+                    /^data:[^;]+;base64,/,
+                    ""
+                );
+
+
+            const prompt =
+
+                getSystemPrompt(
+                    language
+                ) +
+
+                `
+
+The user uploaded a file.
+
+File name:
+${file.name || "Uploaded file"}
+
+File type:
+${file.type}
+
+User request:
+${userMessage}
+
+Analyze the uploaded content and answer the user.
+`;
+
+
+            const response =
+                await ai.models.generateContent({
+
+                    model:
+                        MODEL,
+
+                    contents: [
+
+                        {
+                            role:
+                                "user",
+
+                            parts: [
+
+                                {
+                                    text:
+                                        prompt
+                                },
+
+                                {
+                                    inlineData: {
+
+                                        mimeType:
+                                            file.type,
+
+                                        data:
+                                            base64Data
+
+                                    }
+
+                                }
+
+                            ]
+
+                        }
+
+                    ]
+
+                });
+
+
+            const reply =
+                extractText(
+                    response
+                );
+
+
+            if (!reply) {
+
+                return res.status(500).json({
+
+                    error:
+                        "Gemini returned an empty file response."
+
+                });
+
+            }
+
+
+            return res.json({
+
+                reply:
+                    reply.trim()
+
+            });
+
+        }
+
+
+        /* ---------------------------------------------
+           INVALID FILE
+        --------------------------------------------- */
+
+        return res.status(400).json({
+
+            error:
+                "Invalid uploaded file."
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "================================="
+        );
+
+        console.error(
+            "VIGGO CHAT ERROR"
+        );
+
+        console.error(
+            error
+        );
+
+        console.error(
+            "================================="
+        );
+
+
+        return res.status(500).json({
+
+            error:
+                error.message ||
+                "Internal server error.",
+
+            message:
+                "Viggo AI could not process the request."
+
+        });
+
     }
-);
+
+});
+
 
 /* =====================================================
    404
@@ -1129,100 +717,57 @@ app.use(
 
         res.status(404).json({
 
-            success: false,
-
             error:
                 "Route not found.",
 
             path:
                 req.path
+
         });
+
     }
 );
 
-/* =====================================================
-   GLOBAL ERROR
-===================================================== */
-
-app.use(
-    (
-        error,
-        req,
-        res,
-        next
-    ) => {
-
-        console.error(
-            "GLOBAL ERROR:",
-            error
-        );
-
-        if (
-            res.headersSent
-        ) {
-
-            return next(error);
-        }
-
-        res.status(500).json({
-
-            success: false,
-
-            error:
-                "Internal server error."
-        });
-    }
-);
 
 /* =====================================================
-   START SERVER
+   SERVER START
 ===================================================== */
 
 app.listen(
     PORT,
-    "0.0.0.0",
     () => {
 
-        console.log("");
-        console.log(
-            "================================="
-        );
-        console.log(
-            "       VIGGO AI SERVER ONLINE"
-        );
         console.log(
             "================================="
         );
 
         console.log(
-            "PORT:",
-            PORT
-        );
-
-        console.log(
-            "MODEL:",
-            MODEL
-        );
-
-        console.log(
-            "API KEY:",
-            API_KEY
-                ? "CONFIGURED"
-                : "MISSING"
-        );
-
-        console.log(
-            "CHAT:",
-            "/chat"
-        );
-
-        console.log(
-            "HEALTH:",
-            "/health"
+            "VIGGO AI SERVER ONLINE"
         );
 
         console.log(
             "================================="
         );
+
+        console.log(
+            `PORT: ${PORT}`
+        );
+
+        console.log(
+            `MODEL: ${MODEL}`
+        );
+
+        console.log(
+            `API KEY: ${
+                API_KEY
+                    ? "CONFIGURED"
+                    : "NOT CONFIGURED"
+            }`
+        );
+
+        console.log(
+            "================================="
+        );
+
     }
 );
