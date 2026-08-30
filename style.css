@@ -17,12 +17,13 @@ body {
 
     font-family: Arial, Helvetica, sans-serif;
 
-    background: #050505;
+    background: #050505 !important;
     color: #ffffff;
 }
 
 body {
     min-height: 100vh;
+    background: #050505 !important;
 }
 
 
@@ -61,7 +62,7 @@ body {
     width: 280px;
     height: var(--app-height);
 
-    background: #090909;
+    background: #090909 !important;
 
     border-right: 1px solid var(--border);
 
@@ -102,7 +103,8 @@ body {
     border: none;
     border-radius: 10px;
 
-    background: transparent;
+    background: transparent !important;
+
     color: #ffffff;
 
     font-size: 20px;
@@ -111,7 +113,7 @@ body {
 }
 
 .icon-btn:hover {
-    background: #1a1a1a;
+    background: #1a1a1a !important;
 }
 
 
@@ -127,7 +129,8 @@ body {
     border: 1px solid #147cff;
     border-radius: 12px;
 
-    background: #0b5ed7;
+    background: #0b5ed7 !important;
+
     color: #ffffff;
 
     font-size: 15px;
@@ -139,7 +142,7 @@ body {
 }
 
 .new-chat:hover {
-    background: #0872f9;
+    background: #0872f9 !important;
 }
 
 
@@ -159,9 +162,10 @@ body {
 
     padding: 0 12px;
 
-    background: #111111;
+    background: #111111 !important;
 
     border: 1px solid #242424;
+
     border-radius: 10px;
 }
 
@@ -176,7 +180,8 @@ body {
     border: none;
     outline: none;
 
-    background: transparent;
+    background: transparent !important;
+
     color: #ffffff;
 
     font-size: 14px;
@@ -213,6 +218,8 @@ body {
     overflow-y: auto;
 
     padding: 5px 10px 15px;
+
+    background: #090909 !important;
 }
 
 .chat-history::-webkit-scrollbar {
@@ -221,6 +228,7 @@ body {
 
 .chat-history::-webkit-scrollbar-thumb {
     background: #333333;
+
     border-radius: 10px;
 }
 
@@ -248,17 +256,19 @@ body {
 
     cursor: pointer;
 
-    background: transparent;
+    background: transparent !important;
+
+    border: 1px solid transparent;
 
     transition: 0.2s;
 }
 
 .history-item:hover {
-    background: #151515;
+    background: #151515 !important;
 }
 
 .history-item.active {
-    background: #102b49;
+    background: #102b49 !important;
 
     border: 1px solid #174d7d;
 }
@@ -302,8 +312,7 @@ body {
 
 
 /* =====================================================
-   PIN + DELETE BUTTON
-   NO WHITE BACKGROUND
+   PIN / DELETE BUTTON
 ===================================================== */
 
 .history-action-btn,
@@ -313,17 +322,22 @@ body {
     height: 32px;
 
     display: flex;
+
     align-items: center;
     justify-content: center;
+
+    flex: 0 0 32px;
 
     padding: 0;
     margin: 0;
 
-    border-radius: 8px;
-
     border: 1px solid #24527a !important;
 
+    border-radius: 8px;
+
     background: #0d1c2b !important;
+
+    background-image: none !important;
 
     color: #ffffff;
 
@@ -385,31 +399,31 @@ body {
 
 
 /* =====================================================
-   REMOVE WHITE ACTIVE / FOCUS BACKGROUND
+   REMOVE WHITE ACTIVE / FOCUS
 ===================================================== */
 
 .history-action-btn:focus,
 .history-action-btn:focus-visible,
-.history-action-btn:active,
-.history-action-btn.pin-btn:focus,
-.history-action-btn.pin-btn:active,
-.history-action-btn.delete-btn:focus,
-.history-action-btn.delete-btn:active {
-    background: #0d1c2b !important;
-
-    color: inherit;
-
+.history-action-btn:active {
     outline: none !important;
 
     box-shadow: none !important;
 }
 
-.history-action-btn.delete-btn:active {
-    color: #ff6b6b !important;
+.history-action-btn.pin-btn:focus,
+.history-action-btn.pin-btn:focus-visible,
+.history-action-btn.pin-btn:active {
+    background: #0d1c2b !important;
+
+    color: #3da0ff !important;
 }
 
-.history-action-btn.pin-btn:active {
-    color: #3da0ff !important;
+.history-action-btn.delete-btn:focus,
+.history-action-btn.delete-btn:focus-visible,
+.history-action-btn.delete-btn:active {
+    background: #0d1c2b !important;
+
+    color: #ff6b6b !important;
 }
 
 .history-action-btn:active {
@@ -426,9 +440,9 @@ body {
 }
 
 .history-item.selected {
-    background: #102b49;
+    background: #102b49 !important;
 
-    border: 1px solid #1683ff;
+    border: 1px solid #1683ff !important;
 
     box-shadow:
         0 0 0 1px rgba(22, 131, 255, 0.15);
@@ -456,6 +470,8 @@ body {
     padding: 10px 14px 15px;
 
     border-top: 1px solid var(--border);
+
+    background: #090909 !important;
 }
 
 .more-button {
@@ -466,7 +482,7 @@ body {
 
     border-radius: 10px;
 
-    background: #111111;
+    background: #111111 !important;
 
     color: #ffffff;
 
@@ -483,7 +499,7 @@ body {
 }
 
 .more-button:hover {
-    background: #181818;
+    background: #181818 !important;
 }
 
 .more-dots {
@@ -509,7 +525,7 @@ body {
 
     padding: 7px;
 
-    background: #111111;
+    background: #111111 !important;
 
     border: 1px solid #292929;
 
@@ -535,7 +551,7 @@ body {
 
     border-radius: 8px;
 
-    background: transparent;
+    background: transparent !important;
 
     color: #ffffff;
 
@@ -549,7 +565,7 @@ body {
 }
 
 .more-menu button:hover {
-    background: #1d1d1d;
+    background: #1d1d1d !important;
 }
 
 
@@ -569,7 +585,7 @@ body {
     display: flex;
     flex-direction: column;
 
-    background: #050505;
+    background: #050505 !important;
 }
 
 
@@ -590,7 +606,7 @@ body {
 
     border-bottom: 1px solid var(--border);
 
-    background: #080808;
+    background: #080808 !important;
 }
 
 .top-left {
@@ -609,7 +625,7 @@ body {
 
     border-radius: 10px;
 
-    background: #111111;
+    background: #111111 !important;
 
     color: #ffffff;
 
@@ -621,7 +637,7 @@ body {
 }
 
 .menu-btn:hover {
-    background: #1b1b1b;
+    background: #1b1b1b !important;
 }
 
 .brand {
@@ -646,7 +662,7 @@ body {
 
     border-radius: 10px;
 
-    background: #0d1c2b;
+    background: #0d1c2b !important;
 
     color: #ffffff;
 
@@ -658,7 +674,7 @@ body {
 }
 
 .share-btn:hover {
-    background: #12395a;
+    background: #12395a !important;
 
     border-color: #278fff;
 }
@@ -674,6 +690,8 @@ body {
     min-height: 0;
 
     overflow: hidden;
+
+    background: #050505 !important;
 }
 
 .conversation {
@@ -683,6 +701,8 @@ body {
     overflow-y: auto;
 
     padding: 25px 20px 150px;
+
+    background: #050505 !important;
 }
 
 .conversation::-webkit-scrollbar {
@@ -701,7 +721,7 @@ body {
 
 
 /* =====================================================
-   MESSAGE
+   MESSAGE FORMAT
 ===================================================== */
 
 .message {
@@ -713,18 +733,27 @@ body {
 }
 
 
-/* USER = RIGHT */
+/* =====================================================
+   USER MESSAGE = RIGHT
+===================================================== */
 
 .message.user {
-    justify-content: flex-end;
+    justify-content: flex-end !important;
 }
 
 
-/* AI = LEFT */
+/* =====================================================
+   AI MESSAGE = LEFT
+===================================================== */
 
 .message.ai {
-    justify-content: flex-start;
+    justify-content: flex-start !important;
 }
+
+
+/* =====================================================
+   MESSAGE CONTENT
+===================================================== */
 
 .message-content {
     max-width: min(820px, 85%);
@@ -732,6 +761,24 @@ body {
     display: flex;
 
     flex-direction: column;
+}
+
+
+/* =====================================================
+   USER CONTENT = RIGHT
+===================================================== */
+
+.message.user .message-content {
+    align-items: flex-end;
+}
+
+
+/* =====================================================
+   AI CONTENT = LEFT
+===================================================== */
+
+.message.ai .message-content {
+    align-items: flex-start;
 }
 
 
@@ -754,21 +801,27 @@ body {
 }
 
 
-/* USER MESSAGE - RIGHT */
+/* =====================================================
+   USER BUBBLE
+===================================================== */
 
 .message.user .message-bubble {
-    background: #0868d8;
+    background: #0868d8 !important;
 
     color: #ffffff;
+
+    border: none;
 
     border-bottom-right-radius: 5px;
 }
 
 
-/* AI MESSAGE - LEFT */
+/* =====================================================
+   AI BUBBLE
+===================================================== */
 
 .message.ai .message-bubble {
-    background: #151515;
+    background: #151515 !important;
 
     color: #eeeeee;
 
@@ -797,7 +850,7 @@ body {
 
     border-radius: 7px;
 
-    background: #0d0d0d;
+    background: #0d0d0d !important;
 
     color: #aaaaaa;
 
@@ -815,7 +868,7 @@ body {
 
     border-color: #167de8;
 
-    background: #101d2b;
+    background: #101d2b !important;
 }
 
 
@@ -870,7 +923,7 @@ body {
 
     padding: 8px 9px;
 
-    background: #111111;
+    background: #111111 !important;
 
     border: 1px solid #292929;
 
@@ -897,7 +950,7 @@ body {
 
     border-radius: 11px;
 
-    background: #1b1b1b;
+    background: #1b1b1b !important;
 
     color: #ffffff;
 
@@ -907,7 +960,7 @@ body {
 }
 
 .input-plus:hover {
-    background: #252525;
+    background: #252525 !important;
 }
 
 
@@ -930,7 +983,7 @@ body {
 
     outline: none;
 
-    background: transparent;
+    background: transparent !important;
 
     color: #ffffff;
 
@@ -962,7 +1015,7 @@ body {
 
     border-radius: 11px;
 
-    background: #1a1a1a;
+    background: #1a1a1a !important;
 
     color: #ffffff;
 
@@ -972,11 +1025,11 @@ body {
 }
 
 .input-icon:hover {
-    background: #242424;
+    background: #242424 !important;
 }
 
 .input-icon.active {
-    background: #0a70e8;
+    background: #0a70e8 !important;
 
     box-shadow:
         0 0 12px rgba(22, 131, 255, 0.55);
@@ -997,7 +1050,7 @@ body {
 
     border-radius: 12px;
 
-    background: #0878ef;
+    background: #0878ef !important;
 
     color: #ffffff;
 
@@ -1009,7 +1062,7 @@ body {
 }
 
 .send-btn:hover {
-    background: #1688ff;
+    background: #1688ff !important;
 
     transform: scale(1.03);
 }
@@ -1042,7 +1095,7 @@ body {
 
     padding: 7px;
 
-    background: #111111;
+    background: #111111 !important;
 
     border: 1px solid #292929;
 
@@ -1068,7 +1121,7 @@ body {
 
     border-radius: 8px;
 
-    background: transparent;
+    background: transparent !important;
 
     color: #ffffff;
 
@@ -1082,7 +1135,7 @@ body {
 }
 
 .plus-menu button:hover {
-    background: #1d1d1d;
+    background: #1d1d1d !important;
 }
 
 
@@ -1101,7 +1154,7 @@ body {
 
     justify-content: center;
 
-    background: rgba(0, 0, 0, 0.72);
+    background: rgba(0, 0, 0, 0.72) !important;
 
     z-index: 3000;
 }
@@ -1118,7 +1171,7 @@ body {
 
     padding: 25px;
 
-    background: #111111;
+    background: #111111 !important;
 
     border: 1px solid #292929;
 
@@ -1147,7 +1200,7 @@ body {
 
     border-radius: 8px;
 
-    background: transparent;
+    background: transparent !important;
 
     color: #ffffff;
 
@@ -1157,7 +1210,7 @@ body {
 }
 
 .modal-close:hover {
-    background: #222222;
+    background: #222222 !important;
 }
 
 .modal-box select {
@@ -1173,7 +1226,7 @@ body {
 
     border-radius: 9px;
 
-    background: #080808;
+    background: #080808 !important;
 
     color: #ffffff;
 
@@ -1189,7 +1242,7 @@ body {
 
     border-radius: 9px;
 
-    background: #0878ef;
+    background: #0878ef !important;
 
     color: #ffffff;
 
@@ -1199,7 +1252,7 @@ body {
 }
 
 .modal-button:hover {
-    background: #1688ff;
+    background: #1688ff !important;
 }
 
 
@@ -1400,7 +1453,7 @@ select {
 
 
 /* =====================================================
-   SAFE AREA FOR MOBILE
+   SAFE AREA
 ===================================================== */
 
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
@@ -1417,40 +1470,105 @@ select {
 
 
 /* =====================================================
-   FINAL WHITE-BACKGROUND FIX
-   PIN + DELETE
+   FINAL GLOBAL WHITE BACKGROUND BLOCK
 ===================================================== */
 
-.history-actions .history-action-btn,
-.history-actions .history-action-btn.pin-btn,
-.history-actions .history-action-btn.delete-btn {
+.sidebar,
+.chat-history,
+.main,
+.topbar,
+.chat-area,
+.conversation,
+.input-area,
+.plus-menu,
+.more-menu,
+.modal-box,
+.search-box,
+.message-actions button,
+.history-action-btn {
+    background-color: #050505;
+}
+
+
+/* Keep panels dark instead of white */
+
+.sidebar,
+.chat-history {
+    background-color: #090909;
+}
+
+.topbar {
+    background-color: #080808;
+}
+
+.input-area,
+.plus-menu,
+.more-menu,
+.modal-box,
+.search-box {
+    background-color: #111111;
+}
+
+.message-actions button {
+    background-color: #0d0d0d;
+}
+
+
+/* =====================================================
+   FINAL PIN + DELETE FIX
+===================================================== */
+
+.history-action-btn,
+.history-action-btn.pin-btn,
+.history-action-btn.delete-btn {
     background-color: #0d1c2b !important;
 
     background-image: none !important;
 
-    border-color: #24527a !important;
+    border: 1px solid #24527a !important;
 
     box-shadow: none !important;
 }
 
-.history-actions .history-action-btn.pin-btn {
+.history-action-btn.pin-btn {
     color: #3da0ff !important;
 }
 
-.history-actions .history-action-btn.delete-btn {
+.history-action-btn.delete-btn {
     color: #ff6b6b !important;
 }
 
-.history-actions .history-action-btn.pin-btn:hover {
+.history-action-btn.pin-btn:hover {
     background-color: #12395a !important;
 
     border-color: #1683ff !important;
 }
 
-.history-actions .history-action-btn.delete-btn:hover {
+.history-action-btn.delete-btn:hover {
     background-color: #291414 !important;
 
     border-color: #ff5555 !important;
+}
+
+
+/* =====================================================
+   FINAL MESSAGE ALIGNMENT
+===================================================== */
+
+.message.user {
+    justify-content: flex-end !important;
+}
+
+.message.ai {
+    justify-content: flex-start !important;
+}
+
+.message.user .message-content {
+    align-items: flex-end !important;
+}
+
+.message.ai .message-content {
+    align-items: flex-start !important;
 }
 
 
