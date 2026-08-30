@@ -14,7 +14,9 @@ body {
     width: 100%;
     height: 100%;
     overflow: hidden;
+
     font-family: Arial, Helvetica, sans-serif;
+
     background: #050505;
     color: #ffffff;
 }
@@ -257,6 +259,7 @@ body {
 
 .history-item.active {
     background: #102b49;
+
     border: 1px solid #174d7d;
 }
 
@@ -297,17 +300,17 @@ body {
     flex: 0 0 auto;
 }
 
-.history-action-btn {
+
+/* =====================================================
+   PIN + DELETE BUTTON
+   NO WHITE BACKGROUND
+===================================================== */
+
+.history-action-btn,
+.history-action-btn.pin-btn,
+.history-action-btn.delete-btn {
     width: 32px;
     height: 32px;
-
-    border: 1px solid #24527a;
-
-    border-radius: 8px;
-
-    background: #0d1c2b !important;
-
-    color: #ffffff;
 
     display: flex;
     align-items: center;
@@ -316,11 +319,21 @@ body {
     padding: 0;
     margin: 0;
 
+    border-radius: 8px;
+
+    border: 1px solid #24527a !important;
+
+    background: #0d1c2b !important;
+
+    color: #ffffff;
+
     cursor: pointer;
 
     font-size: 14px;
 
-    box-shadow: none;
+    box-shadow: none !important;
+
+    outline: none;
 
     transition:
         background 0.2s ease,
@@ -329,50 +342,74 @@ body {
 }
 
 
-/* PIN */
+/* =====================================================
+   PIN
+===================================================== */
 
 .history-action-btn.pin-btn {
     background: #0d1c2b !important;
 
-    color: #3da0ff;
+    color: #3da0ff !important;
 
-    border-color: #24527a;
-}
-
-
-/* DELETE */
-
-.history-action-btn.delete-btn {
-    background: #0d1c2b !important;
-
-    color: #ff6b6b;
-
-    border-color: #24527a;
-}
-
-
-/* HOVER */
-
-.history-action-btn:hover {
-    background: #12395a !important;
-
-    border-color: #1683ff;
+    border-color: #24527a !important;
 }
 
 .history-action-btn.pin-btn:hover {
     background: #12395a !important;
 
-    color: #3da0ff;
+    color: #3da0ff !important;
 
-    border-color: #1683ff;
+    border-color: #1683ff !important;
+}
+
+
+/* =====================================================
+   DELETE
+===================================================== */
+
+.history-action-btn.delete-btn {
+    background: #0d1c2b !important;
+
+    color: #ff6b6b !important;
+
+    border-color: #24527a !important;
 }
 
 .history-action-btn.delete-btn:hover {
     background: #291414 !important;
 
-    color: #ff6b6b;
+    color: #ff6b6b !important;
 
-    border-color: #ff5555;
+    border-color: #ff5555 !important;
+}
+
+
+/* =====================================================
+   REMOVE WHITE ACTIVE / FOCUS BACKGROUND
+===================================================== */
+
+.history-action-btn:focus,
+.history-action-btn:focus-visible,
+.history-action-btn:active,
+.history-action-btn.pin-btn:focus,
+.history-action-btn.pin-btn:active,
+.history-action-btn.delete-btn:focus,
+.history-action-btn.delete-btn:active {
+    background: #0d1c2b !important;
+
+    color: inherit;
+
+    outline: none !important;
+
+    box-shadow: none !important;
+}
+
+.history-action-btn.delete-btn:active {
+    color: #ff6b6b !important;
+}
+
+.history-action-btn.pin-btn:active {
+    color: #3da0ff !important;
 }
 
 .history-action-btn:active {
@@ -676,52 +713,18 @@ body {
 }
 
 
-/* =====================================================
-   USER MESSAGE = RIGHT
-===================================================== */
+/* USER = RIGHT */
 
 .message.user {
     justify-content: flex-end;
 }
 
 
-/* =====================================================
-   AI MESSAGE = LEFT
-===================================================== */
+/* AI = LEFT */
 
-.message.ai,
-.message.assistant {
+.message.ai {
     justify-content: flex-start;
 }
-
-
-/* =====================================================
-   SUPPORT message-wrapper
-   USER = RIGHT
-   AI = LEFT
-===================================================== */
-
-.message-wrapper {
-    width: 100%;
-
-    display: flex;
-
-    margin-bottom: 18px;
-}
-
-.message-wrapper.user {
-    justify-content: flex-end;
-}
-
-.message-wrapper.ai,
-.message-wrapper.assistant {
-    justify-content: flex-start;
-}
-
-
-/* =====================================================
-   MESSAGE CONTENT
-===================================================== */
 
 .message-content {
     max-width: min(820px, 85%);
@@ -729,24 +732,6 @@ body {
     display: flex;
 
     flex-direction: column;
-}
-
-
-/* USER CONTENT = RIGHT */
-
-.message.user .message-content,
-.message-wrapper.user .message-content {
-    margin-left: auto;
-}
-
-
-/* AI CONTENT = LEFT */
-
-.message.ai .message-content,
-.message.assistant .message-content,
-.message-wrapper.ai .message-content,
-.message-wrapper.assistant .message-content {
-    margin-right: auto;
 }
 
 
@@ -769,12 +754,9 @@ body {
 }
 
 
-/* =====================================================
-   USER BUBBLE
-===================================================== */
+/* USER MESSAGE - RIGHT */
 
-.message.user .message-bubble,
-.message-wrapper.user .message-bubble {
+.message.user .message-bubble {
     background: #0868d8;
 
     color: #ffffff;
@@ -783,14 +765,9 @@ body {
 }
 
 
-/* =====================================================
-   AI BUBBLE
-===================================================== */
+/* AI MESSAGE - LEFT */
 
-.message.ai .message-bubble,
-.message.assistant .message-bubble,
-.message-wrapper.ai .message-bubble,
-.message-wrapper.assistant .message-bubble {
+.message.ai .message-bubble {
     background: #151515;
 
     color: #eeeeee;
@@ -1161,11 +1138,9 @@ body {
     position: absolute;
 
     top: 12px;
-
     right: 12px;
 
     width: 34px;
-
     height: 34px;
 
     border: none;
@@ -1442,37 +1417,40 @@ select {
 
 
 /* =====================================================
-   FINAL MESSAGE ALIGNMENT
+   FINAL WHITE-BACKGROUND FIX
+   PIN + DELETE
 ===================================================== */
 
-/* USER → RIGHT */
-.message.user,
-.message-wrapper.user {
-    justify-content: flex-end !important;
+.history-actions .history-action-btn,
+.history-actions .history-action-btn.pin-btn,
+.history-actions .history-action-btn.delete-btn {
+    background-color: #0d1c2b !important;
+
+    background-image: none !important;
+
+    border-color: #24527a !important;
+
+    box-shadow: none !important;
 }
 
-/* AI → LEFT */
-.message.ai,
-.message.assistant,
-.message-wrapper.ai,
-.message-wrapper.assistant {
-    justify-content: flex-start !important;
+.history-actions .history-action-btn.pin-btn {
+    color: #3da0ff !important;
 }
 
-/* USER content */
-.message.user .message-content,
-.message-wrapper.user .message-content {
-    margin-left: auto;
-    margin-right: 0;
+.history-actions .history-action-btn.delete-btn {
+    color: #ff6b6b !important;
 }
 
-/* AI content */
-.message.ai .message-content,
-.message.assistant .message-content,
-.message-wrapper.ai .message-content,
-.message-wrapper.assistant .message-content {
-    margin-left: 0;
-    margin-right: auto;
+.history-actions .history-action-btn.pin-btn:hover {
+    background-color: #12395a !important;
+
+    border-color: #1683ff !important;
+}
+
+.history-actions .history-action-btn.delete-btn:hover {
+    background-color: #291414 !important;
+
+    border-color: #ff5555 !important;
 }
 
 
