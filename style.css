@@ -31,13 +31,17 @@ body {
 
 :root {
     --app-height: 100vh;
+
     --blue: #1683ff;
     --blue-dark: #075fc2;
     --blue-light: #3da0ff;
+
     --black: #050505;
     --panel: #0d0d0d;
     --panel-2: #111111;
+
     --border: #242424;
+
     --text: #ffffff;
     --muted: #999999;
 }
@@ -49,12 +53,15 @@ body {
 
 .sidebar {
     position: fixed;
+
     left: 0;
     top: 0;
+
     width: 280px;
     height: var(--app-height);
 
     background: #090909;
+
     border-right: 1px solid var(--border);
 
     display: flex;
@@ -257,7 +264,7 @@ body {
 
 
 /* =====================================================
-   HISTORY TITLE
+   HISTORY CHAT TITLE
 ===================================================== */
 
 .history-chat-title {
@@ -279,6 +286,7 @@ body {
 
 /* =====================================================
    HISTORY ACTIONS
+   PIN + DELETE
 ===================================================== */
 
 .history-actions {
@@ -286,29 +294,116 @@ body {
 
     align-items: center;
 
-    gap: 3px;
+    gap: 5px;
 }
 
 .history-action-btn {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
 
-    border: none;
+    border: 1px solid #24527a;
 
-    border-radius: 7px;
+    border-radius: 8px;
 
-    background: transparent;
+    background: #0d1c2b;
 
-    color: #bbbbbb;
+    color: #ffffff;
 
     cursor: pointer;
 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     font-size: 14px;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
 }
 
 .history-action-btn:hover {
-    background: #222222;
+    background: #12395a;
+
+    border-color: #1683ff;
+
     color: #ffffff;
+}
+
+.history-action-btn:active {
+    transform: scale(0.94);
+}
+
+
+/* =====================================================
+   PIN BUTTON
+===================================================== */
+
+.history-action-btn.pin-btn {
+    background: #0d1c2b;
+
+    color: #3da0ff;
+
+    border-color: #24527a;
+}
+
+.history-action-btn.pin-btn:hover {
+    background: #102b49;
+
+    border-color: #1683ff;
+
+    color: #3da0ff;
+}
+
+
+/* =====================================================
+   DELETE BUTTON
+===================================================== */
+
+.history-action-btn.delete-btn {
+    background: #0d1c2b;
+
+    color: #ff6b6b;
+
+    border-color: #24527a;
+}
+
+.history-action-btn.delete-btn:hover {
+    background: #291414;
+
+    border-color: #ff5555;
+
+    color: #ff6b6b;
+}
+
+
+/* =====================================================
+   SELECT CHAT MODE
+===================================================== */
+
+.history-item.selectable {
+    cursor: pointer;
+}
+
+.history-item.selected {
+    background: #102b49;
+
+    border: 1px solid #1683ff;
+
+    box-shadow:
+        0 0 0 1px rgba(22, 131, 255, 0.15);
+}
+
+.history-item .select-checkbox {
+    width: 18px;
+    height: 18px;
+
+    flex: 0 0 auto;
+
+    accent-color: #1683ff;
+
+    cursor: pointer;
 }
 
 
@@ -381,7 +476,8 @@ body {
 
     border-radius: 12px;
 
-    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.55);
+    box-shadow:
+        0 10px 35px rgba(0, 0, 0, 0.55);
 
     z-index: 1200;
 }
@@ -492,6 +588,7 @@ body {
 .brand {
     font-size: 20px;
     font-weight: 700;
+
     color: #ffffff;
 }
 
@@ -522,6 +619,7 @@ body {
 
 .share-btn:hover {
     background: #12395a;
+
     border-color: #278fff;
 }
 
@@ -603,8 +701,6 @@ body {
     line-height: 1.55;
 
     word-wrap: break-word;
-
-    overflow-wrap: anywhere;
 
     white-space: pre-wrap;
 }
@@ -1259,379 +1355,6 @@ select {
                 8px +
                 env(safe-area-inset-bottom)
             );
-    }
-
-}
-
-
-/* =====================================================
-   JS COMPATIBILITY FIXES
-   EXISTING DESIGN PRESERVED
-===================================================== */
-
-
-/* =====================================================
-   MESSAGE WRAPPER
-   USER = RIGHT
-   AI = LEFT
-===================================================== */
-
-.message-wrapper {
-    width: 100%;
-
-    display: flex;
-
-    flex-direction: column;
-
-    margin-bottom: 18px;
-}
-
-.message-wrapper.user {
-    align-items: flex-end;
-}
-
-.message-wrapper.assistant,
-.message-wrapper.ai {
-    align-items: flex-start;
-}
-
-
-/* User bubble */
-
-.message-wrapper.user .message-bubble {
-    background: #0868d8;
-
-    color: #ffffff;
-
-    border-bottom-right-radius: 5px;
-}
-
-
-/* AI bubble */
-
-.message-wrapper.assistant .message-bubble,
-.message-wrapper.ai .message-bubble {
-    background: #151515;
-
-    color: #eeeeee;
-
-    border: 1px solid #242424;
-
-    border-bottom-left-radius: 5px;
-}
-
-
-/* Keep message width controlled */
-
-.message-wrapper .message-content {
-    max-width: min(820px, 85%);
-
-    display: flex;
-
-    flex-direction: column;
-}
-
-.message-wrapper .message-bubble {
-    max-width: 100%;
-}
-
-
-/* =====================================================
-   HISTORY TEXT
-===================================================== */
-
-.history-text {
-    flex: 1;
-
-    min-width: 0;
-
-    color: #eeeeee;
-
-    font-size: 14px;
-
-    overflow: hidden;
-
-    white-space: nowrap;
-
-    text-overflow: ellipsis;
-}
-
-
-/* =====================================================
-   HISTORY DATE
-   DARK THEME - NOT WHITE
-===================================================== */
-
-.history-date {
-    display: block;
-
-    color: #777777;
-
-    font-size: 10px;
-
-    line-height: 1.3;
-
-    margin-top: 3px;
-
-    white-space: nowrap;
-}
-
-
-/* =====================================================
-   HISTORY DATE / TEXT CONTAINER
-===================================================== */
-
-.history-info {
-    flex: 1;
-
-    min-width: 0;
-
-    display: flex;
-
-    flex-direction: column;
-
-    justify-content: center;
-}
-
-
-/* =====================================================
-   SELECT CHAT
-===================================================== */
-
-.history-item.select-mode {
-    background: #102b49;
-
-    border: 1px solid #174d7d;
-}
-
-.history-item.selected {
-    background: #123a61;
-
-    border-color: #1683ff;
-}
-
-
-/* Checkbox */
-
-.chat-select {
-    flex: 0 0 auto;
-
-    width: 17px;
-
-    height: 17px;
-
-    margin-right: 3px;
-
-    accent-color: #1683ff;
-
-    cursor: pointer;
-}
-
-
-/* Select button state */
-
-#selectChatsBtn.active {
-    background: #102b49;
-
-    color: #3da0ff;
-}
-
-
-/* Delete selected button state */
-
-#deleteSelectedBtn.has-selection {
-    color: #ffffff;
-
-    background: #102b49;
-}
-
-
-/* =====================================================
-   SHARE LINK
-   LONG LINKS WRAP INTO CLEAN 2+ LINES
-===================================================== */
-
-.share-link {
-    width: 100%;
-
-    max-width: 100%;
-
-    min-height: 42px;
-
-    padding: 10px;
-
-    margin-bottom: 15px;
-
-    background: #080808;
-
-    border: 1px solid #292929;
-
-    border-radius: 9px;
-
-    color: #3da0ff;
-
-    font-size: 12px;
-
-    line-height: 1.5;
-
-    overflow-wrap: anywhere;
-
-    word-break: break-word;
-
-    white-space: normal;
-
-    text-align: left;
-}
-
-.share-link a {
-    display: inline;
-
-    max-width: 100%;
-
-    color: #3da0ff;
-
-    text-decoration: none;
-
-    overflow-wrap: anywhere;
-
-    word-break: break-word;
-}
-
-.share-link a:hover {
-    text-decoration: underline;
-}
-
-
-/* =====================================================
-   VOICE GENDER
-===================================================== */
-
-#voiceGender {
-    width: 100%;
-
-    height: 42px;
-
-    margin-bottom: 15px;
-
-    padding: 0 10px;
-
-    border: 1px solid #303030;
-
-    border-radius: 9px;
-
-    background: #080808;
-
-    color: #ffffff;
-
-    outline: none;
-}
-
-
-/* =====================================================
-   LANGUAGE SELECT
-===================================================== */
-
-#languageSelect {
-    color: #ffffff;
-
-    background: #080808;
-}
-
-#languageSelect option,
-#voiceSelect option,
-#voiceGender option {
-    background: #111111;
-
-    color: #ffffff;
-}
-
-
-/* =====================================================
-   CLEAN TEXT / LINK WRAPPING
-===================================================== */
-
-.message-bubble a {
-    overflow-wrap: anywhere;
-
-    word-break: break-word;
-
-    white-space: normal;
-
-    color: #3da0ff;
-}
-
-.message-bubble a:hover {
-    text-decoration: underline;
-}
-
-
-/* =====================================================
-   REMOVE UNNECESSARY VISUAL COMMA SPACING
-===================================================== */
-
-.message-bubble {
-    overflow-wrap: anywhere;
-}
-
-.history-text,
-.history-chat-title {
-    overflow-wrap: anywhere;
-}
-
-
-/* =====================================================
-   MOBILE COMPATIBILITY
-===================================================== */
-
-@media (max-width: 768px) {
-
-    .message-wrapper .message-content {
-        max-width: 92%;
-    }
-
-    .message-wrapper .message-bubble {
-        max-width: 100%;
-    }
-
-    .history-date {
-        font-size: 9px;
-    }
-
-    .share-link {
-        font-size: 11px;
-
-        line-height: 1.45;
-
-        padding: 9px;
-    }
-
-    .chat-select {
-        width: 16px;
-
-        height: 16px;
-    }
-
-}
-
-
-/* =====================================================
-   SMALL MOBILE COMPATIBILITY
-===================================================== */
-
-@media (max-width: 420px) {
-
-    .message-wrapper .message-content {
-        max-width: 94%;
-    }
-
-    .share-link {
-        font-size: 10px;
-
-        line-height: 1.45;
-    }
-
-    .history-date {
-        font-size: 8px;
     }
 
 }
