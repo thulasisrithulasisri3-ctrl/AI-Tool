@@ -283,6 +283,7 @@ body {
     text-overflow: ellipsis;
 }
 
+
 /* =====================================================
    HISTORY ACTIONS
    PIN + DELETE
@@ -290,73 +291,54 @@ body {
 
 .history-actions {
     display: flex;
+
     align-items: center;
+
     gap: 5px;
+
+    flex-shrink: 0;
 }
 
 .history-action-btn {
     width: 32px;
     height: 32px;
 
-    border: 1px solid #24527a;
-    border-radius: 8px;
+    min-width: 32px;
+    min-height: 32px;
 
-    background: #0d1c2b !important;
-    color: #ffffff;
+    padding: 0 !important;
+    margin: 0 !important;
 
     display: flex;
+
     align-items: center;
     justify-content: center;
 
-    padding: 0;
-    margin: 0;
+    border: 1px solid #24527a !important;
+
+    border-radius: 8px !important;
+
+    background: #0d1c2b !important;
+    background-color: #0d1c2b !important;
+
+    color: #ffffff !important;
 
     cursor: pointer;
 
     font-size: 14px;
 
-    box-shadow: none;
+    box-shadow: none !important;
+
+    outline: none;
+
+    appearance: none;
+    -webkit-appearance: none;
 
     transition:
         background 0.2s ease,
         border-color 0.2s ease,
+        color 0.2s ease,
         transform 0.15s ease;
-}
-
-/* PIN */
-.history-action-btn.pin-btn {
-    background: #0d1c2b !important;
-    color: #3da0ff;
-    border-color: #24527a;
-}
-
-/* DELETE */
-.history-action-btn.delete-btn {
-    background: #0d1c2b !important;
-    color: #ff6b6b;
-    border-color: #24527a;
-}
-
-/* HOVER */
-.history-action-btn:hover {
-    background: #12395a !important;
-    border-color: #1683ff;
-}
-
-.history-action-btn.pin-btn:hover {
-    background: #12395a !important;
-    color: #3da0ff;
-    border-color: #1683ff;
-}
-
-.history-action-btn.delete-btn:hover {
-    background: #291414 !important;
-    color: #ff6b6b;
-    border-color: #ff5555;
-}
-
-.history-action-btn:active {
-    transform: scale(0.94);
 }
 
 
@@ -365,19 +347,21 @@ body {
 ===================================================== */
 
 .history-action-btn.pin-btn {
-    background: #0d1c2b;
+    background: #0d1c2b !important;
+    background-color: #0d1c2b !important;
 
-    color: #3da0ff;
+    color: #3da0ff !important;
 
-    border-color: #24527a;
+    border: 1px solid #24527a !important;
 }
 
 .history-action-btn.pin-btn:hover {
-    background: #102b49;
+    background: #102b49 !important;
+    background-color: #102b49 !important;
 
-    border-color: #1683ff;
+    color: #3da0ff !important;
 
-    color: #3da0ff;
+    border-color: #1683ff !important;
 }
 
 
@@ -386,19 +370,51 @@ body {
 ===================================================== */
 
 .history-action-btn.delete-btn {
-    background: #0d1c2b;
+    background: #0d1c2b !important;
+    background-color: #0d1c2b !important;
 
-    color: #ff6b6b;
+    color: #ff6b6b !important;
 
-    border-color: #24527a;
+    border: 1px solid #24527a !important;
 }
 
 .history-action-btn.delete-btn:hover {
-    background: #291414;
+    background: #291414 !important;
+    background-color: #291414 !important;
 
-    border-color: #ff5555;
+    color: #ff6b6b !important;
 
-    color: #ff6b6b;
+    border-color: #ff5555 !important;
+}
+
+
+/* =====================================================
+   ACTION BUTTON CLICK
+===================================================== */
+
+.history-action-btn:active {
+    transform: scale(0.94);
+
+    background: #102b49 !important;
+    background-color: #102b49 !important;
+}
+
+
+/* =====================================================
+   FORCE REMOVE BROWSER WHITE
+===================================================== */
+
+.chat-history button.history-action-btn,
+.chat-history button.history-action-btn.pin-btn,
+.chat-history button.history-action-btn.delete-btn {
+    background-color: #0d1c2b !important;
+
+    -webkit-appearance: none !important;
+    appearance: none !important;
+}
+
+.chat-history button.history-action-btn:hover {
+    background-color: #12395a !important;
 }
 
 
@@ -1387,79 +1403,3 @@ select {
 /* =====================================================
    END
 ===================================================== */
-/* =====================================================
-   HISTORY ACTIONS
-   PIN + DELETE
-===================================================== */
-
-.history-actions {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.history-action-btn {
-    width: 32px;
-    height: 32px;
-
-    border: 1px solid #24527a;
-    border-radius: 8px;
-
-    background: #0d1c2b !important;
-    color: #ffffff;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    padding: 0;
-    margin: 0;
-
-    cursor: pointer;
-
-    font-size: 14px;
-
-    box-shadow: none;
-
-    transition:
-        background 0.2s ease,
-        border-color 0.2s ease,
-        transform 0.15s ease;
-}
-
-/* PIN */
-.history-action-btn.pin-btn {
-    background: #0d1c2b !important;
-    color: #3da0ff;
-    border-color: #24527a;
-}
-
-/* DELETE */
-.history-action-btn.delete-btn {
-    background: #0d1c2b !important;
-    color: #ff6b6b;
-    border-color: #24527a;
-}
-
-/* HOVER */
-.history-action-btn:hover {
-    background: #12395a !important;
-    border-color: #1683ff;
-}
-
-.history-action-btn.pin-btn:hover {
-    background: #12395a !important;
-    color: #3da0ff;
-    border-color: #1683ff;
-}
-
-.history-action-btn.delete-btn:hover {
-    background: #291414 !important;
-    color: #ff6b6b;
-    border-color: #ff5555;
-}
-
-.history-action-btn:active {
-    transform: scale(0.94);
-}
-
