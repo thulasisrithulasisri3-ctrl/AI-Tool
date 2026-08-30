@@ -1,345 +1,339 @@
-
 "use strict";
 
 /* =====================================================
-   VIGGO BUTTON + UPLOAD SYSTEM
+VIGGO BUTTON + UPLOAD SYSTEM
+MATCHES CURRENT INDEX.HTML
 ===================================================== */
 
 (function () {
 
-    console.log("=================================");
-    console.log("VIGGO BUTTON SYSTEM STARTING...");
-    console.log("=================================");
+```
+console.log("=================================");
+console.log("VIGGO BUTTON SYSTEM STARTING...");
+console.log("=================================");
 
-    /* =================================================
-       GET ELEMENT
-    ================================================= */
+function get(id) {
+    return document.getElementById(id);
+}
 
-    function get(id) {
-        return document.getElementById(id);
+/* =================================================
+   CREATE FILE INPUT
+================================================= */
+
+function createInput(id, accept, capture) {
+
+    let input = get(id);
+
+    if (!input) {
+
+        input = document.createElement("input");
+
+        input.id = id;
+        input.type = "file";
+        input.accept = accept || "*/*";
+        input.style.display = "none";
+
+        if (capture) {
+            input.setAttribute("capture", capture);
+        }
+
+        document.body.appendChild(input);
+
+        console.log("Created input:", id);
     }
 
+    return input;
+}
+
+
+/* =================================================
+   INITIALIZE
+================================================= */
+
+function initializeButtons() {
+
+    console.log("Initializing Viggo buttons...");
+
+
     /* =================================================
-       CREATE INPUT IF MISSING
+       INPUTS
     ================================================= */
 
-    function createInput(id, accept, capture) {
+    const cameraInput = createInput(
+        "cameraInput",
+        "image/*",
+        "environment"
+    );
 
-        let input = get(id);
+    const photoInput = createInput(
+        "photoInput",
+        "image/*"
+    );
 
-        if (!input) {
+    const videoInput = createInput(
+        "videoInput",
+        "video/*"
+    );
 
-            input = document.createElement("input");
+    const fileInput = createInput(
+        "fileInput",
+        ".pdf,.txt,.doc,.docx,.xls,.xlsx,.ppt,.pptx,image/*,video/*"
+    );
 
-            input.id = id;
-            input.type = "file";
-            input.accept = accept || "*/*";
-            input.style.display = "none";
-
-            if (capture) {
-                input.setAttribute("capture", capture);
-            }
-
-            document.body.appendChild(input);
-
-            console.log("Created input:", id);
-        }
-
-        return input;
-    }
 
     /* =================================================
-       INITIALIZE
+       CURRENT HTML BUTTONS
     ================================================= */
 
-    function initializeButtons() {
+    const plusBtn = get("plusBtn");
+    const plusMenu = get("plusMenu");
 
-        console.log("Initializing Viggo buttons...");
+    const cameraBtn = get("cameraBtn");
+    const photoBtn = get("photoBtn");
+    const videoBtn = get("videoBtn");
+    const fileBtn = get("fileBtn");
 
-        /* INPUTS */
+    const plusVoiceBtn = get("plusVoiceBtn");
+    const mic = get("mic");
 
-        const cameraInput =
-            createInput(
-                "cameraInput",
-                "image/*",
-                "environment"
-            );
+    const send = get("send");
+    const message = get("message");
 
-        const photoInput =
-            createInput(
-                "photoInput",
-                "image/*"
-            );
 
-        const videoInput =
-            createInput(
-                "videoInput",
-                "video/*"
-            );
+    console.log("plusBtn:", plusBtn);
+    console.log("plusMenu:", plusMenu);
+    console.log("cameraBtn:", cameraBtn);
+    console.log("photoBtn:", photoBtn);
+    console.log("videoBtn:", videoBtn);
+    console.log("fileBtn:", fileBtn);
 
-        const fileInput =
-            createInput(
-                "fileInput",
-                ".pdf,.txt,.doc,.docx,.xls,.xlsx,.ppt,.pptx,image/*,video/*"
-            );
-
-        /* BUTTONS */
-
-        const cameraButton =
-            get("cameraButton");
-
-        const photoButton =
-            get("photoButton");
-
-        const videoButton =
-            get("videoButton");
-
-        const fileButton =
-            get("fileButton");
-
-        console.log(
-            "Camera button:",
-            cameraButton
-        );
-
-        console.log(
-            "Photo button:",
-            photoButton
-        );
-
-        console.log(
-            "Video button:",
-            videoButton
-        );
-
-        console.log(
-            "File button:",
-            fileButton
-        );
-
-        /* =================================================
-           CAMERA
-        ================================================= */
-
-        if (cameraButton) {
-
-            cameraButton.addEventListener(
-                "click",
-                function (event) {
-
-                    event.preventDefault();
-                    event.stopPropagation();
-
-                    console.log(
-                        "📷 CAMERA BUTTON CLICKED"
-                    );
-
-                    cameraInput.value = "";
-
-                    cameraInput.click();
-                }
-            );
-
-        } else {
-
-            console.warn(
-                "⚠ cameraButton not found"
-            );
-        }
-
-        /* =================================================
-           PHOTO
-        ================================================= */
-
-        if (photoButton) {
-
-            photoButton.addEventListener(
-                "click",
-                function (event) {
-
-                    event.preventDefault();
-                    event.stopPropagation();
-
-                    console.log(
-                        "🖼️ PHOTO BUTTON CLICKED"
-                    );
-
-                    photoInput.value = "";
-
-                    photoInput.click();
-                }
-            );
-
-        } else {
-
-            console.warn(
-                "⚠ photoButton not found"
-            );
-        }
-
-        /* =================================================
-           VIDEO
-        ================================================= */
-
-        if (videoButton) {
-
-            videoButton.addEventListener(
-                "click",
-                function (event) {
-
-                    event.preventDefault();
-                    event.stopPropagation();
-
-                    console.log(
-                        "🎥 VIDEO BUTTON CLICKED"
-                    );
-
-                    videoInput.value = "";
-
-                    videoInput.click();
-                }
-            );
-
-        } else {
-
-            console.warn(
-                "⚠ videoButton not found"
-            );
-        }
-
-        /* =================================================
-           FILE
-        ================================================= */
-
-        if (fileButton) {
-
-            fileButton.addEventListener(
-                "click",
-                function (event) {
-
-                    event.preventDefault();
-                    event.stopPropagation();
-
-                    console.log(
-                        "📁 FILE BUTTON CLICKED"
-                    );
-
-                    fileInput.value = "";
-
-                    fileInput.click();
-                }
-            );
-
-        } else {
-
-            console.warn(
-                "⚠ fileButton not found"
-            );
-        }
-
-        /* =================================================
-           FILE SELECTED
-        ================================================= */
-
-        cameraInput.addEventListener(
-            "change",
-            function () {
-
-                if (!this.files || !this.files.length) {
-                    return;
-                }
-
-                const file = this.files[0];
-
-                console.log(
-                    "📷 Camera file selected:",
-                    file.name,
-                    file.type,
-                    file.size
-                );
-
-                handleSelectedFile(file, "camera");
-            }
-        );
-
-        photoInput.addEventListener(
-            "change",
-            function () {
-
-                if (!this.files || !this.files.length) {
-                    return;
-                }
-
-                const file = this.files[0];
-
-                console.log(
-                    "🖼️ Photo selected:",
-                    file.name,
-                    file.type,
-                    file.size
-                );
-
-                handleSelectedFile(file, "photo");
-            }
-        );
-
-        videoInput.addEventListener(
-            "change",
-            function () {
-
-                if (!this.files || !this.files.length) {
-                    return;
-                }
-
-                const file = this.files[0];
-
-                console.log(
-                    "🎥 Video selected:",
-                    file.name,
-                    file.type,
-                    file.size
-                );
-
-                handleSelectedFile(file, "video");
-            }
-        );
-
-        fileInput.addEventListener(
-            "change",
-            function () {
-
-                if (!this.files || !this.files.length) {
-                    return;
-                }
-
-                const file = this.files[0];
-
-                console.log(
-                    "📁 File selected:",
-                    file.name,
-                    file.type,
-                    file.size
-                );
-
-                handleSelectedFile(file, "file");
-            }
-        );
-
-        console.log(
-            "================================="
-        );
-
-        console.log(
-            "✓ VIGGO BUTTON SYSTEM READY"
-        );
-
-        console.log(
-            "================================="
-        );
-    }
 
     /* =================================================
-       HANDLE SELECTED FILE
+       PLUS BUTTON
+    ================================================= */
+
+    if (plusBtn && plusMenu) {
+
+        plusBtn.addEventListener("click", function (event) {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            const isOpen =
+                plusMenu.classList.contains("show") ||
+                plusMenu.style.display === "block";
+
+            if (isOpen) {
+
+                plusMenu.classList.remove("show");
+                plusMenu.style.display = "none";
+
+            } else {
+
+                plusMenu.classList.add("show");
+                plusMenu.style.display = "flex";
+
+            }
+
+            console.log("PLUS MENU:", !isOpen);
+        });
+
+    }
+
+
+    /* =================================================
+       CLOSE PLUS MENU
+    ================================================= */
+
+    document.addEventListener("click", function (event) {
+
+        if (
+            plusMenu &&
+            plusBtn &&
+            !plusMenu.contains(event.target) &&
+            event.target !== plusBtn
+        ) {
+
+            plusMenu.classList.remove("show");
+            plusMenu.style.display = "none";
+        }
+
+    });
+
+
+    /* =================================================
+       CAMERA
+    ================================================= */
+
+    if (cameraBtn) {
+
+        cameraBtn.addEventListener("click", function (event) {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            console.log("📷 CAMERA CLICKED");
+
+            closePlusMenu();
+
+            cameraInput.value = "";
+
+            cameraInput.click();
+
+        });
+
+    }
+
+
+    /* =================================================
+       PHOTO
+    ================================================= */
+
+    if (photoBtn) {
+
+        photoBtn.addEventListener("click", function (event) {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            console.log("🖼️ PHOTO CLICKED");
+
+            closePlusMenu();
+
+            photoInput.value = "";
+
+            photoInput.click();
+
+        });
+
+    }
+
+
+    /* =================================================
+       VIDEO
+    ================================================= */
+
+    if (videoBtn) {
+
+        videoBtn.addEventListener("click", function (event) {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            console.log("🎥 VIDEO CLICKED");
+
+            closePlusMenu();
+
+            videoInput.value = "";
+
+            videoInput.click();
+
+        });
+
+    }
+
+
+    /* =================================================
+       FILE
+    ================================================= */
+
+    if (fileBtn) {
+
+        fileBtn.addEventListener("click", function (event) {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            console.log("📎 FILE CLICKED");
+
+            closePlusMenu();
+
+            fileInput.value = "";
+
+            fileInput.click();
+
+        });
+
+    }
+
+
+    /* =================================================
+       CLOSE PLUS MENU FUNCTION
+    ================================================= */
+
+    function closePlusMenu() {
+
+        if (plusMenu) {
+
+            plusMenu.classList.remove("show");
+            plusMenu.style.display = "none";
+
+        }
+    }
+
+
+    /* =================================================
+       FILE CHANGE
+    ================================================= */
+
+    cameraInput.addEventListener("change", function () {
+
+        if (!this.files || !this.files.length) {
+            return;
+        }
+
+        handleSelectedFile(
+            this.files[0],
+            "camera"
+        );
+
+    });
+
+
+    photoInput.addEventListener("change", function () {
+
+        if (!this.files || !this.files.length) {
+            return;
+        }
+
+        handleSelectedFile(
+            this.files[0],
+            "photo"
+        );
+
+    });
+
+
+    videoInput.addEventListener("change", function () {
+
+        if (!this.files || !this.files.length) {
+            return;
+        }
+
+        handleSelectedFile(
+            this.files[0],
+            "video"
+        );
+
+    });
+
+
+    fileInput.addEventListener("change", function () {
+
+        if (!this.files || !this.files.length) {
+            return;
+        }
+
+        handleSelectedFile(
+            this.files[0],
+            "file"
+        );
+
+    });
+
+
+    /* =================================================
+       HANDLE FILE
     ================================================= */
 
     function handleSelectedFile(file, source) {
@@ -349,14 +343,15 @@
         }
 
         console.log(
-            "Processing:",
+            "Selected:",
             source,
-            file.name
+            file.name,
+            file.type,
+            file.size
         );
 
-        /* =================================================
-           SIZE CHECK
-        ================================================= */
+
+        /* 20 MB LIMIT */
 
         const maxSize =
             20 * 1024 * 1024;
@@ -364,20 +359,20 @@
         if (file.size > maxSize) {
 
             alert(
-                "File is too large. Please choose a file smaller than 20 MB."
+                "File is too large. Maximum size is 20 MB."
             );
 
             return;
         }
 
-        /* =================================================
-           PREVIEW
-        ================================================= */
+
+        /* PREVIEW */
 
         showLocalPreview(file);
 
+
         /* =================================================
-           USE EXISTING UPLOAD FUNCTION
+           EXISTING VIGGO UPLOAD FUNCTION
         ================================================= */
 
         if (
@@ -394,9 +389,6 @@
             return;
         }
 
-        /* =================================================
-           ALTERNATIVE FUNCTION NAMES
-        ================================================= */
 
         if (
             typeof window.uploadFile ===
@@ -412,6 +404,7 @@
             return;
         }
 
+
         if (
             typeof window.handleFileUpload ===
             "function"
@@ -426,19 +419,12 @@
             return;
         }
 
-        /* =================================================
-           NO UPLOAD FUNCTION
-        ================================================= */
-
         console.warn(
             "No upload function found."
         );
 
-        console.log(
-            "Selected file:",
-            file
-        );
     }
+
 
     /* =================================================
        LOCAL PREVIEW
@@ -448,14 +434,13 @@
 
         try {
 
-            const oldPreview =
-                document.getElementById(
-                    "viggoUploadPreview"
-                );
+            const old =
+                get("viggoUploadPreview");
 
-            if (oldPreview) {
-                oldPreview.remove();
+            if (old) {
+                old.remove();
             }
+
 
             const preview =
                 document.createElement("div");
@@ -463,19 +448,19 @@
             preview.id =
                 "viggoUploadPreview";
 
-            preview.style.cssText =
-                `
+            preview.style.cssText = `
                 position:fixed;
-                left:20px;
-                right:20px;
-                bottom:20px;
+                left:12px;
+                right:12px;
+                bottom:80px;
                 z-index:99999;
-                background:#111;
-                border:1px solid #333;
+                background:#101722;
+                border:1px solid #26364d;
                 border-radius:14px;
                 padding:12px;
                 box-sizing:border-box;
-                `;
+            `;
+
 
             const title =
                 document.createElement("div");
@@ -483,15 +468,15 @@
             title.textContent =
                 "Selected: " + file.name;
 
-            title.style.cssText =
-                `
+            title.style.cssText = `
                 color:white;
                 font-size:14px;
                 margin-bottom:8px;
                 word-break:break-word;
-                `;
+            `;
 
             preview.appendChild(title);
+
 
             /* IMAGE */
 
@@ -506,17 +491,17 @@
                 img.src =
                     URL.createObjectURL(file);
 
-                img.style.cssText =
-                    `
+                img.style.cssText = `
                     display:block;
                     width:100%;
                     max-height:280px;
                     object-fit:contain;
                     border-radius:10px;
-                    `;
+                `;
 
                 preview.appendChild(img);
             }
+
 
             /* VIDEO */
 
@@ -533,22 +518,23 @@
 
                 video.controls = true;
 
-                video.style.cssText =
-                    `
+                video.playsInline = true;
+
+                video.style.cssText = `
                     display:block;
                     width:100%;
                     max-height:280px;
                     border-radius:10px;
-                    `;
+                `;
 
                 preview.appendChild(video);
             }
 
-            document.body.appendChild(
-                preview
-            );
 
-            setTimeout(() => {
+            document.body.appendChild(preview);
+
+
+            setTimeout(function () {
 
                 if (preview.parentNode) {
                     preview.remove();
@@ -562,27 +548,279 @@
                 "Preview error:",
                 error
             );
+
         }
+
     }
+
 
     /* =================================================
-       START AFTER DOM
+       VOICE BUTTON
     ================================================= */
 
-    if (
-        document.readyState ===
-        "loading"
-    ) {
+    if (plusVoiceBtn) {
 
-        document.addEventListener(
-            "DOMContentLoaded",
-            initializeButtons
+        plusVoiceBtn.addEventListener(
+            "click",
+            function (event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                closePlusMenu();
+
+                const voiceModal =
+                    get("voiceModal");
+
+                if (voiceModal) {
+
+                    voiceModal.style.display =
+                        "flex";
+
+                }
+
+            }
         );
 
-    } else {
-
-        initializeButtons();
     }
 
-})();
 
+    /* =================================================
+       MICROPHONE
+    ================================================= */
+
+    if (mic) {
+
+        mic.addEventListener(
+            "click",
+            function () {
+
+                console.log(
+                    "🎤 MICROPHONE CLICKED"
+                );
+
+                const voiceModal =
+                    get("voiceModal");
+
+                if (voiceModal) {
+
+                    voiceModal.style.display =
+                        "flex";
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* =================================================
+       VOICE CLOSE
+    ================================================= */
+
+    const closeVoice =
+        get("closeVoice");
+
+    if (closeVoice) {
+
+        closeVoice.addEventListener(
+            "click",
+            function () {
+
+                const voiceModal =
+                    get("voiceModal");
+
+                if (voiceModal) {
+                    voiceModal.style.display =
+                        "none";
+                }
+
+            }
+        );
+
+    }
+
+
+    /* =================================================
+       LANGUAGE
+    ================================================= */
+
+    const languageBtn =
+        get("languageBtn");
+
+    const languageModal =
+        get("languageModal");
+
+    const closeLanguage =
+        get("closeLanguage");
+
+    if (languageBtn && languageModal) {
+
+        languageBtn.addEventListener(
+            "click",
+            function () {
+
+                languageModal.style.display =
+                    "flex";
+
+            }
+        );
+
+    }
+
+    if (closeLanguage && languageModal) {
+
+        closeLanguage.addEventListener(
+            "click",
+            function () {
+
+                languageModal.style.display =
+                    "none";
+
+            }
+        );
+
+    }
+
+
+    /* =================================================
+       SAVE LANGUAGE
+    ================================================= */
+
+    const saveLanguage =
+        get("saveLanguage");
+
+    const languageSelect =
+        get("languageSelect");
+
+    if (saveLanguage && languageSelect) {
+
+        saveLanguage.addEventListener(
+            "click",
+            function () {
+
+                const language =
+                    languageSelect.value;
+
+                localStorage.setItem(
+                    "viggoLanguage",
+                    language
+                );
+
+                if (languageModal) {
+
+                    languageModal.style.display =
+                        "none";
+
+                }
+
+                console.log(
+                    "Language saved:",
+                    language
+                );
+
+            }
+        );
+
+    }
+
+
+    /* =================================================
+       SEND BUTTON
+    ================================================= */
+
+    if (send && message) {
+
+        send.addEventListener(
+            "click",
+            function (event) {
+
+                event.preventDefault();
+
+                const text =
+                    message.value.trim();
+
+                if (!text) {
+                    return;
+                }
+
+
+                if (
+                    typeof window.sendMessage ===
+                    "function"
+                ) {
+
+                    window.sendMessage(text);
+
+                } else {
+
+                    console.warn(
+                        "sendMessage() not found"
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* =================================================
+       ENTER TO SEND
+    ================================================= */
+
+    if (message) {
+
+        message.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Enter" &&
+                    !event.shiftKey
+                ) {
+
+                    event.preventDefault();
+
+                    if (send) {
+                        send.click();
+                    }
+
+                }
+
+            }
+        );
+
+    }
+
+
+    console.log("=================================");
+    console.log("✓ VIGGO BUTTON SYSTEM READY");
+    console.log("=================================");
+
+}
+
+
+/* =====================================================
+   START AFTER DOM
+===================================================== */
+
+if (
+    document.readyState === "loading"
+) {
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        initializeButtons
+    );
+
+} else {
+
+    initializeButtons();
+
+}
+
+
+})();
