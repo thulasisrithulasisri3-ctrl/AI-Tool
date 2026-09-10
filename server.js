@@ -2,7 +2,7 @@
 
 /* =====================================================
    VIGGO AI SERVER
-   EXPRESS + GOOGLE GEMINI
+   EXPRESS + GOOGLE GEMINI + GOOGLE SEARCH
 ===================================================== */
 
 const express = require("express");
@@ -20,11 +20,12 @@ const PORT =
     process.env.PORT || 10000;
 
 const API_KEY =
-    process.env.GEMINI_API_KEY;
+    process.env.GEMINI_API_KEY ||
+    process.env.GOOGLE_API_KEY;
 
 const MODEL =
     process.env.GEMINI_MODEL ||
-    "gemini-3.6-flash";
+    "gemini-3.7-flash";
 
 
 /* =====================================================
@@ -98,7 +99,10 @@ app.get(
                 MODEL,
 
             apiConfigured:
-                Boolean(API_KEY)
+                Boolean(API_KEY),
+
+            realTimeSearch:
+                true
 
         });
 
@@ -127,6 +131,9 @@ app.get(
 
             apiConfigured:
                 Boolean(API_KEY),
+
+            realTimeSearch:
+                true,
 
             serverTime:
                 new Date().toISOString()
@@ -307,10 +314,6 @@ function getDateTimeReply(
         getIndiaDateTime();
 
 
-    /* -----------------------------------------------
-       DATE ONLY
-    ----------------------------------------------- */
-
     if (
         asksDate &&
         !asksTime
@@ -321,10 +324,6 @@ function getDateTimeReply(
     }
 
 
-    /* -----------------------------------------------
-       TIME ONLY
-    ----------------------------------------------- */
-
     if (
         asksTime &&
         !asksDate
@@ -334,10 +333,6 @@ function getDateTimeReply(
 
     }
 
-
-    /* -----------------------------------------------
-       BOTH DATE + TIME
-    ----------------------------------------------- */
 
     return `Date: ${date}\nTime: ${time}`;
 
@@ -362,28 +357,57 @@ IMPORTANT RULES:
 
 1. Answer the user's question directly.
 
-2. Do not add unnecessary information.
+2. When the question requires current,
+   latest, recent, today's, live, updated,
+   or real-world information, USE GOOGLE SEARCH.
 
-3. Do not add a separate date or time below your answer.
+3. Verify current information using
+   reliable web sources whenever possible.
 
-4. If the user asks only for the date,
-   answer only with the date.
+4. Do not pretend that old knowledge is
+   current information.
 
-5. If the user asks only for the time,
-   answer only with the time.
+5. If Google Search provides sources,
+   base the answer on those sources.
 
-6. If the user asks for both date and time,
-   provide both.
+6. For government, exam, recruitment,
+   education, application dates, results,
+   rules, official announcements and
+   other important information, prefer
+   official websites when available.
 
-7. Do not automatically append the current
-   date or time to normal answers.
+7. If the user asks for the latest news,
+   search the web before answering.
 
-8. Do not mention the current date or time
-   unless the user asks for it.
+8. If the user asks "today", "now",
+   "latest", "current", "recent",
+   or similar words, treat it as a
+   real-time information request.
 
-9. Use the selected language when appropriate.
+9. Do not add unnecessary information.
 
-10. Be clear and concise.
+10. Do not add a separate date or time
+    below your answer.
+
+11. If the user asks only for the date,
+    answer only with the date.
+
+12. If the user asks only for the time,
+    answer only with the time.
+
+13. If the user asks for both date and time,
+    provide both.
+
+14. Do not automatically append the
+    current date or time to normal answers.
+
+15. Use the selected language when
+    appropriate.
+
+16. Be clear and concise.
+
+17. Do not say that you searched the web
+    unless it is useful to explain the answer.
 
 Selected language:
 ${language || "en-IN"}
@@ -433,7 +457,17 @@ function extractText(
 
         try {
 
-            return response.text();
+            const result =
+                response.text();
+
+            if (
+                typeof result ===
+                "string"
+            ) {
+
+                return result;
+
+            }
 
         } catch (error) {
 
@@ -494,6 +528,104 @@ function extractText(
 
 
 /* =====================================================
+   EXTRACT GOOGLE SEARCH SOURCES
+===================================================== */
+
+function extractSources(
+    response
+) {
+
+    const sources = [];
+
+    try {
+
+        const metadata =
+            response?.candidates?.[0]
+                ?.groundingMetadata;
+
+
+        if (!metadata) {
+
+            return sources;
+
+        }
+
+
+        const chunks =
+            metadata.groundingChunks || [];
+
+
+        for (
+            const chunk of chunks
+        ) {
+
+            if (
+                chunk.web &&
+                chunk.web.uri
+            ) {
+
+                sources.push({
+
+                    title:
+                        chunk.web.title ||
+                        "Web source",
+
+                    url:
+                        chunk.web.uri
+
+                });
+
+            }
+
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "Source extraction error:",
+            error
+        );
+
+    }
+
+
+    /* -----------------------------------------------
+       REMOVE DUPLICATES
+    ----------------------------------------------- */
+
+    const unique =
+        sources.filter(
+            (source, index, array) =>
+                index ===
+                array.findIndex(
+                    item =>
+                        item.url ===
+                        source.url
+                )
+        );
+
+
+    return unique.slice(
+        0,
+        10
+    );
+
+}
+
+
+/* =====================================================
+   GOOGLE SEARCH CONFIG
+===================================================== */
+
+const GOOGLE_SEARCH_TOOL = {
+
+    googleSearch: {}
+
+};
+
+
+/* =====================================================
    CHAT API
 ===================================================== */
 
@@ -534,12 +666,6 @@ app.post(
 
             /* ---------------------------------------
                DATE / TIME
-               
-               IMPORTANT:
-               This happens BEFORE Gemini.
-               
-               So Gemini cannot add extra
-               information underneath.
             --------------------------------------- */
 
             if (message) {
@@ -557,7 +683,10 @@ app.post(
                     return res.json({
 
                         reply:
-                            specialReply
+                            specialReply,
+
+                        sources:
+                            []
 
                     });
 
@@ -584,9 +713,9 @@ app.post(
             }
 
 
-            /* ---------------------------------------
-               TEXT CHAT
-            --------------------------------------- */
+            /* =================================================
+               TEXT CHAT + REAL-TIME GOOGLE SEARCH
+            ================================================= */
 
             if (!file) {
 
@@ -596,11 +725,31 @@ app.post(
                         language
                     ) +
 
-                    "\n\nUSER MESSAGE:\n" +
+                    `
 
-                    String(
-                        message
-                    );
+The user is asking:
+
+${String(message)}
+
+Use Google Search whenever current,
+latest, recent, live, updated, factual,
+or real-world information is needed.
+
+If web information is available,
+prefer current and reliable sources.
+
+Return a direct answer to the user.
+`;
+
+
+                console.log(
+                    "VIGGO SEARCH ENABLED"
+                );
+
+                console.log(
+                    "USER:",
+                    message
+                );
 
 
                 const response =
@@ -610,7 +759,15 @@ app.post(
                             MODEL,
 
                         contents:
-                            prompt
+                            prompt,
+
+                        config: {
+
+                            tools: [
+                                GOOGLE_SEARCH_TOOL
+                            ]
+
+                        }
 
                     });
 
@@ -619,6 +776,18 @@ app.post(
                     extractText(
                         response
                     );
+
+
+                const sources =
+                    extractSources(
+                        response
+                    );
+
+
+                console.log(
+                    "SEARCH SOURCES:",
+                    sources.length
+                );
 
 
                 if (!reply) {
@@ -638,16 +807,19 @@ app.post(
                 return res.json({
 
                     reply:
-                        reply.trim()
+                        reply.trim(),
+
+                    sources:
+                        sources
 
                 });
 
             }
 
 
-            /* ---------------------------------------
+            /* =================================================
                FILE / IMAGE
-            --------------------------------------- */
+            ================================================= */
 
             if (
                 file.data &&
@@ -683,8 +855,11 @@ ${message || "Please analyze this file."}
 Analyze the uploaded file and answer
 the user's request directly.
 
+If the user's request needs current
+information, use Google Search.
+
 Do not add unnecessary date or time
-information to the response.
+information.
 
 `;
 
@@ -726,13 +901,27 @@ information to the response.
 
                             }
 
-                        ]
+                        ],
+
+                        config: {
+
+                            tools: [
+                                GOOGLE_SEARCH_TOOL
+                            ]
+
+                        }
 
                     });
 
 
                 const reply =
                     extractText(
+                        response
+                    );
+
+
+                const sources =
+                    extractSources(
                         response
                     );
 
@@ -754,7 +943,10 @@ information to the response.
                 return res.json({
 
                     reply:
-                        reply.trim()
+                        reply.trim(),
+
+                    sources:
+                        sources
 
                 });
 
@@ -870,6 +1062,10 @@ app.listen(
                     ? "CONFIGURED"
                     : "NOT CONFIGURED"
             }`
+        );
+
+        console.log(
+            "REAL-TIME GOOGLE SEARCH: ENABLED"
         );
 
         console.log(
