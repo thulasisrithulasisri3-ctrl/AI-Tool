@@ -101,7 +101,21 @@
 
     let isListening = false;
 
-    let speakerEnabled = true;
+
+    /* =================================================
+       SPEAKER STATE
+
+       TRUE  = SPEAKER ON
+       FALSE = SPEAKER OFF
+
+       Saved in localStorage
+    ================================================= */
+
+    let speakerEnabled =
+        localStorage.getItem(
+            "viggoSpeakerEnabled"
+        ) !== "false";
+
 
     let selectedLanguage =
         localStorage.getItem("viggoLanguage") ||
@@ -1099,7 +1113,9 @@
                 "message-actions";
 
 
-            /* COPY */
+            /* =================================================
+               COPY
+            ================================================= */
 
             const copyBtn =
                 createActionButton(
@@ -1146,7 +1162,9 @@
             );
 
 
-            /* SAVE */
+            /* =================================================
+               SAVE
+            ================================================= */
 
             const saveBtn =
                 createActionButton(
@@ -1204,7 +1222,9 @@
             );
 
 
-            /* LIKE */
+            /* =================================================
+               LIKE
+            ================================================= */
 
             const likeBtn =
                 createActionButton(
@@ -1236,23 +1256,14 @@
             );
 
 
-            /* SPEAKER */
+            /* =================================================
+               SPEAKER
+            ================================================= */
 
             const speakerBtn =
-                createActionButton(
-                    "🔊 Speak",
-                    "Speak"
+                createSpeakerButton(
+                    text
                 );
-
-
-            speakerBtn.addEventListener(
-                "click",
-                function () {
-
-                    speakText(text);
-
-                }
-            );
 
 
             actions.appendChild(
@@ -1596,6 +1607,16 @@
             renderHistory();
 
 
+            /* =================================================
+               IMPORTANT:
+               DO NOT AUTO SPEAK HERE.
+
+               Speaker is controlled only by
+               speakerEnabled.
+
+               This prevents unwanted voice.
+            ================================================= */
+
         } catch (error) {
 
             console.error(
@@ -1838,6 +1859,12 @@
                     saveChats();
 
                     renderHistory();
+
+
+                    /* =================================================
+                       IMPORTANT:
+                       NO AUTO SPEAK
+                    ================================================= */
 
 
                 } catch (error) {
@@ -2841,9 +2868,21 @@
 
     /* =================================================
        SPEAKER
+       ON / OFF
     ================================================= */
 
     function speakText(text) {
+
+        if (!speakerEnabled) {
+
+            console.log(
+                "Viggo Speaker is OFF."
+            );
+
+            return;
+
+        }
+
 
         if (
             !("speechSynthesis" in window)
@@ -2910,6 +2949,145 @@
         window.speechSynthesis.speak(
             utterance
         );
+
+    }
+
+
+    /* =================================================
+       TOGGLE SPEAKER
+    ================================================= */
+
+    function toggleSpeaker() {
+
+        speakerEnabled =
+            !speakerEnabled;
+
+
+        localStorage.setItem(
+            "viggoSpeakerEnabled",
+            String(
+                speakerEnabled
+            )
+        );
+
+
+        /* ---------------------------------------------
+           TURN OFF
+        --------------------------------------------- */
+
+        if (!speakerEnabled) {
+
+            if (
+                "speechSynthesis" in window
+            ) {
+
+                window.speechSynthesis.cancel();
+
+            }
+
+
+            console.log(
+                "Viggo Speaker: OFF"
+            );
+
+
+            return;
+
+        }
+
+
+        /* ---------------------------------------------
+           TURN ON
+        --------------------------------------------- */
+
+        console.log(
+            "Viggo Speaker: ON"
+        );
+
+    }
+
+
+    /* =================================================
+       UPDATE SPEAKER BUTTON
+    ================================================= */
+
+    function updateSpeakerButton(
+        button
+    ) {
+
+        if (!button) return;
+
+
+        if (speakerEnabled) {
+
+            button.textContent =
+                "🔊 Speak";
+
+            button.title =
+                "Speaker ON - Click to turn OFF";
+
+        } else {
+
+            button.textContent =
+                "🔇 Speak OFF";
+
+            button.title =
+                "Speaker OFF - Click to turn ON";
+
+        }
+
+    }
+
+
+    /* =================================================
+       CREATE SPEAKER BUTTON
+    ================================================= */
+
+    function createSpeakerButton(
+        text
+    ) {
+
+        const speakerBtn =
+            createActionButton(
+                "",
+                ""
+            );
+
+
+        updateSpeakerButton(
+            speakerBtn
+        );
+
+
+        speakerBtn.addEventListener(
+            "click",
+            function () {
+
+                toggleSpeaker();
+
+
+                updateSpeakerButton(
+                    speakerBtn
+                );
+
+
+                /* -----------------------------------------
+                   ONLY SPEAK WHEN TURNED ON
+                ----------------------------------------- */
+
+                if (speakerEnabled) {
+
+                    speakText(
+                        text
+                    );
+
+                }
+
+            }
+        );
+
+
+        return speakerBtn;
 
     }
 
@@ -3084,6 +3262,13 @@
 
     console.log(
         "VIGGO AI SCRIPT READY"
+    );
+
+    console.log(
+        "Speaker:",
+        speakerEnabled
+            ? "ON"
+            : "OFF"
     );
 
 })();
