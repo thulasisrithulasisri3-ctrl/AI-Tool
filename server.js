@@ -358,56 +358,56 @@ IMPORTANT RULES:
 1. Answer the user's question directly.
 
 2. When the question requires current,
-   latest, recent, today's, live, updated,
-   or real-world information, USE GOOGLE SEARCH.
+    latest, recent, today's, live, updated,
+    or real-world information, USE GOOGLE SEARCH.
 
 3. Verify current information using
-   reliable web sources whenever possible.
+    reliable web sources whenever possible.
 
 4. Do not pretend that old knowledge is
-   current information.
+    current information.
 
 5. If Google Search provides sources,
-   base the answer on those sources.
+    base the answer on those sources.
 
 6. For government, exam, recruitment,
-   education, application dates, results,
-   rules, official announcements and
-   other important information, prefer
-   official websites when available.
+    education, application dates, results,
+    rules, official announcements and
+    other important information, prefer
+    official websites when available.
 
 7. If the user asks for the latest news,
-   search the web before answering.
+    search the web before answering.
 
 8. If the user asks "today", "now",
-   "latest", "current", "recent",
-   or similar words, treat it as a
-   real-time information request.
+    "latest", "current", "recent",
+    or similar words, treat it as a
+    real-time information request.
 
 9. Do not add unnecessary information.
 
 10. Do not add a separate date or time
-    below your answer.
+     below your answer.
 
 11. If the user asks only for the date,
-    answer only with the date.
+     answer only with the date.
 
 12. If the user asks only for the time,
-    answer only with the time.
+     answer only with the time.
 
 13. If the user asks for both date and time,
-    provide both.
+     provide both.
 
 14. Do not automatically append the
-    current date or time to normal answers.
+     current date or time to normal answers.
 
 15. Use the selected language when
-    appropriate.
+     appropriate.
 
 16. Be clear and concise.
 
 17. Do not say that you searched the web
-    unless it is useful to explain the answer.
+     unless it is useful to explain the answer.
 
 Selected language:
 ${language || "en-IN"}
@@ -626,7 +626,7 @@ const GOOGLE_SEARCH_TOOL = {
 
 
 /* =====================================================
-   CHAT API
+   CHAT API (UPDATED TO HANDLE FILE & MEDIA PROPERLY)
 ===================================================== */
 
 app.post(
@@ -638,9 +638,12 @@ app.post(
             const {
                 message,
                 language,
-                file
+                file,
+                media
             } =
                 req.body || {};
+
+            const uploadedFile = file || media;
 
 
             /* ---------------------------------------
@@ -649,7 +652,7 @@ app.post(
 
             if (
                 !message &&
-                !file
+                !uploadedFile
             ) {
 
                 return res.status(
@@ -668,7 +671,7 @@ app.post(
                DATE / TIME
             --------------------------------------- */
 
-            if (message) {
+            if (message && !uploadedFile) {
 
                 const specialReply =
                     getDateTimeReply(
@@ -717,7 +720,7 @@ app.post(
                TEXT CHAT + REAL-TIME GOOGLE SEARCH
             ================================================= */
 
-            if (!file) {
+            if (!uploadedFile) {
 
                 const prompt =
 
@@ -740,16 +743,6 @@ prefer current and reliable sources.
 
 Return a direct answer to the user.
 `;
-
-
-                console.log(
-                    "VIGGO SEARCH ENABLED"
-                );
-
-                console.log(
-                    "USER:",
-                    message
-                );
 
 
                 const response =
@@ -784,12 +777,6 @@ Return a direct answer to the user.
                     );
 
 
-                console.log(
-                    "SEARCH SOURCES:",
-                    sources.length
-                );
-
-
                 if (!reply) {
 
                     return res.status(
@@ -818,17 +805,17 @@ Return a direct answer to the user.
 
 
             /* =================================================
-               FILE / IMAGE
+               FILE / IMAGE ANALYSIS
             ================================================= */
 
             if (
-                file.data &&
-                file.type
+                uploadedFile.data &&
+                uploadedFile.type
             ) {
 
                 const base64Data =
                     String(
-                        file.data
+                        uploadedFile.data
                     ).replace(
                         /^data:[^;]+;base64,/,
                         ""
@@ -841,25 +828,10 @@ ${getSystemPrompt(
     language
 )}
 
-The user uploaded a file.
+The user uploaded an image or file and requested:
+"${message || "Please analyze this image and explain what it is in detail."}"
 
-File name:
-${file.name || "Uploaded file"}
-
-File type:
-${file.type}
-
-User request:
-${message || "Please analyze this file."}
-
-Analyze the uploaded file and answer
-the user's request directly.
-
-If the user's request needs current
-information, use Google Search.
-
-Do not add unnecessary date or time
-information.
+Analyze the uploaded file/image carefully and provide a precise, detailed explanation answering the user's request. Do not give a generic prompt asking what they want; directly describe and explain the contents of the uploaded image.
 
 `;
 
@@ -888,7 +860,7 @@ information.
                                         inlineData: {
 
                                             mimeType:
-                                                file.type,
+                                                uploadedFile.type,
 
                                             data:
                                                 base64Data
