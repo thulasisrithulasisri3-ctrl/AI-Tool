@@ -1,32 +1,9 @@
 "use strict";
 
-/* =========================================================
-   VIGGO AI - FULL PRODUCTION SCRIPT.JS
-   Text + Camera + Photo + Video + File Uploads
-   Chat History + Pinning + Selection + Deletion
-   Voice Speech Recognition + Text-to-Speech Output
-   PWA Service Worker Registration + Offline Support
-   API Endpoint: Render /chat
-========================================================= */
-
 (() => {
-    console.log("=================================");
-    console.log("VIGGO AI ENGINE STARTING...");
-    console.log("=================================");
-
-    /* =====================================================
-       API ENDPOINT
-    ===================================================== */
     const API_URL = "https://ai-tool-2-zpul.onrender.com/chat";
-
-    /* =====================================================
-       DOM ELEMENT HELPERS
-    ===================================================== */
     const get = (id) => document.getElementById(id);
 
-    /* =====================================================
-       HTML ELEMENTS
-    ===================================================== */
     const sidebar = get("sidebar");
     const openSidebar = get("openSidebar");
     const closeSidebar = get("closeSidebar");
@@ -35,15 +12,9 @@
     const chatHistory = get("chatHistory");
     const moreBtn = get("moreBtn");
     const moreMenu = get("moreMenu");
-    const voiceMenuBtn = get("voiceMenuBtn");
-    const languageBtn = get("languageBtn");
-    const selectChatsBtn = get("selectChatsBtn");
-    const deleteSelectedBtn = get("deleteSelectedBtn");
     const clearChatBtn = get("clearChatBtn");
-    const shareBtn = get("shareBtn");
     const conversation = get("conversation");
 
-    /* Plus Menu & Inputs */
     const plusBtn = get("plusBtn");
     const plusMenu = get("plusMenu");
     const cameraBtn = get("cameraBtn");
@@ -56,30 +27,26 @@
     const videoInput = get("videoInput");
     const fileInput = get("fileInput");
 
-    /* Message Bar Controls */
     const messageInput = get("message");
     const micBtn = get("mic");
     const sendBtn = get("send");
 
     /* Modals */
+    const voiceMenuBtn = get("voiceMenuBtn");
     const voiceModal = get("voiceModal");
     const closeVoice = get("closeVoice");
     const voiceSelect = get("voiceSelect");
     const voiceGender = get("voiceGender");
     const startVoice = get("startVoice");
 
+    const languageBtn = get("languageBtn");
     const languageModal = get("languageModal");
     const closeLanguage = get("closeLanguage");
     const languageSelect = get("languageSelect");
     const saveLanguage = get("saveLanguage");
 
-    /* =====================================================
-       STATE MANAGEMENT
-    ===================================================== */
     let chats = [];
     let currentChatId = null;
-    let selectedChats = new Set();
-    let selectMode = false;
     let attachedFile = null;
     let recognition = null;
     let isListening = false;
@@ -88,63 +55,19 @@
     let selectedLanguage = localStorage.getItem("viggoLanguage") || "en-IN";
     let selectedVoice = localStorage.getItem("viggoVoice") || "female";
 
-    /* =====================================================
-       INITIALIZE INPUT ATTRIBUTES
-    ===================================================== */
-    if (cameraInput) {
-        cameraInput.accept = "image/*";
-        cameraInput.setAttribute("capture", "environment");
-    }
-    if (photoInput) {
-        photoInput.accept = "image/*";
-        photoInput.removeAttribute("capture");
-    }
-    if (videoInput) {
-        videoInput.accept = "video/*";
-    }
-    if (fileInput) {
-        fileInput.accept = "*/*";
-    }
-
-    /* =====================================================
-       MOBILE VIEWPORT FIX
-    ===================================================== */
-    function fixViewportHeight() {
-        const height = window.visualViewport
-            ? window.visualViewport.height
-            : window.innerHeight;
-        document.documentElement.style.setProperty("--app-height", `${height}px`);
-    }
-
-    fixViewportHeight();
-    window.addEventListener("resize", fixViewportHeight);
-    window.addEventListener("orientationchange", fixViewportHeight);
-    if (window.visualViewport) {
-        window.visualViewport.addEventListener("resize", fixViewportHeight);
-    }
-
-    /* =====================================================
-       LOCAL STORAGE DATA ACCESS
-    ===================================================== */
     function saveChats() {
         try {
             localStorage.setItem("viggoChats", JSON.stringify(chats));
-        } catch (error) {
-            console.error("Storage error:", error);
+        } catch (e) {
+            console.error("Failed to save chats:", e);
         }
     }
 
     function loadChats() {
         try {
             const saved = localStorage.getItem("viggoChats");
-            if (!saved) {
-                chats = [];
-                return;
-            }
-            const parsed = JSON.parse(saved);
-            chats = Array.isArray(parsed) ? parsed : [];
-        } catch (error) {
-            console.error("Load chats error:", error);
+            chats = saved ? JSON.parse(saved) : [];
+        } catch (e) {
             chats = [];
         }
     }
@@ -158,14 +81,12 @@
             id: createId(),
             title: "New Chat",
             pinned: false,
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
             messages: []
         };
     }
 
     function getCurrentChat() {
-        return chats.find((chat) => chat.id === currentChatId);
+        return chats.find((c) => c.id === currentChatId);
     }
 
     function ensureChat() {
@@ -174,276 +95,133 @@
             chats.push(chat);
             currentChatId = chat.id;
             saveChats();
-            return chat;
         }
-
-        if (!currentChatId) {
-            currentChatId = chats[0].id;
-        }
-
-        let chat = getCurrentChat();
-        if (!chat) {
-            chat = chats[0];
-            currentChatId = chat.id;
-        }
-
-        if (!Array.isArray(chat.messages)) {
-            chat.messages = [];
-        }
-        return chat;
+        if (!currentChatId) currentChatId = chats[0].id;
+        return getCurrentChat() || chats[0];
     }
 
-    /* =====================================================
-       SIDEBAR & MENU CONTROLS
-    ===================================================== */
-    function closeSidebarMobile() {
-        if (sidebar) sidebar.classList.remove("open");
-    }
+    /* Sidebar Toggles */
+    openSidebar?.addEventListener("click", () => sidebar?.classList.add("open"));
+    closeSidebar?.addEventListener("click", () => sidebar?.classList.remove("open"));
 
-    if (openSidebar) {
-        openSidebar.addEventListener("click", () => sidebar?.classList.add("open"));
-    }
-    if (closeSidebar) {
-        closeSidebar.addEventListener("click", closeSidebarMobile);
-    }
-
-    function createNewChat() {
+    newChat?.addEventListener("click", () => {
         const chat = createChat();
         chats.unshift(chat);
         currentChatId = chat.id;
         attachedFile = null;
-
         if (messageInput) {
             messageInput.value = "";
             messageInput.placeholder = "Message Viggo AI...";
         }
-
         saveChats();
         renderHistory();
         renderConversation();
-        closeSidebarMobile();
-        messageInput?.focus();
-    }
-
-    if (newChat) newChat.addEventListener("click", createNewChat);
-
-    function closeMenus() {
-        plusMenu?.classList.remove("show", "active");
-        moreMenu?.classList.remove("show", "active");
-    }
-
-    if (moreBtn) {
-        moreBtn.addEventListener("click", (event) => {
-            event.stopPropagation();
-            moreMenu?.classList.toggle("show");
-            moreMenu?.classList.toggle("active");
-        });
-    }
-
-    if (plusBtn) {
-        plusBtn.addEventListener("click", (event) => {
-            event.stopPropagation();
-            plusMenu?.classList.toggle("show");
-            plusMenu?.classList.toggle("active");
-        });
-    }
-
-    document.addEventListener("click", (event) => {
-        if (plusMenu && !plusMenu.contains(event.target) && event.target !== plusBtn) {
-            plusMenu.classList.remove("show", "active");
-        }
-        if (moreMenu && !moreMenu.contains(event.target) && event.target !== moreBtn) {
-            moreMenu.classList.remove("show", "active");
-        }
+        sidebar?.classList.remove("open");
     });
 
-    /* =====================================================
-       FILE SELECTION HANDLERS
-    ===================================================== */
-    if (cameraBtn) {
-        cameraBtn.addEventListener("click", (e) => {
-            e.preventDefault(); e.stopPropagation(); closeMenus();
-            cameraInput?.click();
-        });
-    }
-    if (photoBtn) {
-        photoBtn.addEventListener("click", (e) => {
-            e.preventDefault(); e.stopPropagation(); closeMenus();
-            photoInput?.click();
-        });
-    }
-    if (videoBtn) {
-        videoBtn.addEventListener("click", (e) => {
-            e.preventDefault(); e.stopPropagation(); closeMenus();
-            videoInput?.click();
-        });
-    }
-    if (fileBtn) {
-        fileBtn.addEventListener("click", (e) => {
-            e.preventDefault(); e.stopPropagation(); closeMenus();
-            fileInput?.click();
-        });
-    }
+    moreBtn?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        moreMenu?.classList.toggle("show");
+    });
 
-    function handleSelectedFile(file) {
-        if (!file) return;
-        attachedFile = file;
-        if (messageInput) {
-            messageInput.placeholder = `Attached: ${file.name}`;
-        }
-    }
+    plusBtn?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        plusMenu?.classList.toggle("show");
+    });
+
+    document.addEventListener("click", () => {
+        plusMenu?.classList.remove("show");
+        moreMenu?.classList.remove("show");
+    });
+
+    /* Modal Controls */
+    voiceMenuBtn?.addEventListener("click", () => {
+        if (voiceSelect) voiceSelect.value = selectedLanguage;
+        if (voiceGender) voiceGender.value = selectedVoice;
+        voiceModal?.classList.add("show");
+    });
+    closeVoice?.addEventListener("click", () => voiceModal?.classList.remove("show"));
+    startVoice?.addEventListener("click", () => {
+        if (voiceSelect) selectedLanguage = voiceSelect.value;
+        if (voiceGender) selectedVoice = voiceGender.value;
+        localStorage.setItem("viggoLanguage", selectedLanguage);
+        localStorage.setItem("viggoVoice", selectedVoice);
+        voiceModal?.classList.remove("show");
+    });
+
+    languageBtn?.addEventListener("click", () => {
+        if (languageSelect) languageSelect.value = selectedLanguage;
+        languageModal?.classList.add("show");
+    });
+    closeLanguage?.addEventListener("click", () => languageModal?.classList.remove("show"));
+    saveLanguage?.addEventListener("click", () => {
+        if (languageSelect) selectedLanguage = languageSelect.value;
+        localStorage.setItem("viggoLanguage", selectedLanguage);
+        languageModal?.classList.remove("show");
+    });
+
+    /* File Handlers */
+    cameraBtn?.addEventListener("click", () => cameraInput?.click());
+    photoBtn?.addEventListener("click", () => photoInput?.click());
+    videoBtn?.addEventListener("click", () => videoInput?.click());
+    fileBtn?.addEventListener("click", () => fileInput?.click());
 
     [cameraInput, photoInput, videoInput, fileInput].forEach((input) => {
-        if (input) {
-            input.addEventListener("change", () => {
-                const file = input.files?.[0];
-                handleSelectedFile(file);
-                input.value = "";
-            });
-        }
+        input?.addEventListener("change", () => {
+            attachedFile = input.files?.[0];
+            if (messageInput && attachedFile) {
+                messageInput.placeholder = `Attached: ${attachedFile.name}`;
+            }
+            input.value = "";
+        });
     });
 
     function fileToDataURL(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = () => resolve(reader.result);
-            reader.onerror = () => reject(reader.error);
+            reader.onerror = reject;
             reader.readAsDataURL(file);
         });
     }
 
-    /* =====================================================
-       UTILITIES & FORMATTING
-    ===================================================== */
-    function escapeHTML(value) {
-        return String(value ?? "")
-            .replaceAll("&", "&amp;")
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;")
-            .replaceAll('"', "&quot;")
-            .replaceAll("'", "&#039;");
-    }
-
-    function formatMessage(text) {
-        if (!text) return "";
-        let html = escapeHTML(text);
-        html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-        html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
-        html = html.replace(/\n/g, "<br>");
-        return html;
-    }
-
-    function createActionButton(text, title) {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.textContent = text;
-        button.title = title;
-        return button;
-    }
-
-    async function copyText(text) {
-        try {
-            await navigator.clipboard.writeText(text || "");
-        } catch {
-            const textarea = document.createElement("textarea");
-            textarea.value = text || "";
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand("copy");
-            textarea.remove();
-        }
-    }
-
-    function saveMessage(text) {
-        try {
-            const saved = JSON.parse(localStorage.getItem("viggoSavedMessages") || "[]");
-            saved.push({ text: text || "", savedAt: Date.now() });
-            localStorage.setItem("viggoSavedMessages", JSON.stringify(saved));
-        } catch (error) {
-            console.error("Save message error:", error);
-        }
-    }
-
-    /* =====================================================
-       SPEECH SYNTHESIS (TTS)
-    ===================================================== */
-    function getSpeechLanguage() {
-        return selectedLanguage || "en-IN";
-    }
-
+    /* Speech Synthesis */
     function speakText(text) {
         if (!speakerEnabled || !("speechSynthesis" in window) || !text) return;
         window.speechSynthesis.cancel();
 
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = getSpeechLanguage();
-        utterance.rate = 1;
-        utterance.pitch = 1;
-        utterance.volume = 1;
-
+        utterance.lang = selectedLanguage;
+        
         const voices = window.speechSynthesis.getVoices();
-        const matchingVoice = voices.find(
-            (voice) =>
-                voice.lang &&
-                voice.lang.toLowerCase().startsWith(selectedLanguage.split("-")[0].toLowerCase())
+        const matchingVoice = voices.find((v) =>
+            v.lang && v.lang.toLowerCase().startsWith(selectedLanguage.split("-")[0].toLowerCase())
         );
-
         if (matchingVoice) utterance.voice = matchingVoice;
+
         window.speechSynthesis.speak(utterance);
     }
 
-    function toggleSpeaker() {
-        speakerEnabled = !speakerEnabled;
-        localStorage.setItem("viggoSpeakerEnabled", String(speakerEnabled));
-        if (!speakerEnabled && "speechSynthesis" in window) {
-            window.speechSynthesis.cancel();
-        }
-    }
-
-    function createSpeakerButton(text) {
-        const button = createActionButton(
-            speakerEnabled ? "🔊" : "🔇",
-            speakerEnabled ? "Speaker ON" : "Speaker OFF"
-        );
-        button.className = "speaker-action-btn";
-
-        button.addEventListener("click", () => {
-            toggleSpeaker();
-            button.textContent = speakerEnabled ? "🔊" : "🔇";
-            button.title = speakerEnabled ? "Speaker ON" : "Speaker OFF";
-            if (speakerEnabled) speakText(text);
-        });
-        return button;
-    }
-
-    /* =====================================================
-       SPEECH RECOGNITION (STT)
-    ===================================================== */
+    /* Speech Recognition */
     function setupSpeechRecognition() {
-        const SpeechRecognition =
-            window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) {
-            console.warn("Speech Recognition API unavailable in this browser.");
-            return;
-        }
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) return;
 
         recognition = new SpeechRecognition();
         recognition.continuous = false;
         recognition.interimResults = false;
-        recognition.lang = selectedLanguage;
 
         recognition.onstart = () => {
             isListening = true;
             micBtn?.classList.add("listening");
         };
 
-        recognition.onresult = (event) => {
-            const transcript = event.results[0][0].transcript;
+        recognition.onresult = (e) => {
+            const transcript = e.results[0][0].transcript;
             if (messageInput) messageInput.value = transcript;
         };
 
-        recognition.onerror = (event) => {
-            console.error("Speech recognition error:", event.error);
+        recognition.onerror = () => {
             isListening = false;
             micBtn?.classList.remove("listening");
         };
@@ -456,28 +234,24 @@
 
     setupSpeechRecognition();
 
-    if (micBtn) {
-        micBtn.addEventListener("click", () => {
-            if (!recognition) {
-                alert("Speech recognition is not supported in this browser.");
-                return;
-            }
-            if (isListening) {
-                recognition.stop();
-            } else {
-                recognition.lang = selectedLanguage;
-                recognition.start();
-            }
-        });
-    }
+    micBtn?.addEventListener("click", () => {
+        if (!recognition) {
+            alert("Speech recognition is not supported on this browser.");
+            return;
+        }
+        if (isListening) {
+            recognition.stop();
+        } else {
+            recognition.lang = selectedLanguage;
+            recognition.start();
+        }
+    });
 
-    /* =====================================================
-       RENDER MESSAGE TO CONVERSATION
-    ===================================================== */
-    function addMessageToUI(message) {
+    /* UI Rendering */
+    function addMessageToUI(msg) {
         if (!conversation) return;
 
-        const role = message.role === "assistant" ? "assistant" : "user";
+        const role = msg.role === "assistant" ? "assistant" : "user";
         const wrapper = document.createElement("div");
         wrapper.className = role === "user" ? "message user" : "message ai";
 
@@ -487,99 +261,33 @@
         const bubble = document.createElement("div");
         bubble.className = "message-bubble";
 
-        /* Media Attachments */
-        const media = message.media;
-        if (media && media.data && media.type?.startsWith("image/")) {
+        if (msg.media && msg.media.data && msg.media.type?.startsWith("image/")) {
             const img = document.createElement("img");
-            img.src = media.data;
-            img.alt = media.name || "Uploaded image";
+            img.src = msg.media.data;
             img.style.maxWidth = "100%";
-            img.style.maxHeight = "350px";
-            img.style.objectFit = "contain";
-            img.style.borderRadius = "12px";
+            img.style.borderRadius = "10px";
             img.style.display = "block";
             bubble.appendChild(img);
         }
 
-        if (media && media.data && media.type?.startsWith("video/")) {
-            const video = document.createElement("video");
-            video.src = media.data;
-            video.controls = true;
-            video.style.maxWidth = "100%";
-            video.style.maxHeight = "350px";
-            video.style.borderRadius = "12px";
-            bubble.appendChild(video);
-        }
-
-        if (
-            media &&
-            media.name &&
-            !media.type?.startsWith("image/") &&
-            !media.type?.startsWith("video/")
-        ) {
-            const fileBox = document.createElement("div");
-            fileBox.textContent = `📎 ${media.name}`;
-            bubble.appendChild(fileBox);
-        }
-
-        /* Message Text */
-        if (message.text) {
-            const textElement = document.createElement("div");
-            textElement.innerHTML = formatMessage(message.text);
-            if (media && media.data) textElement.style.marginTop = "8px";
-            bubble.appendChild(textElement);
+        if (msg.text) {
+            const textEl = document.createElement("div");
+            textEl.textContent = msg.text;
+            if (msg.media) textEl.style.marginTop = "8px";
+            bubble.appendChild(textEl);
         }
 
         content.appendChild(bubble);
-
-        /* Assistant Action Buttons */
-        if (role === "assistant" && !message.loading) {
-            const actions = document.createElement("div");
-            actions.className = "message-actions";
-
-            const copy = createActionButton("Copy", "Copy");
-            copy.addEventListener("click", () => copyText(message.text));
-
-            const save = createActionButton("Save", "Save");
-            save.addEventListener("click", () => saveMessage(message.text));
-
-            const like = createActionButton(
-                message.liked ? "Liked" : "Like",
-                "Like"
-            );
-            like.addEventListener("click", () => {
-                message.liked = !message.liked;
-                saveChats();
-                like.textContent = message.liked ? "Liked" : "Like";
-            });
-
-            const speaker = createSpeakerButton(message.text);
-
-            actions.appendChild(copy);
-            actions.appendChild(save);
-            actions.appendChild(like);
-            actions.appendChild(speaker);
-
-            content.appendChild(actions);
-        }
-
         wrapper.appendChild(content);
         conversation.appendChild(wrapper);
     }
 
-    /* =====================================================
-       RENDER CONVERSATION & CHAT HISTORY
-    ===================================================== */
     function renderConversation() {
         if (!conversation) return;
         conversation.innerHTML = "";
-
         const chat = getCurrentChat();
         if (!chat) return;
-
-        if (!Array.isArray(chat.messages)) chat.messages = [];
-
-        chat.messages.forEach((message) => addMessageToUI(message));
+        chat.messages.forEach(addMessageToUI);
         conversation.scrollTop = conversation.scrollHeight;
     }
 
@@ -588,57 +296,73 @@
         chatHistory.innerHTML = "";
 
         const query = searchChat?.value ? searchChat.value.toLowerCase() : "";
-        const filtered = chats.filter((chat) => {
-            if (!query) return true;
-            return chat.title && chat.title.toLowerCase().includes(query);
-        });
+
+        // Sort: Pinned chats first
+        const sortedChats = [...chats].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+        const filtered = sortedChats.filter((c) => !query || (c.title && c.title.toLowerCase().includes(query)));
 
         filtered.forEach((chat) => {
             const item = document.createElement("div");
-            item.className = "history-item";
-
-            if (chat.id === currentChatId) item.classList.add("active");
-            if (selectMode && selectedChats.has(chat.id)) item.classList.add("selected");
+            item.className = `history-item ${chat.id === currentChatId ? "active" : ""}`;
 
             const titleSpan = document.createElement("span");
-            titleSpan.className = "history-title";
-            titleSpan.textContent = chat.title || "New Chat";
-            item.appendChild(titleSpan);
+            titleSpan.className = "history-title-text";
+            titleSpan.textContent = (chat.pinned ? "📌 " : "") + (chat.title || "New Chat");
 
-            item.addEventListener("click", () => {
-                if (selectMode) {
-                    if (selectedChats.has(chat.id)) {
-                        selectedChats.delete(chat.id);
-                    } else {
-                        selectedChats.add(chat.id);
-                    }
-                    renderHistory();
-                    return;
-                }
+            /* History Action Buttons (Pin & Delete) */
+            const actionsDiv = document.createElement("div");
+            actionsDiv.className = "history-actions";
 
-                currentChatId = chat.id;
-                attachedFile = null;
-                if (messageInput) {
-                    messageInput.value = "";
-                    messageInput.placeholder = "Message Viggo AI...";
-                }
+            const pinBtn = document.createElement("button");
+            pinBtn.type = "button";
+            pinBtn.className = `history-action-btn pin-btn ${chat.pinned ? "pinned" : ""}`;
+            pinBtn.innerHTML = "📌";
+            pinBtn.title = chat.pinned ? "Unpin Chat" : "Pin Chat";
+
+            pinBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                chat.pinned = !chat.pinned;
                 saveChats();
                 renderHistory();
+            });
+
+            const deleteBtn = document.createElement("button");
+            deleteBtn.type = "button";
+            deleteBtn.className = "history-action-btn delete-btn";
+            deleteBtn.innerHTML = "🗑️";
+            deleteBtn.title = "Delete Chat";
+
+            deleteBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                chats = chats.filter((c) => c.id !== chat.id);
+                if (currentChatId === chat.id) {
+                    currentChatId = chats.length ? chats[0].id : null;
+                }
+                saveChats();
+                ensureChat();
+                renderHistory();
                 renderConversation();
-                closeSidebarMobile();
+            });
+
+            actionsDiv.appendChild(pinBtn);
+            actionsDiv.appendChild(deleteBtn);
+
+            item.appendChild(titleSpan);
+            item.appendChild(actionsDiv);
+
+            item.addEventListener("click", () => {
+                currentChatId = chat.id;
+                renderHistory();
+                renderConversation();
+                sidebar?.classList.remove("open");
             });
 
             chatHistory.appendChild(item);
         });
     }
 
-    if (searchChat) {
-        searchChat.addEventListener("input", renderHistory);
-    }
+    searchChat?.addEventListener("input", renderHistory);
 
-    /* =====================================================
-       SEND MESSAGE & API EXECUTION
-    ===================================================== */
     async function sendMessage() {
         const text = messageInput?.value.trim() || "";
         if (!text && !attachedFile) return;
@@ -648,149 +372,81 @@
 
         if (attachedFile) {
             try {
-                const base64Data = await fileToDataURL(attachedFile);
-                mediaPayload = {
-                    name: attachedFile.name,
-                    type: attachedFile.type,
-                    data: base64Data
-                };
+                const base64 = await fileToDataURL(attachedFile);
+                mediaPayload = { name: attachedFile.name, type: attachedFile.type, data: base64 };
             } catch (err) {
-                console.error("File conversion error:", err);
+                console.error("Error reading file:", err);
             }
         }
 
-        const userMessage = {
-            role: "user",
-            text: text,
-            media: mediaPayload
-        };
-
-        chat.messages.push(userMessage);
-
+        chat.messages.push({ role: "user", text, media: mediaPayload });
         if (chat.title === "New Chat" && text) {
             chat.title = text.length > 25 ? text.substring(0, 25) + "..." : text;
         }
-
-        chat.updatedAt = Date.now();
 
         if (messageInput) {
             messageInput.value = "";
             messageInput.placeholder = "Message Viggo AI...";
         }
-
         attachedFile = null;
 
         saveChats();
         renderHistory();
         renderConversation();
 
-        /* Loading Indicator */
-        const loadingMessage = {
-            role: "assistant",
-            text: "Thinking...",
-            loading: true
-        };
-        chat.messages.push(loadingMessage);
-        renderConversation();
-
         try {
-            const response = await fetch(API_URL, {
+            const res = await fetch(API_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     message: text,
-                    history: chat.messages.slice(0, -2),
                     language: selectedLanguage,
                     voice: selectedVoice
                 })
             });
 
-            if (!response.ok) {
-                throw new Error(`Server status: ${response.status}`);
-            }
+            if (!res.ok) throw new Error("Server error");
 
-            const data = await response.json();
-            const aiReply = data.reply || data.message || "I'm here to help!";
+            const data = await res.json();
+            const reply = data.reply || data.message || "I'm here to help!";
 
-            chat.messages.pop(); // Remove loading message
-
-            const assistantMessage = {
-                role: "assistant",
-                text: aiReply,
-                liked: false
-            };
-            chat.messages.push(assistantMessage);
-
+            chat.messages.push({ role: "assistant", text: reply });
             saveChats();
             renderHistory();
             renderConversation();
 
-            if (speakerEnabled) speakText(aiReply);
+            if (speakerEnabled) speakText(reply);
 
-        } catch (error) {
-            console.error("API Fetch Error:", error);
-            chat.messages.pop();
-
-            const errorMessage = {
+        } catch (err) {
+            chat.messages.push({
                 role: "assistant",
-                text: "Sorry, I couldn't reach the server. Please verify network connectivity."
-            };
-            chat.messages.push(errorMessage);
-
+                text: "Sorry, I couldn't reach the server. Please check your network connection."
+            });
             saveChats();
             renderHistory();
             renderConversation();
         }
     }
 
-    /* =====================================================
-       EVENT LISTENERS
-    ===================================================== */
-    if (sendBtn) sendBtn.addEventListener("click", sendMessage);
+    sendBtn?.addEventListener("click", sendMessage);
+    messageInput?.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
 
-    if (messageInput) {
-        messageInput.addEventListener("keydown", (event) => {
-            if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                sendMessage();
-            }
-        });
-    }
+    clearChatBtn?.addEventListener("click", () => {
+        const chat = getCurrentChat();
+        if (chat) {
+            chat.messages = [];
+            saveChats();
+            renderConversation();
+        }
+    });
 
-    /* Clear Chat */
-    if (clearChatBtn) {
-        clearChatBtn.addEventListener("click", () => {
-            const chat = getCurrentChat();
-            if (chat) {
-                chat.messages = [];
-                saveChats();
-                renderConversation();
-                closeMenus();
-            }
-        });
-    }
-
-    /* =====================================================
-       SERVICE WORKER REGISTRATION (PWA)
-    ===================================================== */
-    if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-            navigator.serviceWorker
-                .register("/sw.js")
-                .then((reg) => console.log("SW registered on scope:", reg.scope))
-                .catch((err) => console.error("SW registration failed:", err));
-        });
-    }
-
-    /* =====================================================
-       BOOTSTRAP APPLICATION
-    ===================================================== */
     loadChats();
     ensureChat();
     renderHistory();
     renderConversation();
-
-    console.log("=================================");
-    console.log("VIGGO AI ENGINE READY.");
-    console.log("=================================");
 })();
