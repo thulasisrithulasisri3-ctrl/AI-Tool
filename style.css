@@ -129,7 +129,7 @@ html, body {
     background: #090909 !important;
 }
 
-/* HISTORY ITEM & ACTIONS */
+/* HISTORY ITEM & ACTIONS (BLACK THEME MATCH) */
 .history-item {
     width: 100%;
     min-height: 46px;
@@ -165,7 +165,6 @@ html, body {
     text-overflow: ellipsis;
 }
 
-/* PIN & DELETE ACTIONS BACKGROUND STYLING */
 .history-actions {
     display: flex;
     align-items: center;
@@ -173,53 +172,32 @@ html, body {
     flex: 0 0 auto;
 }
 
-.history-action-btn,
-.history-action-btn.pin-btn,
-.history-action-btn.delete-btn {
-    width: 30px;
-    height: 30px;
+.history-action-btn {
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid #24527a !important;
-    border-radius: 8px;
-    background: #0d1c2b !important;
-    background-image: none !important;
-    color: #ffffff;
+    border: 1px solid #242424 !important;
+    border-radius: 6px;
+    background: #111111 !important;
+    color: #aaaaaa !important;
     cursor: pointer;
-    font-size: 13px;
-    box-shadow: none !important;
-    outline: none;
-    transition: 0.2s;
+    font-size: 12px;
+    transition: 0.2s ease;
 }
 
-.history-action-btn.pin-btn {
-    color: #3da0ff !important;
-    border-color: #24527a !important;
-    background: #0d1c2b !important;
-}
-
+.history-action-btn.pin-btn:hover,
 .history-action-btn.pin-btn.pinned {
-    background: #1683ff !important;
-    color: #ffffff !important;
-    border-color: #3da0ff !important;
-}
-
-.history-action-btn.delete-btn {
-    color: #ff6b6b !important;
-    border-color: #24527a !important;
-    background: #0d1c2b !important;
-}
-
-.history-action-btn.pin-btn:hover {
-    background: #12395a !important;
+    background: #0d1f33 !important;
+    color: #3da0ff !important;
     border-color: #1683ff !important;
 }
 
 .history-action-btn.delete-btn:hover {
-    background: #291414 !important;
-    border-color: #ff5555 !important;
+    background: #2b0d0d !important;
     color: #ff6b6b !important;
+    border-color: #ff4d4d !important;
 }
 
 /* SIDEBAR MORE */
@@ -403,6 +381,43 @@ html, body {
     color: #eeeeee;
     border: 1px solid #242424;
     border-bottom-left-radius: 5px;
+}
+
+/* CHAT BOTTOM ACTION BUTTONS (COPY, LIKE, SPEAKER) */
+.message-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.action-btn {
+    background: #111111 !important;
+    border: 1px solid #242424 !important;
+    color: #aaaaaa !important;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.action-btn:hover {
+    background: #1a1a1a !important;
+    color: #ffffff !important;
+    border-color: #1683ff !important;
+}
+
+.action-btn.liked {
+    color: #ff4d6d !important;
+    border-color: #ff4d6d !important;
+    background: #200a10 !important;
+}
+
+.action-btn.speaker-active {
+    color: #3da0ff !important;
+    border-color: #1683ff !important;
+    background: #0a1829 !important;
 }
 
 /* INPUT AREA */
