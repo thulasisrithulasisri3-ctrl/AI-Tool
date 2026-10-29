@@ -15,8 +15,22 @@
     const messageInput = get("message");
     const sendBtn = get("send");
 
+    /* Plus Menu & File Inputs */
+    const plusBtn = get("plusBtn");
+    const plusMenu = get("plusMenu");
+    const cameraBtn = get("cameraBtn");
+    const photoBtn = get("photoBtn");
+    const videoBtn = get("videoBtn");
+    const fileBtn = get("fileBtn");
+
+    const cameraInput = get("cameraInput");
+    const photoInput = get("photoInput");
+    const videoInput = get("videoInput");
+    const fileInput = get("fileInput");
+
     let chats = [];
     let currentChatId = null;
+    let attachedFile = null;
     let speakerEnabled = localStorage.getItem("viggoSpeakerEnabled") !== "false";
     let selectedLanguage = localStorage.getItem("viggoLanguage") || "ta-IN";
 
@@ -87,7 +101,56 @@
         }
     }
 
-    /* THINKING / LOADING INDICATOR */
+    /* PLUS MENU & FILE HANDLERS */
+    plusBtn?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        plusMenu?.classList.toggle("show");
+    });
+
+    document.addEventListener("click", () => {
+        plusMenu?.classList.remove("show");
+    });
+
+    cameraBtn?.addEventListener("click", () => {
+        plusMenu?.classList.remove("show");
+        cameraInput?.click();
+    });
+
+    photoBtn?.addEventListener("click", () => {
+        plusMenu?.classList.remove("show");
+        photoInput?.click();
+    });
+
+    videoBtn?.addEventListener("click", () => {
+        plusMenu?.classList.remove("show");
+        videoInput?.click();
+    });
+
+    fileBtn?.addEventListener("click", () => {
+        plusMenu?.classList.remove("show");
+        fileInput?.click();
+    });
+
+    [cameraInput, photoInput, videoInput, fileInput].forEach((input) => {
+        input?.addEventListener("change", () => {
+            attachedFile = input.files?.[0];
+            if (messageInput && attachedFile) {
+                messageInput.placeholder = `Attached: ${attachedFile.name}`;
+            }
+            input.value = "";
+        });
+    });
+
+    function fileToDataURL(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    /* THINKING INDICATOR */
     function showThinkingIndicator() {
         if (!conversation) return null;
         const wrapper = document.createElement("div");
@@ -126,7 +189,22 @@
 
         const bubble = document.createElement("div");
         bubble.className = "message-bubble";
-        bubble.textContent = msg.text;
+
+        if (msg.media && msg.media.data && msg.media.type?.startsWith("image/")) {
+            const img = document.createElement("img");
+            img.src = msg.media.data;
+            img.style.maxWidth = "100%";
+            img.style.borderRadius = "10px";
+            img.style.display = "block";
+            bubble.appendChild(img);
+        }
+
+        if (msg.text) {
+            const textEl = document.createElement("div");
+            textEl.textContent = msg.text;
+            if (msg.media) textEl.style.marginTop = "8px";
+            bubble.appendChild(textEl);
+        }
 
         content.appendChild(bubble);
 
@@ -249,49 +327,69 @@
         const chat = createChat();
         chats.unshift(chat);
         currentChatId = chat.id;
-        if (messageInput) messageInput.value = "";
+        attachedFile = null;
+        if (messageInput) {
+            messageInput.value = "";
+            messageInput.placeholder = "Message Viggo AI...";
+        }
         saveChats();
         renderHistory();
         renderConversation();
         sidebar?.classList.remove("open");
     });
 
+    searchChat?.addEventListener("input", renderHistory);
+
     /* SEND MESSAGE WITH CONTEXT MEMORY AND THINKING INDICATOR */
     async function sendMessage() {
         const text = messageInput?.value.trim() || "";
-        if (!text) return;
+        if (!text && !attachedFile) return;
 
         const chat = ensureChat();
-        
-        // User மெசேஜை சேர்த்தல்
-        chat.messages.push({ role: "user", text });
+        let mediaPayload = null;
 
-        if (chat.title === "New Chat" && text) {
-            chat.title = text.length > 25 ? text.substring(0, 25) + "..." : text;
+        if (attachedFile) {
+            try {
+                const base64 = await fileToDataURL(attachedFile);
+                mediaPayload = { name: attachedFile.name, type: attachedFile.type, data: base64 };
+            } catch (err) {
+                console.error("Error reading file:", err);
+            }
         }
 
-        if (messageInput) messageInput.value = "";
+        chat.messages.push({ role: "user", text, media: mediaPayload });
+
+        if (chat.title === "New Chat" && (text || attachedFile)) {
+            const titleSource = text || attachedFile.name;
+            chat.title = titleSource.length > 25 ? titleSource.substring(0, 25) + "..." : titleSource;
+        }
+
+        if (messageInput) {
+            messageInput.value = "";
+            messageInput.placeholder = "Message Viggo AI...";
+        }
+        attachedFile = null;
 
         saveChats();
         renderHistory();
         renderConversation();
 
-        // Thinking Indicator ஐக் காட்டுதல்
         showThinkingIndicator();
 
         try {
-            // முந்தைய உரையாடல்கள் அனைத்தையும் Context-ஆக அனுப்புதல்
             const res = await fetch(API_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ 
                     message: text,
-                    history: chat.messages, // முழு சாட் வரலாறும் சர்வருக்குச் செல்லும்
+                    history: chat.messages,
                     language: selectedLanguage 
                 })
             });
 
             removeThinkingIndicator();
+
+            if (!res.ok) throw new Error("Server error");
 
             const data = await res.json();
             const reply = data.reply || data.message || "I'm here to help!";
