@@ -65,9 +65,6 @@
             #message {
                 min-width: 0;
             }
-            .plus-menu {
-                max-width: calc(100vw - 20px);
-            }
         }
     </style>
 </head>
@@ -121,13 +118,16 @@
     </section>
 
     <div class="input-area">
-        <button class="input-plus" id="plusBtn" type="button" aria-label="Add">＋</button>
+        <div class="input-plus-wrapper" style="position: relative;">
+            <button class="input-plus" id="plusBtn" type="button" aria-label="Add">＋</button>
 
-        <div class="plus-menu" id="plusMenu">
-            <button id="cameraBtn" type="button">📷 Camera</button>
-            <button id="photoBtn" type="button">🖼️ Photo</button>
-            <button id="videoBtn" type="button">🎥 Video</button>
-            <button id="fileBtn" type="button">📎 File</button>
+            <!-- PLUS MENU -->
+            <div class="plus-menu" id="plusMenu">
+                <button id="cameraBtn" type="button">📷 Camera</button>
+                <button id="photoBtn" type="button">🖼️ Photo</button>
+                <button id="videoBtn" type="button">🎥 Video</button>
+                <button id="fileBtn" type="button">📎 File</button>
+            </div>
         </div>
 
         <textarea id="message" placeholder="Message Viggo AI..." rows="1" autocomplete="off"></textarea>
