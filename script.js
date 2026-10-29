@@ -149,8 +149,30 @@
 
     function fileToDataURL(file) {
         return new Promise((resolve, reject) => {
+            if (!file.type.startsWith("image/")) {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+                return;
+            }
+
             const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement("canvas");
+                    const MAX_WIDTH = 800;
+                    const scaleSize = MAX_WIDTH / img.width;
+                    canvas.width = MAX_WIDTH;
+                    canvas.height = img.height * scaleSize;
+
+                    const ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    resolve(canvas.toDataURL("image/jpeg", 0.7));
+                };
+                img.src = e.target.result;
+            };
             reader.onerror = reject;
             reader.readAsDataURL(file);
         });
@@ -346,7 +368,7 @@
 
     searchChat?.addEventListener("input", renderHistory);
 
-    /* SEND MESSAGE WITH CONTEXT MEMORY AND THINKING INDICATOR */
+    /* SEND MESSAGE WITH FILE/PHOTO SUPPORT AND CONTEXT MEMORY */
     async function sendMessage() {
         const text = messageInput?.value.trim() || "";
         if (!text && !attachedFile) return;
@@ -357,7 +379,11 @@
         if (attachedFile) {
             try {
                 const base64 = await fileToDataURL(attachedFile);
-                mediaPayload = { name: attachedFile.name, type: attachedFile.type, data: base64 };
+                mediaPayload = { 
+                    name: attachedFile.name, 
+                    type: attachedFile.type, 
+                    data: base64 
+                };
             } catch (err) {
                 console.error("Error reading file:", err);
             }
@@ -374,6 +400,8 @@
             messageInput.value = "";
             messageInput.placeholder = "Message Viggo AI...";
         }
+        
+        const currentAttachedFile = attachedFile;
         attachedFile = null;
 
         saveChats();
@@ -383,14 +411,17 @@
         showThinkingIndicator();
 
         try {
+            const requestBody = {
+                message: text || (currentAttachedFile ? `Uploaded file: ${currentAttachedFile.name}` : ""),
+                history: chat.messages,
+                language: selectedLanguage,
+                media: mediaPayload
+            };
+
             const res = await fetch(API_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    message: text,
-                    history: chat.messages,
-                    language: selectedLanguage 
-                })
+                body: JSON.stringify(requestBody)
             });
 
             removeThinkingIndicator();
@@ -398,7 +429,7 @@
             if (!res.ok) throw new Error("Server error");
 
             const data = await res.json();
-            const reply = data.reply || data.message || "I'm here to help!";
+            const reply = data.reply || data.message || "I've received your file/photo!";
 
             chat.messages.push({ role: "assistant", text: reply, liked: false });
             saveChats();
@@ -409,7 +440,10 @@
 
         } catch (err) {
             removeThinkingIndicator();
-            chat.messages.push({ role: "assistant", text: "Error connecting to server. Please check your network or try again." });
+            chat.messages.push({ 
+                role: "assistant", 
+                text: "Error connecting to server or processing the file. Please check your network and try again." 
+            });
             saveChats();
             renderHistory();
             renderConversation();
