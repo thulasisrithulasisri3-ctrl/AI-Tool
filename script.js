@@ -1,425 +1,638 @@
-"use strict";
+/* =========================================================
+   VIGGO AI - FULL CSS
+   BLACK + BLUE THEME
+========================================================= */
 
-(() => {
-    const API_URL = "https://ai-tool-2-zpul.onrender.com/chat";
-    const get = (id) => document.getElementById(id);
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-    const sidebar = get("sidebar");
-    const openSidebar = get("openSidebar");
-    const closeSidebar = get("closeSidebar");
-    const newChat = get("newChat");
-    const searchChat = get("searchChat");
-    const chatHistory = get("chatHistory");
-    const conversation = get("conversation");
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #050505 !important;
+    color: #ffffff;
+}
 
-    const messageInput = get("message");
-    const sendBtn = get("send");
+:root {
+    --app-height: 100vh;
+    --blue: #1683ff;
+    --blue-dark: #075fc2;
+    --blue-light: #3da0ff;
+    --black: #050505;
+    --panel: #0d0d0d;
+    --panel-2: #111111;
+    --border: #242424;
+    --text: #ffffff;
+    --muted: #999999;
+}
 
-    /* Plus Menu & File Inputs */
-    const plusBtn = get("plusBtn");
-    const plusMenu = get("plusMenu");
-    const cameraBtn = get("cameraBtn");
-    const photoBtn = get("photoBtn");
-    const videoBtn = get("videoBtn");
-    const fileBtn = get("fileBtn");
+/* SIDEBAR */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 280px;
+    height: var(--app-height);
+    background: #090909 !important;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    transition: transform 0.25s ease;
+}
 
-    const cameraInput = get("cameraInput");
-    const photoInput = get("photoInput");
-    const videoInput = get("videoInput");
-    const fileInput = get("fileInput");
+.sidebar-header {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 18px;
+    border-bottom: 1px solid var(--border);
+}
 
-    let chats = [];
-    let currentChatId = null;
-    let attachedFile = null;
-    let speakerEnabled = localStorage.getItem("viggoSpeakerEnabled") !== "false";
-    let selectedLanguage = localStorage.getItem("viggoLanguage") || "ta-IN";
+.sidebar-header h2 {
+    font-size: 21px;
+    color: #ffffff;
+}
 
-    function saveChats() {
-        localStorage.setItem("viggoChats", JSON.stringify(chats));
+.icon-btn {
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 10px;
+    background: transparent !important;
+    color: #ffffff;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.icon-btn:hover {
+    background: #1a1a1a !important;
+}
+
+.new-chat {
+    margin: 16px;
+    height: 46px;
+    border: 1px solid #147cff;
+    border-radius: 12px;
+    background: #0b5ed7 !important;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.new-chat:hover {
+    background: #0872f9 !important;
+}
+
+.search-box {
+    margin: 0 16px 14px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px;
+    background: #111111 !important;
+    border: 1px solid #242424;
+    border-radius: 10px;
+}
+
+.search-box input {
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent !important;
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.history-title {
+    padding: 8px 18px;
+    color: #777777;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.chat-history {
+    flex: 1;
+    overflow-y: auto;
+    padding: 5px 10px 15px;
+    background: #090909 !important;
+}
+
+/* HISTORY ITEM & ACTIONS */
+.history-item {
+    width: 100%;
+    min-height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 9px;
+    margin-bottom: 5px;
+    border-radius: 10px;
+    cursor: pointer;
+    background: transparent !important;
+    border: 1px solid transparent;
+    transition: 0.2s;
+}
+
+.history-item:hover {
+    background: #151515 !important;
+}
+
+.history-item.active {
+    background: #102b49 !important;
+    border: 1px solid #174d7d;
+}
+
+.history-title-text {
+    flex: 1;
+    min-width: 0;
+    color: #eeeeee;
+    font-size: 14px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.history-actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex: 0 0 auto;
+}
+
+.history-action-btn {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #242424 !important;
+    border-radius: 6px;
+    background: #111111 !important;
+    color: #aaaaaa !important;
+    cursor: pointer;
+    font-size: 12px;
+    transition: 0.2s ease;
+}
+
+.history-action-btn.pin-btn:hover,
+.history-action-btn.pin-btn.pinned {
+    background: #0d1f33 !important;
+    color: #3da0ff !important;
+    border-color: #1683ff !important;
+}
+
+.history-action-btn.delete-btn:hover {
+    background: #2b0d0d !important;
+    color: #ff6b6b !important;
+    border-color: #ff4d4d !important;
+}
+
+/* SIDEBAR MORE */
+.sidebar-more {
+    position: relative;
+    padding: 10px 14px 15px;
+    border-top: 1px solid var(--border);
+    background: #090909 !important;
+}
+
+.more-button {
+    width: 100%;
+    height: 44px;
+    border: none;
+    border-radius: 10px;
+    background: #111111 !important;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 14px;
+    font-size: 14px;
+}
+
+.more-menu {
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 65px;
+    display: none;
+    flex-direction: column;
+    padding: 7px;
+    background: #111111 !important;
+    border: 1px solid #292929;
+    border-radius: 12px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.55);
+    z-index: 1200;
+}
+
+.more-menu.show {
+    display: flex;
+}
+
+.more-menu button {
+    width: 100%;
+    min-height: 40px;
+    border: none;
+    border-radius: 8px;
+    background: transparent !important;
+    color: #ffffff;
+    text-align: left;
+    padding: 0 12px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.more-menu button:hover {
+    background: #1d1d1d !important;
+}
+
+/* MAIN AREA */
+.main {
+    position: fixed;
+    left: 280px;
+    top: 0;
+    width: calc(100% - 280px);
+    height: var(--app-height);
+    display: flex;
+    flex-direction: column;
+    background: #050505 !important;
+}
+
+.topbar {
+    height: 64px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 18px;
+    border-bottom: 1px solid var(--border);
+    background: #080808 !important;
+}
+
+.top-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.menu-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 10px;
+    background: #111111 !important;
+    color: #ffffff;
+    font-size: 20px;
+    cursor: pointer;
+    display: none;
+}
+
+.brand {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.share-btn {
+    height: 40px;
+    padding: 0 15px;
+    border: 1px solid #225d91;
+    border-radius: 10px;
+    background: #0d1c2b !important;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* CHAT CONVERSATION */
+.chat-area {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    background: #050505 !important;
+}
+
+.conversation {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    padding: 25px 20px 150px;
+    background: #050505 !important;
+}
+
+.message {
+    width: 100%;
+    display: flex;
+    margin-bottom: 18px;
+}
+
+.message.user {
+    justify-content: flex-end !important;
+}
+
+.message.ai {
+    justify-content: flex-start !important;
+}
+
+.message-content {
+    max-width: min(820px, 85%);
+    display: flex;
+    flex-direction: column;
+}
+
+.message.user .message-content {
+    align-items: flex-end !important;
+}
+
+.message.ai .message-content {
+    align-items: flex-start !important;
+}
+
+.message-bubble {
+    padding: 12px 15px;
+    border-radius: 15px;
+    font-size: 15px;
+    line-height: 1.55;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.message.user .message-bubble {
+    background: #0868d8 !important;
+    color: #ffffff;
+    border-bottom-right-radius: 5px;
+}
+
+.message.ai .message-bubble {
+    background: #151515 !important;
+    color: #eeeeee;
+    border: 1px solid #242424;
+    border-bottom-left-radius: 5px;
+}
+
+/* CHAT BOTTOM ACTION BUTTONS (COPY, LIKE, SPEAKER) */
+.message-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.action-btn {
+    background: #111111 !important;
+    border: 1px solid #242424 !important;
+    color: #aaaaaa !important;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.action-btn:hover {
+    background: #1a1a1a !important;
+    color: #ffffff !important;
+    border-color: #1683ff !important;
+}
+
+.action-btn.liked {
+    color: #ff4d6d !important;
+    border-color: #ff4d6d !important;
+    background: #200a10 !important;
+}
+
+.action-btn.speaker-active {
+    color: #3da0ff !important;
+    border-color: #1683ff !important;
+    background: #0a1829 !important;
+}
+
+/* THINKING INDICATOR ANIMATION */
+.thinking-bubble {
+    background: #111111 !important;
+    color: #3da0ff !important;
+    border: 1px solid #174d7d !important;
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dots span {
+    animation: blink 1.4s infinite repeating-linear-gradient;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.dots span:nth-child(2) {
+    animation-delay: .2s;
+}
+
+.dots span:nth-child(3) {
+    animation-delay: .4s;
+}
+
+@keyframes blink {
+    0% { opacity: 0.2; }
+    20% { opacity: 1; }
+    100% { opacity: 0.2; }
+}
+
+/* INPUT AREA */
+.input-area {
+    position: absolute;
+    left: 50%;
+    bottom: 18px;
+    transform: translateX(-50%);
+    width: min(900px, calc(100% - 40px));
+    min-height: 58px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 9px;
+    background: #111111 !important;
+    border: 1px solid #292929;
+    border-radius: 17px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
+    z-index: 500;
+}
+
+.input-plus, .input-icon {
+    flex: 0 0 auto;
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 11px;
+    background: #1b1b1b !important;
+    color: #ffffff;
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.input-plus:hover {
+    background: #1683ff !important;
+}
+
+#message {
+    flex: 1;
+    min-width: 0;
+    min-height: 40px;
+    max-height: 130px;
+    resize: none;
+    border: none;
+    outline: none;
+    background: transparent !important;
+    color: #ffffff;
+    padding: 10px 7px;
+    font-size: 15px;
+}
+
+.send-btn {
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 12px;
+    background: #0878ef !important;
+    color: #ffffff;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* COLORED & VISIBLE PLUS MENU */
+.plus-menu {
+    position: absolute;
+    left: 0;
+    bottom: 54px;
+    width: 175px;
+    display: none;
+    flex-direction: column;
+    padding: 8px;
+    background: #121212 !important;
+    border: 1px solid #1683ff;
+    border-radius: 12px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.75);
+    z-index: 2500;
+}
+
+.plus-menu.show {
+    display: flex !important;
+}
+
+.plus-menu button {
+    width: 100%;
+    min-height: 40px;
+    border: none;
+    border-radius: 8px;
+    background: transparent !important;
+    color: #ffffff !important;
+    text-align: left;
+    padding: 0 12px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s ease;
+}
+
+.plus-menu button:hover {
+    background: #1683ff !important;
+    color: #ffffff !important;
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.72) !important;
+    z-index: 3000;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-box {
+    position: relative;
+    width: min(400px, calc(100% - 30px));
+    padding: 25px;
+    background: #111111 !important;
+    border: 1px solid #292929;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.65);
+}
+
+.modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 8px;
+    background: transparent !important;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.modal-box select {
+    width: 100%;
+    height: 42px;
+    margin-bottom: 15px;
+    padding: 0 10px;
+    border: 1px solid #303030;
+    border-radius: 9px;
+    background: #080808 !important;
+    color: #ffffff;
+    outline: none;
+}
+
+.modal-button {
+    width: 100%;
+    height: 43px;
+    border: none;
+    border-radius: 9px;
+    background: #0878ef !important;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
     }
-
-    function loadChats() {
-        const saved = localStorage.getItem("viggoChats");
-        chats = saved ? JSON.parse(saved) : [];
+    .sidebar.open {
+        transform: translateX(0);
     }
-
-    function createId() {
-        return Date.now().toString(36) + Math.random().toString(36).substring(2, 10);
+    .main {
+        left: 0;
+        width: 100%;
     }
-
-    function createChat() {
-        return { id: createId(), title: "New Chat", pinned: false, messages: [] };
+    .menu-btn {
+        display: block;
     }
-
-    function getCurrentChat() {
-        return chats.find((c) => c.id === currentChatId);
+    .input-area {
+        width: calc(100% - 16px);
+        bottom: 8px;
     }
-
-    function ensureChat() {
-        if (!chats.length) {
-            const chat = createChat();
-            chats.push(chat);
-            currentChatId = chat.id;
-            saveChats();
-        }
-        if (!currentChatId) currentChatId = chats[0].id;
-        return getCurrentChat() || chats[0];
+    .plus-menu {
+        left: 0;
+        bottom: 54px;
     }
-
-    /* SPEECH SYNTHESIS */
-    function speakText(text) {
-        if (!speakerEnabled || !("speechSynthesis" in window) || !text) return;
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = selectedLanguage;
-        window.speechSynthesis.speak(utterance);
-    }
-
-    function toggleSpeaker(speakerBtn, text) {
-        speakerEnabled = !speakerEnabled;
-        localStorage.setItem("viggoSpeakerEnabled", String(speakerEnabled));
-
-        if (speakerEnabled) {
-            speakerBtn.textContent = "🔊 Speaker ON";
-            speakerBtn.classList.add("speaker-active");
-            speakText(text);
-        } else {
-            speakerBtn.textContent = "🔇 Speaker OFF";
-            speakerBtn.classList.remove("speaker-active");
-            if ("speechSynthesis" in window) {
-                window.speechSynthesis.cancel();
-            }
-        }
-    }
-
-    async function copyMessageText(text) {
-        try {
-            await navigator.clipboard.writeText(text || "");
-            alert("Copied to clipboard!");
-        } catch (err) {
-            console.error("Failed to copy text:", err);
-        }
-    }
-
-    /* PLUS MENU & FILE HANDLERS */
-    plusBtn?.addEventListener("click", (e) => {
-        e.stopPropagation();
-        plusMenu?.classList.toggle("show");
-    });
-
-    document.addEventListener("click", () => {
-        plusMenu?.classList.remove("show");
-    });
-
-    cameraBtn?.addEventListener("click", () => {
-        plusMenu?.classList.remove("show");
-        cameraInput?.click();
-    });
-
-    photoBtn?.addEventListener("click", () => {
-        plusMenu?.classList.remove("show");
-        photoInput?.click();
-    });
-
-    videoBtn?.addEventListener("click", () => {
-        plusMenu?.classList.remove("show");
-        videoInput?.click();
-    });
-
-    fileBtn?.addEventListener("click", () => {
-        plusMenu?.classList.remove("show");
-        fileInput?.click();
-    });
-
-    [cameraInput, photoInput, videoInput, fileInput].forEach((input) => {
-        input?.addEventListener("change", () => {
-            attachedFile = input.files?.[0];
-            if (messageInput && attachedFile) {
-                messageInput.placeholder = `Attached: ${attachedFile.name}`;
-            }
-            input.value = "";
-        });
-    });
-
-    function fileToDataURL(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-        });
-    }
-
-    /* THINKING INDICATOR */
-    function showThinkingIndicator() {
-        if (!conversation) return null;
-        const wrapper = document.createElement("div");
-        wrapper.className = "message ai thinking-wrapper";
-        wrapper.id = "thinkingIndicator";
-
-        const content = document.createElement("div");
-        content.className = "message-content";
-
-        const bubble = document.createElement("div");
-        bubble.className = "message-bubble thinking-bubble";
-        bubble.innerHTML = `🤔 Viggo AI is thinking... <span class="dots"><span>.</span><span>.</span><span>.</span></span>`;
-
-        content.appendChild(bubble);
-        wrapper.appendChild(content);
-        conversation.appendChild(wrapper);
-        conversation.scrollTop = conversation.scrollHeight;
-        return wrapper;
-    }
-
-    function removeThinkingIndicator() {
-        const thinking = get("thinkingIndicator");
-        if (thinking) thinking.remove();
-    }
-
-    /* RENDER MESSAGES */
-    function addMessageToUI(msg) {
-        if (!conversation) return;
-
-        const role = msg.role === "assistant" ? "assistant" : "user";
-        const wrapper = document.createElement("div");
-        wrapper.className = role === "user" ? "message user" : "message ai";
-
-        const content = document.createElement("div");
-        content.className = "message-content";
-
-        const bubble = document.createElement("div");
-        bubble.className = "message-bubble";
-
-        if (msg.media && msg.media.data && msg.media.type?.startsWith("image/")) {
-            const img = document.createElement("img");
-            img.src = msg.media.data;
-            img.style.maxWidth = "100%";
-            img.style.borderRadius = "10px";
-            img.style.display = "block";
-            bubble.appendChild(img);
-        }
-
-        if (msg.text) {
-            const textEl = document.createElement("div");
-            textEl.textContent = msg.text;
-            if (msg.media) textEl.style.marginTop = "8px";
-            bubble.appendChild(textEl);
-        }
-
-        content.appendChild(bubble);
-
-        if (role === "assistant") {
-            const actionsDiv = document.createElement("div");
-            actionsDiv.className = "message-actions";
-
-            const copyBtn = document.createElement("button");
-            copyBtn.type = "button";
-            copyBtn.className = "action-btn";
-            copyBtn.textContent = "📋 Copy";
-            copyBtn.addEventListener("click", () => copyMessageText(msg.text));
-
-            const likeBtn = document.createElement("button");
-            likeBtn.type = "button";
-            likeBtn.className = `action-btn ${msg.liked ? "liked" : ""}`;
-            likeBtn.textContent = msg.liked ? "❤️ Liked" : "🤍 Like";
-            likeBtn.addEventListener("click", () => {
-                msg.liked = !msg.liked;
-                saveChats();
-                likeBtn.textContent = msg.liked ? "❤️ Liked" : "🤍 Like";
-                likeBtn.classList.toggle("liked", msg.liked);
-            });
-
-            const speakerBtn = document.createElement("button");
-            speakerBtn.type = "button";
-            speakerBtn.className = `action-btn ${speakerEnabled ? "speaker-active" : ""}`;
-            speakerBtn.textContent = speakerEnabled ? "🔊 Speaker ON" : "🔇 Speaker OFF";
-            speakerBtn.addEventListener("click", () => toggleSpeaker(speakerBtn, msg.text));
-
-            actionsDiv.appendChild(copyBtn);
-            actionsDiv.appendChild(likeBtn);
-            actionsDiv.appendChild(speakerBtn);
-
-            content.appendChild(actionsDiv);
-        }
-
-        wrapper.appendChild(content);
-        conversation.appendChild(wrapper);
-    }
-
-    function renderConversation() {
-        if (!conversation) return;
-        conversation.innerHTML = "";
-        const chat = getCurrentChat();
-        if (!chat) return;
-        chat.messages.forEach(addMessageToUI);
-        conversation.scrollTop = conversation.scrollHeight;
-    }
-
-    function renderHistory() {
-        if (!chatHistory) return;
-        chatHistory.innerHTML = "";
-
-        const query = searchChat?.value ? searchChat.value.toLowerCase() : "";
-        const sortedChats = [...chats].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
-        const filtered = sortedChats.filter((c) => !query || (c.title && c.title.toLowerCase().includes(query)));
-
-        filtered.forEach((chat) => {
-            const item = document.createElement("div");
-            item.className = `history-item ${chat.id === currentChatId ? "active" : ""}`;
-
-            const titleSpan = document.createElement("span");
-            titleSpan.className = "history-title-text";
-            titleSpan.textContent = (chat.pinned ? "📌 " : "") + (chat.title || "New Chat");
-
-            const actionsDiv = document.createElement("div");
-            actionsDiv.className = "history-actions";
-
-            const pinBtn = document.createElement("button");
-            pinBtn.type = "button";
-            pinBtn.className = `history-action-btn pin-btn ${chat.pinned ? "pinned" : ""}`;
-            pinBtn.innerHTML = "📌";
-            pinBtn.title = chat.pinned ? "Unpin Chat" : "Pin Chat";
-            pinBtn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                chat.pinned = !chat.pinned;
-                saveChats();
-                renderHistory();
-            });
-
-            const deleteBtn = document.createElement("button");
-            deleteBtn.type = "button";
-            deleteBtn.className = "history-action-btn delete-btn";
-            deleteBtn.innerHTML = "🗑️";
-            deleteBtn.title = "Delete Chat";
-            deleteBtn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                chats = chats.filter((c) => c.id !== chat.id);
-                if (currentChatId === chat.id) {
-                    currentChatId = chats.length ? chats[0].id : null;
-                }
-                saveChats();
-                ensureChat();
-                renderHistory();
-                renderConversation();
-            });
-
-            actionsDiv.appendChild(pinBtn);
-            actionsDiv.appendChild(deleteBtn);
-
-            item.appendChild(titleSpan);
-            item.appendChild(actionsDiv);
-
-            item.addEventListener("click", () => {
-                currentChatId = chat.id;
-                renderHistory();
-                renderConversation();
-                sidebar?.classList.remove("open");
-            });
-
-            chatHistory.appendChild(item);
-        });
-    }
-
-    openSidebar?.addEventListener("click", () => sidebar?.classList.add("open"));
-    closeSidebar?.addEventListener("click", () => sidebar?.classList.remove("open"));
-
-    newChat?.addEventListener("click", () => {
-        const chat = createChat();
-        chats.unshift(chat);
-        currentChatId = chat.id;
-        attachedFile = null;
-        if (messageInput) {
-            messageInput.value = "";
-            messageInput.placeholder = "Message Viggo AI...";
-        }
-        saveChats();
-        renderHistory();
-        renderConversation();
-        sidebar?.classList.remove("open");
-    });
-
-    searchChat?.addEventListener("input", renderHistory);
-
-    /* SEND MESSAGE WITH CONTEXT MEMORY AND THINKING INDICATOR */
-    async function sendMessage() {
-        const text = messageInput?.value.trim() || "";
-        if (!text && !attachedFile) return;
-
-        const chat = ensureChat();
-        let mediaPayload = null;
-
-        if (attachedFile) {
-            try {
-                const base64 = await fileToDataURL(attachedFile);
-                mediaPayload = { name: attachedFile.name, type: attachedFile.type, data: base64 };
-            } catch (err) {
-                console.error("Error reading file:", err);
-            }
-        }
-
-        chat.messages.push({ role: "user", text, media: mediaPayload });
-
-        if (chat.title === "New Chat" && (text || attachedFile)) {
-            const titleSource = text || attachedFile.name;
-            chat.title = titleSource.length > 25 ? titleSource.substring(0, 25) + "..." : titleSource;
-        }
-
-        if (messageInput) {
-            messageInput.value = "";
-            messageInput.placeholder = "Message Viggo AI...";
-        }
-        attachedFile = null;
-
-        saveChats();
-        renderHistory();
-        renderConversation();
-
-        showThinkingIndicator();
-
-        try {
-            const res = await fetch(API_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    message: text,
-                    history: chat.messages,
-                    language: selectedLanguage 
-                })
-            });
-
-            removeThinkingIndicator();
-
-            if (!res.ok) throw new Error("Server error");
-
-            const data = await res.json();
-            const reply = data.reply || data.message || "I'm here to help!";
-
-            chat.messages.push({ role: "assistant", text: reply, liked: false });
-            saveChats();
-            renderHistory();
-            renderConversation();
-
-            if (speakerEnabled) speakText(reply);
-
-        } catch (err) {
-            removeThinkingIndicator();
-            chat.messages.push({ role: "assistant", text: "Error connecting to server. Please check your network or try again." });
-            saveChats();
-            renderHistory();
-            renderConversation();
-        }
-    }
-
-    sendBtn?.addEventListener("click", sendMessage);
-    messageInput?.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-        }
-    });
-
-    loadChats();
-    ensureChat();
-    renderHistory();
-    renderConversation();
-})();
+}
