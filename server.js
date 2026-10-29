@@ -781,7 +781,7 @@ Return a direct answer to the user.
 
 
             /* =================================================
-               FILE / IMAGE ANALYSIS
+               FILE / IMAGE ANALYSIS (FIXED FOR SDK)
             ================================================= */
 
             if (
@@ -797,65 +797,29 @@ Return a direct answer to the user.
                         ""
                     );
 
-
-                const prompt = `
-
-${getSystemPrompt(
-    language
-)}
-
-The user uploaded an image/file and asked:
-"${message || "Please analyze this image and explain what it is in detail."}"
-
-Analyze the uploaded image carefully and provide a precise, detailed explanation. Do not say that the image is missing or not uploaded.
-`;
-
+                const userPrompt = message || "Please analyze this uploaded image and explain what it is in detail.";
 
                 const response =
                     await ai.models.generateContent({
 
-                        model:
-                            MODEL,
+                        model: MODEL,
 
                         contents: [
-
                             {
-
-                                role:
-                                    "user",
-
-                                parts: [
-
-                                    {
-                                        text:
-                                            prompt
-                                    },
-
-                                    {
-                                        inlineData: {
-
-                                            mimeType:
-                                                uploadedFile.type,
-
-                                            data:
-                                                base64Data
-
-                                        }
-
-                                    }
-
-                                ]
-
+                                inlineData: {
+                                    mimeType: uploadedFile.type,
+                                    data: base64Data
+                                }
+                            },
+                            {
+                                text: `${getSystemPrompt(language)}\n\nUser request: ${userPrompt}\n\nAnalyze this image in detail and answer directly.`
                             }
-
                         ],
 
                         config: {
-
                             tools: [
                                 GOOGLE_SEARCH_TOOL
                             ]
-
                         }
 
                     });
