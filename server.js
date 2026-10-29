@@ -54,7 +54,7 @@ if (API_KEY) {
 
 
 /* =====================================================
-   MIDDLEWARE
+   MIDDLEWARE (INCREASED LIMIT FOR IMAGES)
 ===================================================== */
 
 app.use(
@@ -74,7 +74,14 @@ app.use(
 
 app.use(
     express.json({
-        limit: "50mb"
+        limit: "100mb"
+    })
+);
+
+app.use(
+    express.urlencoded({
+        limit: "100mb",
+        extended: true
     })
 );
 
@@ -432,10 +439,6 @@ function extractText(
     }
 
 
-    /* -----------------------------------------------
-       DIRECT TEXT
-    ----------------------------------------------- */
-
     if (
         typeof response.text ===
         "string"
@@ -445,10 +448,6 @@ function extractText(
 
     }
 
-
-    /* -----------------------------------------------
-       TEXT FUNCTION
-    ----------------------------------------------- */
 
     if (
         typeof response.text ===
@@ -480,10 +479,6 @@ function extractText(
 
     }
 
-
-    /* -----------------------------------------------
-       CANDIDATES
-    ----------------------------------------------- */
 
     try {
 
@@ -590,10 +585,6 @@ function extractSources(
     }
 
 
-    /* -----------------------------------------------
-       REMOVE DUPLICATES
-    ----------------------------------------------- */
-
     const unique =
         sources.filter(
             (source, index, array) =>
@@ -626,7 +617,7 @@ const GOOGLE_SEARCH_TOOL = {
 
 
 /* =====================================================
-   CHAT API (UPDATED TO HANDLE FILE & MEDIA PROPERLY)
+   CHAT API
 ===================================================== */
 
 app.post(
@@ -646,10 +637,6 @@ app.post(
             const uploadedFile = file || media;
 
 
-            /* ---------------------------------------
-               VALIDATION
-            --------------------------------------- */
-
             if (
                 !message &&
                 !uploadedFile
@@ -666,10 +653,6 @@ app.post(
 
             }
 
-
-            /* ---------------------------------------
-               DATE / TIME
-            --------------------------------------- */
 
             if (message && !uploadedFile) {
 
@@ -698,10 +681,6 @@ app.post(
             }
 
 
-            /* ---------------------------------------
-               GEMINI KEY
-            --------------------------------------- */
-
             if (!ai) {
 
                 return res.status(
@@ -717,7 +696,7 @@ app.post(
 
 
             /* =================================================
-               TEXT CHAT + REAL-TIME GOOGLE SEARCH
+               TEXT CHAT
             ================================================= */
 
             if (!uploadedFile) {
@@ -737,9 +716,6 @@ ${String(message)}
 Use Google Search whenever current,
 latest, recent, live, updated, factual,
 or real-world information is needed.
-
-If web information is available,
-prefer current and reliable sources.
 
 Return a direct answer to the user.
 `;
@@ -828,11 +804,10 @@ ${getSystemPrompt(
     language
 )}
 
-The user uploaded an image or file and requested:
+The user uploaded an image/file and asked:
 "${message || "Please analyze this image and explain what it is in detail."}"
 
-Analyze the uploaded file/image carefully and provide a precise, detailed explanation answering the user's request. Do not give a generic prompt asking what they want; directly describe and explain the contents of the uploaded image.
-
+Analyze the uploaded image carefully and provide a precise, detailed explanation. Do not say that the image is missing or not uploaded.
 `;
 
 
@@ -924,10 +899,6 @@ Analyze the uploaded file/image carefully and provide a precise, detailed explan
 
             }
 
-
-            /* ---------------------------------------
-               INVALID FILE
-            --------------------------------------- */
 
             return res.status(
                 400
