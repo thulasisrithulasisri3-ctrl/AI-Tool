@@ -77,12 +77,7 @@
     }
 
     function createChat() {
-        return {
-            id: createId(),
-            title: "New Chat",
-            pinned: false,
-            messages: []
-        };
+        return { id: createId(), title: "New Chat", pinned: false, messages: [] };
     }
 
     function getCurrentChat() {
@@ -100,7 +95,195 @@
         return getCurrentChat() || chats[0];
     }
 
-    /* Sidebar Toggles */
+    /* SPEECH SYNTHESIS (SPEAK / OFF) */
+    function speakText(text) {
+        if (!speakerEnabled || !("speechSynthesis" in window) || !text) return;
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = selectedLanguage;
+        window.speechSynthesis.speak(utterance);
+    }
+
+    function toggleSpeaker(speakerBtn, text) {
+        speakerEnabled = !speakerEnabled;
+        localStorage.setItem("viggoSpeakerEnabled", String(speakerEnabled));
+
+        if (speakerEnabled) {
+            speakerBtn.textContent = "🔊 Speaker ON";
+            speakerBtn.classList.add("speaker-active");
+            speakText(text);
+        } else {
+            speakerBtn.textContent = "🔇 Speaker OFF";
+            speakerBtn.classList.remove("speaker-active");
+            if ("speechSynthesis" in window) {
+                window.speechSynthesis.cancel();
+            }
+        }
+    }
+
+    /* COPY TEXT FUNCTION */
+    async function copyMessageText(text) {
+        try {
+            await navigator.clipboard.writeText(text || "");
+            alert("Copied to clipboard!");
+        } catch (err) {
+            console.error("Failed to copy text:", err);
+        }
+    }
+
+    /* RENDER MESSAGE WITH COPY, LIKE, SPEAKER BUTTONS BELOW CHAT */
+    function addMessageToUI(msg) {
+        if (!conversation) return;
+
+        const role = msg.role === "assistant" ? "assistant" : "user";
+        const wrapper = document.createElement("div");
+        wrapper.className = role === "user" ? "message user" : "message ai";
+
+        const content = document.createElement("div");
+        content.className = "message-content";
+
+        const bubble = document.createElement("div");
+        bubble.className = "message-bubble";
+
+        if (msg.media && msg.media.data && msg.media.type?.startsWith("image/")) {
+            const img = document.createElement("img");
+            img.src = msg.media.data;
+            img.style.maxWidth = "100%";
+            img.style.borderRadius = "10px";
+            img.style.display = "block";
+            bubble.appendChild(img);
+        }
+
+        if (msg.text) {
+            const textEl = document.createElement("div");
+            textEl.textContent = msg.text;
+            if (msg.media) textEl.style.marginTop = "8px";
+            bubble.appendChild(textEl);
+        }
+
+        content.appendChild(bubble);
+
+        /* AI சாட்டுகளுக்கு மட்டும் கீழே Action Buttons (Copy, Like, Speaker) */
+        if (role === "assistant") {
+            const actionsDiv = document.createElement("div");
+            actionsDiv.className = "message-actions";
+
+            // Copy Button
+            const copyBtn = document.createElement("button");
+            copyBtn.type = "button";
+            copyBtn.className = "action-btn";
+            copyBtn.textContent = "📋 Copy";
+            copyBtn.addEventListener("click", () => copyMessageText(msg.text));
+
+            // Like Button
+            const likeBtn = document.createElement("button");
+            likeBtn.type = "button";
+            likeBtn.className = `action-btn ${msg.liked ? "liked" : ""}`;
+            likeBtn.textContent = msg.liked ? "❤️ Liked" : "🤍 Like";
+            likeBtn.addEventListener("click", () => {
+                msg.liked = !msg.liked;
+                saveChats();
+                likeBtn.textContent = msg.liked ? "❤️ Liked" : "🤍 Like";
+                likeBtn.classList.toggle("liked", msg.liked);
+            });
+
+            // Speaker ON/OFF Button
+            const speakerBtn = document.createElement("button");
+            speakerBtn.type = "button";
+            speakerBtn.className = `action-btn ${speakerEnabled ? "speaker-active" : ""}`;
+            speakerBtn.textContent = speakerEnabled ? "🔊 Speaker ON" : "🔇 Speaker OFF";
+            speakerBtn.addEventListener("click", () => toggleSpeaker(speakerBtn, msg.text));
+
+            actionsDiv.appendChild(copyBtn);
+            actionsDiv.appendChild(likeBtn);
+            actionsDiv.appendChild(speakerBtn);
+
+            content.appendChild(actionsDiv);
+        }
+
+        wrapper.appendChild(content);
+        conversation.appendChild(wrapper);
+    }
+
+    function renderConversation() {
+        if (!conversation) return;
+        conversation.innerHTML = "";
+        const chat = getCurrentChat();
+        if (!chat) return;
+        chat.messages.forEach(addMessageToUI);
+        conversation.scrollTop = conversation.scrollHeight;
+    }
+
+    /* RENDER SIDEBAR HISTORY WITH BLACK THEME PIN/DELETE BUTTONS */
+    function renderHistory() {
+        if (!chatHistory) return;
+        chatHistory.innerHTML = "";
+
+        const query = searchChat?.value ? searchChat.value.toLowerCase() : "";
+        const sortedChats = [...chats].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+        const filtered = sortedChats.filter((c) => !query || (c.title && c.title.toLowerCase().includes(query)));
+
+        filtered.forEach((chat) => {
+            const item = document.createElement("div");
+            item.className = `history-item ${chat.id === currentChatId ? "active" : ""}`;
+
+            const titleSpan = document.createElement("span");
+            titleSpan.className = "history-title-text";
+            titleSpan.textContent = (chat.pinned ? "📌 " : "") + (chat.title || "New Chat");
+
+            const actionsDiv = document.createElement("div");
+            actionsDiv.className = "history-actions";
+
+            // Pin Button
+            const pinBtn = document.createElement("button");
+            pinBtn.type = "button";
+            pinBtn.className = `history-action-btn pin-btn ${chat.pinned ? "pinned" : ""}`;
+            pinBtn.innerHTML = "📌";
+            pinBtn.title = chat.pinned ? "Unpin Chat" : "Pin Chat";
+            pinBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                chat.pinned = !chat.pinned;
+                saveChats();
+                renderHistory();
+            });
+
+            // Delete Button
+            const deleteBtn = document.createElement("button");
+            deleteBtn.type = "button";
+            deleteBtn.className = "history-action-btn delete-btn";
+            deleteBtn.innerHTML = "🗑️";
+            deleteBtn.title = "Delete Chat";
+            deleteBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                chats = chats.filter((c) => c.id !== chat.id);
+                if (currentChatId === chat.id) {
+                    currentChatId = chats.length ? chats[0].id : null;
+                }
+                saveChats();
+                ensureChat();
+                renderHistory();
+                renderConversation();
+            });
+
+            actionsDiv.appendChild(pinBtn);
+            actionsDiv.appendChild(deleteBtn);
+
+            item.appendChild(titleSpan);
+            item.appendChild(actionsDiv);
+
+            item.addEventListener("click", () => {
+                currentChatId = chat.id;
+                renderHistory();
+                renderConversation();
+                sidebar?.classList.remove("open");
+            });
+
+            chatHistory.appendChild(item);
+        });
+    }
+
+    /* Sidebar Controls */
     openSidebar?.addEventListener("click", () => sidebar?.classList.add("open"));
     closeSidebar?.addEventListener("click", () => sidebar?.classList.remove("open"));
 
@@ -185,23 +368,6 @@
         });
     }
 
-    /* Speech Synthesis */
-    function speakText(text) {
-        if (!speakerEnabled || !("speechSynthesis" in window) || !text) return;
-        window.speechSynthesis.cancel();
-
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = selectedLanguage;
-        
-        const voices = window.speechSynthesis.getVoices();
-        const matchingVoice = voices.find((v) =>
-            v.lang && v.lang.toLowerCase().startsWith(selectedLanguage.split("-")[0].toLowerCase())
-        );
-        if (matchingVoice) utterance.voice = matchingVoice;
-
-        window.speechSynthesis.speak(utterance);
-    }
-
     /* Speech Recognition */
     function setupSpeechRecognition() {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -246,120 +412,6 @@
             recognition.start();
         }
     });
-
-    /* UI Rendering */
-    function addMessageToUI(msg) {
-        if (!conversation) return;
-
-        const role = msg.role === "assistant" ? "assistant" : "user";
-        const wrapper = document.createElement("div");
-        wrapper.className = role === "user" ? "message user" : "message ai";
-
-        const content = document.createElement("div");
-        content.className = "message-content";
-
-        const bubble = document.createElement("div");
-        bubble.className = "message-bubble";
-
-        if (msg.media && msg.media.data && msg.media.type?.startsWith("image/")) {
-            const img = document.createElement("img");
-            img.src = msg.media.data;
-            img.style.maxWidth = "100%";
-            img.style.borderRadius = "10px";
-            img.style.display = "block";
-            bubble.appendChild(img);
-        }
-
-        if (msg.text) {
-            const textEl = document.createElement("div");
-            textEl.textContent = msg.text;
-            if (msg.media) textEl.style.marginTop = "8px";
-            bubble.appendChild(textEl);
-        }
-
-        content.appendChild(bubble);
-        wrapper.appendChild(content);
-        conversation.appendChild(wrapper);
-    }
-
-    function renderConversation() {
-        if (!conversation) return;
-        conversation.innerHTML = "";
-        const chat = getCurrentChat();
-        if (!chat) return;
-        chat.messages.forEach(addMessageToUI);
-        conversation.scrollTop = conversation.scrollHeight;
-    }
-
-    function renderHistory() {
-        if (!chatHistory) return;
-        chatHistory.innerHTML = "";
-
-        const query = searchChat?.value ? searchChat.value.toLowerCase() : "";
-
-        // Sort: Pinned chats first
-        const sortedChats = [...chats].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
-        const filtered = sortedChats.filter((c) => !query || (c.title && c.title.toLowerCase().includes(query)));
-
-        filtered.forEach((chat) => {
-            const item = document.createElement("div");
-            item.className = `history-item ${chat.id === currentChatId ? "active" : ""}`;
-
-            const titleSpan = document.createElement("span");
-            titleSpan.className = "history-title-text";
-            titleSpan.textContent = (chat.pinned ? "📌 " : "") + (chat.title || "New Chat");
-
-            /* History Action Buttons (Pin & Delete) */
-            const actionsDiv = document.createElement("div");
-            actionsDiv.className = "history-actions";
-
-            const pinBtn = document.createElement("button");
-            pinBtn.type = "button";
-            pinBtn.className = `history-action-btn pin-btn ${chat.pinned ? "pinned" : ""}`;
-            pinBtn.innerHTML = "📌";
-            pinBtn.title = chat.pinned ? "Unpin Chat" : "Pin Chat";
-
-            pinBtn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                chat.pinned = !chat.pinned;
-                saveChats();
-                renderHistory();
-            });
-
-            const deleteBtn = document.createElement("button");
-            deleteBtn.type = "button";
-            deleteBtn.className = "history-action-btn delete-btn";
-            deleteBtn.innerHTML = "🗑️";
-            deleteBtn.title = "Delete Chat";
-
-            deleteBtn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                chats = chats.filter((c) => c.id !== chat.id);
-                if (currentChatId === chat.id) {
-                    currentChatId = chats.length ? chats[0].id : null;
-                }
-                saveChats();
-                ensureChat();
-                renderHistory();
-                renderConversation();
-            });
-
-            actionsDiv.appendChild(pinBtn);
-            actionsDiv.appendChild(deleteBtn);
-
-            item.appendChild(titleSpan);
-            item.appendChild(actionsDiv);
-
-            item.addEventListener("click", () => {
-                currentChatId = chat.id;
-                renderHistory();
-                renderConversation();
-                sidebar?.classList.remove("open");
-            });
-
-            chatHistory.appendChild(item);
-        });
-    }
 
     searchChat?.addEventListener("input", renderHistory);
 
@@ -410,7 +462,7 @@
             const data = await res.json();
             const reply = data.reply || data.message || "I'm here to help!";
 
-            chat.messages.push({ role: "assistant", text: reply });
+            chat.messages.push({ role: "assistant", text: reply, liked: false });
             saveChats();
             renderHistory();
             renderConversation();
