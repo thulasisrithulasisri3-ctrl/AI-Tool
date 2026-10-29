@@ -1,7 +1,6 @@
-/* =====================================================
-   VIGGO AI - FULL CSS
-   BLACK + BLUE THEME
-===================================================== */
+/* =========================================================
+   VIGGO AI - FULL CSS (BLACK + BLUE THEME)
+========================================================= */
 
 * {
     box-sizing: border-box;
@@ -9,8 +8,7 @@
     padding: 0;
 }
 
-html,
-body {
+html, body {
     width: 100%;
     height: 100%;
     overflow: hidden;
@@ -18,15 +16,6 @@ body {
     background: #050505 !important;
     color: #ffffff;
 }
-
-body {
-    min-height: 100vh;
-    background: #050505 !important;
-}
-
-/* =====================================================
-   APP HEIGHT
-===================================================== */
 
 :root {
     --app-height: 100vh;
@@ -41,10 +30,7 @@ body {
     --muted: #999999;
 }
 
-/* =====================================================
-   SIDEBAR
-===================================================== */
-
+/* SIDEBAR */
 .sidebar {
     position: fixed;
     left: 0;
@@ -58,10 +44,6 @@ body {
     z-index: 1000;
     transition: transform 0.25s ease;
 }
-
-/* =====================================================
-   SIDEBAR HEADER
-===================================================== */
 
 .sidebar-header {
     height: 64px;
@@ -92,10 +74,6 @@ body {
     background: #1a1a1a !important;
 }
 
-/* =====================================================
-   NEW CHAT
-===================================================== */
-
 .new-chat {
     margin: 16px;
     height: 46px;
@@ -113,10 +91,6 @@ body {
     background: #0872f9 !important;
 }
 
-/* =====================================================
-   SEARCH
-===================================================== */
-
 .search-box {
     margin: 0 16px 14px;
     height: 42px;
@@ -127,10 +101,6 @@ body {
     background: #111111 !important;
     border: 1px solid #242424;
     border-radius: 10px;
-}
-
-.search-box span {
-    font-size: 16px;
 }
 
 .search-box input {
@@ -147,10 +117,6 @@ body {
     color: #777777;
 }
 
-/* =====================================================
-   HISTORY TITLE
-===================================================== */
-
 .history-title {
     padding: 8px 18px;
     color: #777777;
@@ -159,29 +125,12 @@ body {
     letter-spacing: 1px;
 }
 
-/* =====================================================
-   CHAT HISTORY
-===================================================== */
-
 .chat-history {
     flex: 1;
     overflow-y: auto;
     padding: 5px 10px 15px;
     background: #090909 !important;
 }
-
-.chat-history::-webkit-scrollbar {
-    width: 5px;
-}
-
-.chat-history::-webkit-scrollbar-thumb {
-    background: #333333;
-    border-radius: 10px;
-}
-
-/* =====================================================
-   HISTORY ITEM
-===================================================== */
 
 .history-item {
     width: 100%;
@@ -208,11 +157,7 @@ body {
     border: 1px solid #174d7d;
 }
 
-/* =====================================================
-   HISTORY CHAT TITLE
-===================================================== */
-
-.history-chat-title {
+.history-title-text {
     flex: 1;
     min-width: 0;
     color: #eeeeee;
@@ -221,82 +166,6 @@ body {
     white-space: nowrap;
     text-overflow: ellipsis;
 }
-
-/* =====================================================
-   HISTORY ACTIONS (PIN + DELETE)
-===================================================== */
-
-.history-actions {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    flex: 0 0 auto;
-}
-
-.history-action-btn,
-.history-action-btn.pin-btn,
-.history-action-btn.delete-btn {
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: 0 0 32px;
-    padding: 0;
-    margin: 0;
-    border: 1px solid #24527a !important;
-    border-radius: 8px;
-    background: #0d1c2b !important;
-    background-image: none !important;
-    color: #ffffff;
-    cursor: pointer;
-    font-size: 14px;
-    box-shadow: none !important;
-    outline: none;
-    transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
-}
-
-.history-action-btn.pin-btn {
-    background: #0d1c2b !important;
-    color: #3da0ff !important;
-    border-color: #24527a !important;
-}
-
-.history-action-btn.pin-btn:hover {
-    background: #12395a !important;
-    color: #3da0ff !important;
-    border-color: #1683ff !important;
-}
-
-.history-action-btn.delete-btn {
-    background: #0d1c2b !important;
-    color: #ff6b6b !important;
-    border-color: #24527a !important;
-}
-
-.history-action-btn.delete-btn:hover {
-    background: #291414 !important;
-    color: #ff6b6b !important;
-    border-color: #ff5555 !important;
-}
-
-.history-action-btn:active {
-    transform: scale(0.94);
-}
-
-/* =====================================================
-   SELECT CHAT MODE
-===================================================== */
-
-.history-item.selected {
-    background: #102b49 !important;
-    border: 1px solid #1683ff !important;
-    box-shadow: 0 0 0 1px rgba(22, 131, 255, 0.15);
-}
-
-/* =====================================================
-   SIDEBAR MORE & MENUS
-===================================================== */
 
 .sidebar-more {
     position: relative;
@@ -339,8 +208,7 @@ body {
     z-index: 1200;
 }
 
-.more-menu.show,
-.more-menu.open {
+.more-menu.show, .more-menu.open {
     display: flex;
 }
 
@@ -361,10 +229,7 @@ body {
     background: #1d1d1d !important;
 }
 
-/* =====================================================
-   MAIN & TOPBAR
-===================================================== */
-
+/* MAIN AREA */
 .main {
     position: fixed;
     left: 280px;
@@ -432,10 +297,7 @@ body {
     border-color: #278fff;
 }
 
-/* =====================================================
-   CHAT AREA & MESSAGES
-===================================================== */
-
+/* CHAT CONVERSATION */
 .chat-area {
     flex: 1;
     min-height: 0;
@@ -491,7 +353,6 @@ body {
 .message.user .message-bubble {
     background: #0868d8 !important;
     color: #ffffff;
-    border: none;
     border-bottom-right-radius: 5px;
 }
 
@@ -502,34 +363,7 @@ body {
     border-bottom-left-radius: 5px;
 }
 
-.message-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 7px;
-}
-
-.message-actions button {
-    border: 1px solid #2b2b2b;
-    border-radius: 7px;
-    background: #0d0d0d !important;
-    color: #aaaaaa;
-    padding: 5px 8px;
-    font-size: 11px;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.message-actions button:hover {
-    color: #ffffff;
-    border-color: #167de8;
-    background: #101d2b !important;
-}
-
-/* =====================================================
-   INPUT AREA
-===================================================== */
-
+/* INPUT AREA */
 .input-area {
     position: absolute;
     left: 50%;
@@ -548,7 +382,7 @@ body {
     z-index: 500;
 }
 
-.input-plus {
+.input-plus, .input-icon {
     flex: 0 0 auto;
     width: 42px;
     height: 42px;
@@ -556,12 +390,13 @@ body {
     border-radius: 11px;
     background: #1b1b1b !important;
     color: #ffffff;
-    font-size: 25px;
+    font-size: 18px;
     cursor: pointer;
 }
 
-.input-plus:hover {
-    background: #252525 !important;
+.input-icon.listening {
+    background: #0878ef !important;
+    box-shadow: 0 0 12px rgba(22, 131, 255, 0.6);
 }
 
 #message {
@@ -575,30 +410,11 @@ body {
     background: transparent !important;
     color: #ffffff;
     padding: 10px 7px;
-    font-family: inherit;
     font-size: 15px;
-    line-height: 20px;
 }
 
 #message::placeholder {
     color: #777777;
-}
-
-.input-icon {
-    flex: 0 0 auto;
-    width: 42px;
-    height: 42px;
-    border: none;
-    border-radius: 11px;
-    background: #1a1a1a !important;
-    color: #ffffff;
-    cursor: pointer;
-    font-size: 17px;
-}
-
-.input-icon.active {
-    background: #0a70e8 !important;
-    box-shadow: 0 0 12px rgba(22, 131, 255, 0.55);
 }
 
 .send-btn {
@@ -619,10 +435,7 @@ body {
     transform: scale(1.03);
 }
 
-/* =====================================================
-   PLUS MENU & MODALS
-===================================================== */
-
+/* MENUS & MODALS */
 .plus-menu {
     position: fixed;
     left: calc(50% - 450px);
@@ -638,8 +451,7 @@ body {
     z-index: 1500;
 }
 
-.plus-menu.show,
-.plus-menu.open {
+.plus-menu.show {
     display: flex;
 }
 
@@ -670,8 +482,7 @@ body {
     z-index: 3000;
 }
 
-.modal.show,
-.modal.open {
+.modal.show {
     display: flex;
 }
 
@@ -685,13 +496,45 @@ body {
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.65);
 }
 
-/* =====================================================
-   MEDIA RESPONSIVE QUERIES
-===================================================== */
+.modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 8px;
+    background: transparent !important;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.modal-box select {
+    width: 100%;
+    height: 42px;
+    margin-bottom: 15px;
+    padding: 0 10px;
+    border: 1px solid #303030;
+    border-radius: 9px;
+    background: #080808 !important;
+    color: #ffffff;
+    outline: none;
+}
+
+.modal-button {
+    width: 100%;
+    height: 43px;
+    border: none;
+    border-radius: 9px;
+    background: #0878ef !important;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 14px;
+}
 
 @media (max-width: 768px) {
     .sidebar {
-        width: 280px;
         transform: translateX(-100%);
     }
     .sidebar.open {
@@ -707,5 +550,9 @@ body {
     .input-area {
         width: calc(100% - 16px);
         bottom: 8px;
+    }
+    .plus-menu {
+        left: 8px;
+        bottom: 75px;
     }
 }
