@@ -215,6 +215,7 @@
         });
     });
 
+    /* COMPRESSED FILE TO DATA URL (SERVER TIMEOUT FIX) */
     function fileToDataURL(file) {
         return new Promise((resolve, reject) => {
             if (!file.type.startsWith("image/")) {
@@ -230,14 +231,14 @@
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement("canvas");
-                    const MAX_WIDTH = 800;
+                    const MAX_WIDTH = 600; // Optimized size for Render server safety
                     const scaleSize = MAX_WIDTH / img.width;
                     canvas.width = MAX_WIDTH;
                     canvas.height = img.height * scaleSize;
 
                     const ctx = canvas.getContext("2d");
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    resolve(canvas.toDataURL("image/jpeg", 0.7));
+                    resolve(canvas.toDataURL("image/jpeg", 0.6)); // 60% Quality compression
                 };
                 img.src = e.target.result;
             };
@@ -412,124 +413,4 @@
                 sidebar?.classList.remove("open");
             });
 
-            chatHistory.appendChild(item);
-        });
-    }
-
-    openSidebar?.addEventListener("click", () => sidebar?.classList.add("open"));
-    closeSidebar?.addEventListener("click", () => sidebar?.classList.remove("open"));
-
-    newChat?.addEventListener("click", () => {
-        const chat = createChat();
-        chats.unshift(chat);
-        currentChatId = chat.id;
-        attachedFile = null;
-        if (messageInput) {
-            messageInput.value = "";
-            messageInput.placeholder = "Message Viggo AI...";
-        }
-        saveChats();
-        renderHistory();
-        renderConversation();
-        sidebar?.classList.remove("open");
-    });
-
-    searchChat?.addEventListener("input", renderHistory);
-
-    /* SEND MESSAGE WITH FIXED FILE & MEDIA PAYLOAD */
-    async function sendMessage() {
-        const text = messageInput?.value.trim() || "";
-        if (!text && !attachedFile) return;
-
-        const chat = ensureChat();
-        let mediaPayload = null;
-
-        if (attachedFile) {
-            try {
-                const base64 = await fileToDataURL(attachedFile);
-                mediaPayload = { 
-                    name: attachedFile.name, 
-                    type: attachedFile.type, 
-                    data: base64 
-                };
-            } catch (err) {
-                console.error("Error reading file:", err);
-            }
-        }
-
-        const userMessageText = text || (attachedFile ? `Please analyze this uploaded image (${attachedFile.name}) and give me a detailed explanation about it.` : "");
-
-        chat.messages.push({ role: "user", text: userMessageText, media: mediaPayload });
-
-        if (chat.title === "New Chat" && (text || attachedFile)) {
-            const titleSource = text || attachedFile.name;
-            chat.title = titleSource.length > 25 ? titleSource.substring(0, 25) + "..." : titleSource;
-        }
-
-        if (messageInput) {
-            messageInput.value = "";
-            messageInput.placeholder = "Message Viggo AI...";
-        }
-        
-        attachedFile = null;
-
-        saveChats();
-        renderHistory();
-        renderConversation();
-
-        showThinkingIndicator();
-
-        try {
-            const requestBody = {
-                message: userMessageText,
-                history: chat.messages,
-                language: selectedLanguage,
-                file: mediaPayload,
-                media: mediaPayload
-            };
-
-            const res = await fetch(API_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(requestBody)
-            });
-
-            removeThinkingIndicator();
-
-            if (!res.ok) throw new Error("Server error");
-
-            const data = await res.json();
-            const reply = data.reply || data.message || "I've analyzed your image!";
-
-            chat.messages.push({ role: "assistant", text: reply, liked: false });
-            saveChats();
-            renderHistory();
-            renderConversation();
-
-            if (speakerEnabled) speakText(reply);
-
-        } catch (err) {
-            removeThinkingIndicator();
-            chat.messages.push({ 
-                role: "assistant", 
-                text: "Error connecting to server or processing the image. Please check your network and try again." 
-            });
-            saveChats();
-            renderHistory();
-            renderConversation();
-        }
-    }
-
-    sendBtn?.addEventListener("click", sendMessage);
-    messageInput?.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-        }
-    });
-
-    loadChats();
-    ensureChat();
-    renderHistory();
-    renderConversation();
-})();
+            chatHistory.
