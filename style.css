@@ -1,6 +1,5 @@
 /* =========================================================
-   VIGGO AI - FULL CSS
-   BLACK + BLUE THEME
+   VIGGO AI - FULL CSS (MOBILE & DESKTOP OPTIMIZED)
 ========================================================= */
 
 * {
@@ -12,6 +11,7 @@
 html, body {
     width: 100%;
     height: 100%;
+    height: 100dvh;
     overflow: hidden;
     font-family: Arial, Helvetica, sans-serif;
     background: #050505 !important;
@@ -19,7 +19,7 @@ html, body {
 }
 
 :root {
-    --app-height: 100vh;
+    --app-height: 100dvh;
     --blue: #1683ff;
     --blue-dark: #075fc2;
     --blue-light: #3da0ff;
@@ -329,7 +329,7 @@ html, body {
     width: 100%;
     height: 100%;
     overflow-y: auto;
-    padding: 25px 20px 150px;
+    padding: 20px 16px 120px;
     background: #050505 !important;
 }
 
@@ -383,7 +383,7 @@ html, body {
     border-bottom-left-radius: 5px;
 }
 
-/* CHAT BOTTOM ACTION BUTTONS (COPY, LIKE, SPEAKER) */
+/* CHAT BOTTOM ACTION BUTTONS */
 .message-actions {
     display: flex;
     align-items: center;
@@ -420,7 +420,7 @@ html, body {
     background: #0a1829 !important;
 }
 
-/* THINKING INDICATOR ANIMATION */
+/* THINKING INDICATOR */
 .thinking-bubble {
     background: #111111 !important;
     color: #3da0ff !important;
@@ -451,34 +451,34 @@ html, body {
     100% { opacity: 0.2; }
 }
 
-/* INPUT AREA */
+/* INPUT AREA FIXED */
 .input-area {
     position: absolute;
     left: 50%;
-    bottom: 18px;
+    bottom: max(10px, env(safe-area-inset-bottom));
     transform: translateX(-50%);
-    width: min(900px, calc(100% - 40px));
-    min-height: 58px;
+    width: min(900px, calc(100% - 20px));
+    min-height: 54px;
     display: flex;
     align-items: center;
-    gap: 7px;
-    padding: 8px 9px;
+    gap: 6px;
+    padding: 6px 8px;
     background: #111111 !important;
     border: 1px solid #292929;
-    border-radius: 17px;
-    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
+    border-radius: 16px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
     z-index: 500;
 }
 
 .input-plus, .input-icon {
     flex: 0 0 auto;
-    width: 42px;
-    height: 42px;
+    width: 40px;
+    height: 40px;
     border: none;
-    border-radius: 11px;
+    border-radius: 10px;
     background: #1b1b1b !important;
     color: #ffffff;
-    font-size: 18px;
+    font-size: 17px;
     cursor: pointer;
     transition: 0.2s ease;
 }
@@ -490,42 +490,42 @@ html, body {
 #message {
     flex: 1;
     min-width: 0;
-    min-height: 40px;
-    max-height: 130px;
+    min-height: 38px;
+    max-height: 120px;
     resize: none;
     border: none;
     outline: none;
     background: transparent !important;
     color: #ffffff;
-    padding: 10px 7px;
+    padding: 8px 6px;
     font-size: 15px;
 }
 
 .send-btn {
     flex: 0 0 auto;
-    width: 44px;
-    height: 44px;
+    width: 42px;
+    height: 42px;
     border: none;
-    border-radius: 12px;
+    border-radius: 11px;
     background: #0878ef !important;
     color: #ffffff;
-    font-size: 20px;
+    font-size: 18px;
     cursor: pointer;
 }
 
-/* COLORED & VISIBLE PLUS MENU */
+/* PLUS MENU */
 .plus-menu {
     position: absolute;
     left: 0;
-    bottom: 54px;
-    width: 175px;
+    bottom: 60px;
+    width: 170px;
     display: none;
     flex-direction: column;
-    padding: 8px;
+    padding: 6px;
     background: #121212 !important;
     border: 1px solid #1683ff;
     border-radius: 12px;
-    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.75);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
     z-index: 2500;
 }
 
@@ -535,21 +535,19 @@ html, body {
 
 .plus-menu button {
     width: 100%;
-    min-height: 40px;
+    min-height: 38px;
     border: none;
     border-radius: 8px;
     background: transparent !important;
     color: #ffffff !important;
     text-align: left;
-    padding: 0 12px;
+    padding: 0 10px;
     cursor: pointer;
     font-size: 14px;
-    transition: 0.2s ease;
 }
 
 .plus-menu button:hover {
     background: #1683ff !important;
-    color: #ffffff !important;
 }
 
 .modal {
@@ -623,16 +621,10 @@ html, body {
     .main {
         left: 0;
         width: 100%;
-    }
-    .menu-btn {
-        display: block;
+        height: 100dvh;
     }
     .input-area {
-        width: calc(100% - 16px);
-        bottom: 8px;
-    }
-    .plus-menu {
-        left: 0;
-        bottom: 54px;
+        width: calc(100% - 12px);
+        bottom: max(6px, env(safe-area-inset-bottom));
     }
 }
