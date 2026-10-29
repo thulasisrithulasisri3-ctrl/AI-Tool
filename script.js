@@ -10,66 +10,23 @@
     const newChat = get("newChat");
     const searchChat = get("searchChat");
     const chatHistory = get("chatHistory");
-    const moreBtn = get("moreBtn");
-    const moreMenu = get("moreMenu");
-    const clearChatBtn = get("clearChatBtn");
     const conversation = get("conversation");
 
-    const plusBtn = get("plusBtn");
-    const plusMenu = get("plusMenu");
-    const cameraBtn = get("cameraBtn");
-    const photoBtn = get("photoBtn");
-    const videoBtn = get("videoBtn");
-    const fileBtn = get("fileBtn");
-
-    const cameraInput = get("cameraInput");
-    const photoInput = get("photoInput");
-    const videoInput = get("videoInput");
-    const fileInput = get("fileInput");
-
     const messageInput = get("message");
-    const micBtn = get("mic");
     const sendBtn = get("send");
-
-    /* Modals */
-    const voiceMenuBtn = get("voiceMenuBtn");
-    const voiceModal = get("voiceModal");
-    const closeVoice = get("closeVoice");
-    const voiceSelect = get("voiceSelect");
-    const voiceGender = get("voiceGender");
-    const startVoice = get("startVoice");
-
-    const languageBtn = get("languageBtn");
-    const languageModal = get("languageModal");
-    const closeLanguage = get("closeLanguage");
-    const languageSelect = get("languageSelect");
-    const saveLanguage = get("saveLanguage");
 
     let chats = [];
     let currentChatId = null;
-    let attachedFile = null;
-    let recognition = null;
-    let isListening = false;
-
     let speakerEnabled = localStorage.getItem("viggoSpeakerEnabled") !== "false";
-    let selectedLanguage = localStorage.getItem("viggoLanguage") || "en-IN";
-    let selectedVoice = localStorage.getItem("viggoVoice") || "female";
+    let selectedLanguage = localStorage.getItem("viggoLanguage") || "ta-IN";
 
     function saveChats() {
-        try {
-            localStorage.setItem("viggoChats", JSON.stringify(chats));
-        } catch (e) {
-            console.error("Failed to save chats:", e);
-        }
+        localStorage.setItem("viggoChats", JSON.stringify(chats));
     }
 
     function loadChats() {
-        try {
-            const saved = localStorage.getItem("viggoChats");
-            chats = saved ? JSON.parse(saved) : [];
-        } catch (e) {
-            chats = [];
-        }
+        const saved = localStorage.getItem("viggoChats");
+        chats = saved ? JSON.parse(saved) : [];
     }
 
     function createId() {
@@ -95,11 +52,10 @@
         return getCurrentChat() || chats[0];
     }
 
-    /* SPEECH SYNTHESIS (SPEAK / OFF) */
+    /* SPEECH SYNTHESIS */
     function speakText(text) {
         if (!speakerEnabled || !("speechSynthesis" in window) || !text) return;
         window.speechSynthesis.cancel();
-
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = selectedLanguage;
         window.speechSynthesis.speak(utterance);
@@ -122,7 +78,6 @@
         }
     }
 
-    /* COPY TEXT FUNCTION */
     async function copyMessageText(text) {
         try {
             await navigator.clipboard.writeText(text || "");
@@ -132,7 +87,33 @@
         }
     }
 
-    /* RENDER MESSAGE WITH COPY, LIKE, SPEAKER BUTTONS BELOW CHAT */
+    /* THINKING / LOADING INDICATOR */
+    function showThinkingIndicator() {
+        if (!conversation) return null;
+        const wrapper = document.createElement("div");
+        wrapper.className = "message ai thinking-wrapper";
+        wrapper.id = "thinkingIndicator";
+
+        const content = document.createElement("div");
+        content.className = "message-content";
+
+        const bubble = document.createElement("div");
+        bubble.className = "message-bubble thinking-bubble";
+        bubble.innerHTML = `🤔 Viggo AI is thinking... <span class="dots"><span>.</span><span>.</span><span>.</span></span>`;
+
+        content.appendChild(bubble);
+        wrapper.appendChild(content);
+        conversation.appendChild(wrapper);
+        conversation.scrollTop = conversation.scrollHeight;
+        return wrapper;
+    }
+
+    function removeThinkingIndicator() {
+        const thinking = get("thinkingIndicator");
+        if (thinking) thinking.remove();
+    }
+
+    /* RENDER MESSAGES */
     function addMessageToUI(msg) {
         if (!conversation) return;
 
@@ -145,38 +126,20 @@
 
         const bubble = document.createElement("div");
         bubble.className = "message-bubble";
-
-        if (msg.media && msg.media.data && msg.media.type?.startsWith("image/")) {
-            const img = document.createElement("img");
-            img.src = msg.media.data;
-            img.style.maxWidth = "100%";
-            img.style.borderRadius = "10px";
-            img.style.display = "block";
-            bubble.appendChild(img);
-        }
-
-        if (msg.text) {
-            const textEl = document.createElement("div");
-            textEl.textContent = msg.text;
-            if (msg.media) textEl.style.marginTop = "8px";
-            bubble.appendChild(textEl);
-        }
+        bubble.textContent = msg.text;
 
         content.appendChild(bubble);
 
-        /* AI சாட்டுகளுக்கு மட்டும் கீழே Action Buttons (Copy, Like, Speaker) */
         if (role === "assistant") {
             const actionsDiv = document.createElement("div");
             actionsDiv.className = "message-actions";
 
-            // Copy Button
             const copyBtn = document.createElement("button");
             copyBtn.type = "button";
             copyBtn.className = "action-btn";
             copyBtn.textContent = "📋 Copy";
             copyBtn.addEventListener("click", () => copyMessageText(msg.text));
 
-            // Like Button
             const likeBtn = document.createElement("button");
             likeBtn.type = "button";
             likeBtn.className = `action-btn ${msg.liked ? "liked" : ""}`;
@@ -188,7 +151,6 @@
                 likeBtn.classList.toggle("liked", msg.liked);
             });
 
-            // Speaker ON/OFF Button
             const speakerBtn = document.createElement("button");
             speakerBtn.type = "button";
             speakerBtn.className = `action-btn ${speakerEnabled ? "speaker-active" : ""}`;
@@ -215,7 +177,6 @@
         conversation.scrollTop = conversation.scrollHeight;
     }
 
-    /* RENDER SIDEBAR HISTORY WITH BLACK THEME PIN/DELETE BUTTONS */
     function renderHistory() {
         if (!chatHistory) return;
         chatHistory.innerHTML = "";
@@ -235,7 +196,6 @@
             const actionsDiv = document.createElement("div");
             actionsDiv.className = "history-actions";
 
-            // Pin Button
             const pinBtn = document.createElement("button");
             pinBtn.type = "button";
             pinBtn.className = `history-action-btn pin-btn ${chat.pinned ? "pinned" : ""}`;
@@ -248,7 +208,6 @@
                 renderHistory();
             });
 
-            // Delete Button
             const deleteBtn = document.createElement("button");
             deleteBtn.type = "button";
             deleteBtn.className = "history-action-btn delete-btn";
@@ -283,7 +242,6 @@
         });
     }
 
-    /* Sidebar Controls */
     openSidebar?.addEventListener("click", () => sidebar?.classList.add("open"));
     closeSidebar?.addEventListener("click", () => sidebar?.classList.remove("open"));
 
@@ -291,173 +249,49 @@
         const chat = createChat();
         chats.unshift(chat);
         currentChatId = chat.id;
-        attachedFile = null;
-        if (messageInput) {
-            messageInput.value = "";
-            messageInput.placeholder = "Message Viggo AI...";
-        }
+        if (messageInput) messageInput.value = "";
         saveChats();
         renderHistory();
         renderConversation();
         sidebar?.classList.remove("open");
     });
 
-    moreBtn?.addEventListener("click", (e) => {
-        e.stopPropagation();
-        moreMenu?.classList.toggle("show");
-    });
-
-    plusBtn?.addEventListener("click", (e) => {
-        e.stopPropagation();
-        plusMenu?.classList.toggle("show");
-    });
-
-    document.addEventListener("click", () => {
-        plusMenu?.classList.remove("show");
-        moreMenu?.classList.remove("show");
-    });
-
-    /* Modal Controls */
-    voiceMenuBtn?.addEventListener("click", () => {
-        if (voiceSelect) voiceSelect.value = selectedLanguage;
-        if (voiceGender) voiceGender.value = selectedVoice;
-        voiceModal?.classList.add("show");
-    });
-    closeVoice?.addEventListener("click", () => voiceModal?.classList.remove("show"));
-    startVoice?.addEventListener("click", () => {
-        if (voiceSelect) selectedLanguage = voiceSelect.value;
-        if (voiceGender) selectedVoice = voiceGender.value;
-        localStorage.setItem("viggoLanguage", selectedLanguage);
-        localStorage.setItem("viggoVoice", selectedVoice);
-        voiceModal?.classList.remove("show");
-    });
-
-    languageBtn?.addEventListener("click", () => {
-        if (languageSelect) languageSelect.value = selectedLanguage;
-        languageModal?.classList.add("show");
-    });
-    closeLanguage?.addEventListener("click", () => languageModal?.classList.remove("show"));
-    saveLanguage?.addEventListener("click", () => {
-        if (languageSelect) selectedLanguage = languageSelect.value;
-        localStorage.setItem("viggoLanguage", selectedLanguage);
-        languageModal?.classList.remove("show");
-    });
-
-    /* File Handlers */
-    cameraBtn?.addEventListener("click", () => cameraInput?.click());
-    photoBtn?.addEventListener("click", () => photoInput?.click());
-    videoBtn?.addEventListener("click", () => videoInput?.click());
-    fileBtn?.addEventListener("click", () => fileInput?.click());
-
-    [cameraInput, photoInput, videoInput, fileInput].forEach((input) => {
-        input?.addEventListener("change", () => {
-            attachedFile = input.files?.[0];
-            if (messageInput && attachedFile) {
-                messageInput.placeholder = `Attached: ${attachedFile.name}`;
-            }
-            input.value = "";
-        });
-    });
-
-    function fileToDataURL(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-        });
-    }
-
-    /* Speech Recognition */
-    function setupSpeechRecognition() {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) return;
-
-        recognition = new SpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-
-        recognition.onstart = () => {
-            isListening = true;
-            micBtn?.classList.add("listening");
-        };
-
-        recognition.onresult = (e) => {
-            const transcript = e.results[0][0].transcript;
-            if (messageInput) messageInput.value = transcript;
-        };
-
-        recognition.onerror = () => {
-            isListening = false;
-            micBtn?.classList.remove("listening");
-        };
-
-        recognition.onend = () => {
-            isListening = false;
-            micBtn?.classList.remove("listening");
-        };
-    }
-
-    setupSpeechRecognition();
-
-    micBtn?.addEventListener("click", () => {
-        if (!recognition) {
-            alert("Speech recognition is not supported on this browser.");
-            return;
-        }
-        if (isListening) {
-            recognition.stop();
-        } else {
-            recognition.lang = selectedLanguage;
-            recognition.start();
-        }
-    });
-
-    searchChat?.addEventListener("input", renderHistory);
-
+    /* SEND MESSAGE WITH CONTEXT MEMORY AND THINKING INDICATOR */
     async function sendMessage() {
         const text = messageInput?.value.trim() || "";
-        if (!text && !attachedFile) return;
+        if (!text) return;
 
         const chat = ensureChat();
-        let mediaPayload = null;
+        
+        // User மெசேஜை சேர்த்தல்
+        chat.messages.push({ role: "user", text });
 
-        if (attachedFile) {
-            try {
-                const base64 = await fileToDataURL(attachedFile);
-                mediaPayload = { name: attachedFile.name, type: attachedFile.type, data: base64 };
-            } catch (err) {
-                console.error("Error reading file:", err);
-            }
-        }
-
-        chat.messages.push({ role: "user", text, media: mediaPayload });
         if (chat.title === "New Chat" && text) {
             chat.title = text.length > 25 ? text.substring(0, 25) + "..." : text;
         }
 
-        if (messageInput) {
-            messageInput.value = "";
-            messageInput.placeholder = "Message Viggo AI...";
-        }
-        attachedFile = null;
+        if (messageInput) messageInput.value = "";
 
         saveChats();
         renderHistory();
         renderConversation();
 
+        // Thinking Indicator ஐக் காட்டுதல்
+        showThinkingIndicator();
+
         try {
+            // முந்தைய உரையாடல்கள் அனைத்தையும் Context-ஆக அனுப்புதல்
             const res = await fetch(API_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
+                body: JSON.stringify({ 
                     message: text,
-                    language: selectedLanguage,
-                    voice: selectedVoice
+                    history: chat.messages, // முழு சாட் வரலாறும் சர்வருக்குச் செல்லும்
+                    language: selectedLanguage 
                 })
             });
 
-            if (!res.ok) throw new Error("Server error");
+            removeThinkingIndicator();
 
             const data = await res.json();
             const reply = data.reply || data.message || "I'm here to help!";
@@ -470,10 +304,8 @@
             if (speakerEnabled) speakText(reply);
 
         } catch (err) {
-            chat.messages.push({
-                role: "assistant",
-                text: "Sorry, I couldn't reach the server. Please check your network connection."
-            });
+            removeThinkingIndicator();
+            chat.messages.push({ role: "assistant", text: "Error connecting to server. Please check your network or try again." });
             saveChats();
             renderHistory();
             renderConversation();
@@ -485,15 +317,6 @@
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             sendMessage();
-        }
-    });
-
-    clearChatBtn?.addEventListener("click", () => {
-        const chat = getCurrentChat();
-        if (chat) {
-            chat.messages = [];
-            saveChats();
-            renderConversation();
         }
     });
 
