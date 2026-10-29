@@ -105,7 +105,7 @@
         }
     }
 
-    /* SPEECH RECOGNITION (MIC FIX) */
+    /* SPEECH RECOGNITION (MOBILE MIC SUPPORT) */
     function setupSpeechRecognition() {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SpeechRecognition) {
@@ -119,8 +119,10 @@
 
         recognition.onstart = () => {
             isListening = true;
-            micBtn.style.color = "#1683ff";
-            micBtn.style.background = "#0a1829";
+            if (micBtn) {
+                micBtn.style.color = "#1683ff";
+                micBtn.style.background = "#0a1829";
+            }
         };
 
         recognition.onresult = (e) => {
@@ -131,14 +133,18 @@
         recognition.onerror = (err) => {
             console.error("Speech recognition error", err);
             isListening = false;
-            micBtn.style.color = "#ffffff";
-            micBtn.style.background = "#1b1b1b";
+            if (micBtn) {
+                micBtn.style.color = "#ffffff";
+                micBtn.style.background = "#1b1b1b";
+            }
         };
 
         recognition.onend = () => {
             isListening = false;
-            micBtn.style.color = "#ffffff";
-            micBtn.style.background = "#1b1b1b";
+            if (micBtn) {
+                micBtn.style.color = "#ffffff";
+                micBtn.style.background = "#1b1b1b";
+            }
         };
     }
 
@@ -146,7 +152,7 @@
 
     micBtn?.addEventListener("click", () => {
         if (!recognition) {
-            alert("Microphone voice input is not supported on this browser.");
+            alert("Microphone is not supported on this browser or requires HTTPS.");
             return;
         }
         if (isListening) {
@@ -430,7 +436,7 @@
 
     searchChat?.addEventListener("input", renderHistory);
 
-    /* SEND MESSAGE WITH STABLE CURRENT CHAT CONTEXT */
+    /* SEND MESSAGE WITH PROPER PHOTO ANALYSIS CONTEXT & STABLE CHAT */
     async function sendMessage() {
         const text = messageInput?.value.trim() || "";
         if (!text && !attachedFile) return;
@@ -451,7 +457,9 @@
             }
         }
 
-        chat.messages.push({ role: "user", text: text || "Describe this image/file", media: mediaPayload });
+        const userMessageText = text || (attachedFile ? `Please analyze this uploaded image (${attachedFile.name}) and give me a detailed explanation about it.` : "");
+
+        chat.messages.push({ role: "user", text: userMessageText, media: mediaPayload });
 
         if (chat.title === "New Chat" && (text || attachedFile)) {
             const titleSource = text || attachedFile.name;
@@ -463,7 +471,6 @@
             messageInput.placeholder = "Message Viggo AI...";
         }
         
-        const currentAttachedFile = attachedFile;
         attachedFile = null;
 
         saveChats();
@@ -474,7 +481,7 @@
 
         try {
             const requestBody = {
-                message: text || (currentAttachedFile ? `Please explain this image: ${currentAttachedFile.name}` : ""),
+                message: userMessageText,
                 history: chat.messages,
                 language: selectedLanguage,
                 media: mediaPayload
@@ -491,7 +498,7 @@
             if (!res.ok) throw new Error("Server error");
 
             const data = await res.json();
-            const reply = data.reply || data.message || "I've received your file/photo!";
+            const reply = data.reply || data.message || "I've analyzed your image!";
 
             chat.messages.push({ role: "assistant", text: reply, liked: false });
             saveChats();
@@ -504,7 +511,7 @@
             removeThinkingIndicator();
             chat.messages.push({ 
                 role: "assistant", 
-                text: "Error connecting to server or processing the file. Please check your network and try again." 
+                text: "Error connecting to server or processing the image. Please check your network and try again." 
             });
             saveChats();
             renderHistory();
