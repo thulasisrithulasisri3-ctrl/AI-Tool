@@ -14,6 +14,7 @@
 
     const messageInput = get("message");
     const sendBtn = get("send");
+    const micBtn = get("mic");
 
     /* Plus Menu & File Inputs */
     const plusBtn = get("plusBtn");
@@ -31,6 +32,9 @@
     let chats = [];
     let currentChatId = null;
     let attachedFile = null;
+    let recognition = null;
+    let isListening = false;
+
     let speakerEnabled = localStorage.getItem("viggoSpeakerEnabled") !== "false";
     let selectedLanguage = localStorage.getItem("viggoLanguage") || "ta-IN";
 
@@ -101,6 +105,62 @@
         }
     }
 
+    /* SPEECH RECOGNITION (MIC FIX) */
+    function setupSpeechRecognition() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            console.warn("Speech Recognition not supported in this browser.");
+            return;
+        }
+
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onstart = () => {
+            isListening = true;
+            micBtn.style.color = "#1683ff";
+            micBtn.style.background = "#0a1829";
+        };
+
+        recognition.onresult = (e) => {
+            const transcript = e.results[0][0].transcript;
+            if (messageInput) messageInput.value = transcript;
+        };
+
+        recognition.onerror = (err) => {
+            console.error("Speech recognition error", err);
+            isListening = false;
+            micBtn.style.color = "#ffffff";
+            micBtn.style.background = "#1b1b1b";
+        };
+
+        recognition.onend = () => {
+            isListening = false;
+            micBtn.style.color = "#ffffff";
+            micBtn.style.background = "#1b1b1b";
+        };
+    }
+
+    setupSpeechRecognition();
+
+    micBtn?.addEventListener("click", () => {
+        if (!recognition) {
+            alert("Microphone voice input is not supported on this browser.");
+            return;
+        }
+        if (isListening) {
+            recognition.stop();
+        } else {
+            recognition.lang = selectedLanguage;
+            try {
+                recognition.start();
+            } catch (e) {
+                console.error("Mic start error:", e);
+            }
+        }
+    });
+
     /* PLUS MENU & FILE HANDLERS */
     plusBtn?.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -139,9 +199,11 @@
 
     [cameraInput, photoInput, videoInput, fileInput].forEach((input) => {
         input?.addEventListener("change", () => {
-            attachedFile = input.files?.[0];
-            if (messageInput && attachedFile) {
-                messageInput.placeholder = `Attached: ${attachedFile.name}`;
+            if (input.files && input.files[0]) {
+                attachedFile = input.files[0];
+                if (messageInput) {
+                    messageInput.placeholder = `Attached: ${attachedFile.name}`;
+                }
             }
             input.value = "";
         });
@@ -368,7 +430,7 @@
 
     searchChat?.addEventListener("input", renderHistory);
 
-    /* SEND MESSAGE WITH FILE/PHOTO SUPPORT AND CONTEXT MEMORY */
+    /* SEND MESSAGE WITH STABLE CURRENT CHAT CONTEXT */
     async function sendMessage() {
         const text = messageInput?.value.trim() || "";
         if (!text && !attachedFile) return;
@@ -389,7 +451,7 @@
             }
         }
 
-        chat.messages.push({ role: "user", text, media: mediaPayload });
+        chat.messages.push({ role: "user", text: text || "Describe this image/file", media: mediaPayload });
 
         if (chat.title === "New Chat" && (text || attachedFile)) {
             const titleSource = text || attachedFile.name;
@@ -412,7 +474,7 @@
 
         try {
             const requestBody = {
-                message: text || (currentAttachedFile ? `Uploaded file: ${currentAttachedFile.name}` : ""),
+                message: text || (currentAttachedFile ? `Please explain this image: ${currentAttachedFile.name}` : ""),
                 history: chat.messages,
                 language: selectedLanguage,
                 media: mediaPayload
