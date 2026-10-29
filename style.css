@@ -1,5 +1,6 @@
 /* =========================================================
-   VIGGO AI - FULL CSS (BLACK + BLUE THEME)
+   VIGGO AI - FULL CSS
+   BLACK + BLUE THEME
 ========================================================= */
 
 * {
@@ -113,10 +114,6 @@ html, body {
     font-size: 14px;
 }
 
-.search-box input::placeholder {
-    color: #777777;
-}
-
 .history-title {
     padding: 8px 18px;
     color: #777777;
@@ -132,6 +129,7 @@ html, body {
     background: #090909 !important;
 }
 
+/* HISTORY ITEM & ACTIONS */
 .history-item {
     width: 100%;
     min-height: 46px;
@@ -167,6 +165,64 @@ html, body {
     text-overflow: ellipsis;
 }
 
+/* PIN & DELETE ACTIONS BACKGROUND STYLING */
+.history-actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex: 0 0 auto;
+}
+
+.history-action-btn,
+.history-action-btn.pin-btn,
+.history-action-btn.delete-btn {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #24527a !important;
+    border-radius: 8px;
+    background: #0d1c2b !important;
+    background-image: none !important;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 13px;
+    box-shadow: none !important;
+    outline: none;
+    transition: 0.2s;
+}
+
+.history-action-btn.pin-btn {
+    color: #3da0ff !important;
+    border-color: #24527a !important;
+    background: #0d1c2b !important;
+}
+
+.history-action-btn.pin-btn.pinned {
+    background: #1683ff !important;
+    color: #ffffff !important;
+    border-color: #3da0ff !important;
+}
+
+.history-action-btn.delete-btn {
+    color: #ff6b6b !important;
+    border-color: #24527a !important;
+    background: #0d1c2b !important;
+}
+
+.history-action-btn.pin-btn:hover {
+    background: #12395a !important;
+    border-color: #1683ff !important;
+}
+
+.history-action-btn.delete-btn:hover {
+    background: #291414 !important;
+    border-color: #ff5555 !important;
+    color: #ff6b6b !important;
+}
+
+/* SIDEBAR MORE */
 .sidebar-more {
     position: relative;
     padding: 10px 14px 15px;
@@ -189,10 +245,6 @@ html, body {
     font-size: 14px;
 }
 
-.more-button:hover {
-    background: #181818 !important;
-}
-
 .more-menu {
     position: absolute;
     left: 14px;
@@ -208,7 +260,7 @@ html, body {
     z-index: 1200;
 }
 
-.more-menu.show, .more-menu.open {
+.more-menu.show {
     display: flex;
 }
 
@@ -270,10 +322,6 @@ html, body {
     display: none;
 }
 
-.menu-btn:hover {
-    background: #1b1b1b !important;
-}
-
 .brand {
     font-size: 20px;
     font-weight: 700;
@@ -289,12 +337,6 @@ html, body {
     color: #ffffff;
     cursor: pointer;
     font-size: 14px;
-    transition: 0.2s;
-}
-
-.share-btn:hover {
-    background: #12395a !important;
-    border-color: #278fff;
 }
 
 /* CHAT CONVERSATION */
@@ -394,11 +436,6 @@ html, body {
     cursor: pointer;
 }
 
-.input-icon.listening {
-    background: #0878ef !important;
-    box-shadow: 0 0 12px rgba(22, 131, 255, 0.6);
-}
-
 #message {
     flex: 1;
     min-width: 0;
@@ -413,10 +450,6 @@ html, body {
     font-size: 15px;
 }
 
-#message::placeholder {
-    color: #777777;
-}
-
 .send-btn {
     flex: 0 0 auto;
     width: 44px;
@@ -427,15 +460,8 @@ html, body {
     color: #ffffff;
     font-size: 20px;
     cursor: pointer;
-    transition: 0.2s;
 }
 
-.send-btn:hover {
-    background: #1688ff !important;
-    transform: scale(1.03);
-}
-
-/* MENUS & MODALS */
 .plus-menu {
     position: fixed;
     left: calc(50% - 450px);
