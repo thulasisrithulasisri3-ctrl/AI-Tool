@@ -436,7 +436,7 @@
 
     searchChat?.addEventListener("input", renderHistory);
 
-    /* SEND MESSAGE WITH PROPER PHOTO ANALYSIS CONTEXT & STABLE CHAT */
+    /* SEND MESSAGE WITH FIXED FILE & MEDIA PAYLOAD */
     async function sendMessage() {
         const text = messageInput?.value.trim() || "";
         if (!text && !attachedFile) return;
@@ -484,6 +484,7 @@
                 message: userMessageText,
                 history: chat.messages,
                 language: selectedLanguage,
+                file: mediaPayload,
                 media: mediaPayload
             };
 
